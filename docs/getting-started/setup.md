@@ -199,18 +199,27 @@ Use `GenericModularApi.slnx` for the full skeleton/composition repository. Use t
 Gma.Framework.slnx
 Gma.Modules.Administration.slnx
 Gma.Modules.Auth.slnx
-Gma.Modules.Catalog.slnx
 Gma.Modules.Files.slnx
 Gma.Modules.Notifications.slnx
-Gma.Modules.Ordering.slnx
-Gma.Modules.TaskSamples.slnx
 Gma.Modules.TaskRuntime.slnx
 Gma.Modules.Tenancy.slnx
 ```
 
-Focused framework, reusable-module, and example-module tests are colocated with their future source roots, for example `src/Framework/tests/Gma.Framework.Tests`, `src/Modules/Auth/tests/Gma.Modules.Auth.Tests`, and `src/Modules/Catalog/tests/Catalog.Tests`. Cross-module architecture and integration tests stay under the repository-level `tests/` folder.
+Those root focused solutions are monorepo staging entrypoints: their paths start at `src/Framework` or `src/Modules/<Module>` so the skeleton can validate every package from one checkout. Each package root also has a package-local solution with the same contents but local paths:
 
-Focused module `.slnx` files list only module-owned projects, focused module tests, and the module-owned docs index. They do not list framework projects as solution entries; framework dependencies resolve through `GmaFrameworkRoot` project references so the same module solution can build in the monorepo, an extracted module repo, or a source-submodule application checkout.
+```text
+src/Framework/Gma.Framework.slnx
+src/Modules/Auth/Gma.Modules.Auth.slnx
+src/Modules/Notifications/Gma.Modules.Notifications.slnx
+```
+
+Open the package-local solution when you want to work as if the framework or module were already its own repository. The source-package checker compares each root focused solution with its package-local mirror so they stay aligned instead of becoming another manual list to maintain.
+
+Focused framework and reusable-module tests are colocated with their current monorepo staging roots, for example `src/Framework/tests/Gma.Framework.Tests` and `src/Modules/Auth/tests/Gma.Modules.Auth.Tests`. After extraction, package-owned tests should move to the independent repository root `tests/` folder. Cross-module architecture and integration tests stay under the skeleton repository-level `tests/` folder.
+
+Catalog, Ordering, and TaskSamples are skeleton-owned examples, not reusable GMA source packages. They do not have standalone `.slnx` entrypoints; validate them through `GenericModularApi.slnx` and the skeleton-level test suites.
+
+Focused module `.slnx` files list only module-owned projects, focused module tests, and the module-owned docs index. They do not list framework projects as solution entries; framework dependencies resolve through `GmaFrameworkRoot` project references so the same module solution can build in the monorepo, an extracted module repo, or a source-submodule application checkout. In an extracted repository, the `.slnx`, `docs/`, `tests/`, `eng/`, and `src/` folders should live at the repository root rather than under preserved monorepo parent folders.
 
 To dry-run the source-package boundary in the current monorepo:
 
@@ -232,7 +241,7 @@ To create a local override file:
 
 This copies `Gma.SourceRoots.props.example` to ignored `Gma.SourceRoots.props`. Edit that local file when a production app stores the framework or reusable modules outside the default `src/Framework` and `src/Modules` layout.
 
-For source-split dry runs on Windows, keep sandbox paths short and clone with `core.longpaths=true`. The current extraction proof used a short ignored `.agents\sr\1` root and validated a composition clone whose `src\Framework` and reusable module folders pointed at extracted source repositories.
+For source-split dry runs on Windows, keep sandbox paths short and clone with `core.longpaths=true`. Early extraction proofs used short ignored `.agents` roots and validated composition clones against local source repositories. The final package-repo rehearsal should use flattened package roots such as `gma-framework\src\Gma.Framework.Results` and `gma-module-auth\src\Gma.Modules.Auth.Application`, then mount them into applications at ergonomic paths such as `gma\framework` and `gma\modules\auth`.
 
 Useful source-first helpers:
 

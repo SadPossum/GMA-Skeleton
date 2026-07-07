@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="docs/README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="Gma.Modules.Auth.Admin.Contracts/Gma.Modules.Auth.Admin.Contracts.csproj" />
+    <Project Path="Gma.Modules.Auth.AdminApi/Gma.Modules.Auth.AdminApi.csproj" />
+    <Project Path="Gma.Modules.Auth.AdminCli/Gma.Modules.Auth.AdminCli.csproj" />
+    <Project Path="Gma.Modules.Auth.Api/Gma.Modules.Auth.Api.csproj" />
+    <Project Path="Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj" />
+    <Project Path="Gma.Modules.Auth.Contracts/Gma.Modules.Auth.Contracts.csproj" />
+    <Project Path="Gma.Modules.Auth.Domain/Gma.Modules.Auth.Domain.csproj" />
+    <Project Path="Gma.Modules.Auth.Infrastructure.JwtBearer/Gma.Modules.Auth.Infrastructure.JwtBearer.csproj" />
+    <Project Path="Gma.Modules.Auth.Infrastructure/Gma.Modules.Auth.Infrastructure.csproj" />
+    <Project Path="Gma.Modules.Auth.Persistence.PostgreSqlMigrations/Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj" />
+    <Project Path="Gma.Modules.Auth.Persistence.SqlServerMigrations/Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj" />
+    <Project Path="Gma.Modules.Auth.Persistence/Gma.Modules.Auth.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -14,11 +14,8 @@ if ($FocusedSolutions) {
         'Gma.Framework.slnx',
         'Gma.Modules.Administration.slnx',
         'Gma.Modules.Auth.slnx',
-        'Gma.Modules.Catalog.slnx',
         'Gma.Modules.Files.slnx',
         'Gma.Modules.Notifications.slnx',
-        'Gma.Modules.Ordering.slnx',
-        'Gma.Modules.TaskSamples.slnx',
         'Gma.Modules.TaskRuntime.slnx',
         'Gma.Modules.Tenancy.slnx'
     )

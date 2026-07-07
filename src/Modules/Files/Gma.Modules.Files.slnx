@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="docs/README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="Gma.Modules.Files.Api/Gma.Modules.Files.Api.csproj" />
+    <Project Path="Gma.Modules.Files.Application/Gma.Modules.Files.Application.csproj" />
+    <Project Path="Gma.Modules.Files.Contracts/Gma.Modules.Files.Contracts.csproj" />
+  </Folder>
+</Solution>

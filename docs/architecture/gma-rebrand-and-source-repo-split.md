@@ -88,12 +88,38 @@ Each independent repository still owns its own `.slnx` for standalone work:
 
 ```text
 gma-framework/
+  src/
+    Gma.Framework.Results/
+    Gma.Framework.Cqrs/
+    Gma.Framework.Messaging/
+  tests/
+    Gma.Framework.Tests/
+  docs/
+  eng/
   Gma.Framework.slnx
 
 gma-module-auth/
+  src/
+    Gma.Modules.Auth.Contracts/
+    Gma.Modules.Auth.Domain/
+    Gma.Modules.Auth.Application/
+    Gma.Modules.Auth.Persistence/
+    Gma.Modules.Auth.Api/
+  tests/
+    Gma.Modules.Auth.Tests/
+  docs/
+  eng/
   Gma.Modules.Auth.slnx
 
 gma-module-notifications/
+  src/
+    Gma.Modules.Notifications.Contracts/
+    Gma.Modules.Notifications.Application/
+    Gma.Modules.Notifications.Persistence/
+  tests/
+    Gma.Modules.Notifications.Tests/
+  docs/
+  eng/
   Gma.Modules.Notifications.slnx
 
 my-business-app/
@@ -181,6 +207,23 @@ This avoids one bad tradeoff:
 - no duplicate nested framework submodule per module in production apps;
 - no forced NuGet dependency while framework source is still evolving;
 - no brittle assumption that every clone lives in the same parent folder.
+
+Independent repositories should be flattened around their own product root. The monorepo staging layout can keep `src\Framework\...` and `src\Modules\Auth\...`, but extracted repositories should not keep those parent folders inside themselves. For example, the Auth repository should contain `src\Gma.Modules.Auth.Application\Gma.Modules.Auth.Application.csproj`, not `src\Modules\Auth\Gma.Modules.Auth.Application\Gma.Modules.Auth.Application.csproj`.
+
+In a business app checkout, the submodule folder can be ergonomic even if the remote repository name is longer:
+
+```text
+gma/modules/auth                # checkout of SadPossum/gma-module-auth
+gma/modules/administration      # checkout of SadPossum/gma-module-administration
+```
+
+The corresponding source-root values should point at the flattened package `src` folder:
+
+```xml
+<GmaFrameworkRoot>$(MSBuildThisFileDirectory)gma\framework\src\</GmaFrameworkRoot>
+<GmaModuleAuthRoot>$(MSBuildThisFileDirectory)gma\modules\auth\src\</GmaModuleAuthRoot>
+<GmaModuleAdministrationRoot>$(MSBuildThisFileDirectory)gma\modules\administration\src\</GmaModuleAdministrationRoot>
+```
 
 ## Stage 0: Preflight And Decision Lock
 
@@ -327,7 +370,7 @@ Actions:
 - Rename the all-up solution to the chosen current repo identity if needed, for example `Gma.Skeleton.slnx` or `GenericModularApi.slnx`.
 - Update build/test scripts and docs to use `.slnx`.
 - Update CI references.
-- Remove the legacy `.sln` only after IDE, CLI, and scripts are verified.
+- Remove the legacy `.sln` only after IDE, CLI, and scripts are verified. Done in the current repo after `GenericModularApi.slnx`, focused package `.slnx` files, and architecture checks passed.
 
 Validation:
 
@@ -361,6 +404,13 @@ Gma.Modules.TaskRuntime.slnx
 Gma.Modules.Tenancy.slnx
 ```
 
+Keep two entrypoints per package while the monorepo is still the staging area:
+
+- root focused solutions such as `Gma.Modules.Auth.slnx`, with paths rooted at the skeleton checkout;
+- package-local mirrors such as `src/Modules/Auth/Gma.Modules.Auth.slnx`, with paths local to the future module repository root.
+
+The root focused solutions are convenient for all-up validation from the skeleton. The package-local mirrors are convenient for editing a framework or module in isolation and should move with the package when it becomes its own repository.
+
 Each module `.slnx` should include:
 
 - that module's source projects;
@@ -374,6 +424,8 @@ Each module `.slnx` should not include:
 - example modules;
 - framework projects as solution entries; framework dependencies are resolved through `GmaFrameworkRoot` project references;
 - unrelated reusable modules except through contract-only references if that module truly owns such a dependency.
+
+Catalog, Ordering, and TaskSamples are compiled skeleton examples, not reusable GMA modules. Do not create `Gma.Modules.Catalog.slnx`, `Gma.Modules.Ordering.slnx`, `Gma.Modules.TaskSamples.slnx`, or package-local mirrors for them unless they are deliberately promoted to reusable packages later.
 
 Validation:
 
@@ -483,14 +535,14 @@ Local dry-run result:
 - A first long sandbox path failed on Windows checkout because some generated paths exceeded the default path length limit.
 - The successful history extraction used `git clone -c core.longpaths=true` and the short `.agents\sr\1` root.
 - `gma-framework` restored, built, and passed its focused tests from the extracted repository.
-- Administration, Auth, Files, Notifications, TaskRuntime, Tenancy, and the compiled example modules restored and built from focused package entrypoints against the extracted framework root; package-local focused tests passed where present.
+- Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy restored and built from focused package entrypoints against the extracted framework root; package-local focused tests passed where present. Compiled example modules remained skeleton-owned and were validated through the all-up composition.
 - A local composition clone restored and built the all-up `GenericModularApi.slnx` while `src\Framework` and reusable module folders were directory junctions to the extracted source repositories.
 
 Current source-shape rehearsal result on 2026-07-07:
 
 - The rehearsal used `.agents\sr\3`, `git clone -c core.longpaths=true`, and a working-tree overlay from the active repository.
 - `git filter-repo` was not required for this pass because the goal was source-dependency shape, not history rewriting.
-- Snapshot local source-package directories were created for `gma-framework` plus Administration, Auth, Catalog, Files, Notifications, Ordering, TaskRuntime, TaskSamples, and Tenancy.
+- Snapshot local source-package directories were created for `gma-framework` plus Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy.
 - Each source package restored and built from its own focused `.slnx`.
 - The local composition clone then replaced `src\Framework` and `src\Modules\<Module>` with directory junctions to those source-package directories.
 - After restoring the composition clone to refresh `obj` assets for the junction-backed paths, `.\eng\check-source-packages.ps1 -SkipRestore` and `dotnet build GenericModularApi.slnx --no-restore -m:1` both passed.
@@ -515,8 +567,37 @@ Stage 8B start result on 2026-07-07:
 - `gh` was not installed in the active shell, and no `GITHUB_TOKEN`/`GH_TOKEN` was available, so repository creation could not be performed from this environment.
 - `git ls-remote` returned `Repository not found` for the intended `SadPossum/gma-framework`, reusable module, and `gma-skeleton` repositories, confirming they still need to be created before candidate repos can be pushed.
 - A local submodule proof intentionally checked whether candidate repos could be mounted directly at `src\Framework` and `src\Modules\<Module>`. That does not work because each candidate repository owns its own root files and keeps package code under `src\Framework` or `src\Modules\<Module>` inside the repo.
-- Stage 9 should therefore mount source repositories under stable dependency paths such as `gma\framework` and `gma\modules\<module>`, then update solution paths, source-root defaults, and source-package/architecture guards to consume `gma\framework\src\Framework` and `gma\modules\<module>\src\Modules\<Module>`.
+- Stage 9 should mount source repositories under stable dependency paths such as `gma\framework` and `gma\modules\<module>`, then update solution paths, source-root defaults, and source-package/architecture guards to consume flattened package roots such as `gma\framework\src` and `gma\modules\auth\src`.
 - Do not submodule a candidate repository directly into the old source-package folder unless that repository is intentionally flattened first.
+
+Stage 8C source-root composition proof on 2026-07-07:
+
+- A local-only skeleton rehearsal used `gma\framework` plus repo-named module folders such as `gma\modules\gma-module-auth`.
+- Repo-named module folders worked with the generated module-local `eng\bootstrap-source-roots.ps1`, but this is not the desired final developer experience. Real application checkouts should prefer short aliases such as `gma\modules\auth`; bootstrap scripts must support those aliases explicitly.
+- Each module repository keeps its own `Directory.Build.props`, so a root-level `Gma.SourceRoots.props` in the skeleton does not flow into module-local builds. Run each module repository's `eng\bootstrap-source-roots.ps1` when validating a module checkout outside the monorepo.
+- Host and root test projects now use per-module source-root properties such as `$(GmaModuleAuthRoot)` instead of physical `..\Modules\Auth\...` references.
+- `dotnet restore GenericModularApi.slnx` and `dotnet build GenericModularApi.slnx --no-restore -m:1` passed in the local skeleton rehearsal after `src\Framework` and reusable module folders were removed and replaced by `gma\...` source repositories.
+- `tests\Architecture.Tests` still contains many monorepo file-path probes such as `src\Framework` and `src\Modules\Auth`. In the split skeleton rehearsal the architecture test assembly built, but the tests failed because those probes could not find files that had moved under source repositories.
+- Before Stage 9 can require `dotnet test Gma.Skeleton.slnx`, either move framework/module-specific architecture tests into their owning repositories or make the all-up architecture test helpers resolve `GmaFrameworkRoot` and `GmaModule*Root` source roots.
+
+Stage 8D target: flatten source repositories before real submodules:
+
+- Rebuild local candidate repositories so package roots look like normal repositories:
+  - `gma-framework\src\Gma.Framework.Results\...`
+  - `gma-framework\docs\...`
+  - `gma-framework\tests\Gma.Framework.Tests\...`
+  - `gma-module-auth\src\Gma.Modules.Auth.Application\...`
+  - `gma-module-auth\docs\...`
+  - `gma-module-auth\tests\Gma.Modules.Auth.Tests\...`
+- Do not preserve `src\Framework\...` or `src\Modules\<Module>\...` inside the independent repositories.
+- Mount module repositories in the skeleton under short aliases such as `gma\modules\auth`, while keeping the remote repository names `gma-module-auth`, `gma-module-administration`, and so on.
+- Update root `Gma.SourceRoots.props` for the skeleton rehearsal so module roots point to flattened package `src` folders, for example `gma\modules\auth\src\`.
+- Move or copy architecture tests by ownership:
+  - framework dependency, docs, scaffolder, naming, package-shape, and optional-adapter guards move to the framework repository;
+  - module-specific guards move to the owning module repository;
+  - skeleton tests keep only composition guards, selected-module wiring, physical-path bans, source-root bootstrap checks, and cross-module integration tests.
+- If helper code is duplicated across package test suites, extract a tiny framework-owned test helper project such as `Gma.Framework.ArchitectureTesting` under the framework repository's `tests` folder.
+- Rerun the split skeleton restore/build/test proof only after the test ownership move is complete.
 
 Agent goal:
 
@@ -577,14 +658,18 @@ Create and configure the real GitHub repositories for GMA framework, reusable mo
 
 Goal: turn the skeleton/composition repository into the app-like consumer of the independent source repositories.
 
+Prerequisite: Stage 8D has produced flattened framework/module repositories with root-level `docs/`, `tests/`, `eng/`, and `src/` folders, and package-owned architecture tests have moved or been copied to their owning repositories.
+
 Actions:
 
-- Replace framework source folder with a `gma/framework` submodule.
-- Replace reusable module source folders with `gma/modules/<module>` submodules.
+- Replace framework source folder with a `gma/framework` submodule whose package projects live under `gma/framework/src/`.
+- Replace reusable module source folders with short alias submodules such as `gma/modules/auth`, `gma/modules/administration`, `gma/modules/notifications`, and `gma/modules/files`.
 - Keep skeleton hosts, examples, app-specific docs, and composition tests in the skeleton repo.
 - Update `Gma.Skeleton.slnx` to reference projects from submodule paths.
+- Generate source-root values that point to flattened package roots, for example `$(MSBuildThisFileDirectory)gma\modules\auth\src\`.
 - Update docs so new production apps can copy the skeleton pattern.
 - Ensure module repos do not accidentally include the skeleton's examples or host-specific code.
+- Keep skeleton architecture tests composition-focused; do not require them to inspect framework/module repository internals by physical monorepo paths.
 
 Validation:
 

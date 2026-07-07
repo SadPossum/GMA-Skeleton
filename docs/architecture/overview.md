@@ -10,7 +10,7 @@ The skeleton owns:
 - repository split planning and source-first workflow docs;
 - cross-module, integration, and architecture tests that prove application-level composition.
 
-Reusable docs live beside reusable source:
+Reusable docs live beside reusable source. While this repository is still the monorepo staging area, those links point into the staged framework/module source roots:
 
 - [GMA Framework architecture](../../src/Framework/docs/architecture/overview.md)
 - [GMA Framework documentation index](../../src/Framework/docs/README.md)

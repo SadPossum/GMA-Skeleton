@@ -18,7 +18,7 @@ Do not require Obsidian plugins or `.obsidian` settings.
 
 ## Structure
 
-Documentation is source-owned:
+Documentation is source-owned. In the current monorepo staging layout, source-owned docs live under the staged package source roots:
 
 ```text
 docs/
@@ -40,6 +40,8 @@ src/Modules/<Module>/docs/
 
 Root `docs/` describes the skeleton/template repository and links out to source-owned framework and module documentation. Framework docs describe reusable framework packages, cross-cutting architecture, templates, guidelines, and ADRs. Module docs describe that module only.
 
+When a framework or reusable module is extracted into its own repository, move its docs to that repository's root-level `docs/` folder. Do not preserve monorepo parent folders such as `src/Framework/docs/` or `src/Modules/Auth/docs/` inside the standalone repository.
+
 ## What to Document
 
 Document when a change affects:
@@ -56,7 +58,7 @@ Document when a change affects:
 
 ## Module Docs
 
-Each reusable module should have `src/Modules/<Module>/docs/README.md`.
+Each reusable module should have `src/Modules/<Module>/docs/README.md` while it is staged in this monorepo. In a standalone module repository, the same content should live at `docs/README.md`.
 
 Use [../templates/module.md](../templates/module.md).
 
@@ -102,5 +104,6 @@ Use [../templates/adr.md](../templates/adr.md).
 - Are config keys spelled exactly?
 - Are module boundaries clear?
 - Is the page linked from the owning docs index?
-- If the page belongs to a reusable framework or module package, is it outside root `docs/`?
+- If the page belongs to a reusable framework or module package in this monorepo, is it outside skeleton root `docs/`?
+- If the page belongs to an extracted framework or module repository, is it under that repository's root `docs/`?
 - Is a template needed for repeating this doc shape?

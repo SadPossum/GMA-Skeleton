@@ -43,11 +43,8 @@
     <File Path="Gma.Framework.slnx" />
     <File Path="Gma.Modules.Administration.slnx" />
     <File Path="Gma.Modules.Auth.slnx" />
-    <File Path="Gma.Modules.Catalog.slnx" />
     <File Path="Gma.Modules.Files.slnx" />
     <File Path="Gma.Modules.Notifications.slnx" />
-    <File Path="Gma.Modules.Ordering.slnx" />
-    <File Path="Gma.Modules.TaskSamples.slnx" />
     <File Path="Gma.Modules.TaskRuntime.slnx" />
     <File Path="Gma.Modules.Tenancy.slnx" />
     <File Path="Gma.SourceRoots.props.example" />
