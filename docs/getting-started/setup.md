@@ -5,7 +5,7 @@
 - Windows PowerShell.
 - .NET 10 SDK. The repo pins SDK `10.0.300` in `global.json`.
 - Docker Desktop for SQL Server, PostgreSQL, NATS, Aspire resources, and Docker-backed integration tests.
-- An editor that understands `.sln` files or plain C# projects.
+- An editor that understands `.slnx` files or plain C# projects.
 
 The scripts resolve `dotnet` in this order:
 
@@ -199,13 +199,26 @@ Use `GenericModularApi.slnx` for the full skeleton/composition repository. Use t
 Gma.Framework.slnx
 Gma.Modules.Administration.slnx
 Gma.Modules.Auth.slnx
+Gma.Modules.Catalog.slnx
 Gma.Modules.Files.slnx
 Gma.Modules.Notifications.slnx
+Gma.Modules.Ordering.slnx
+Gma.Modules.TaskSamples.slnx
 Gma.Modules.TaskRuntime.slnx
 Gma.Modules.Tenancy.slnx
 ```
 
-Focused framework and module tests are colocated with their future source roots, for example `src/Framework/tests/Gma.Framework.Tests` and `src/Modules/Auth/tests/Gma.Modules.Auth.Tests`. Cross-module architecture, integration, and example tests stay under the repository-level `tests/` folder.
+Focused framework, reusable-module, and example-module tests are colocated with their future source roots, for example `src/Framework/tests/Gma.Framework.Tests`, `src/Modules/Auth/tests/Gma.Modules.Auth.Tests`, and `src/Modules/Catalog/tests/Catalog.Tests`. Cross-module architecture and integration tests stay under the repository-level `tests/` folder.
+
+Focused module `.slnx` files list only module-owned projects, focused module tests, and the module-owned docs index. They do not list framework projects as solution entries; framework dependencies resolve through `GmaFrameworkRoot` project references so the same module solution can build in the monorepo, an extracted module repo, or a source-submodule application checkout.
+
+To dry-run the source-package boundary in the current monorepo:
+
+```powershell
+.\eng\check-source-packages.ps1 -SkipRestore
+```
+
+The script verifies focused `.slnx` ownership, stale root docs/tests, package-local docs/tests/scripts, and builds every focused package solution. Omit `-SkipRestore` when package references changed.
 
 ## Source-First GMA Development
 
@@ -219,12 +232,15 @@ To create a local override file:
 
 This copies `Gma.SourceRoots.props.example` to ignored `Gma.SourceRoots.props`. Edit that local file when a production app stores the framework or reusable modules outside the default `src/Framework` and `src/Modules` layout.
 
+For source-split dry runs on Windows, keep sandbox paths short and clone with `core.longpaths=true`. The current extraction proof used a short ignored `.agents\sr\1` root and validated a composition clone whose `src\Framework` and reusable module folders pointed at extracted source repositories.
+
 Useful source-first helpers:
 
 ```powershell
 .\eng\gma-status.ps1
 .\eng\gma-update.ps1
+.\eng\check-source-packages.ps1 -SkipRestore
 .\eng\gma-validate.ps1 -FocusedSolutions
 ```
 
-`gma-status` reports dirty working tree and submodule state when submodules exist. `gma-update` is a no-op until `.gitmodules` exists. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.
+`gma-status` reports dirty working tree and submodule state when submodules exist. `gma-update` is a no-op until `.gitmodules` exists. `check-source-packages` validates package-local solution ownership and builds focused packages. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.

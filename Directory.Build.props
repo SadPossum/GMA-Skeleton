@@ -11,9 +11,12 @@
     <GmaModulesRoot Condition="'$(GmaModulesRoot)' == ''">$(GmaRepositoryRoot)src\Modules\</GmaModulesRoot>
     <GmaModuleAdministrationRoot Condition="'$(GmaModuleAdministrationRoot)' == ''">$(GmaModulesRoot)Administration\</GmaModuleAdministrationRoot>
     <GmaModuleAuthRoot Condition="'$(GmaModuleAuthRoot)' == ''">$(GmaModulesRoot)Auth\</GmaModuleAuthRoot>
+    <GmaModuleCatalogRoot Condition="'$(GmaModuleCatalogRoot)' == ''">$(GmaModulesRoot)Catalog\</GmaModuleCatalogRoot>
     <GmaModuleFilesRoot Condition="'$(GmaModuleFilesRoot)' == ''">$(GmaModulesRoot)Files\</GmaModuleFilesRoot>
     <GmaModuleNotificationsRoot Condition="'$(GmaModuleNotificationsRoot)' == ''">$(GmaModulesRoot)Notifications\</GmaModuleNotificationsRoot>
+    <GmaModuleOrderingRoot Condition="'$(GmaModuleOrderingRoot)' == ''">$(GmaModulesRoot)Ordering\</GmaModuleOrderingRoot>
     <GmaModuleTaskRuntimeRoot Condition="'$(GmaModuleTaskRuntimeRoot)' == ''">$(GmaModulesRoot)TaskRuntime\</GmaModuleTaskRuntimeRoot>
+    <GmaModuleTaskSamplesRoot Condition="'$(GmaModuleTaskSamplesRoot)' == ''">$(GmaModulesRoot)TaskSamples\</GmaModuleTaskSamplesRoot>
     <GmaModuleTenancyRoot Condition="'$(GmaModuleTenancyRoot)' == ''">$(GmaModulesRoot)Tenancy\</GmaModuleTenancyRoot>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <TargetFramework>net10.0</TargetFramework>

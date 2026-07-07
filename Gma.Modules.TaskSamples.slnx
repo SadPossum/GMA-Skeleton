@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="src/Modules/TaskSamples/docs/README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Modules/TaskSamples/TaskSamples.Application/TaskSamples.Application.csproj" />
+    <Project Path="src/Modules/TaskSamples/TaskSamples.Contracts/TaskSamples.Contracts.csproj" />
+  </Folder>
+</Solution>

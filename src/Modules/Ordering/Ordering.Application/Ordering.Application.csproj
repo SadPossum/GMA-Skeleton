@@ -3,8 +3,8 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Catalog\Catalog.Contracts\Catalog.Contracts.csproj" />
-    <ProjectReference Include="..\..\Notifications\Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleCatalogRoot)Catalog.Contracts\Catalog.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
     <ProjectReference Include="..\Ordering.Contracts\Ordering.Contracts.csproj" />
     <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Application.Composition\Gma.Framework.Application.Composition.csproj" />

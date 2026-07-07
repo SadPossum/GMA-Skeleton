@@ -1,6 +1,6 @@
 # GMA Rebrand And Source Repo Split Plan
 
-Status: in progress; Stages 1-6 are implemented in the current repository, while local extraction, real GitHub repositories, and submodule replacement remain future work.
+Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, and Stage 8A has local candidate repositories with standalone and composed validation. Real GitHub repositories, history-preserving extraction, and permanent submodule replacement remain future work.
 
 This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
 
@@ -151,10 +151,16 @@ Recommended convention:
 
 ```text
 GmaFrameworkRoot
+GmaModulesRoot
 GmaModuleAuthRoot
 GmaModuleAdministrationRoot
+GmaModuleCatalogRoot
 GmaModuleNotificationsRoot
 GmaModuleFilesRoot
+GmaModuleOrderingRoot
+GmaModuleTaskRuntimeRoot
+GmaModuleTaskSamplesRoot
+GmaModuleTenancyRoot
 ```
 
 Each reusable module repository should import an ignored local source-roots file from its root `Directory.Build.props` if it exists:
@@ -165,6 +171,10 @@ Each reusable module repository should import an ignored local source-roots file
 ```
 
 The checked-in fallback can point to the normal standalone development layout. Application bootstrap scripts can generate ignored `Gma.SourceRoots.props` files inside submodules so Visual Studio, Rider, the .NET CLI, and CI all resolve the same framework root.
+
+When `Gma.SourceRoots.props` uses relative paths, anchor them with `$(MSBuildThisFileDirectory)`. Bare relative values such as `..\..\gma-framework\...` are later consumed by `ProjectReference` items and can be evaluated from the consuming project directory instead of the props file directory.
+
+Cross-module project references must use the per-module root properties, for example `$(GmaModuleCatalogRoot)Catalog.Contracts\Catalog.Contracts.csproj`, not physical sibling paths such as `..\..\Catalog\...`. The physical path works in the current monorepo, but it breaks as soon as a module is checked out as an independent source repository.
 
 This avoids one bad tradeoff:
 
@@ -260,7 +270,7 @@ Actions:
 - Update documentation wording from "shared packages" to "framework packages" where it refers to reusable GMA code.
 - Keep "shared" as a generic concept only when talking about application-owned shared code or .NET shared concepts.
 - Update solution folders and architecture diagrams.
-- Update `eng/new-module.ps1` and other scaffolding docs/scripts to reference `src/Framework`.
+- Keep `src/Framework/eng/new-module.ps1` as the framework-owned scaffolder implementation, with skeleton repositories exposing a thin `eng/new-module.ps1` wrapper that passes their composition root and composition solution filename.
 - Update dependency boundary tests from "Shared" language to "Framework" language.
 
 Validation:
@@ -355,13 +365,14 @@ Each module `.slnx` should include:
 
 - that module's source projects;
 - its focused tests when the module already has a focused test project;
-- required framework projects through project references;
 - any migration projects owned by that module.
+- the module-owned docs index.
 
 Each module `.slnx` should not include:
 
 - application hosts;
 - example modules;
+- framework projects as solution entries; framework dependencies are resolved through `GmaFrameworkRoot` project references;
 - unrelated reusable modules except through contract-only references if that module truly owns such a dependency.
 
 Validation:
@@ -388,7 +399,7 @@ src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj
 Agent goal:
 
 ```text
-Add standalone .slnx entrypoints for the future framework and reusable module repositories while still inside the current monorepo. Each .slnx must include only the projects that future repo owns plus necessary framework dependencies and focused tests. Validate every new solution independently and keep the all-up solution green.
+Add standalone .slnx entrypoints for the future framework and reusable module repositories while still inside the current monorepo. Each .slnx must include only the projects that future repo owns, source-owned docs, plus necessary framework dependencies and focused tests. Validate every new solution independently and keep the all-up solution green.
 ```
 
 ## Stage 6: Source Root And Submodule Development Tooling
@@ -434,12 +445,16 @@ Goal: prove repository extraction from a fresh clone before creating or pushing 
 Actions:
 
 - Work from a fresh clone, not the active working tree.
+- On Windows, keep the dry-run root short, for example `.agents\sr\1`, and clone with `core.longpaths=true`.
+- Install `git-filter-repo` into an ignored local tools folder if it is not available globally.
 - Extract framework history into a local `gma-framework` repository.
 - Extract each reusable module history into local module repositories.
 - Preserve authorship and tags where practical.
 - Keep a rollback branch and do not rewrite the current source repository history.
 - Validate each extracted repository with its own `.slnx`.
-- Validate a local composition app that adds extracted repositories as submodules and builds the all-up app.
+- Validate a local composition app that consumes extracted repositories as source dependencies and builds the all-up app.
+- Keep module `.slnx` files ownership-only: they should list only module-owned projects, focused tests, and the module-owned docs index. Framework dependencies come from `GmaFrameworkRoot`, not from framework projects listed inside the module solution.
+- Run `eng/check-source-packages.ps1` in the composition repository before and after extraction-oriented moves. It verifies focused `.slnx` ownership, stale root docs/tests, package-local docs/tests/scripts, and focused package builds.
 
 Extraction options:
 
@@ -456,7 +471,43 @@ dotnet build Gma.Framework.slnx --no-restore -m:1
 dotnet test Gma.Framework.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
-Repeat for each extracted module repository and the local composition app.
+Repeat for each extracted module repository and the local composition app. In the source monorepo, use this shortcut before a full extraction run:
+
+```powershell
+.\eng\check-source-packages.ps1 -SkipRestore
+```
+
+Local dry-run result:
+
+- A previous history-preserving dry run proved `git filter-repo` when installed into ignored local tooling and run from a short sandbox path.
+- A first long sandbox path failed on Windows checkout because some generated paths exceeded the default path length limit.
+- The successful history extraction used `git clone -c core.longpaths=true` and the short `.agents\sr\1` root.
+- `gma-framework` restored, built, and passed its focused tests from the extracted repository.
+- Administration, Auth, Files, Notifications, TaskRuntime, Tenancy, and the compiled example modules restored and built from focused package entrypoints against the extracted framework root; package-local focused tests passed where present.
+- A local composition clone restored and built the all-up `GenericModularApi.slnx` while `src\Framework` and reusable module folders were directory junctions to the extracted source repositories.
+
+Current source-shape rehearsal result on 2026-07-07:
+
+- The rehearsal used `.agents\sr\3`, `git clone -c core.longpaths=true`, and a working-tree overlay from the active repository.
+- `git filter-repo` was not required for this pass because the goal was source-dependency shape, not history rewriting.
+- Snapshot local source-package directories were created for `gma-framework` plus Administration, Auth, Catalog, Files, Notifications, Ordering, TaskRuntime, TaskSamples, and Tenancy.
+- Each source package restored and built from its own focused `.slnx`.
+- The local composition clone then replaced `src\Framework` and `src\Modules\<Module>` with directory junctions to those source-package directories.
+- After restoring the composition clone to refresh `obj` assets for the junction-backed paths, `.\eng\check-source-packages.ps1 -SkipRestore` and `dotnet build GenericModularApi.slnx --no-restore -m:1` both passed.
+- The rehearsal produced one real repo hardening fix: all modules now have explicit source-root properties, Ordering cross-module project references use `$(GmaModuleCatalogRoot)` and `$(GmaModuleNotificationsRoot)`, and architecture tests reject physical cross-module project references.
+
+Stage 8A local candidate result on 2026-07-07:
+
+- The run used `.agents\stage8a\1`; all generated repositories and composition clones are ignored local artifacts.
+- `git filter-repo` was not available in the active shell, so this pass intentionally used snapshot import commits instead of history-preserving extraction.
+- Local repositories were created for `gma-framework`, `gma-module-administration`, `gma-module-auth`, `gma-module-files`, `gma-module-notifications`, and `gma-module-task-runtime`.
+- Each local repository has `main` and `dev` branches pointing to the validated import commit, plus repo-local `README.md`, `.github\workflows\ci.yml`, and `eng\validate.ps1`.
+- Module repositories also include `eng\bootstrap-source-roots.ps1` so CI or a local consumer can point them at a sibling framework checkout and optional sibling module checkout root.
+- Each candidate repository restored, built, and ran its focused tests through `.\eng\validate.ps1`.
+- The sandbox composition under `.agents\stage8a\1\composition` replaced `src\Framework` plus the reusable module folders with directory junctions to those candidate repositories.
+- The sandbox composition passed `dotnet restore GenericModularApi.slnx`, `.\eng\check-source-packages.ps1 -SkipRestore -SkipBuild`, `dotnet build GenericModularApi.slnx --no-restore -m:1`, and `dotnet test tests\Architecture.Tests\Architecture.Tests.csproj --no-build --logger "console;verbosity=minimal"`.
+- The candidate CI workflow is a draft. It checks out framework source for module builds; if a reusable module later depends on another reusable module's contracts, that module CI should also check out the needed sibling module repository and pass `-ModuleReposRoot` to `eng\bootstrap-source-roots.ps1`.
+- Stage 8B should repeat this with real GitHub repositories and either `git filter-repo`/`git subtree split` history extraction or an explicit initial-import decision per repository.
 
 Agent goal:
 
@@ -476,6 +527,7 @@ SadPossum/gma-module-auth
 SadPossum/gma-module-administration
 SadPossum/gma-module-notifications
 SadPossum/gma-module-files
+SadPossum/gma-module-task-runtime
 SadPossum/gma-skeleton
 ```
 

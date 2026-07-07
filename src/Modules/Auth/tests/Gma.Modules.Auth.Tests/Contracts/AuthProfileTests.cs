@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using Gma.Framework.ModuleComposition;
 using Gma.Framework.Tenancy;
 using Gma.Framework.Tenancy.Infrastructure;
-using Gma.Modules.Tenancy.Contracts;
 using Xunit;
 
 [Trait("Category", "Unit")]
@@ -77,7 +76,7 @@ public sealed class AuthProfileTests
         ModuleCompositionValidationResult result = ModuleCompositionValidator.Validate(new ModuleCompositionSnapshot(
             selectedProfiles:
             [
-                new SelectedModuleProfile(TenancyProfiles.Default),
+                new SelectedModuleProfile(CreateTenantContextProfile()),
                 new SelectedModuleProfile(profile.Descriptor)
             ]));
 
@@ -87,9 +86,20 @@ public sealed class AuthProfileTests
     [Fact]
     public void Tenancy_profile_advertises_header_resolution_separately_from_context()
     {
-        Assert.Contains(TenancyProfiles.Default.Provides, feature => feature.Id == TenancyCompositionFeatures.Context);
-        Assert.Contains(TenancyProfiles.Default.Provides, feature => feature.Id == TenancyCompositionFeatures.HeaderResolution);
+        ModuleProfileDescriptor profile = CreateTenantContextProfile();
+
+        Assert.Contains(profile.Provides, feature => feature.Id == TenancyCompositionFeatures.Context);
+        Assert.Contains(profile.Provides, feature => feature.Id == TenancyCompositionFeatures.HeaderResolution);
     }
+
+    private static ModuleProfileDescriptor CreateTenantContextProfile() => new(
+        "test-tenancy",
+        "default",
+        provides:
+        [
+            TenancyCompositionFeatures.ContextProvided("test-tenancy/default"),
+            TenancyCompositionFeatures.HeaderResolutionProvided("test-tenancy/default")
+        ]);
 
     private static IEnumerable<KeyValuePair<string, string?>> CreateValidAuthConfiguration() =>
     [

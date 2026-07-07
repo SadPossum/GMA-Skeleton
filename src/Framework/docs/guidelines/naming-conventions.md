@@ -322,11 +322,14 @@ Register_login_refresh_and_sign_out_runs_against_sql_server_and_postgre_sql
 
 ## Scripts
 
-Scripts live in `eng/` and use kebab-case:
+Skeleton composition scripts live in root `eng/` and use kebab-case:
 
 ```text
 test-fast.ps1
 test-docker.ps1
 add-migration.ps1
+check-source-packages.ps1
 new-module.ps1
 ```
+
+Framework-owned scripts live under `src/Framework/eng/`. The root `eng/new-module.ps1` script is a convenience wrapper around `src/Framework/eng/new-module.ps1`.

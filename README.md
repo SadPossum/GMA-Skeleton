@@ -87,16 +87,17 @@ Useful entry points:
 
 - [Setup](docs/getting-started/setup.md)
 - [Architecture Overview](docs/architecture/overview.md)
-- [Module System](docs/architecture/module-system.md)
-- [Administration](docs/architecture/administration.md)
-- [Messaging and Outbox](docs/architecture/messaging-and-outbox.md)
-- [Tasks and Daemons](docs/architecture/tasks-and-daemons.md)
-- [Auth Module](docs/modules/auth.md)
-- [Administration Module](docs/modules/administration.md)
-- [Tenancy Module](docs/modules/tenancy.md)
-- [Naming Conventions](docs/guidelines/naming-conventions.md)
-- [Development Guidelines](docs/guidelines/development-guidelines.md)
-- [Documentation Guidelines](docs/guidelines/documentation-guidelines.md)
+- [GMA Framework Docs](src/Framework/docs/README.md)
+- [Module System](src/Framework/docs/architecture/module-system.md)
+- [Administration Architecture](src/Framework/docs/architecture/administration.md)
+- [Messaging and Outbox](src/Framework/docs/architecture/messaging-and-outbox.md)
+- [Tasks and Daemons](src/Framework/docs/architecture/tasks-and-daemons.md)
+- [Auth Module](src/Modules/Auth/docs/README.md)
+- [Administration Module](src/Modules/Administration/docs/README.md)
+- [Tenancy Module](src/Modules/Tenancy/docs/README.md)
+- [Naming Conventions](src/Framework/docs/guidelines/naming-conventions.md)
+- [Development Guidelines](src/Framework/docs/guidelines/development-guidelines.md)
+- [Documentation Guidelines](src/Framework/docs/guidelines/documentation-guidelines.md)
 
 ## Request Examples
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\Catalog\Catalog.Contracts\Catalog.Contracts.csproj" />
-    <ProjectReference Include="..\..\Notifications\Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleCatalogRoot)Catalog.Contracts\Catalog.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging\Gma.Framework.Messaging.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Modules\Gma.Framework.Modules.csproj" />

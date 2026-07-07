@@ -16,18 +16,26 @@ The docs should be easy to read in common developer tools and should not depend 
 
 ## Decision
 
-Use plain Markdown under `docs/` with this structure:
+Use plain Markdown, with documentation owned by the source root it describes.
 
 ```text
 docs/
   README.md
   getting-started/
   architecture/
-  modules/
+
+src/Framework/docs/
+  README.md
+  architecture/
   guidelines/
   templates/
   adr/
+
+src/Modules/<Module>/docs/
+  README.md
 ```
+
+The root `docs/` tree is for the skeleton/template repository: local setup, host composition, example workflows, and source-split planning. Framework behavior, reusable templates, ADRs, and framework guidelines live under `src/Framework/docs/`. Reusable module behavior lives under `src/Modules/<Module>/docs/`.
 
 The docs are compatible with Obsidian, but the repo does not commit `.obsidian` configuration or plugin requirements.
 
@@ -37,7 +45,7 @@ Positive:
 
 - works in GitHub, IDEs, and Obsidian;
 - keeps docs versioned with code;
-- keeps architecture and module docs easy to find;
+- keeps framework and module docs beside their source;
 - supports repeatable templates for new modules and decisions.
 
 Negative:

@@ -368,12 +368,12 @@ Use Docker-backed tests only where a real broker or provider behavior matters. K
 Update:
 
 - `docs/README.md`;
-- `docs/architecture/messaging-and-outbox.md`;
-- `docs/architecture/messaging-consumers.md`;
-- `docs/architecture/tasks-and-daemons.md`;
-- `docs/guidelines/deployment-guidelines.md`;
+- `src/Framework/docs/architecture/messaging-and-outbox.md`;
+- `src/Framework/docs/architecture/messaging-consumers.md`;
+- `src/Framework/docs/architecture/tasks-and-daemons.md`;
+- `src/Framework/docs/guidelines/deployment-guidelines.md`;
 - `docs/getting-started/setup.md`;
-- `docs/architecture/production-readiness-backlog.md`.
+- `src/Framework/docs/architecture/production-readiness-backlog.md`.
 
 Docs must clearly explain:
 

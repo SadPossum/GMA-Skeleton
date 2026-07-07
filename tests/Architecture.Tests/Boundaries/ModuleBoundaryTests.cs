@@ -81,6 +81,28 @@ public sealed class ModuleBoundaryTests
     }
 
     [Fact]
+    public void Cross_module_project_references_use_source_root_properties()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
+        string[] moduleNames = Directory
+            .EnumerateDirectories(modulesRoot)
+            .Select(Path.GetFileName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name!)
+            .ToArray();
+
+        string[] offenders = Directory
+            .EnumerateFiles(modulesRoot, "*.csproj", SearchOption.AllDirectories)
+            .Where(path => !HasIgnoredPathSegment(path))
+            .SelectMany(path => FindPhysicalCrossModuleReferences(repositoryRoot, modulesRoot, moduleNames, path))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
     public void Modules_do_not_depend_on_observability_backends()
     {
         string[] backendPrefixes = ["OpenTelemetry", "Prometheus", "Serilog.Sinks.Grafana.Loki"];
@@ -611,6 +633,33 @@ public sealed class ModuleBoundaryTests
                type.GetGenericArguments().Any(ContainsForbiddenQuerySideEffectDependency);
     }
 
+    private static IEnumerable<string> FindPhysicalCrossModuleReferences(
+        string repositoryRoot,
+        string modulesRoot,
+        string[] moduleNames,
+        string projectPath)
+    {
+        string currentModule = Path.GetRelativePath(modulesRoot, projectPath)
+            .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[0];
+        string source = File.ReadAllText(projectPath);
+
+        foreach (string moduleName in moduleNames.Where(name => !string.Equals(name, currentModule, StringComparison.Ordinal)))
+        {
+            string physicalSiblingReference = $@"..\..\{moduleName}\";
+            string moduleRootReference = $@"$(GmaModulesRoot){moduleName}\";
+
+            if (source.Contains(physicalSiblingReference, StringComparison.OrdinalIgnoreCase))
+            {
+                yield return $"{Path.GetRelativePath(repositoryRoot, projectPath)} uses {physicalSiblingReference}";
+            }
+
+            if (source.Contains(moduleRootReference, StringComparison.OrdinalIgnoreCase))
+            {
+                yield return $"{Path.GetRelativePath(repositoryRoot, projectPath)} uses {moduleRootReference}";
+            }
+        }
+    }
+
     private static bool HasIgnoredPathSegment(string path)
     {
         string[] segments = path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
@@ -624,7 +673,7 @@ public sealed class ModuleBoundaryTests
 
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "GenericModularApi.sln")))
+            if (File.Exists(Path.Combine(directory.FullName, "GenericModularApi.slnx")))
             {
                 return directory.FullName;
             }

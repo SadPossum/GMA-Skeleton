@@ -1,6 +1,11 @@
-<Solution>
-  <Folder Name="/src/" />
-  <Folder Name="/src/Framework/">
+﻿<Solution>
+  <Folder Name="/docs/">
+    <File Path="src/Framework/docs/README.md" />
+  </Folder>
+  <Folder Name="/eng/">
+    <File Path="src/Framework/eng/new-module.ps1" />
+  </Folder>
+  <Folder Name="/src/">
     <Project Path="src/Framework/Gma.Framework.AccessControl/Gma.Framework.AccessControl.csproj" />
     <Project Path="src/Framework/Gma.Framework.Administration.Api/Gma.Framework.Administration.Api.csproj" />
     <Project Path="src/Framework/Gma.Framework.Administration.Cli/Gma.Framework.Administration.Cli.csproj" />

@@ -1,97 +1,36 @@
-# GenericModularApi Documentation
+# GenericModularApi Skeleton Documentation
 
-This documentation is plain Markdown so it works in GitHub, Visual Studio, Rider, VS Code, and Obsidian. It uses an index-first structure rather than tool-specific vault configuration.
+This folder documents the skeleton/composition repository: how to run it, how it composes selected GMA source dependencies, and how the included example modules demonstrate application-level patterns.
+
+Reusable framework and module documentation lives with the source that owns it:
+
+- [GMA Framework Docs](../src/Framework/docs/README.md)
+- [Administration Module](../src/Modules/Administration/docs/README.md)
+- [Auth Module](../src/Modules/Auth/docs/README.md)
+- [Files Module](../src/Modules/Files/docs/README.md)
+- [Notifications Module](../src/Modules/Notifications/docs/README.md)
+- [TaskRuntime Module](../src/Modules/TaskRuntime/docs/README.md)
+- [Tenancy Module](../src/Modules/Tenancy/docs/README.md)
 
 ## Start Here
 
 - [Setup](getting-started/setup.md)
 - [Local Development](getting-started/local-development.md)
-- [Architecture Overview](architecture/overview.md)
-- [Development Guidelines](guidelines/development-guidelines.md)
-
-## Architecture
-
-- [Architecture Overview](architecture/overview.md)
+- [Skeleton Overview](architecture/overview.md)
 - [GMA Rebrand And Source Repo Split Plan](architecture/gma-rebrand-and-source-repo-split.md)
-- [Module System](architecture/module-system.md)
-- [Module Composition Features And Profiles Task](architecture/module-composition-features-task.md)
-- [CQRS and Domain Events](architecture/cqrs-and-domain-events.md)
-- [Persistence and Tenancy](architecture/persistence-and-tenancy.md)
-- [Metadata Attribute Pipeline Refactor Task](architecture/metadata-attribute-pipeline-task.md)
-- [Messaging and Outbox](architecture/messaging-and-outbox.md)
-- [Messaging Consumers](architecture/messaging-consumers.md)
-- [Background Worker Host Task](architecture/background-worker-host-task.md)
-- [File Management](architecture/file-management.md)
-- [Tasks and Daemons](architecture/tasks-and-daemons.md)
-- [Notifications and Streaming](architecture/notifications-and-streaming.md)
-- [Module Descriptor Builder Refactor Notes](architecture/module-descriptor-builder-refactor-notes.md)
-- [Metadata Attributes Refactor Notes](architecture/metadata-attributes-refactor-notes.md)
-- [Shared Dependency Boundary Refactor Notes](architecture/shared-dependency-boundary-refactor-notes.md)
-- [Observability](architecture/observability.md)
-- [Caching](architecture/caching.md)
-- [Administration](architecture/administration.md)
-- [Shared Access Policy Foundation](architecture/shared-access-policy-foundation.md)
-- [Scoped Resource Access](architecture/scoped-resource-access.md)
-- [Shared Access Policy Implementation Notes](architecture/shared-access-policy-implementation-notes.md)
-- [Projection Rebuild Tasks](architecture/projection-rebuild-tasks.md)
-- [Projection Rebuild Implementation Notes](architecture/projection-rebuild-implementation-notes.md)
-- [Notifications and Streaming Implementation Notes](architecture/notifications-streaming-implementation-notes.md)
-- [Semantic Enum Refactor Notes](architecture/semantic-enum-refactor-notes.md)
-- [Tenant Model Conventions Task](architecture/tenant-model-conventions-task.md)
-- [Tenant Model Conventions Implementation Notes](architecture/tenant-model-conventions-implementation-notes.md)
-- [Production Readiness Backlog](architecture/production-readiness-backlog.md)
-- [Architecture Hardening Notes](architecture/audit-hardening-notes.md)
-- [Architecture Audit Follow-Up Notes](architecture/audit-follow-up-notes.md)
-
-## Existing Modules
-
-- [Auth Module](modules/auth.md)
-- [Tenancy Module](modules/tenancy.md)
-- [Administration Module](modules/administration.md)
-- [Files Module](modules/files.md)
-- [Notifications Module](modules/notifications.md)
-- [TaskRuntime Module](modules/task-runtime.md)
 
 ## Examples
 
-- [Catalog Example Module](examples/catalog-module.md)
-- [Ordering Example Module](examples/ordering-module.md)
+- [Catalog Example Module](../src/Modules/Catalog/docs/README.md)
+- [Ordering Example Module](../src/Modules/Ordering/docs/README.md)
 - [Cross-Module Integration](examples/cross-module-integration.md)
-- [TaskSamples Example Module](examples/task-samples-module.md)
+- [TaskSamples Example Module](../src/Modules/TaskSamples/docs/README.md)
 
-## Guidelines
+## Ownership
 
-- [Naming Conventions](guidelines/naming-conventions.md)
-- [Development Guidelines](guidelines/development-guidelines.md)
-- [Testing Guidelines](guidelines/testing-guidelines.md)
-- [Deployment Guidelines](guidelines/deployment-guidelines.md)
-- [Documentation Guidelines](guidelines/documentation-guidelines.md)
-
-## Templates
-
-- [Module Documentation Template](templates/module.md)
-- [ADR Template](templates/adr.md)
-- [Integration Event Template](templates/integration-event.md)
-- [Endpoint Template](templates/endpoint.md)
-
-## ADRs
-
-- [0001 Documentation Structure](adr/0001-documentation-structure.md)
-- [0002 Explicit Optional Caching](adr/0002-explicit-optional-caching.md)
-- [0003 Optional Administration CLI](adr/0003-optional-administration-cli.md)
-- [0004 Optional Administration API](adr/0004-optional-administration-api.md)
-- [0005 NATS Consumers and Cross-Module Data Ownership](adr/0005-nats-consumers-and-cross-module-data-ownership.md)
-- [0006 Constrained Application Service Registration](adr/0006-constrained-application-service-registration.md)
-- [0007 Shared CQRS Validation Contracts](adr/0007-shared-cqrs-validation-contracts.md)
-- [0008 Optional Tasks and Daemons Foundation](adr/0008-optional-tasks-and-daemons-foundation.md)
-- [0009 Configurable Application Identity](adr/0009-configurable-application-identity.md)
-- [0010 Projection Rebuild Tasks](adr/0010-projection-rebuild-tasks.md)
-- [0011 Optional User Notifications and Streaming](adr/0011-optional-user-notifications-and-streaming.md)
-- [0012 Optional Notifications Module](adr/0012-optional-notifications-module.md)
-
-## Documentation Rules
-
-- Keep docs close to implementation reality.
-- Prefer short, linked pages over one huge document.
-- Update module docs in the same change that changes module behavior.
-- Use templates for new modules, ADRs, events, and endpoints.
+- Keep skeleton docs in `docs/`.
+- Keep reusable framework docs in `src/Framework/docs/`.
+- Keep reusable module docs in `src/Modules/<Module>/docs/`.
+- Keep example-module docs in the example module folder.
+- Keep focused framework/module tests beside the owning source root.
+- Keep cross-module architecture and integration tests in the skeleton-level `tests/` folder.

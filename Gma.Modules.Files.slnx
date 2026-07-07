@@ -1,24 +1,8 @@
 <Solution>
-  <Folder Name="/src/" />
-  <Folder Name="/src/Framework/">
-    <Project Path="src/Framework/Gma.Framework.AccessControl/Gma.Framework.AccessControl.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Api/Gma.Framework.Api.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Application.Composition/Gma.Framework.Application.Composition.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Application.Events/Gma.Framework.Application.Events.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Cqrs/Gma.Framework.Cqrs.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Domain/Gma.Framework.Domain.csproj" />
-    <Project Path="src/Framework/Gma.Framework.FileManagement/Gma.Framework.FileManagement.csproj" />
-    <Project Path="src/Framework/Gma.Framework.ModuleComposition/Gma.Framework.ModuleComposition.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Modules/Gma.Framework.Modules.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Naming/Gma.Framework.Naming.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Numerics/Gma.Framework.Numerics.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Results/Gma.Framework.Results.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Runtime/Gma.Framework.Runtime.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Security/Gma.Framework.Security.csproj" />
-    <Project Path="src/Framework/Gma.Framework.Tenancy/Gma.Framework.Tenancy.csproj" />
+  <Folder Name="/docs/">
+    <File Path="src/Modules/Files/docs/README.md" />
   </Folder>
-  <Folder Name="/src/Modules/" />
-  <Folder Name="/src/Modules/Files/">
+  <Folder Name="/src/">
     <Project Path="src/Modules/Files/Gma.Modules.Files.Api/Gma.Modules.Files.Api.csproj" />
     <Project Path="src/Modules/Files/Gma.Modules.Files.Application/Gma.Modules.Files.Application.csproj" />
     <Project Path="src/Modules/Files/Gma.Modules.Files.Contracts/Gma.Modules.Files.Contracts.csproj" />

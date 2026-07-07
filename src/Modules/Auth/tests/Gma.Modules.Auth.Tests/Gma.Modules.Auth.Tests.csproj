@@ -18,7 +18,6 @@
     <ProjectReference Include="..\..\Gma.Modules.Auth.Domain\Gma.Modules.Auth.Domain.csproj" />
     <ProjectReference Include="..\..\Gma.Modules.Auth.Infrastructure\Gma.Modules.Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Gma.Modules.Auth.Persistence\Gma.Modules.Auth.Persistence.csproj" />
-    <ProjectReference Include="..\..\..\Tenancy\Gma.Modules.Tenancy.Contracts\Gma.Modules.Tenancy.Contracts.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Domain\Gma.Framework.Domain.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />

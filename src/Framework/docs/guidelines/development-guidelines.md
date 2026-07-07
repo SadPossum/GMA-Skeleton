@@ -132,7 +132,7 @@ Then manually decide:
 
 Optional modules must be explicit host decisions.
 
-`eng/new-module.ps1` scaffolds the current project shape, module metadata, and optional persistence/admin/cache/inbox/outbox shells. It still does not invent domain behavior, aggregate models, commands, queries, or host registration decisions. Use the compiled Catalog and Ordering examples as the richer reference for stored entities, admin surfaces, cache keys/tags, provider migrations, integration events, inbound subscriptions, and cross-module projections.
+`src/Framework/eng/new-module.ps1` is the framework-owned scaffolder implementation. The skeleton-level `eng/new-module.ps1` wrapper delegates to it and supplies the composition repository root plus the composition solution filename. The scaffolder creates the current project shape, module metadata, and optional persistence/admin/cache/inbox/outbox shells. It still does not invent domain behavior, aggregate models, commands, queries, or host registration decisions. Use the compiled Catalog and Ordering examples as the richer reference for stored entities, admin surfaces, cache keys/tags, provider migrations, integration events, inbound subscriptions, and cross-module projections.
 
 When a new module becomes compiled code, update `Architecture.Tests/Support/ArchitectureCatalog.cs` in the same change. The catalog is test/tooling metadata only; it must not become runtime module discovery.
 

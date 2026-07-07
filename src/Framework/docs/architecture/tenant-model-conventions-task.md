@@ -239,11 +239,11 @@ Do not run full Docker suites unless the slice changes provider mappings, migrat
 
 Update these docs with the final implemented approach:
 
-- `docs/architecture/persistence-and-tenancy.md`
-- `docs/modules/tenancy.md`
-- `docs/templates/module.md`
-- `docs/guidelines/development-guidelines.md`
-- `docs/guidelines/testing-guidelines.md`
+- `src/Framework/docs/architecture/persistence-and-tenancy.md`
+- `src/Modules/Tenancy/docs/README.md`
+- `src/Framework/docs/templates/module.md`
+- `src/Framework/docs/guidelines/development-guidelines.md`
+- `src/Framework/docs/guidelines/testing-guidelines.md`
 
 Document the allowed magic explicitly:
 

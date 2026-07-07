@@ -126,4 +126,4 @@ Provider-specific migrations exist for SQL Server and PostgreSQL. Tests and depl
 - Default API/admin hosts do not start workers or register the task admin front doors.
 - External schedulers remain optional adapters that enqueue the same `TaskRunRequest` shape.
 
-See [Tasks and Daemons](../architecture/tasks-and-daemons.md) for the shared task model and [TaskSamples Example Module](../examples/task-samples-module.md) for compiled example handlers.
+See [Tasks and Daemons](../../../Framework/docs/architecture/tasks-and-daemons.md) for the shared task model and [TaskSamples Example Module](../../TaskSamples/docs/README.md) for compiled example handlers.

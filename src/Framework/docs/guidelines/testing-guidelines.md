@@ -6,15 +6,15 @@
 src/Framework/tests/Gma.Framework.Tests
 src/Modules/Administration/tests/Gma.Modules.Administration.Tests
 src/Modules/Auth/tests/Gma.Modules.Auth.Tests
+src/Modules/Catalog/tests/Catalog.Tests
 src/Modules/Notifications/tests/Gma.Modules.Notifications.Tests
+src/Modules/Ordering/tests/Ordering.Tests
 tests/Architecture.Tests
-tests/Catalog.Tests
 tests/Integration.Tests
-tests/Ordering.Tests
 tests/ServiceDefaults.Tests
 ```
 
-Focused framework and reusable-module tests live under the future source repository root. Root-level `tests/` is for skeleton/composition tests, example-module tests, and cross-module integration or architecture coverage.
+Focused framework, reusable-module, and example-module unit tests live under the source root that owns them. Root-level `tests/` is for skeleton/composition tests, cross-module integration tests, architecture coverage, and host/service-default tests.
 
 Test project names:
 

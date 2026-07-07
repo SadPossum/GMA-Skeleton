@@ -5,7 +5,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Catalog\Catalog.Contracts\Catalog.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleCatalogRoot)Catalog.Contracts\Catalog.Contracts.csproj" />
     <ProjectReference Include="..\Ordering.Contracts\Ordering.Contracts.csproj" />
     <ProjectReference Include="..\Ordering.Application\Ordering.Application.csproj" />
     <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />

@@ -1,6 +1,6 @@
 # Shared Access Policy Implementation Notes
 
-These notes capture the first implementation slice for `docs/architecture/shared-access-policy-foundation.md`.
+These notes capture the first implementation slice for `src/Framework/docs/architecture/shared-access-policy-foundation.md`.
 
 ## Implemented Slice
 

@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="src/Modules/Catalog/docs/README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Modules/Catalog/Catalog.Admin.Contracts/Catalog.Admin.Contracts.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.AdminApi/Catalog.AdminApi.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.AdminCli/Catalog.AdminCli.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Api/Catalog.Api.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Contracts/Catalog.Contracts.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Persistence.PostgreSqlMigrations/Catalog.Persistence.PostgreSqlMigrations.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Persistence.SqlServerMigrations/Catalog.Persistence.SqlServerMigrations.csproj" />
+    <Project Path="src/Modules/Catalog/Catalog.Persistence/Catalog.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="src/Modules/Catalog/tests/Catalog.Tests/Catalog.Tests.csproj" />
+  </Folder>
+</Solution>

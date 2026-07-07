@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="src/Modules/Ordering/docs/README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Modules/Ordering/Ordering.Api/Ordering.Api.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Application/Ordering.Application.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Contracts/Ordering.Contracts.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Domain/Ordering.Domain.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Persistence.PostgreSqlMigrations/Ordering.Persistence.PostgreSqlMigrations.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Persistence.SqlServerMigrations/Ordering.Persistence.SqlServerMigrations.csproj" />
+    <Project Path="src/Modules/Ordering/Ordering.Persistence/Ordering.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="src/Modules/Ordering/tests/Ordering.Tests/Ordering.Tests.csproj" />
+  </Folder>
+</Solution>

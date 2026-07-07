@@ -18,16 +18,27 @@ Do not require Obsidian plugins or `.obsidian` settings.
 
 ## Structure
 
+Documentation is source-owned:
+
 ```text
 docs/
   README.md
   getting-started/
   architecture/
-  modules/
+  examples/
+
+src/Framework/docs/
+  README.md
+  architecture/
   guidelines/
   templates/
   adr/
+
+src/Modules/<Module>/docs/
+  README.md
 ```
+
+Root `docs/` describes the skeleton/template repository and links out to source-owned framework and module documentation. Framework docs describe reusable framework packages, cross-cutting architecture, templates, guidelines, and ADRs. Module docs describe that module only.
 
 ## What to Document
 
@@ -45,7 +56,7 @@ Document when a change affects:
 
 ## Module Docs
 
-Each module should have a page in `docs/modules/`.
+Each reusable module should have `src/Modules/<Module>/docs/README.md`.
 
 Use [../templates/module.md](../templates/module.md).
 
@@ -90,5 +101,6 @@ Use [../templates/adr.md](../templates/adr.md).
 - Are commands runnable from repo root?
 - Are config keys spelled exactly?
 - Are module boundaries clear?
-- Is the page linked from `docs/README.md`?
+- Is the page linked from the owning docs index?
+- If the page belongs to a reusable framework or module package, is it outside root `docs/`?
 - Is a template needed for repeating this doc shape?

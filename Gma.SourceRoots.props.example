@@ -1,13 +1,17 @@
 <Project>
   <PropertyGroup>
     <!-- Copy this file to Gma.SourceRoots.props and keep the copy untracked. -->
+    <!-- In split source repos, anchor relative paths with $(MSBuildThisFileDirectory). -->
     <GmaFrameworkRoot>$(GmaRepositoryRoot)src\Framework\</GmaFrameworkRoot>
     <GmaModulesRoot>$(GmaRepositoryRoot)src\Modules\</GmaModulesRoot>
     <GmaModuleAdministrationRoot>$(GmaModulesRoot)Administration\</GmaModuleAdministrationRoot>
     <GmaModuleAuthRoot>$(GmaModulesRoot)Auth\</GmaModuleAuthRoot>
+    <GmaModuleCatalogRoot>$(GmaModulesRoot)Catalog\</GmaModuleCatalogRoot>
     <GmaModuleFilesRoot>$(GmaModulesRoot)Files\</GmaModuleFilesRoot>
     <GmaModuleNotificationsRoot>$(GmaModulesRoot)Notifications\</GmaModuleNotificationsRoot>
+    <GmaModuleOrderingRoot>$(GmaModulesRoot)Ordering\</GmaModuleOrderingRoot>
     <GmaModuleTaskRuntimeRoot>$(GmaModulesRoot)TaskRuntime\</GmaModuleTaskRuntimeRoot>
+    <GmaModuleTaskSamplesRoot>$(GmaModulesRoot)TaskSamples\</GmaModuleTaskSamplesRoot>
     <GmaModuleTenancyRoot>$(GmaModulesRoot)Tenancy\</GmaModuleTenancyRoot>
   </PropertyGroup>
 </Project>

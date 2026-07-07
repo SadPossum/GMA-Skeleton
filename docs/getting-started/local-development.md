@@ -211,6 +211,8 @@ Register the module in `Host.Api` during scaffolding:
 `-RegisterInHost` inserts the module at the explicit `// module-scaffold:public-api-modules` marker in `src/Host.Api/Program.cs`.
 Manual registration is usually better until the module is real. Optional modules should remain explicit host choices.
 
+The root script is a skeleton convenience wrapper. The canonical framework-owned scaffolder implementation lives at `src/Framework/eng/new-module.ps1`, and the wrapper passes the composition repository root to it.
+
 ## Build Discipline
 
 - Keep warnings as errors.
@@ -219,10 +221,12 @@ Manual registration is usually better until the module is real. Optional modules
 - Do not introduce cross-module project references except to `.Contracts` projects.
 - Keep SQL Server and PostgreSQL migration snapshots synchronized.
 - Do not apply database migrations from `Host.Api` startup.
+- Run `.\eng\check-source-packages.ps1 -SkipRestore` after moving docs, tests, scripts, focused `.slnx` files, or source-package project references.
 
 ## When Something Fails
 
 - Restore first: `.\eng\restore.ps1`
 - Rebuild without stale artifacts: `.\eng\build.ps1`
+- Check source-package boundaries: `.\eng\check-source-packages.ps1 -SkipRestore`
 - Run fast tests: `.\eng\test-fast.ps1`
 - If infrastructure behavior is involved, run Docker tests: `.\eng\test-docker.ps1`

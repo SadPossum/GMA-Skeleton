@@ -12,12 +12,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Contracts\Catalog.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\Modules\Notifications\Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\Modules\Ordering\Ordering.Application\Ordering.Application.csproj" />
-    <ProjectReference Include="..\..\src\Modules\Ordering\Ordering.Contracts\Ordering.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\Modules\Ordering\Ordering.Domain\Ordering.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Modules\Ordering\Ordering.Persistence\Ordering.Persistence.csproj" />
+    <ProjectReference Include="$(GmaModuleCatalogRoot)Catalog.Contracts\Catalog.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
+    <ProjectReference Include="..\..\Ordering.Application\Ordering.Application.csproj" />
+    <ProjectReference Include="..\..\Ordering.Contracts\Ordering.Contracts.csproj" />
+    <ProjectReference Include="..\..\Ordering.Domain\Ordering.Domain.csproj" />
+    <ProjectReference Include="..\..\Ordering.Persistence\Ordering.Persistence.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Runtime\Gma.Framework.Runtime.csproj" />

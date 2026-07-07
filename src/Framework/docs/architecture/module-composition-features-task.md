@@ -503,11 +503,11 @@ Add focused tests:
 Update:
 
 - `docs/README.md`;
-- `docs/architecture/module-system.md`;
-- `docs/architecture/metadata-attribute-pipeline-task.md`;
-- `docs/guidelines/development-guidelines.md`;
-- `docs/templates/module.md`;
-- `docs/architecture/production-readiness-backlog.md`;
+- `src/Framework/docs/architecture/module-system.md`;
+- `src/Framework/docs/architecture/metadata-attribute-pipeline-task.md`;
+- `src/Framework/docs/guidelines/development-guidelines.md`;
+- `src/Framework/docs/templates/module.md`;
+- `src/Framework/docs/architecture/production-readiness-backlog.md`;
 - relevant module docs for any proof module.
 
 Docs must explain:
