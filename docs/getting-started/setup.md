@@ -241,6 +241,14 @@ To create a local override file:
 
 This copies `Gma.SourceRoots.props.example` to ignored `Gma.SourceRoots.props`. Edit that local file when a production app stores the framework or reusable modules outside the default `src/Framework` and `src/Modules` layout.
 
+For an app-style checkout that already has flattened GMA source repositories mounted under `gma/framework` and `gma/modules/<alias>`, bootstrap the root, framework, and module-local source-root files with:
+
+```powershell
+.\eng\gma-bootstrap.ps1 -SourceLayout GmaSubmodules
+```
+
+That command writes ignored `Gma.SourceRoots.props` files at the skeleton root, `gma/framework`, and each mounted reusable module root. The module-local files are required because each source repository imports its own `Directory.Build.props`; the skeleton root props file does not flow into projects inside a mounted source repository. Use `-WhatIf` to preview writes and `-Force` to refresh existing local files.
+
 For source-split dry runs on Windows, keep sandbox paths short and clone with `core.longpaths=true`. Early extraction proofs used short ignored `.agents` roots and validated composition clones against local source repositories. The final package-repo rehearsal should use flattened package roots such as `gma-framework\src\Gma.Framework.Results` and `gma-module-auth\src\Gma.Modules.Auth.Application`, then mount them into applications at ergonomic paths such as `gma\framework` and `gma\modules\auth`.
 
 Useful source-first helpers:

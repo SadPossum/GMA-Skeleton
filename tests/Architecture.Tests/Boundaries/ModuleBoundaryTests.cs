@@ -281,16 +281,12 @@ public sealed class ModuleBoundaryTests
             Path.Combine(repositoryRoot, "src", "Host.Api", "Host.Api.csproj"),
             Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Host.AdminApi.csproj")
         ];
-        string adapterSource = File.ReadAllText(Path.Combine(
+        string adapterSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Messaging.Nats.Aspire",
             "DependencyInjection.cs"));
-        string adapterProject = File.ReadAllText(Path.Combine(
+        string adapterProject = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Messaging.Nats.Aspire",
             "Gma.Framework.Messaging.Nats.Aspire.csproj"));
 
@@ -449,12 +445,12 @@ public sealed class ModuleBoundaryTests
         string repositoryRoot = FindRepositoryRoot();
         Dictionary<string, string[]> expectedTokensByFile = new()
         {
-            [Path.Combine(repositoryRoot, "src", "Modules", "Auth", "Gma.Modules.Auth.AdminApi", "AuthAdminApiModule.cs")] =
+            [GmaSourceLayout.ModulePath(repositoryRoot, "Auth", "Gma.Modules.Auth.AdminApi", "AuthAdminApiModule.cs")] =
             [
                 "errorStatusCodes:",
                 "AuthApplicationErrors.MemberNotFound.Code"
             ],
-            [Path.Combine(repositoryRoot, "src", "Modules", "Catalog", "Catalog.AdminApi", "CatalogAdminApiModule.cs")] =
+            [GmaSourceLayout.ModulePath(repositoryRoot, "Catalog", "Catalog.AdminApi", "CatalogAdminApiModule.cs")] =
             [
                 "errorStatusCodes:",
                 "CatalogApplicationErrors.ItemNotFound.Code"

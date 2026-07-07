@@ -1,6 +1,6 @@
 # GMA Rebrand And Source Repo Split Plan
 
-Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8A has local candidate repositories with standalone and composed validation, and Stage 8D has flattened local repository-shape proof. Real GitHub repositories, history-preserving extraction, and permanent submodule replacement remain future work.
+Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8A has local candidate repositories with standalone and composed validation, and Stage 8D has flattened local repository-shape proof including split-skeleton architecture tests. Real GitHub repositories, history-preserving extraction, and permanent submodule replacement remain future work.
 
 This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
 
@@ -616,9 +616,9 @@ Stage 8D flattened local rehearsal result on 2026-07-08:
   - `gma\modules\task-runtime`;
   - `gma\modules\tenancy`.
 - The skeleton rehearsal removed the old reusable package folders from `src\Framework` and `src\Modules\<ReusableModule>`, rewrote `GenericModularApi.slnx` project/file paths to the `gma\...` mount points, and generated a root `Gma.SourceRoots.props` for hosts, examples, and root tests.
-- Module projects use their own repository-local `Directory.Build.props`, so the skeleton root `Gma.SourceRoots.props` does not flow into mounted module projects. The rehearsal therefore generated app-context `Gma.SourceRoots.props` files inside each mounted module root, pointing back to `gma\framework\src` and the short module aliases. This is the behavior `eng\gma-bootstrap.ps1` should automate before real submodules are introduced.
+- Module projects use their own repository-local `Directory.Build.props`, so the skeleton root `Gma.SourceRoots.props` does not flow into mounted module projects. The rehearsal therefore generated app-context `Gma.SourceRoots.props` files inside each mounted module root, pointing back to `gma\framework\src` and the short module aliases. This is now automated by `eng\gma-bootstrap.ps1 -SourceLayout GmaSubmodules`.
 - The app-style skeleton rehearsal passed `dotnet restore GenericModularApi.slnx` and `dotnet build GenericModularApi.slnx --no-restore -m:1`.
-- Full split-skeleton test execution is still deferred until package-owned architecture tests move or are copied to their owning repositories. The skeleton architecture tests should eventually keep only composition-focused guards.
+- The split-skeleton architecture test project now resolves `Gma.SourceRoots.props` and passed in the flattened rehearsal. Package-owned architecture tests should still eventually move or be copied to their owning repositories so the skeleton keeps only composition-focused guards.
 
 Agent goal:
 

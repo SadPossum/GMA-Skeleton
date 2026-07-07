@@ -186,15 +186,16 @@ public sealed partial class ModuleMetadataTests
     public void Shared_capability_feature_sources_are_sealed_and_keyed()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Shared");
+        string sharedRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         Regex featureDeclarationPattern = new(
             @"public\s+(?:sealed\s+)?record\s+[A-Za-z_][A-Za-z0-9_]*\s*:\s*ModuleDescriptorFeature",
             RegexOptions.Multiline);
         Regex sealedFeaturePattern = new(
             @"public\s+sealed\s+record\s+[A-Za-z_][A-Za-z0-9_]*\s*:\s*ModuleDescriptorFeature",
             RegexOptions.Multiline);
-        string[] offenders = Directory
-            .EnumerateFiles(sharedRoot, "*.cs", SearchOption.AllDirectories)
+        string[] offenders = GmaSourceLayout
+            .FromRepositoryRoot(repositoryRoot)
+            .EnumerateSourceFiles(sharedRoot)
             .Where(path => !HasIgnoredPathSegment(path))
             .Select(path => new
             {

@@ -293,7 +293,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Documentation_templates_do_not_ship_unresolved_placeholder_language()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string templatesRoot = Path.Combine(repositoryRoot, "src", "Framework", "docs", "templates");
+        string templatesRoot = FrameworkDocsPath(repositoryRoot, "templates");
         string[] forbiddenTokens =
         [
             "TODO",
@@ -535,16 +535,12 @@ public sealed partial class DeveloperExperienceGuardTests
             Path.Combine(repositoryRoot, "src", "Host.Api", "Host.Api.csproj"),
             Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Host.AdminApi.csproj")
         ];
-        string openApiProject = File.ReadAllText(Path.Combine(
+        string openApiProject = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Api.OpenApi",
             "Gma.Framework.Api.OpenApi.csproj"));
-        string openApiSource = File.ReadAllText(Path.Combine(
+        string openApiSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Api.OpenApi",
             "DependencyInjection.cs"));
 
@@ -626,10 +622,8 @@ public sealed partial class DeveloperExperienceGuardTests
             Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"),
             Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Program.cs")
         ];
-        string sharedSecurity = File.ReadAllText(Path.Combine(
+        string sharedSecurity = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Api",
             "Security",
             "ApiSecurityServiceCollectionExtensions.cs"));
@@ -653,16 +647,12 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Production_sources_use_shared_claim_name_constants()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string claimNamesPath = Path.Combine(
+        string claimNamesPath = GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Security",
             "ApplicationClaimNames.cs");
-        string compatibilityClaimNamesPath = Path.Combine(
+        string compatibilityClaimNamesPath = GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Security",
             "GmaClaimNames.cs");
         string[] rawClaimNameLiterals =
@@ -671,9 +661,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "\"sid\"",
             "\"sub\""
         ];
-        string[] offenders = Directory
-            .EnumerateFiles(Path.Combine(repositoryRoot, "src"), "*.cs", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string[] offenders = EnumerateSourceFiles(Path.Combine(repositoryRoot, "src"))
             .Where(path => !IsTestSourcePath(path))
             .Where(path => !string.Equals(path, claimNamesPath, StringComparison.OrdinalIgnoreCase))
             .Where(path => !string.Equals(path, compatibilityClaimNamesPath, StringComparison.OrdinalIgnoreCase))
@@ -696,9 +684,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
 
-        string[] offenders = Directory
-            .EnumerateFiles(modulesRoot, "*.cs", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string[] offenders = EnumerateSourceFiles(modulesRoot)
             .Where(path => path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 .Any(segment => segment.EndsWith(".Contracts", StringComparison.Ordinal)))
             .SelectMany(path =>
@@ -727,66 +713,48 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Auth_jwt_bearer_adapter_is_explicitly_http_only()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string authApiModule = File.ReadAllText(Path.Combine(
+        string authApiModule = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Api",
             "AuthModule.cs"));
-        string authAdminApiModule = File.ReadAllText(Path.Combine(
+        string authAdminApiModule = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.AdminApi",
             "AuthAdminApiModule.cs"));
-        string authAdminCliModule = File.ReadAllText(Path.Combine(
+        string authAdminCliModule = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.AdminCli",
             "AuthAdminCliModule.cs"));
-        string authInfrastructureProject = File.ReadAllText(Path.Combine(
+        string authInfrastructureProject = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Infrastructure",
             "Gma.Modules.Auth.Infrastructure.csproj"));
-        string authInfrastructureSource = File.ReadAllText(Path.Combine(
+        string authInfrastructureSource = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Infrastructure",
             "DependencyInjection.cs"));
-        string authJwtBearerProject = File.ReadAllText(Path.Combine(
+        string authJwtBearerProject = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Infrastructure.JwtBearer",
             "Gma.Modules.Auth.Infrastructure.JwtBearer.csproj"));
-        string authAdminCliProject = File.ReadAllText(Path.Combine(
+        string authAdminCliProject = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.AdminCli",
             "Gma.Modules.Auth.AdminCli.csproj"));
-        string authApiProject = File.ReadAllText(Path.Combine(
+        string authApiProject = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Api",
             "Gma.Modules.Auth.Api.csproj"));
-        string authAdminApiProject = File.ReadAllText(Path.Combine(
+        string authAdminApiProject = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.AdminApi",
             "Gma.Modules.Auth.AdminApi.csproj"));
@@ -825,34 +793,24 @@ public sealed partial class DeveloperExperienceGuardTests
             Path.Combine(repositoryRoot, "src", "Host.Api", "Host.Api.csproj"),
             Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Host.AdminApi.csproj")
         ];
-        string sharedApiProject = File.ReadAllText(Path.Combine(
+        string sharedApiProject = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Api",
             "Gma.Framework.Api.csproj"));
-        string serilogHostAdapterProject = File.ReadAllText(Path.Combine(
+        string serilogHostAdapterProject = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Logging.Serilog",
             "Gma.Framework.Logging.Serilog.csproj"));
-        string serilogAdapterProject = File.ReadAllText(Path.Combine(
+        string serilogAdapterProject = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Api.Serilog",
             "Gma.Framework.Api.Serilog.csproj"));
-        string tenantSerilogBridgeProject = File.ReadAllText(Path.Combine(
+        string tenantSerilogBridgeProject = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Tenancy.Api.Serilog",
             "Gma.Framework.Tenancy.Api.Serilog.csproj"));
-        string sharedExtension = File.ReadAllText(Path.Combine(
+        string sharedExtension = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Api.Serilog",
             "RequestLoggingApplicationBuilderExtensions.cs"));
 
@@ -946,14 +904,12 @@ public sealed partial class DeveloperExperienceGuardTests
             .Where(token => !notes.Contains(token, StringComparison.Ordinal))
             .Select(token => $"audit-hardening-notes.md missing {token}")
             .ToArray();
-        string[] sourceOffenders = Directory
-            .EnumerateFiles(srcRoot, "*.cs", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string[] sourceOffenders = EnumerateSourceFiles(srcRoot)
             .Where(path => !IsTestSourcePath(path))
             .Select(path => new
             {
                 Path = path,
-                RelativePath = NormalizePath(Path.GetRelativePath(repositoryRoot, path)),
+                RelativePath = NormalizePath(CanonicalRelativePath(repositoryRoot, path)),
                 Source = File.ReadAllText(path)
             })
             .Where(item => reflectionTokens.Any(token => item.Source.Contains(token, StringComparison.Ordinal)))
@@ -1010,9 +966,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Package_versions_are_centralized_unique_and_stable()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string[] inlineVersionOffenders = Directory
-            .EnumerateFiles(repositoryRoot, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string[] inlineVersionOffenders = EnumerateProjectFiles(Path.Combine(repositoryRoot, "src"))
+            .Concat(EnumerateProjectFiles(Path.Combine(repositoryRoot, "tests")))
             .SelectMany(projectPath =>
             {
                 XDocument project = XDocument.Load(projectPath);
@@ -1023,7 +978,7 @@ public sealed partial class DeveloperExperienceGuardTests
                         reference.Attribute("Version") is not null ||
                         reference.Elements("Version").Any())
                     .Select(reference =>
-                        $"{Path.GetRelativePath(repositoryRoot, projectPath)}:{reference.Attribute("Include")?.Value ?? "PackageReference"}");
+                        $"{CanonicalRelativePath(repositoryRoot, projectPath)}:{reference.Attribute("Include")?.Value ?? "PackageReference"}");
             })
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -1043,9 +998,8 @@ public sealed partial class DeveloperExperienceGuardTests
             .Select(element => $"{element.Attribute("Include")?.Value}:{element.Attribute("Version")?.Value}")
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
-        HashSet<string> referencedPackages = Directory
-            .EnumerateFiles(repositoryRoot, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        HashSet<string> referencedPackages = EnumerateProjectFiles(Path.Combine(repositoryRoot, "src"))
+            .Concat(EnumerateProjectFiles(Path.Combine(repositoryRoot, "tests")))
             .SelectMany(projectPath =>
             {
                 XDocument project = XDocument.Load(projectPath);
@@ -1332,10 +1286,57 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
+    public void Gma_bootstrap_supports_flattened_submodule_source_roots()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string bootstrapScript = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "gma-bootstrap.ps1"));
+        string statusScript = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "gma-status.ps1"));
+        string setupDocs = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "getting-started", "setup.md"));
+        string[] requiredBootstrapTokens =
+        [
+            "SupportsShouldProcess",
+            "SourceLayout",
+            "GmaSubmodules",
+            @"gma\framework\src\",
+            @"gma\modules\",
+            @"$(GmaModulesRoot)auth\src\",
+            @"..\..\framework\src\",
+            @"gma\modules\$moduleAlias\Gma.SourceRoots.props",
+            "task-runtime"
+        ];
+        string[] requiredStatusTokens =
+        [
+            "GMA source package roots:",
+            "eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules",
+            @"gma\modules\auth\Gma.SourceRoots.props"
+        ];
+        string[] requiredDocsTokens =
+        [
+            "gma-bootstrap.ps1 -SourceLayout GmaSubmodules",
+            "gma/framework",
+            "gma/modules/<alias>",
+            "module-local files are required"
+        ];
+        string[] offenders = requiredBootstrapTokens
+            .Where(token => !bootstrapScript.Contains(token, StringComparison.Ordinal))
+            .Select(token => $"eng/gma-bootstrap.ps1 missing {token}")
+            .Concat(requiredStatusTokens
+                .Where(token => !statusScript.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"eng/gma-status.ps1 missing {token}"))
+            .Concat(requiredDocsTokens
+                .Where(token => !setupDocs.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"docs/getting-started/setup.md missing {token}"))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
     public void External_framework_project_references_use_source_root_property()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string frameworkRoot = Path.Combine(repositoryRoot, "src", "Framework");
+        string frameworkRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         string[] offenders = Directory
             .EnumerateFiles(repositoryRoot, "*.csproj", SearchOption.AllDirectories)
             .Where(path => (IsUnder(path, Path.Combine(repositoryRoot, "src")) ||
@@ -1368,13 +1369,12 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Naming_conventions_document_all_framework_project_names()
     {
         string repositoryRoot = FindRepositoryRoot();
+        string frameworkRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         string namingConventions = File.ReadAllText(FrameworkDocsPath(
             repositoryRoot,
             "guidelines",
             "naming-conventions.md"));
-        string[] offenders = Directory
-            .EnumerateFiles(Path.Combine(repositoryRoot, "src", "Framework"), "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string[] offenders = EnumerateProjectFiles(frameworkRoot)
             .Select(Path.GetFileNameWithoutExtension)
             .Where(projectName => projectName is not null && !projectName.EndsWith(".Tests", StringComparison.Ordinal))
             .Where(projectName => projectName is not null && !namingConventions.Contains(projectName, StringComparison.Ordinal))
@@ -1389,11 +1389,12 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Architecture_overview_documents_current_module_roots()
     {
         string repositoryRoot = FindRepositoryRoot();
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
         string overview = File.ReadAllText(FrameworkDocsPath(repositoryRoot, "architecture", "overview.md"));
-        string[] offenders = Directory
-            .EnumerateDirectories(Path.Combine(repositoryRoot, "src", "Modules"))
-            .Select(Path.GetFileName)
-            .Where(moduleName => moduleName is not null && !overview.Contains($"{moduleName}/", StringComparison.Ordinal))
+        string[] offenders = sourceLayout
+            .ModuleRoots
+            .Keys
+            .Where(moduleName => !overview.Contains($"{moduleName}/", StringComparison.Ordinal))
             .Select(moduleName => $"src/Framework/docs/architecture/overview.md missing module root {moduleName}/")
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -1405,12 +1406,10 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Architecture_overview_documents_framework_project_dependency_map()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Framework");
+        string sharedRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         string overview = File.ReadAllText(FrameworkDocsPath(repositoryRoot, "architecture", "overview.md"));
         Dictionary<string, string[]> documentedDependencies = ParseDependencyDirectionBlocks(overview);
-        string[] offenders = Directory
-            .EnumerateFiles(sharedRoot, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string[] offenders = EnumerateProjectFiles(sharedRoot)
             .Where(path => !Path.GetFileNameWithoutExtension(path).EndsWith(".Tests", StringComparison.Ordinal))
             .SelectMany(projectPath =>
             {
@@ -1459,9 +1458,12 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Architecture_catalog_lists_all_non_migration_module_projects()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
-        string[] moduleProjects = Directory
-            .EnumerateFiles(modulesRoot, "*.csproj", SearchOption.AllDirectories)
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
+        string[] moduleProjects = sourceLayout
+            .ModuleRoots
+            .Values
+            .Where(Directory.Exists)
+            .SelectMany(moduleRoot => Directory.EnumerateFiles(moduleRoot, "*.csproj", SearchOption.AllDirectories))
             .Where(path => !HasIgnoredPathSegment(path))
             .Select(path => Path.GetFileNameWithoutExtension(path))
             .Where(projectName => !IsProviderMigrationProject(projectName))
@@ -1633,25 +1635,27 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Package_local_solutions_mirror_root_focused_solutions()
     {
         string repositoryRoot = FindRepositoryRoot();
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
         Dictionary<string, (string SourcePrefix, string LocalSolution)> packages = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Gma.Framework.slnx"] = ("src/Framework/", "src/Framework/Gma.Framework.slnx"),
-            ["Gma.Modules.Administration.slnx"] = ("src/Modules/Administration/", "src/Modules/Administration/Gma.Modules.Administration.slnx"),
-            ["Gma.Modules.Auth.slnx"] = ("src/Modules/Auth/", "src/Modules/Auth/Gma.Modules.Auth.slnx"),
-            ["Gma.Modules.Files.slnx"] = ("src/Modules/Files/", "src/Modules/Files/Gma.Modules.Files.slnx"),
-            ["Gma.Modules.Notifications.slnx"] = ("src/Modules/Notifications/", "src/Modules/Notifications/Gma.Modules.Notifications.slnx"),
-            ["Gma.Modules.TaskRuntime.slnx"] = ("src/Modules/TaskRuntime/", "src/Modules/TaskRuntime/Gma.Modules.TaskRuntime.slnx"),
-            ["Gma.Modules.Tenancy.slnx"] = ("src/Modules/Tenancy/", "src/Modules/Tenancy/Gma.Modules.Tenancy.slnx")
+            ["Gma.Framework.slnx"] = ("src/Framework/", Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx")),
+            ["Gma.Modules.Administration.slnx"] = ("src/Modules/Administration/", Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx")),
+            ["Gma.Modules.Auth.slnx"] = ("src/Modules/Auth/", Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx")),
+            ["Gma.Modules.Files.slnx"] = ("src/Modules/Files/", Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx")),
+            ["Gma.Modules.Notifications.slnx"] = ("src/Modules/Notifications/", Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx")),
+            ["Gma.Modules.TaskRuntime.slnx"] = ("src/Modules/TaskRuntime/", Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx")),
+            ["Gma.Modules.Tenancy.slnx"] = ("src/Modules/Tenancy/", Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx"))
         };
 
         string[] offenders = packages
             .SelectMany(item =>
             {
                 string rootSolutionPath = Path.Combine(repositoryRoot, item.Key);
-                string localSolutionPath = Path.Combine(repositoryRoot, item.Value.LocalSolution);
+                string localSolutionPath = item.Value.LocalSolution;
+                string localSolutionDisplayPath = CanonicalRelativePath(repositoryRoot, localSolutionPath);
                 if (!File.Exists(localSolutionPath))
                 {
-                    return [$"{item.Value.LocalSolution} is missing"];
+                    return [$"{localSolutionDisplayPath} is missing"];
                 }
 
                 string[] rootEntries = GetSolutionEntryPaths(XDocument.Load(rootSolutionPath));
@@ -1663,20 +1667,21 @@ public sealed partial class DeveloperExperienceGuardTests
                 string[] expectedLocalEntries = rootEntries
                     .Where(path => path.StartsWith(item.Value.SourcePrefix, StringComparison.OrdinalIgnoreCase))
                     .Select(path => path[item.Value.SourcePrefix.Length..])
+                    .Select(path => ToExpectedPackageLocalSolutionEntry(path, sourceLayout.UsesExternalSourceRoots))
                     .Order(StringComparer.OrdinalIgnoreCase)
                     .ToArray();
                 string[] staleLocalPrefixes = localEntries
                     .Where(path => path.StartsWith("src/Framework/", StringComparison.OrdinalIgnoreCase) ||
                                    path.StartsWith("src/Modules/", StringComparison.OrdinalIgnoreCase))
-                    .Select(path => $"{item.Value.LocalSolution} keeps monorepo-staged path {path}")
+                    .Select(path => $"{localSolutionDisplayPath} keeps monorepo-staged path {path}")
                     .ToArray();
                 string[] missingLocalEntries = expectedLocalEntries
                     .Except(localEntries, StringComparer.OrdinalIgnoreCase)
-                    .Select(path => $"{item.Value.LocalSolution} missing {path}")
+                    .Select(path => $"{localSolutionDisplayPath} missing {path}")
                     .ToArray();
                 string[] staleLocalEntries = localEntries
                     .Except(expectedLocalEntries, StringComparer.OrdinalIgnoreCase)
-                    .Select(path => $"{item.Value.LocalSolution} has stale entry {path}")
+                    .Select(path => $"{localSolutionDisplayPath} has stale entry {path}")
                     .ToArray();
 
                 return outsideRootEntries
@@ -1928,9 +1933,7 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string repositoryRoot = FindRepositoryRoot();
         string collectionDefinition = File.ReadAllText(Path.Combine(
-            repositoryRoot,
-            "src",
-            "Framework",
+            GmaSourceLayout.FromRepositoryRoot(repositoryRoot).FrameworkRepositoryRoot,
             "tests",
             "Gma.Framework.Tests",
             "Support",
@@ -2006,10 +2009,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
         string srcRoot = Path.Combine(repositoryRoot, "src");
         string scaffolder = File.ReadAllText(ModuleScaffolderPath(repositoryRoot));
-        string helperSource = File.ReadAllText(Path.Combine(
+        string helperSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Application.Composition",
             "ApplicationServiceCollectionExtensions.cs"));
         string[] handlerRegistrationTokens =
@@ -2123,9 +2124,9 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] guardedRoots =
         [
-            Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Modules"),
-            Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Caching"),
-            Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Tasks")
+            GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Modules"),
+            GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Caching"),
+            GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Tasks")
         ];
         string[] offenders = guardedRoots
             .SelectMany(EnumerateSourceFiles)
@@ -2136,7 +2137,7 @@ public sealed partial class DeveloperExperienceGuardTests
             })
             .Where(item => item.Source.Contains("Gma.Framework.Messaging", StringComparison.Ordinal) ||
                            item.Source.Contains("IntegrationEventNaming", StringComparison.Ordinal))
-            .Select(item => Path.GetRelativePath(repositoryRoot, item.Path))
+            .Select(item => CanonicalRelativePath(repositoryRoot, item.Path))
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -2325,10 +2326,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Page_request_does_not_expose_positional_constructor_bypass()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Pagination",
             "PageRequest.cs"));
 
@@ -2354,10 +2353,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Api_error_status_code_does_not_expose_positional_constructor_bypass()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Api",
             "Results",
             "ApiErrorStatusCode.cs"));
@@ -2370,10 +2367,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Admin_operation_execution_result_does_not_expose_positional_constructor_bypass()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Administration",
             "AdminOperationExecutionResult.cs"));
 
@@ -2385,10 +2380,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Module_endpoint_metadata_does_not_expose_positional_constructor_bypass()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Api",
             "Observability",
             "ModuleEndpointMetadata.cs"));
@@ -2401,10 +2394,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Auth_access_token_claims_do_not_expose_positional_constructor_bypass()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Domain",
             "Services",
@@ -2418,10 +2409,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Jwt_token_generation_uses_access_token_claims_validation()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Infrastructure",
             "Services",
@@ -2435,10 +2424,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Messaging_records_do_not_expose_positional_constructor_bypass()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string messagingRoot = Path.Combine(
+        string messagingRoot = GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Messaging");
         Dictionary<string, string> sources = new(StringComparer.Ordinal)
         {
@@ -2609,7 +2596,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Where(path => !IsGeneratedMigrationSource(path))
             .SelectMany(path =>
             {
-                string relativePath = Path.GetRelativePath(repositoryRoot, path);
+                string relativePath = CanonicalRelativePath(repositoryRoot, path);
                 if (IsAllowedSemanticStringBoundary(relativePath))
                 {
                     return [];
@@ -2653,10 +2640,9 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Tenant_id_normalization_lives_in_shared_naming()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string[] tenantIdHelpers = Directory
-            .EnumerateFiles(Path.Combine(repositoryRoot, "src"), "TenantIds.cs", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
-            .Select(path => Path.GetRelativePath(repositoryRoot, path))
+        string[] tenantIdHelpers = EnumerateSourceFiles(Path.Combine(repositoryRoot, "src"))
+            .Where(path => string.Equals(Path.GetFileName(path), "TenantIds.cs", StringComparison.Ordinal))
+            .Select(path => CanonicalRelativePath(repositoryRoot, path))
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
         string[] domainTrimOffenders = EnumerateSourceFiles(Path.Combine(repositoryRoot, "src", "Modules"))
@@ -2674,10 +2660,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Auth_refresh_token_hashing_uses_keyed_versioned_hashes()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Infrastructure",
             "Services",
@@ -2695,17 +2679,13 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Auth_security_options_are_validated_on_start()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string infrastructureSource = File.ReadAllText(Path.Combine(
+        string infrastructureSource = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Infrastructure",
             "DependencyInjection.cs"));
-        string applicationSource = File.ReadAllText(Path.Combine(
+        string applicationSource = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Application",
             "DependencyInjection.cs"));
@@ -2739,17 +2719,13 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Auth_security_options_do_not_ship_secret_defaults()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string jwtSettings = File.ReadAllText(Path.Combine(
+        string jwtSettings = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Infrastructure",
             "JwtSettings.cs"));
-        string refreshTokenHashingOptions = File.ReadAllText(Path.Combine(
+        string refreshTokenHashingOptions = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Infrastructure",
             "RefreshTokenHashingOptions.cs"));
@@ -3041,23 +3017,17 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Cache_cqrs_bridge_uses_internal_invalidation_flusher_seam()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string queueSource = File.ReadAllText(Path.Combine(
+        string queueSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Caching.Infrastructure",
             "CacheInvalidationQueue.cs"));
-        string assemblyInfo = File.ReadAllText(Path.Combine(
+        string assemblyInfo = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Caching.Infrastructure",
             "Properties",
             "AssemblyInfo.cs"));
-        string bridgeSource = File.ReadAllText(Path.Combine(
+        string bridgeSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Caching.Cqrs",
             "CacheInvalidationCommandBehavior.cs"));
 
@@ -3152,10 +3122,8 @@ public sealed partial class DeveloperExperienceGuardTests
                 "MemberUsername.NormalizedValueMaxLength"
             ]
         };
-        string authPersistenceRoot = Path.Combine(
+        string authPersistenceRoot = GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Persistence");
         string[] offenders = expectedTokensByFile
@@ -3178,10 +3146,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Auth_password_validators_use_shared_password_policy()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string authApplicationRoot = Path.Combine(
+        string authApplicationRoot = GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Auth",
             "Gma.Modules.Auth.Application");
         string policySource = File.ReadAllText(Path.Combine(authApplicationRoot, "Security", "AuthPasswordPolicy.cs"));
@@ -3212,10 +3178,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Administration_options_are_validated_on_start()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Administration",
             "Gma.Modules.Administration.Application",
             "DependencyInjection.cs"));
@@ -3671,16 +3635,12 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] checkedFiles =
         [
-            Path.Combine(
+            GmaSourceLayout.FrameworkPath(
                 repositoryRoot,
-                "src",
-                "Framework",
                 "Gma.Framework.Administration",
                 "AdminOperationRunner.cs"),
-            Path.Combine(
+            GmaSourceLayout.ModulePath(
                 repositoryRoot,
-                "src",
-                "Modules",
                 "Administration",
                 "Gma.Modules.Administration.AdminCli",
                 "AdministrationAdminCliModule.cs")
@@ -3740,10 +3700,8 @@ public sealed partial class DeveloperExperienceGuardTests
                 "AdminPermission.MaxLength"
             ]
         };
-        string administrationPersistenceRoot = Path.Combine(
+        string administrationPersistenceRoot = GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Administration",
             "Gma.Modules.Administration.Persistence");
         string[] offenders = expectedTokensByFile
@@ -3846,11 +3804,10 @@ public sealed partial class DeveloperExperienceGuardTests
                 "Order.AmountScale"
             ]
         };
-        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
         string[] offenders = expectedTokensByPath
             .SelectMany(item =>
             {
-                string path = Path.Combine(modulesRoot, item.Key);
+                string path = ModulePathFromRelative(repositoryRoot, item.Key);
                 string source = File.ReadAllText(path);
 
                 return item.Value
@@ -3891,11 +3848,10 @@ public sealed partial class DeveloperExperienceGuardTests
                 "this.ApplyTenantConventions(modelBuilder);"
             ]
         };
-        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
         string[] offenders = expectedTokensByPath
             .SelectMany(item =>
             {
-                string path = Path.Combine(modulesRoot, item.Key);
+                string path = ModulePathFromRelative(repositoryRoot, item.Key);
                 string source = File.ReadAllText(path);
 
                 return item.Value
@@ -3998,10 +3954,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Administration_role_name_length_is_not_hidden_in_regex()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "src",
-            "Modules",
             "Administration",
             "Gma.Modules.Administration.Application",
             "AdminRoleName.cs"));
@@ -4036,7 +3990,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_core_projects_keep_dependency_free_or_abstractions_only_shape()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Framework");
+        string sharedRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         string[] dependencyFreeProjects =
         [
             Path.Combine(sharedRoot, "Gma.Framework.Results", "Gma.Framework.Results.csproj"),
@@ -4165,7 +4119,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_application_boundary_projects_stay_source_narrow()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Framework");
+        string sharedRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         IReadOnlyDictionary<string, string[]> expectedProjectSources = new Dictionary<string, string[]>(
             StringComparer.Ordinal)
         {
@@ -4266,7 +4220,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void File_management_core_stays_dependency_neutral()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string projectRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.FileManagement");
+        string projectRoot = GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.FileManagement");
         XDocument project = XDocument.Load(Path.Combine(projectRoot, "Gma.Framework.FileManagement.csproj"));
         string[] packageReferences = GetProjectIncludes(project, "PackageReference");
         string[] projectReferences = GetProjectIncludes(project, "ProjectReference");
@@ -4302,7 +4256,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_project_dependency_manifest_matches_intended_adapter_boundaries()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Framework");
+        string sharedRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         FrameworkProjectShape[] expectedShapes =
         [
             new(
@@ -4868,9 +4822,7 @@ public sealed partial class DeveloperExperienceGuardTests
         HashSet<string> expectedProjectNames = expectedShapes
             .Select(shape => shape.ProjectName)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        string[] undocumentedFrameworkProjects = Directory
-            .EnumerateFiles(sharedRoot, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string[] undocumentedFrameworkProjects = EnumerateProjectFiles(sharedRoot)
             .Where(path => !IsTestProjectPath(path))
             .Select(Path.GetFileNameWithoutExtension)
             .Where(projectName => projectName is not null && !expectedProjectNames.Contains(projectName))
@@ -4900,10 +4852,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string srcRoot = Path.Combine(repositoryRoot, "src");
         string testsRoot = Path.Combine(repositoryRoot, "tests");
-        string frameworkRoot = Path.Combine(srcRoot, "Framework");
-        string[] frameworkProjectNames = Directory
-            .EnumerateFiles(frameworkRoot, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string frameworkRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
+        string[] frameworkProjectNames = EnumerateProjectFiles(frameworkRoot)
             .Select(Path.GetFileNameWithoutExtension)
             .Where(projectName => !string.IsNullOrWhiteSpace(projectName))
             .Select(projectName => projectName!)
@@ -4911,8 +4861,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .ToArray();
         string[] scannedRoots = [srcRoot, testsRoot];
         string[] offenders = scannedRoots
-            .SelectMany(root => Directory.EnumerateFiles(root, "*.csproj", SearchOption.AllDirectories))
-            .Where(path => !HasIgnoredPathSegment(path))
+            .SelectMany(root => EnumerateProjectFiles(root))
             .SelectMany(projectPath =>
             {
                 string projectName = Path.GetFileNameWithoutExtension(projectPath);
@@ -4964,16 +4913,13 @@ public sealed partial class DeveloperExperienceGuardTests
         string srcRoot = Path.Combine(repositoryRoot, "src");
         string testsRoot = Path.Combine(repositoryRoot, "tests");
         string modulesRoot = Path.Combine(srcRoot, "Modules");
-        string[] moduleNamespaceRoots = Directory
-            .EnumerateDirectories(modulesRoot)
-            .Select(Path.GetFileName)
-            .Where(moduleName => !string.IsNullOrWhiteSpace(moduleName))
-            .Select(moduleName => moduleName!)
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
+        string[] moduleNamespaceRoots = sourceLayout
+            .ModuleRoots
+            .Keys
             .OrderByDescending(moduleName => moduleName.Length)
             .ToArray();
-        string[] moduleProjectNames = Directory
-            .EnumerateFiles(modulesRoot, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        string[] moduleProjectNames = EnumerateProjectFiles(modulesRoot)
             .Select(Path.GetFileNameWithoutExtension)
             .Where(projectName => !string.IsNullOrWhiteSpace(projectName))
             .Select(projectName => projectName!)
@@ -4981,8 +4927,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .ToArray();
         string[] scannedRoots = [srcRoot, testsRoot];
         string[] offenders = scannedRoots
-            .SelectMany(root => Directory.EnumerateFiles(root, "*.csproj", SearchOption.AllDirectories))
-            .Where(path => !HasIgnoredPathSegment(path))
+            .SelectMany(root => EnumerateProjectFiles(root))
             .SelectMany(projectPath =>
             {
                 string projectName = Path.GetFileNameWithoutExtension(projectPath);
@@ -5029,7 +4974,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_infrastructure_facade_stays_tiny_and_host_level_only()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string facadeRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Infrastructure");
+        string facadeRoot = GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Infrastructure");
         string[] expectedSourceFiles =
         [
             NormalizePath("DependencyInjection.cs"),
@@ -5316,7 +5261,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_administration_core_remains_backend_agnostic()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedAdministrationRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Administration");
+        string sharedAdministrationRoot = GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Administration");
         string projectPath = Path.Combine(sharedAdministrationRoot, "Gma.Framework.Administration.csproj");
         XDocument project = XDocument.Load(projectPath);
         string[] forbiddenPackages =
@@ -5371,7 +5316,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_access_control_core_remains_backend_agnostic()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedAccessControlRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.AccessControl");
+        string sharedAccessControlRoot = GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.AccessControl");
         string projectPath = Path.Combine(sharedAccessControlRoot, "Gma.Framework.AccessControl.csproj");
         XDocument project = XDocument.Load(projectPath);
         string[] forbiddenPackages =
@@ -6534,7 +6479,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_infrastructure_centralizes_direct_time_and_id_creation()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedInfrastructureRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Runtime.Infrastructure");
+        string sharedInfrastructureRoot = GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Runtime.Infrastructure");
         string[] forbiddenTokens =
         [
             "Guid.NewGuid(",
@@ -6563,34 +6508,24 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Shared_infrastructure_runtime_options_are_validated_on_start()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string coreSource = File.ReadAllText(Path.Combine(
+        string coreSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Infrastructure",
             "DependencyInjection.cs"));
-        string cachingSource = File.ReadAllText(Path.Combine(
+        string cachingSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Caching.Infrastructure",
             "DependencyInjection.cs"));
-        string messagingSource = File.ReadAllText(Path.Combine(
+        string messagingSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Messaging.Infrastructure",
             "DependencyInjection.cs"));
-        string natsSource = File.ReadAllText(Path.Combine(
+        string natsSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Messaging.Nats",
             "DependencyInjection.cs"));
-        string tenancySource = File.ReadAllText(Path.Combine(
+        string tenancySource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Tenancy.Infrastructure",
             "DependencyInjection.cs"));
         (string SourceName, string Source, string[] Tokens)[] requiredSources =
@@ -6651,20 +6586,16 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Shared_messaging_runtime_registration_composes_runtime_infrastructure()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Messaging.Infrastructure",
             "DependencyInjection.cs"));
 
         AssertMethodContains(source, "AddMessagingInfrastructure", "builder.AddRuntimeInfrastructure();");
         AssertMethodContains(source, "AddOutboxPublishing", "builder.AddMessagingInfrastructure();");
 
-        string natsSource = File.ReadAllText(Path.Combine(
+        string natsSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Messaging.Nats",
             "DependencyInjection.cs"));
         AssertMethodContains(natsSource, "AddNatsJetStreamMessaging", "builder.AddMessagingInfrastructure();");
@@ -6725,10 +6656,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Cqrs_validation_behaviors_use_shared_validation_error_contract()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string cqrsRoot = Path.Combine(
+        string cqrsRoot = GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Cqrs.Infrastructure");
         string[] behaviorFiles =
         [
@@ -6753,16 +6682,13 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Persistence_options_are_validated_only_by_persistence_modules()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedInfrastructureSource = File.ReadAllText(Path.Combine(
+        string sharedInfrastructureSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Infrastructure",
             "DependencyInjection.cs"));
         string scaffolder = File.ReadAllText(ModuleScaffolderPath(repositoryRoot));
         string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
-        string[] persistenceRegistrationOffenders = Directory
-            .EnumerateFiles(modulesRoot, "*.csproj", SearchOption.AllDirectories)
+        string[] persistenceRegistrationOffenders = EnumerateProjectFiles(modulesRoot)
             .Where(path => Path.GetFileNameWithoutExtension(path).EndsWith(".Persistence", StringComparison.Ordinal))
             .Select(path => Path.Combine(Path.GetDirectoryName(path)!, "DependencyInjection.cs"))
             .Where(File.Exists)
@@ -6852,7 +6778,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Transactional_commands_have_matching_persistence_unit_of_work_module_names()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
         Dictionary<string, ModuleProject> persistenceProjects = ArchitectureCatalog.ModuleProjects
             .Where(project => project.Kind == ModuleProjectKind.Persistence)
             .ToDictionary(
@@ -6877,11 +6803,8 @@ public sealed partial class DeveloperExperienceGuardTests
                     return $"{item.CommandType.FullName} resolves to module '{item.ModuleName}' but no persistence project is registered";
                 }
 
-                string persistenceProjectDirectory = Path.Combine(
-                    modulesRoot,
-                    persistenceProject.ModulePrefix,
-                    persistenceProject.ProjectName);
-                string moduleDirectory = Path.Combine(modulesRoot, persistenceProject.ModulePrefix);
+                string moduleDirectory = sourceLayout.GetModuleRoot(persistenceProject.ModulePrefix);
+                string persistenceProjectDirectory = Path.Combine(moduleDirectory, persistenceProject.ProjectName);
                 string requiredToken = $"ModuleName => \"{item.ModuleName}\"";
                 bool hasMatchingUnitOfWork = PersistenceProjectDeclaresMatchingUnitOfWorkModuleName(
                     moduleDirectory,
@@ -7010,10 +6933,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Redis_caching_options_are_validated_when_adapter_is_enabled()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Caching.Redis",
             "DependencyInjection.cs"));
         string[] requiredTokens =
@@ -7057,10 +6978,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Shared_administration_api_options_are_validated_on_start()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(Path.Combine(
+        string source = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
-            "src",
-            "Framework",
             "Gma.Framework.Administration.Api",
             "DependencyInjection.cs"));
         string[] requiredTokens =
@@ -7234,13 +7153,11 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string sourceRoot = Path.Combine(repositoryRoot, "src");
 
-        return Directory
-            .EnumerateFiles(sourceRoot, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        return EnumerateProjectFiles(sourceRoot)
             .SelectMany(projectPath =>
             {
                 XDocument project = XDocument.Load(projectPath);
-                string relativePath = Path.GetRelativePath(repositoryRoot, projectPath);
+                string relativePath = CanonicalRelativePath(repositoryRoot, projectPath);
 
                 return project
                     .Descendants("PackageReference")
@@ -7254,13 +7171,11 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string sourceRoot = Path.Combine(repositoryRoot, "src");
 
-        return Directory
-            .EnumerateFiles(sourceRoot, "*.csproj", SearchOption.AllDirectories)
-            .Where(path => !HasIgnoredPathSegment(path))
+        return EnumerateProjectFiles(sourceRoot)
             .SelectMany(projectPath =>
             {
                 XDocument project = XDocument.Load(projectPath);
-                string relativePath = Path.GetRelativePath(repositoryRoot, projectPath);
+                string relativePath = CanonicalRelativePath(repositoryRoot, projectPath);
 
                 return project
                     .Descendants("ProjectReference")
@@ -7846,9 +7761,7 @@ public sealed partial class DeveloperExperienceGuardTests
     private static string FrameworkDocsPath(string repositoryRoot, params string[] segments) =>
         Path.Combine(
         [
-            repositoryRoot,
-            "src",
-            "Framework",
+            GmaSourceLayout.FromRepositoryRoot(repositoryRoot).FrameworkRepositoryRoot,
             "docs",
             ..segments
         ]);
@@ -7856,44 +7769,19 @@ public sealed partial class DeveloperExperienceGuardTests
     private static string ModuleDocsPath(string repositoryRoot, string moduleName, params string[] segments) =>
         Path.Combine(
         [
-            repositoryRoot,
-            "src",
-            "Modules",
-            moduleName,
+            GmaSourceLayout.FromRepositoryRoot(repositoryRoot).GetModulePackageRoot(moduleName),
             "docs",
             ..segments
         ]);
 
     private static string ModuleScaffolderPath(string repositoryRoot) =>
-        Path.Combine(repositoryRoot, "src", "Framework", "eng", "new-module.ps1");
+        GmaSourceLayout.ModuleScaffolderPath(repositoryRoot);
 
     private static IEnumerable<string> EnumerateDocumentationRoots(string repositoryRoot)
     {
-        string rootDocs = Path.Combine(repositoryRoot, "docs");
-        if (Directory.Exists(rootDocs))
+        foreach (string documentationRoot in GmaSourceLayout.FromRepositoryRoot(repositoryRoot).DocumentationRoots())
         {
-            yield return rootDocs;
-        }
-
-        string frameworkDocs = Path.Combine(repositoryRoot, "src", "Framework", "docs");
-        if (Directory.Exists(frameworkDocs))
-        {
-            yield return frameworkDocs;
-        }
-
-        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
-        if (!Directory.Exists(modulesRoot))
-        {
-            yield break;
-        }
-
-        foreach (string moduleDocs in Directory
-            .EnumerateDirectories(modulesRoot)
-            .Select(moduleRoot => Path.Combine(moduleRoot, "docs"))
-            .Where(Directory.Exists)
-            .Order(StringComparer.OrdinalIgnoreCase))
-        {
-            yield return moduleDocs;
+            yield return documentationRoot;
         }
     }
 
@@ -8028,8 +7916,15 @@ public sealed partial class DeveloperExperienceGuardTests
         string.Equals(FindOwningProjectName(sourcePath)?.Split('.').LastOrDefault(), "Contracts", StringComparison.Ordinal);
 
     private static IEnumerable<string> EnumerateSourceFiles(string root) =>
-        Directory
-            .EnumerateFiles(root, "*.cs", SearchOption.AllDirectories)
+        GmaSourceLayout.FromRepositoryRoot(FindRepositoryRoot())
+            .EnumerateSourceFiles(root)
+            .Where(path => !HasIgnoredPathSegment(path));
+
+    private static IEnumerable<string> EnumerateProjectFiles(string root, SearchOption searchOption = SearchOption.AllDirectories) =>
+        GmaSourceLayout.FromRepositoryRoot(FindRepositoryRoot())
+            .ResolveSourceSearchRoots(root)
+            .Where(Directory.Exists)
+            .SelectMany(searchRoot => Directory.EnumerateFiles(searchRoot, "*.csproj", searchOption))
             .Where(path => !HasIgnoredPathSegment(path));
 
     private static bool IsUnder(string path, string parent)
@@ -8037,6 +7932,15 @@ public sealed partial class DeveloperExperienceGuardTests
         string relativePath = Path.GetRelativePath(parent, path);
         return !relativePath.StartsWith("..", StringComparison.Ordinal) &&
                !Path.IsPathRooted(relativePath);
+    }
+
+    private static string CanonicalRelativePath(string repositoryRoot, string path) =>
+        GmaSourceLayout.FromRepositoryRoot(repositoryRoot).ToCanonicalRelativePath(path);
+
+    private static string ModulePathFromRelative(string repositoryRoot, string relativePath)
+    {
+        string[] segments = relativePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return GmaSourceLayout.ModulePath(repositoryRoot, segments[0], segments[1..]);
     }
 
     private static bool HasRequiredPath(string jsonPath, IReadOnlyList<string> path)
@@ -8323,7 +8227,25 @@ public sealed partial class DeveloperExperienceGuardTests
 
     private static bool HasIgnoredPathSegment(string path)
     {
-        string[] segments = path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        string effectivePath = path;
+        if (Path.IsPathRooted(path))
+        {
+            try
+            {
+                string repositoryRoot = FindRepositoryRoot();
+                string relativePath = Path.GetRelativePath(repositoryRoot, path);
+                if (!relativePath.StartsWith("..", StringComparison.Ordinal) && !Path.IsPathRooted(relativePath))
+                {
+                    effectivePath = relativePath;
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                effectivePath = path;
+            }
+        }
+
+        string[] segments = effectivePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         return segments.Contains("bin", StringComparer.OrdinalIgnoreCase) ||
                segments.Contains("obj", StringComparer.OrdinalIgnoreCase) ||
                segments.Contains(".git", StringComparer.OrdinalIgnoreCase) ||
@@ -8403,11 +8325,28 @@ public sealed partial class DeveloperExperienceGuardTests
                 continue;
             }
 
-            if (!File.Exists(resolvedPath) && !Directory.Exists(resolvedPath))
+            if (!File.Exists(resolvedPath) &&
+                !Directory.Exists(resolvedPath) &&
+                !TryResolveSourceLayoutDocumentationTarget(repositoryRoot, resolvedPath, out resolvedPath))
             {
                 yield return $"{Path.GetRelativePath(repositoryRoot, markdownFile)} has broken local link: {target}";
             }
         }
+    }
+
+    private static bool TryResolveSourceLayoutDocumentationTarget(
+        string repositoryRoot,
+        string resolvedPath,
+        out string sourceLayoutPath)
+    {
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
+        string canonicalPath = sourceLayout.ToCanonicalRelativePath(resolvedPath);
+        if (!sourceLayout.TryResolveCanonicalPath(canonicalPath, out sourceLayoutPath))
+        {
+            return false;
+        }
+
+        return File.Exists(sourceLayoutPath) || Directory.Exists(sourceLayoutPath);
     }
 
     private static bool IsExternalOrAnchorMarkdownTarget(string target) =>
@@ -8416,6 +8355,20 @@ public sealed partial class DeveloperExperienceGuardTests
         target.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
         target.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
         target.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase);
+
+    private static string ToExpectedPackageLocalSolutionEntry(string path, bool packageRootLayout)
+    {
+        if (!packageRootLayout)
+        {
+            return path;
+        }
+
+        return path.StartsWith("docs/", StringComparison.OrdinalIgnoreCase) ||
+               path.StartsWith("eng/", StringComparison.OrdinalIgnoreCase) ||
+               path.StartsWith("tests/", StringComparison.OrdinalIgnoreCase)
+            ? path
+            : $"src/{path}";
+    }
 
     private static string FindRepositoryRoot()
     {
