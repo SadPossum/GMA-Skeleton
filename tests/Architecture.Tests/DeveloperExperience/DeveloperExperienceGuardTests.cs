@@ -1,23 +1,23 @@
 namespace Architecture.Tests;
 
-using Gma.Modules.Auth.Persistence;
-using Catalog.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Gma.Modules.Notifications.Persistence;
-using Ordering.Persistence;
-using Gma.Framework.Domain;
-using Gma.Framework.Naming;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Catalog.Persistence;
 using Gma.Framework.Administration;
 using Gma.Framework.Cqrs;
-using Gma.Framework.Observability;
-using Gma.Framework.Results;
+using Gma.Framework.Domain;
 using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Naming;
+using Gma.Framework.Observability;
 using Gma.Framework.Persistence.EntityFrameworkCore;
+using Gma.Framework.Results;
+using Gma.Modules.Auth.Persistence;
+using Gma.Modules.Notifications.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Ordering.Persistence;
 using Xunit;
 
 [Trait("Category", "Architecture")]
@@ -1326,6 +1326,73 @@ public sealed partial class DeveloperExperienceGuardTests
             .Concat(requiredDocsTokens
                 .Where(token => !setupDocs.Contains(token, StringComparison.Ordinal))
                 .Select(token => $"docs/getting-started/setup.md missing {token}"))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void Stage8_github_repository_helper_is_guarded_and_complete()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string script = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "gma-github-stage8.ps1"));
+        string setupDocs = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "getting-started", "setup.md"));
+        string splitPlan = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "docs",
+            "architecture",
+            "gma-rebrand-and-source-repo-split.md"));
+        string[] requiredRepositories =
+        [
+            "gma-framework",
+            "gma-module-administration",
+            "gma-module-auth",
+            "gma-module-files",
+            "gma-module-notifications",
+            "gma-module-task-runtime",
+            "gma-module-tenancy",
+            "gma-skeleton"
+        ];
+        string[] requiredScriptTokens =
+        [
+            "SupportsShouldProcess",
+            "InitializeCandidates",
+            "CreateRepositories",
+            "PushCandidates",
+            "ConfigureRepositories",
+            "ProtectBranches",
+            "Test-GmaCandidateOwnsGitRepository",
+            "Ensure-GmaSkeletonCandidateMountIgnores",
+            "Assert-GmaGithubCliReady",
+            "gh auth status",
+            "No changes were requested",
+            "required_status_checks",
+            "allow_force_pushes = $false",
+            "git -C $RepositoryPlan.LocalPath push -u origin main dev"
+        ];
+        string[] requiredDocsTokens =
+        [
+            "gma-github-stage8.ps1",
+            "-InitializeCandidates",
+            "-CreateRepositories",
+            "-PushCandidates",
+            "-ConfigureRepositories",
+            "-ProtectBranches",
+            "-WhatIf"
+        ];
+
+        string[] offenders = requiredRepositories
+            .Where(repositoryName => !script.Contains(repositoryName, StringComparison.Ordinal) ||
+                                     !splitPlan.Contains($"SadPossum/{repositoryName}", StringComparison.Ordinal))
+            .Select(repositoryName => $"Stage 8 helper/docs missing {repositoryName}")
+            .Concat(requiredScriptTokens
+                .Where(token => !script.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"eng/gma-github-stage8.ps1 missing {token}"))
+            .Concat(requiredDocsTokens
+                .Where(token => !setupDocs.Contains(token, StringComparison.Ordinal) &&
+                                !splitPlan.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"Stage 8 docs missing {token}"))
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 

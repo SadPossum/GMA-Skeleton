@@ -639,14 +639,22 @@ SadPossum/gma-module-administration
 SadPossum/gma-module-notifications
 SadPossum/gma-module-files
 SadPossum/gma-module-task-runtime
+SadPossum/gma-module-tenancy
 SadPossum/gma-skeleton
 ```
 
 Actions:
 
 - Create GitHub repositories.
+- Use `eng\gma-github-stage8.ps1` as the guarded automation entrypoint once GitHub CLI is installed and authenticated:
+  - no switches prints the exact repository/local-candidate plan without external changes;
+  - `-InitializeCandidates` converts generated Stage 8D folders into standalone local Git repositories, commits their current contents as `SadPossum <258739@bk.ru>`, ensures `main` and `dev`, and ignores skeleton `gma\...` mount points so reusable source is not duplicated into the skeleton repository;
+  - `-CreateRepositories` creates missing GitHub repositories;
+  - `-PushCandidates` adds/updates each candidate `origin` and pushes `main` plus `dev`;
+  - `-ConfigureRepositories` sets repository metadata, default branch, squash-merge defaults, and topics;
+  - `-ProtectBranches` applies branch protection to the configured default branch.
 - Push extracted histories.
-- If using the local Stage 8A snapshot candidates, add each real repository as `origin` under `.agents\stage8a\1\repos\<repo>` and push `dev` plus `main` after the GitHub repository exists.
+- If using the local Stage 8D flattened candidates, add each real repository as `origin` under `.agents\stage8d\2\repos\<repo>` and push `dev` plus `main` after the GitHub repository exists.
 - Configure `main` and `dev` branch model consistently.
 - Set default branch policy. If development happens on `dev`, make `dev` the default branch for work repos.
 - Add branch protection and required checks.
@@ -661,6 +669,10 @@ Actions:
 Validation:
 
 ```powershell
+.\eng\gma-github-stage8.ps1
+.\eng\gma-github-stage8.ps1 -InitializeCandidates -WhatIf
+.\eng\gma-github-stage8.ps1 -InitializeCandidates
+.\eng\gma-github-stage8.ps1 -CreateRepositories -WhatIf
 git ls-remote git@github.com-private:SadPossum/gma-framework.git
 git ls-remote git@github.com-private:SadPossum/gma-module-auth.git
 git clone --recurse-submodules git@github.com-private:SadPossum/gma-skeleton.git
@@ -674,6 +686,16 @@ Agent goal:
 ```text
 Create and configure the real GitHub repositories for GMA framework, reusable modules, and skeleton/composition. Push the proven extracted histories, configure branch model and protections, add CI for standalone and composition validation, and prove a clean clone with recursive submodules can restore, build, and test.
 ```
+
+Stage 8 automation-prep result on 2026-07-08:
+
+- Added `eng\gma-github-stage8.ps1` as the guarded local entrypoint for real repository creation/configuration once GitHub CLI and authentication are available.
+- The helper includes all Stage 8D flattened candidates: framework, Administration, Auth, Files, Notifications, TaskRuntime, Tenancy, and skeleton.
+- The helper is explicit-action only. With no switches it prints the repository/local-candidate plan without changes. With `-WhatIf`, candidate initialization, repository creation, repository configuration, and branch protection can be previewed even before GitHub CLI is installed.
+- The helper validates that push candidates are real standalone Git repositories instead of folders accidentally resolved through the parent monorepo worktree.
+- The Stage 8D local candidates were initialized with standalone `.git` directories, `main` and `dev` branches, clean working trees, and `SadPossum <258739@bk.ru>` local commit authorship. A `-PushCandidates -WhatIf` pass now reaches all framework, module, and skeleton candidates successfully.
+- The skeleton candidate tracks only `gma\.gitkeep` and `gma\modules\.gitkeep` for the mount shape; the actual `gma\framework` and `gma\modules\<module>` source mounts remain ignored local composition paths.
+- The active environment still lacks `gh` and `GH_TOKEN`/`GITHUB_TOKEN`, so real repository creation, pushes, branch protection, and clean recursive-submodule clone proof remain external Stage 8 work.
 
 ## Stage 9: Replace Current Monorepo Internals With Submodules
 

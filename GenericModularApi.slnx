@@ -14,6 +14,7 @@
     <File Path="eng/check-migrations.ps1" />
     <File Path="eng/common.ps1" />
     <File Path="eng/gma-bootstrap.ps1" />
+    <File Path="eng/gma-github-stage8.ps1" />
     <File Path="eng/gma-status.ps1" />
     <File Path="eng/gma-update.ps1" />
     <File Path="eng/gma-validate.ps1" />

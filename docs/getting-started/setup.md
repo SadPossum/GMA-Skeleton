@@ -249,6 +249,14 @@ For an app-style checkout that already has flattened GMA source repositories mou
 
 That command writes ignored `Gma.SourceRoots.props` files at the skeleton root, `gma/framework`, and each mounted reusable module root. The module-local files are required because each source repository imports its own `Directory.Build.props`; the skeleton root props file does not flow into projects inside a mounted source repository. Use `-WhatIf` to preview writes and `-Force` to refresh existing local files.
 
+When moving from local rehearsal to real GitHub repositories, use the guarded Stage 8 helper:
+
+```powershell
+.\eng\gma-github-stage8.ps1
+```
+
+With no action switches, the helper prints the planned `SadPossum/gma-*` repositories and local candidate paths without touching GitHub. Use `-InitializeCandidates` after generating the local Stage 8 candidates so each split folder becomes a standalone local repository with `main` and `dev` branches and the expected local author. Once GitHub CLI is installed and authenticated, run explicit switches such as `-CreateRepositories`, `-PushCandidates`, `-ConfigureRepositories`, and `-ProtectBranches`. Keep `-WhatIf` on the first external pass.
+
 For source-split dry runs on Windows, keep sandbox paths short and clone with `core.longpaths=true`. Early extraction proofs used short ignored `.agents` roots and validated composition clones against local source repositories. The final package-repo rehearsal should use flattened package roots such as `gma-framework\src\Gma.Framework.Results` and `gma-module-auth\src\Gma.Modules.Auth.Application`, then mount them into applications at ergonomic paths such as `gma\framework` and `gma\modules\auth`.
 
 Useful source-first helpers:
