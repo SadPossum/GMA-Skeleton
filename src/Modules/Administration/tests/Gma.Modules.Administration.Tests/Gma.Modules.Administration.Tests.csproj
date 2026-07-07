@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
@@ -11,8 +11,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Administration.Persistence\Gma.Modules.Administration.Persistence.csproj" />
+    <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj" />
+    <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.Persistence\Gma.Modules.Administration.Persistence.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration\Gma.Framework.Administration.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Naming\Gma.Framework.Naming.csproj" />

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
@@ -13,10 +13,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Gma.Modules.Notifications.Application\Gma.Modules.Notifications.Application.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Notifications.Domain\Gma.Modules.Notifications.Domain.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Notifications.Persistence\Gma.Modules.Notifications.Persistence.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Application\Gma.Modules.Notifications.Application.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Domain\Gma.Modules.Notifications.Domain.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Persistence\Gma.Modules.Notifications.Persistence.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj" />

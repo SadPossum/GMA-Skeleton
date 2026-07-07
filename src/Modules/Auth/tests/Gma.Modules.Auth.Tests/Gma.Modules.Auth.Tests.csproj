@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
@@ -12,12 +12,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Auth.Api\Gma.Modules.Auth.Api.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Auth.Application\Gma.Modules.Auth.Application.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Auth.Domain\Gma.Modules.Auth.Domain.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Auth.Infrastructure\Gma.Modules.Auth.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Gma.Modules.Auth.Persistence\Gma.Modules.Auth.Persistence.csproj" />
+    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Api\Gma.Modules.Auth.Api.csproj" />
+    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Application\Gma.Modules.Auth.Application.csproj" />
+    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Domain\Gma.Modules.Auth.Domain.csproj" />
+    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Infrastructure\Gma.Modules.Auth.Infrastructure.csproj" />
+    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Persistence\Gma.Modules.Auth.Persistence.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Domain\Gma.Framework.Domain.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />

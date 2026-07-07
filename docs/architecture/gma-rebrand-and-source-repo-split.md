@@ -1,6 +1,6 @@
 # GMA Rebrand And Source Repo Split Plan
 
-Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, and Stage 8A has local candidate repositories with standalone and composed validation. Real GitHub repositories, history-preserving extraction, and permanent submodule replacement remain future work.
+Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8A has local candidate repositories with standalone and composed validation, and Stage 8D has flattened local repository-shape proof. Real GitHub repositories, history-preserving extraction, and permanent submodule replacement remain future work.
 
 This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
 
@@ -598,6 +598,27 @@ Stage 8D target: flatten source repositories before real submodules:
   - skeleton tests keep only composition guards, selected-module wiring, physical-path bans, source-root bootstrap checks, and cross-module integration tests.
 - If helper code is duplicated across package test suites, extract a tiny framework-owned test helper project such as `Gma.Framework.ArchitectureTesting` under the framework repository's `tests` folder.
 - Rerun the split skeleton restore/build/test proof only after the test ownership move is complete.
+
+Stage 8D flattened local rehearsal result on 2026-07-08:
+
+- The run used `.agents\stage8d\2`; all generated repositories and skeleton composition folders are ignored local artifacts.
+- Local candidate repositories were generated with normal standalone roots:
+  - `gma-framework\src\Gma.Framework.*`, `gma-framework\docs`, `gma-framework\tests`, and `gma-framework\eng`;
+  - `gma-module-<module>\src\Gma.Modules.<Module>.*`, plus module-owned `docs` and `tests` where present.
+- Package-local test projects were hardened so package-owned references use source-root properties such as `$(GmaFrameworkRoot)`, `$(GmaModuleAuthRoot)`, and `$(GmaModuleNotificationsRoot)` instead of monorepo-relative `..\..\Gma.*` paths.
+- The flattened `gma-framework`, Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy candidates each passed restore, build, and package-local tests where present.
+- The skeleton composition mounted candidates under short aliases:
+  - `gma\framework`;
+  - `gma\modules\administration`;
+  - `gma\modules\auth`;
+  - `gma\modules\files`;
+  - `gma\modules\notifications`;
+  - `gma\modules\task-runtime`;
+  - `gma\modules\tenancy`.
+- The skeleton rehearsal removed the old reusable package folders from `src\Framework` and `src\Modules\<ReusableModule>`, rewrote `GenericModularApi.slnx` project/file paths to the `gma\...` mount points, and generated a root `Gma.SourceRoots.props` for hosts, examples, and root tests.
+- Module projects use their own repository-local `Directory.Build.props`, so the skeleton root `Gma.SourceRoots.props` does not flow into mounted module projects. The rehearsal therefore generated app-context `Gma.SourceRoots.props` files inside each mounted module root, pointing back to `gma\framework\src` and the short module aliases. This is the behavior `eng\gma-bootstrap.ps1` should automate before real submodules are introduced.
+- The app-style skeleton rehearsal passed `dotnet restore GenericModularApi.slnx` and `dotnet build GenericModularApi.slnx --no-restore -m:1`.
+- Full split-skeleton test execution is still deferred until package-owned architecture tests move or are copied to their owning repositories. The skeleton architecture tests should eventually keep only composition-focused guards.
 
 Agent goal:
 
