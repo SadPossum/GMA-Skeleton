@@ -509,6 +509,15 @@ Stage 8A local candidate result on 2026-07-07:
 - The candidate CI workflow is a draft. It checks out framework source for module builds; if a reusable module later depends on another reusable module's contracts, that module CI should also check out the needed sibling module repository and pass `-ModuleReposRoot` to `eng\bootstrap-source-roots.ps1`.
 - Stage 8B should repeat this with real GitHub repositories and either `git filter-repo`/`git subtree split` history extraction or an explicit initial-import decision per repository.
 
+Stage 8B start result on 2026-07-07:
+
+- The source-split readiness work was committed to `dev` and pushed to `origin/dev`.
+- `gh` was not installed in the active shell, and no `GITHUB_TOKEN`/`GH_TOKEN` was available, so repository creation could not be performed from this environment.
+- `git ls-remote` returned `Repository not found` for the intended `SadPossum/gma-framework`, reusable module, and `gma-skeleton` repositories, confirming they still need to be created before candidate repos can be pushed.
+- A local submodule proof intentionally checked whether candidate repos could be mounted directly at `src\Framework` and `src\Modules\<Module>`. That does not work because each candidate repository owns its own root files and keeps package code under `src\Framework` or `src\Modules\<Module>` inside the repo.
+- Stage 9 should therefore mount source repositories under stable dependency paths such as `gma\framework` and `gma\modules\<module>`, then update solution paths, source-root defaults, and source-package/architecture guards to consume `gma\framework\src\Framework` and `gma\modules\<module>\src\Modules\<Module>`.
+- Do not submodule a candidate repository directly into the old source-package folder unless that repository is intentionally flattened first.
+
 Agent goal:
 
 ```text
@@ -535,6 +544,7 @@ Actions:
 
 - Create GitHub repositories.
 - Push extracted histories.
+- If using the local Stage 8A snapshot candidates, add each real repository as `origin` under `.agents\stage8a\1\repos\<repo>` and push `dev` plus `main` after the GitHub repository exists.
 - Configure `main` and `dev` branch model consistently.
 - Set default branch policy. If development happens on `dev`, make `dev` the default branch for work repos.
 - Add branch protection and required checks.
