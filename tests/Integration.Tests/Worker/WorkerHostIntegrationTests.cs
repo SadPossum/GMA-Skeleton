@@ -1,7 +1,7 @@
 namespace Integration.Tests;
 
 using System.Text.Json;
-using Auth.Persistence;
+using Gma.Modules.Auth.Persistence;
 using Catalog.Persistence;
 using DotNet.Testcontainers.Containers;
 using Host.Worker;
@@ -11,12 +11,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Ordering.Persistence;
-using Shared.Messaging;
-using Shared.Messaging.Nats;
-using Shared.ModuleComposition;
-using Shared.Tasks;
-using Shared.Tasks.Infrastructure;
-using TaskRuntime.Persistence;
+using Gma.Framework.Messaging;
+using Gma.Framework.Messaging.Nats;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tasks.Infrastructure;
+using Gma.Modules.TaskRuntime.Persistence;
 using TaskSamples.Application.Tasks;
 using TaskSamples.Contracts;
 using Testcontainers.PostgreSql;

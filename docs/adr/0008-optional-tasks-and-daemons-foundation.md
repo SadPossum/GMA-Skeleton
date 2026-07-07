@@ -20,7 +20,7 @@ The backlog calls for:
 
 ## Decision
 
-Add a small `Shared.Tasks` contract surface and task metadata support through module descriptor feature extensions.
+Add a small `Gma.Framework.Tasks` contract surface and task metadata support through module descriptor feature extensions.
 
 The first foundation includes:
 
@@ -29,7 +29,7 @@ The first foundation includes:
 - `TaskProgress` for bounded progress reporting;
 - `TaskControlMessage`, `ITaskControlChannel`, `ITaskControlLoop`, `TaskControlCommandNames`, and `TaskControlLoopExtensions` for system-to-runner control messages;
 - `ITaskRuntimeReporter` for runner-to-system heartbeat/progress reporting;
-- `ITaskCommandDispatcher` in `Shared.Tasks.Cqrs` for dispatching normal CQRS commands from task payload code with task-run context; hosts compose `AddTaskCqrs()` only when registered task handlers need it;
+- `ITaskCommandDispatcher` in `Gma.Framework.Tasks.Cqrs` for dispatching normal CQRS commands from task payload code with task-run context; hosts compose `AddTaskCqrs()` only when registered task handlers need it;
 - `TaskRunRequest`, `TaskWorkerClaim`, `TaskRunLease`, `ITaskRunStore`, `TaskRunStats`, `TaskRunStatusTransitions`, and `TaskRunStatusNames` for scheduler-neutral run persistence, requester provenance, leasing, stats, cancellation, status rules, and stable status wire names;
 - payload versioning and active-run deduplication on `TaskRunRequest`;
 - `TaskHandlerRegistration`, `ITaskHandlerRegistry`, and explicit attribute-backed `AddTaskHandler<TPayload,THandler>(moduleName)` registration;
@@ -39,10 +39,10 @@ The first foundation includes:
 
 The first runtime implementation adds:
 
-- `TaskRuntime.Persistence`, an optional EF-backed runtime module with SQL Server and PostgreSQL migrations in the `tasks` schema;
+- `Gma.Modules.TaskRuntime.Persistence`, an optional EF-backed runtime module with SQL Server and PostgreSQL migrations in the `tasks` schema;
 - `AddTaskWorkerRuntime()`, an explicit hosted-worker composition hook;
 - bounded worker concurrency, task counters/duration, queue-depth and active-run gauges, retrying hosted loops for transient runtime failures, and a stale timeout scanner;
-- optional `TaskRuntime.AdminCli` and `TaskRuntime.AdminApi` front doors for listing, inspecting, status-count stats, enqueueing, control messages, canceling, and retrying runs;
+- optional `Gma.Modules.TaskRuntime.AdminCli` and `Gma.Modules.TaskRuntime.AdminApi` front doors for listing, inspecting, status-count stats, enqueueing, control messages, canceling, and retrying runs;
 - `TaskSamples`, a compiled optional example module that declares and registers tenant-scoped sample tasks.
 
 No external scheduler package or default host worker registration is added in this slice.
@@ -63,7 +63,7 @@ Tasks are executable when a host explicitly composes the runtime store, worker r
 
 - Domain and application modules should not reference scheduler packages directly.
 - Modules declare task metadata in public contracts, but hosts still opt into task runtime composition explicitly.
-- Task control messages are commands at the contract boundary; payload code should poll them through `ITaskControlLoop` or `TaskControlLoopExtensions` and call application commands through `ITaskCommandDispatcher` from `Shared.Tasks.Cqrs` or `IRequestDispatcher`, not through HTTP or module internals. CQRS dispatch is an explicit bridge, not part of baseline task worker infrastructure.
+- Task control messages are commands at the contract boundary; payload code should poll them through `ITaskControlLoop` or `TaskControlLoopExtensions` and call application commands through `ITaskCommandDispatcher` from `Gma.Framework.Tasks.Cqrs` or `IRequestDispatcher`, not through HTTP or module internals. CQRS dispatch is an explicit bridge, not part of baseline task worker infrastructure.
 - Task store implementations should use `TaskRunStatusTransitions` for lease, retry, and terminal-state rules.
 - Cancellation is persisted and lease-aware: unstarted work can terminate immediately, heartbeat/progress renews owned leases, and abandoned cancellation-requested leases can be reclaimed and marked canceled without running payload code.
 - Default hosts must not call `AddTaskWorkerRuntime()` or register task example modules.

@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared.Modules\Shared.Modules.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Tasks\Shared.Tasks.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Modules\Gma.Framework.Modules.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tasks\Gma.Framework.Tasks.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj" />
   </ItemGroup>
 </Project>

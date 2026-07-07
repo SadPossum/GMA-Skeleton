@@ -7,7 +7,7 @@ Observability is split into vendor-neutral module instrumentation and optional h
 - Module code uses `ILogger<T>`, `IMeterFactory`, and `ActivitySource`.
 - Module code never references Prometheus, Loki, Grafana, Serilog sinks, or OpenTelemetry exporters.
 - `ServiceDefaults` owns exporter configuration.
-- HTTP hosts such as `Host.Api` and `Host.AdminApi` own Serilog appsettings and compose the explicit `Shared.Logging.Serilog` and `Shared.Api.Serilog` adapters.
+- HTTP hosts such as `Host.Api` and `Host.AdminApi` own Serilog appsettings and compose the explicit `Gma.Framework.Logging.Serilog` and `Gma.Framework.Api.Serilog` adapters.
 - Prometheus and OTLP export are independently optional.
 
 ## Meter and Source Names
@@ -94,10 +94,10 @@ RouteGroupBuilder group = endpoints.MapGroup("/api/auth")
     .WithTags("Auth");
 ```
 
-HTTP hosts call `UseConfiguredSerilog()` from `Shared.Logging.Serilog` to load their local Serilog appsettings, then call `UseSharedSerilogRequestLogging()` from `Shared.Api.Serilog`. The request logging adapter reads endpoint metadata and enriches Serilog request events with module, tenant, and trace properties while hosts still own levels, sinks, and deployment-specific configuration data.
+HTTP hosts call `UseConfiguredSerilog()` from `Gma.Framework.Logging.Serilog` to load their local Serilog appsettings, then call `UseGmaSerilogRequestLogging()` from `Gma.Framework.Api.Serilog`. The request logging adapter reads endpoint metadata and enriches Serilog request events with module, tenant, and trace properties while hosts still own levels, sinks, and deployment-specific configuration data.
 
-`Shared.Api` remains vendor-neutral and owns only HTTP/module metadata. Serilog-specific request logging lives in the separate adapter project so modules can depend on generic API contracts without inheriting logging backend packages.
-Serilog host configuration lives in `Shared.Logging.Serilog`, so host projects do not reference Serilog packages directly.
+`Gma.Framework.Api` remains vendor-neutral and owns only HTTP/module metadata. Serilog-specific request logging lives in the separate adapter project so modules can depend on generic API contracts without inheriting logging backend packages.
+Serilog host configuration lives in `Gma.Framework.Logging.Serilog`, so host projects do not reference Serilog packages directly.
 
 ## Prometheus
 
@@ -159,7 +159,7 @@ Create a module-owned internal metrics class using `IMeterFactory`:
 
 ```csharp
 using Microsoft.Extensions.Options;
-using Shared.Runtime;
+using Gma.Framework.Runtime;
 
 internal sealed class BillingMetrics
 {

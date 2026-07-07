@@ -4,10 +4,10 @@ Projection rebuild tasks are the production mechanism for repairing or evolving 
 
 ## Implemented V1
 
-The first implementation adds a small shared projection rebuild helper in `Shared.ProjectionRebuild`, an optional task adapter in `Shared.ProjectionRebuild.Tasks`, an optional EF adapter in `Shared.ProjectionRebuild.EntityFrameworkCore`, and a compiled Catalog-to-Ordering example:
+The first implementation adds a small shared projection rebuild helper in `Gma.Framework.ProjectionRebuild`, an optional task adapter in `Gma.Framework.ProjectionRebuild.Tasks`, an optional EF adapter in `Gma.Framework.ProjectionRebuild.EntityFrameworkCore`, and a compiled Catalog-to-Ordering example:
 
 - `ProjectionRebuildRunner<TSnapshot>` owns the generic task-neutral loop, checkpoint load/save, observer callbacks, and bounded metrics.
-- `TaskProjectionRebuildRunner<TSnapshot>` in `Shared.ProjectionRebuild.Tasks` adapts the generic loop to task progress reporting and cooperative task control polling.
+- `TaskProjectionRebuildRunner<TSnapshot>` in `Gma.Framework.ProjectionRebuild.Tasks` adapts the generic loop to task progress reporting and cooperative task control polling.
 - `IProjectionRebuildSource<TSnapshot>` reads authoritative source batches through an explicit contract.
 - `IProjectionRebuildWriter<TSnapshot>` writes or dry-runs idempotent consumer-owned projection batches.
 - `IProjectionRebuildCheckpointStore` is resolved by consumer module and persists checkpoints in that module's schema.
@@ -56,7 +56,7 @@ The shared framework should own repetitive operational behavior:
 - idempotent write orchestration;
 - metrics and task progress payloads.
 
-For EF-backed modules, `Shared.ProjectionRebuild.EntityFrameworkCore` owns the repeated checkpoint entity/store mapping shape. The module still provides a concrete checkpoint state type, maps it into its own schema, includes provider-specific migrations, and registers the store explicitly.
+For EF-backed modules, `Gma.Framework.ProjectionRebuild.EntityFrameworkCore` owns the repeated checkpoint entity/store mapping shape. The module still provides a concrete checkpoint state type, maps it into its own schema, includes provider-specific migrations, and registers the store explicitly.
 When a projection writer and checkpoint store use the same DbContext, the module may register an EF transaction boundary so each write batch and its checkpoint save commit or roll back together. Modules that write through separate stores or external systems should leave the boundary unregistered and keep the writer idempotent.
 
 Tenant context remains owned by the caller. Tenant-scoped rebuild tasks declare tenant scope in `ModuleTaskDescriptor`; the worker sets `ITenantContextAccessor` before invoking the task handler, then the task handler calls `TaskProjectionRebuildRunner<TSnapshot>`.

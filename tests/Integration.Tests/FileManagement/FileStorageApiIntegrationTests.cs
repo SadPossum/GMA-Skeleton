@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
-using Files.Contracts;
+using Gma.Modules.Files.Contracts;
 using Integration.Tests.Support;
 using Xunit;
 

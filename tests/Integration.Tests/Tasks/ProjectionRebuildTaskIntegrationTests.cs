@@ -3,7 +3,7 @@ namespace Integration.Tests;
 using Catalog.Contracts;
 using Integration.Tests.Support;
 using Ordering.Contracts;
-using Shared.Tasks;
+using Gma.Framework.Tasks;
 using Testcontainers.MsSql;
 using Testcontainers.PostgreSql;
 using Xunit;

@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\Shared.Messaging\Shared.Messaging.csproj" />
-    <ProjectReference Include="..\Shared.ModuleComposition\Shared.ModuleComposition.csproj" />
-    <ProjectReference Include="..\Shared.Naming\Shared.Naming.csproj" />
-    <ProjectReference Include="..\Shared.Tenancy\Shared.Tenancy.csproj" />
-  </ItemGroup>
-</Project>

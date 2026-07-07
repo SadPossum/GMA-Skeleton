@@ -1,8 +1,8 @@
 namespace Ordering.Application.Validation;
 
 using Ordering.Application.Queries;
-using Shared.AccessControl;
-using Shared.Cqrs;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
 
 internal sealed class GetOrderQueryValidator : IQueryValidator<GetOrderQuery>
 {

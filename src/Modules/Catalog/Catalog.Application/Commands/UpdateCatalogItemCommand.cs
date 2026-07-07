@@ -1,7 +1,7 @@
 namespace Catalog.Application.Commands;
 
 using Catalog.Contracts;
-using Shared.Cqrs;
+using Gma.Framework.Cqrs;
 
 public sealed record UpdateCatalogItemCommand(
     Guid ItemId,

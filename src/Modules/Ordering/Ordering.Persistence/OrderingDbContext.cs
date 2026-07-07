@@ -2,9 +2,9 @@ namespace Ordering.Persistence;
 
 using Microsoft.EntityFrameworkCore;
 using Ordering.Domain.Aggregates;
-using Shared.Persistence.EntityFrameworkCore;
-using Shared.Tenancy;
-using Shared.Messaging.Infrastructure;
+using Gma.Framework.Persistence.EntityFrameworkCore;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Messaging.Infrastructure;
 
 public sealed class OrderingDbContext(DbContextOptions<OrderingDbContext> options, ITenantContext tenantContext)
     : TenantAwareDbContext<OrderingDbContext>(options, tenantContext)

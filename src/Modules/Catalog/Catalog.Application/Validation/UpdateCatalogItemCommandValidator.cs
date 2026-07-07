@@ -2,7 +2,7 @@ namespace Catalog.Application.Validation;
 
 using Catalog.Application.Commands;
 using Catalog.Contracts;
-using Shared.Cqrs;
+using Gma.Framework.Cqrs;
 
 internal sealed class UpdateCatalogItemCommandValidator : ICommandValidator<UpdateCatalogItemCommand>
 {

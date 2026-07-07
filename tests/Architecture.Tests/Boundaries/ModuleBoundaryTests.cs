@@ -2,10 +2,10 @@ namespace Architecture.Tests;
 
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Shared.Caching;
-using Shared.Cqrs;
-using Shared.Messaging;
-using Shared.Cqrs.UnitOfWork;
+using Gma.Framework.Caching;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Messaging;
+using Gma.Framework.Cqrs.UnitOfWork;
 using Xunit;
 
 [Trait("Category", "Architecture")]
@@ -13,23 +13,23 @@ public sealed class ModuleBoundaryTests
 {
     private static readonly string[] SharedAdapterAssembliesWithNonStandardNames =
     [
-        "Shared.Api.OpenApi",
-        "Shared.Api.Serilog",
-        "Shared.Caching.Cqrs",
-        "Shared.Caching.Redis",
-        "Shared.Infrastructure",
-        "Shared.Logging.Serilog",
-        "Shared.Messaging.Nats",
-        "Shared.Messaging.Nats.Aspire",
-        "Shared.Notifications.Api",
-        "Shared.Notifications.Cqrs",
-        "Shared.Notifications.SignalR",
-        "Shared.Persistence.EntityFrameworkCore",
-        "Shared.Tenancy.Api.Serilog",
-        "Shared.Tenancy.Caching",
-        "Shared.Tenancy.Cqrs",
-        "Shared.Tenancy.Messaging.Infrastructure",
-        "Shared.Tenancy.Tasks"
+        "Gma.Framework.Api.OpenApi",
+        "Gma.Framework.Api.Serilog",
+        "Gma.Framework.Caching.Cqrs",
+        "Gma.Framework.Caching.Redis",
+        "Gma.Framework.Infrastructure",
+        "Gma.Framework.Logging.Serilog",
+        "Gma.Framework.Messaging.Nats",
+        "Gma.Framework.Messaging.Nats.Aspire",
+        "Gma.Framework.Notifications.Api",
+        "Gma.Framework.Notifications.Cqrs",
+        "Gma.Framework.Notifications.SignalR",
+        "Gma.Framework.Persistence.EntityFrameworkCore",
+        "Gma.Framework.Tenancy.Api.Serilog",
+        "Gma.Framework.Tenancy.Caching",
+        "Gma.Framework.Tenancy.Cqrs",
+        "Gma.Framework.Tenancy.Messaging.Infrastructure",
+        "Gma.Framework.Tenancy.Tasks"
     ];
 
     [Fact]
@@ -104,8 +104,8 @@ public sealed class ModuleBoundaryTests
         [
             "Microsoft.Extensions.Caching.Hybrid",
             "Microsoft.Extensions.Caching.StackExchangeRedis",
-            "Shared.Caching.Cqrs",
-            "Shared.Caching.Redis",
+            "Gma.Framework.Caching.Cqrs",
+            "Gma.Framework.Caching.Redis",
             "StackExchange.Redis"
         ];
 
@@ -142,9 +142,9 @@ public sealed class ModuleBoundaryTests
         string[] forbiddenPrefixes =
         [
             "Microsoft.AspNetCore.SignalR",
-            "Shared.Notifications.Api",
-            "Shared.Notifications.Cqrs",
-            "Shared.Notifications.SignalR"
+            "Gma.Framework.Notifications.Api",
+            "Gma.Framework.Notifications.Cqrs",
+            "Gma.Framework.Notifications.SignalR"
         ];
 
         foreach (Assembly assembly in ArchitectureCatalog.ModuleBoundaryAssemblies)
@@ -173,7 +173,7 @@ public sealed class ModuleBoundaryTests
                 return !projectName.EndsWith(".Api", StringComparison.Ordinal) &&
                        !projectName.EndsWith(".AdminApi", StringComparison.Ordinal);
             })
-            .Where(path => File.ReadAllText(path).Contains("Shared.Api", StringComparison.Ordinal))
+            .Where(path => File.ReadAllText(path).Contains("Gma.Framework.Api", StringComparison.Ordinal))
             .Select(path => Path.GetRelativePath(repositoryRoot, path))
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -188,7 +188,7 @@ public sealed class ModuleBoundaryTests
             .Where(project => project.Kind == ModuleProjectKind.Contracts)
             .Where(project => project.Assembly
                 .GetReferencedAssemblies()
-                .Any(reference => string.Equals(reference.Name, "Shared.Administration", StringComparison.Ordinal)))
+                .Any(reference => string.Equals(reference.Name, "Gma.Framework.Administration", StringComparison.Ordinal)))
             .Select(project => project.ProjectName)
             .Order(StringComparer.Ordinal)
             .ToArray();
@@ -262,15 +262,15 @@ public sealed class ModuleBoundaryTests
         string adapterSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Messaging.Nats.Aspire",
+            "Framework",
+            "Gma.Framework.Messaging.Nats.Aspire",
             "DependencyInjection.cs"));
         string adapterProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Messaging.Nats.Aspire",
-            "Shared.Messaging.Nats.Aspire.csproj"));
+            "Framework",
+            "Gma.Framework.Messaging.Nats.Aspire",
+            "Gma.Framework.Messaging.Nats.Aspire.csproj"));
 
         string[] offenders = hostFiles
             .SelectMany(path =>
@@ -345,8 +345,8 @@ public sealed class ModuleBoundaryTests
 
     private static bool IsAllowedNonTransactionalCommand(Type type) =>
         type.FullName is
-            "Files.Application.Commands.DeleteFileCommand" or
-            "Files.Application.Commands.UploadFileCommand";
+            "Gma.Modules.Files.Application.Commands.DeleteFileCommand" or
+            "Gma.Modules.Files.Application.Commands.UploadFileCommand";
 
     [Fact]
     public void Module_query_handlers_do_not_inject_side_effect_infrastructure()
@@ -427,7 +427,7 @@ public sealed class ModuleBoundaryTests
         string repositoryRoot = FindRepositoryRoot();
         Dictionary<string, string[]> expectedTokensByFile = new()
         {
-            [Path.Combine(repositoryRoot, "src", "Modules", "Auth", "Auth.AdminApi", "AuthAdminApiModule.cs")] =
+            [Path.Combine(repositoryRoot, "src", "Modules", "Auth", "Gma.Modules.Auth.AdminApi", "AuthAdminApiModule.cs")] =
             [
                 "errorStatusCodes:",
                 "AuthApplicationErrors.MemberNotFound.Code"
@@ -527,13 +527,13 @@ public sealed class ModuleBoundaryTests
     private static bool IsForbiddenDomainDependency(string referenceName) =>
         ArchitectureCatalog.ModulePrefixes.Any(prefix => referenceName.StartsWith(prefix + ".", StringComparison.Ordinal)) ||
         IsSharedAdapterDependency(referenceName) ||
-        referenceName.StartsWith("Shared.AccessControl", StringComparison.Ordinal) ||
-        referenceName.StartsWith("Shared.Application", StringComparison.Ordinal) ||
-        referenceName.StartsWith("Shared.Infrastructure", StringComparison.Ordinal) ||
-        referenceName.StartsWith("Shared.Api", StringComparison.Ordinal) ||
-        referenceName.StartsWith("Shared.Administration", StringComparison.Ordinal) ||
-        referenceName.StartsWith("Shared.Messaging", StringComparison.Ordinal) ||
-        referenceName.StartsWith("Shared.Tasks", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.AccessControl", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.Application", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.Infrastructure", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.Api", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.Administration", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.Messaging", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.Tasks", StringComparison.Ordinal) ||
         referenceName.StartsWith("Microsoft.AspNetCore", StringComparison.Ordinal) ||
         referenceName.StartsWith("Microsoft.EntityFrameworkCore", StringComparison.Ordinal) ||
         referenceName.StartsWith("Microsoft.Extensions", StringComparison.Ordinal) ||
@@ -546,8 +546,8 @@ public sealed class ModuleBoundaryTests
         referenceName.StartsWith(modulePrefix + ".Infrastructure", StringComparison.Ordinal) ||
         referenceName.StartsWith(modulePrefix + ".Persistence", StringComparison.Ordinal) ||
         IsSharedAdapterDependency(referenceName) ||
-        referenceName.StartsWith("Shared.Infrastructure", StringComparison.Ordinal) ||
-        referenceName.StartsWith("Shared.Api", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.Infrastructure", StringComparison.Ordinal) ||
+        referenceName.StartsWith("Gma.Framework.Api", StringComparison.Ordinal) ||
         referenceName.StartsWith("Microsoft.AspNetCore", StringComparison.Ordinal) ||
         referenceName.StartsWith("Microsoft.EntityFrameworkCore", StringComparison.Ordinal) ||
         referenceName.StartsWith("Microsoft.Extensions.Hosting", StringComparison.Ordinal) ||
@@ -555,7 +555,7 @@ public sealed class ModuleBoundaryTests
         referenceName.StartsWith("NATS.", StringComparison.Ordinal);
 
     private static bool IsSharedAdapterDependency(string referenceName) =>
-        (referenceName.StartsWith("Shared.", StringComparison.Ordinal) &&
+        (referenceName.StartsWith("Gma.Framework.", StringComparison.Ordinal) &&
          referenceName.EndsWith(".Infrastructure", StringComparison.Ordinal)) ||
         SharedAdapterAssembliesWithNonStandardNames.Contains(referenceName, StringComparer.Ordinal);
 
@@ -572,7 +572,7 @@ public sealed class ModuleBoundaryTests
         type.IsGenericType &&
         string.Equals(
             type.GetGenericTypeDefinition().FullName,
-            "Shared.Cqrs.ICommand`1",
+            "Gma.Framework.Cqrs.ICommand`1",
             StringComparison.Ordinal);
 
     private static bool ImplementsQuery(Type type) =>
@@ -590,7 +590,7 @@ public sealed class ModuleBoundaryTests
         type.IsGenericType &&
         string.Equals(
             type.GetGenericTypeDefinition().FullName,
-            "Shared.Cqrs.ITransactionalCommand`1",
+            "Gma.Framework.Cqrs.ITransactionalCommand`1",
             StringComparison.Ordinal);
 
     private static bool ContainsForbiddenQuerySideEffectDependency(Type dependencyType)

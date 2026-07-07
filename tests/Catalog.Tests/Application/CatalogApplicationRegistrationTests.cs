@@ -5,8 +5,8 @@ using Catalog.Application.Commands;
 using Catalog.Application.Queries;
 using Catalog.Contracts;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Cqrs;
-using Shared.Application.Events;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Application.Events;
 using Xunit;
 
 [Trait("Category", "Unit")]

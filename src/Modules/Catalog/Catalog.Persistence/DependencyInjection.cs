@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Shared.Messaging;
-using Shared.Cqrs.UnitOfWork;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Messaging;
+using Gma.Framework.Cqrs.UnitOfWork;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 public static class DependencyInjection
 {

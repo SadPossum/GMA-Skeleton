@@ -2,8 +2,8 @@ namespace Catalog.Application.Handlers;
 
 using Catalog.Contracts;
 using Catalog.Domain.Events;
-using Shared.Application.Events;
-using Shared.Messaging;
+using Gma.Framework.Application.Events;
+using Gma.Framework.Messaging;
 
 internal sealed class CatalogItemCreatedOutboxProjector(IOutboxWriterRegistry outboxWriters)
     : IDomainEventHandler<CatalogItemCreatedDomainEvent>

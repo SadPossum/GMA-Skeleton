@@ -12,20 +12,20 @@ Messaging is behind abstractions. Domain and application code should never depen
 - `IOutboxStore`
 - `IEventBus`
 
-Public module integration events inherit `IntegrationEvent` from `Shared.Messaging`.
+Public module integration events inherit `IntegrationEvent` from `Gma.Framework.Messaging`.
 The base owns event id, occurrence time, event name, and version validation. Module event types keep payload-specific fields and validation local to the owning `.Contracts` project.
-Tenant-owned events opt into `Shared.Tenancy.Messaging` by inheriting `TenantIntegrationEvent`; that contract bridge owns tenant id normalization without making base messaging or NATS depend on tenancy.
+Tenant-owned events opt into `Gma.Framework.Tenancy.Messaging` by inheriting `TenantIntegrationEvent`; that contract bridge owns tenant id normalization without making base messaging or NATS depend on tenancy.
 This keeps the skeleton compatible with common event metadata practices without forcing a full CloudEvents envelope into module payload classes.
 
 ## Runtime Adapter
 
-`Shared.Messaging.Infrastructure` registers EF outbox/inbox helpers, the outbox writer registry, outbox options, messaging metrics, the outbox publisher loop, and a fail-fast null event bus. It does not reference NATS and does not start the outbox publisher by itself.
-`Shared.Messaging.Nats` owns the NATS JetStream event bus, consumer hosted service, NATS options, and low-level `AddNatsJetStreamMessaging()` / `AddNatsJetStreamConsumers()` composition hooks.
-`Shared.Messaging.Nats.Aspire` owns configured Aspire NATS client composition for production-style hosts. `AddConfiguredNatsJetStreamMessaging()` wires publishing and `AddConfiguredNatsJetStreamConsumers()` wires consumer-only or consumer-plus-publisher hosts without requiring direct Aspire package references in composition roots.
-`Shared.Tenancy.Messaging` is the optional contract bridge for module contract packages that need tenant-aware integration events.
-`Shared.Tenancy.Messaging.Infrastructure` is the optional runtime bridge for hosts; `AddTenantAwareMessaging()` registers generic scope resolution and consumer tenant-context setup through messaging extension points.
+`Gma.Framework.Messaging.Infrastructure` registers EF outbox/inbox helpers, the outbox writer registry, outbox options, messaging metrics, the outbox publisher loop, and a fail-fast null event bus. It does not reference NATS and does not start the outbox publisher by itself.
+`Gma.Framework.Messaging.Nats` owns the NATS JetStream event bus, consumer hosted service, NATS options, and low-level `AddNatsJetStreamMessaging()` / `AddNatsJetStreamConsumers()` composition hooks.
+`Gma.Framework.Messaging.Nats.Aspire` owns configured Aspire NATS client composition for production-style hosts. `AddConfiguredNatsJetStreamMessaging()` wires publishing and `AddConfiguredNatsJetStreamConsumers()` wires consumer-only or consumer-plus-publisher hosts without requiring direct Aspire package references in composition roots.
+`Gma.Framework.Tenancy.Messaging` is the optional contract bridge for module contract packages that need tenant-aware integration events.
+`Gma.Framework.Tenancy.Messaging.Infrastructure` is the optional runtime bridge for hosts; `AddTenantAwareMessaging()` registers generic scope resolution and consumer tenant-context setup through messaging extension points.
 
-HTTP hosts that need real publishing opt in by referencing `Shared.Messaging.Nats.Aspire` and calling:
+HTTP hosts that need real publishing opt in by referencing `Gma.Framework.Messaging.Nats.Aspire` and calling:
 
 ```csharp
 builder.AddMessagingInfrastructure();
@@ -33,7 +33,7 @@ builder.AddTenantAwareMessaging(); // only for hosts/modules that use tenant-sco
 builder.AddConfiguredNatsJetStreamMessaging();
 ```
 
-That call is a no-op unless `NatsJetStream:Enabled=true`. When enabled, it validates `NatsJetStream` settings, requires `ConnectionStrings:nats`, configures the Aspire NATS client from that connection string, calls into `Shared.Messaging.Nats`, registers the NATS event bus, and starts `OutboxPublisherService`.
+That call is a no-op unless `NatsJetStream:Enabled=true`. When enabled, it validates `NatsJetStream` settings, requires `ConnectionStrings:nats`, configures the Aspire NATS client from that connection string, calls into `Gma.Framework.Messaging.Nats`, registers the NATS event bus, and starts `OutboxPublisherService`.
 When the host does not opt in, `IEventBus` remains a null adapter and module outbox rows stay local until a publisher is composed.
 Tools and short-lived hosts can use shared infrastructure without accidentally draining outboxes.
 
@@ -51,7 +51,7 @@ Separated mode:
 
 The worker can publish only module outbox stores registered in that worker process. For example, an Auth-only worker sets `Worker:Modules:Auth=true`; a Catalog/Ordering worker must opt into those modules and run their migrations before enabling publishing.
 
-Lower-level test or custom hosts can still reference `Shared.Messaging.Nats`, provide `INatsConnection` themselves, and call `AddNatsJetStreamMessaging()` directly, but production hosts should use the configured Aspire adapter so connection-string behavior stays consistent.
+Lower-level test or custom hosts can still reference `Gma.Framework.Messaging.Nats`, provide `INatsConnection` themselves, and call `AddNatsJetStreamMessaging()` directly, but production hosts should use the configured Aspire adapter so connection-string behavior stays consistent.
 The low-level messaging methods compose `AddMessagingInfrastructure()` idempotently, and that composes `AddRuntimeInfrastructure()` for shared clocks and id generation without pulling in CQRS or domain-event dispatch.
 
 The NATS JetStream adapter publishes each outbox row with the outbox message id as `NatsJSPubOpts.MsgId`.
@@ -130,7 +130,7 @@ Publisher failures are isolated at module-store and message granularity. If one 
 
 Broker-side publish de-duplication is a defensive layer, not a replacement for outbox state. The local outbox row remains the source of retry truth, and consumer inbox tables remain the source of handler idempotency truth.
 
-Outbox metadata limits are declared by `OutboxMessage` and applied through `ConfigureOutboxMessage(...)` from `Shared.Messaging.Infrastructure`. Subject, event type, generic message scope id, worker id, and bounded failure metadata should fail or truncate in shared infrastructure before a provider-specific `SaveChanges` path can fail late.
+Outbox metadata limits are declared by `OutboxMessage` and applied through `ConfigureOutboxMessage(...)` from `Gma.Framework.Messaging.Infrastructure`. Subject, event type, generic message scope id, worker id, and bounded failure metadata should fail or truncate in shared infrastructure before a provider-specific `SaveChanges` path can fail late.
 For storage compatibility, the shared EF mapping currently stores `ScopeId` in the existing `TenantId` column. New code should use `ScopeId` for messaging infrastructure and `TenantId` only inside tenant-aware event payloads or tenant modules.
 
 ## Inbox And Consumers
@@ -146,7 +146,7 @@ EF-backed modules should map inbox rows through `ConfigureInboxMessage(...)` so 
 - Use `IOutboxWriterRegistry` from application handlers; do not inject a bare `IOutboxWriter`.
 - Keep event names stable.
 - Version events explicitly.
-- Inherit tenant-owned public events from `TenantIntegrationEvent` and compose `Shared.Tenancy.Messaging.Infrastructure` in hosts that publish or consume them.
+- Inherit tenant-owned public events from `TenantIntegrationEvent` and compose `Gma.Framework.Tenancy.Messaging.Infrastructure` in hosts that publish or consume them.
 - Inherit tenant-free public events from `IntegrationEvent`; do not re-declare event id, occurrence time, event name, or version in every event.
 - Prefer additive event changes.
 - Do not expose internal domain entities as integration events.

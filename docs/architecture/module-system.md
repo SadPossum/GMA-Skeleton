@@ -26,82 +26,82 @@ public interface IModule
 
 The shared core is intentionally small:
 
-- `Shared.Naming`, `Shared.Numerics`, `Shared.Observability`, and `Shared.Results` stay dependency-free.
-- `Shared.Domain` owns aggregate/domain-event primitives and depends only on `Shared.Naming` for shared identifier syntax such as tenant ids and `Shared.Numerics` for reusable numeric validation.
-- `Shared.Modules` owns module metadata primitives and references only `Shared.Naming`.
-- `Shared.ModuleComposition` owns module profile, provided-feature, required-feature, required-module, and fail-fast composition validation primitives. It references only `Shared.Modules`, `Shared.Naming`, and hosting abstractions needed by composition roots.
-- `Shared.Authorization` owns permission metadata descriptor extensions and references only `Shared.Modules` and `Shared.Naming`.
-- `Shared.Caching` owns cache contracts, provider/options seams, adapter markers, cache descriptor metadata, and cache composition feature ids. It references `Shared.ModuleComposition`, `Shared.Modules`, and `Shared.Naming`.
-- `Shared.Messaging` owns integration event, outbox/inbox, subscription, messaging descriptor contracts, and messaging composition feature ids. It references shared primitives plus DI abstractions, not transport adapters.
-- `Shared.Tasks` owns task contracts, task descriptor metadata, and task runtime composition feature ids. It does not reference CQRS or runtime adapters.
-- `Shared.Caching.Cqrs` owns the optional bridge for flushing deferred cache invalidations after successful CQRS unit-of-work commits.
-- `Shared.Tasks.Cqrs` owns the optional bridge for dispatching application commands from task payload handlers.
-- `Shared.ProjectionRebuild` owns the task-neutral rebuild loop, checkpoint contracts, source/writer contracts, and metrics; `Shared.ProjectionRebuild.Tasks` adapts that loop to task progress and control messages.
-- `Shared.Runtime` owns clock/id abstractions and dependency-free runtime naming helpers.
-- `Shared.Tenancy` owns tenant context contracts, tenant options, and tenant errors.
-- `Shared.Security` owns dependency-free claim/security constants shared by HTTP adapters and token issuers.
-- `Shared.Cqrs` owns command/query contracts, validators, dispatcher contracts, `Unit`, and transactional unit-of-work contracts.
-- `Shared.Application.Events` owns domain-event handler and dispatcher contracts. It references `Shared.Domain` only.
-- `Shared.Pagination` owns normalized paging request helpers and remains dependency-free.
-- `Shared.Application.Composition` owns constrained application assembly registration only. It may reference `Shared.Application.Events`, `Shared.Cqrs`, and small dependency-injection abstractions, but not domain models directly, HTTP, EF, messaging transports, cache backends, logging backends, hosting, or provider packages.
-- Adapter projects such as `Shared.Infrastructure`, `Shared.Application.Events.Infrastructure`, `Shared.Cqrs.Infrastructure`, `Shared.Runtime.Infrastructure`, `Shared.Tenancy.Infrastructure`, `Shared.Tenancy.Api.Serilog`, `Shared.Tenancy.Caching`, `Shared.Tenancy.Cqrs`, `Shared.Tenancy.Tasks`, `Shared.Caching.Infrastructure`, `Shared.Caching.Cqrs`, `Shared.Messaging.Infrastructure`, `Shared.Messaging.Nats`, `Shared.Tasks.Infrastructure`, `Shared.ProjectionRebuild.Tasks`, `Shared.Persistence.EntityFrameworkCore`, `Shared.Api.*`, `Shared.Caching.Redis`, `Shared.Messaging.Nats.Aspire`, and `Shared.Logging.Serilog` own concrete runtime packages.
+- `Gma.Framework.Naming`, `Gma.Framework.Numerics`, `Gma.Framework.Observability`, and `Gma.Framework.Results` stay dependency-free.
+- `Gma.Framework.Domain` owns aggregate/domain-event primitives and depends only on `Gma.Framework.Naming` for shared identifier syntax such as tenant ids and `Gma.Framework.Numerics` for reusable numeric validation.
+- `Gma.Framework.Modules` owns module metadata primitives and references only `Gma.Framework.Naming`.
+- `Gma.Framework.ModuleComposition` owns module profile, provided-feature, required-feature, required-module, and fail-fast composition validation primitives. It references only `Gma.Framework.Modules`, `Gma.Framework.Naming`, and hosting abstractions needed by composition roots.
+- `Gma.Framework.Authorization` owns permission metadata descriptor extensions and references only `Gma.Framework.Modules` and `Gma.Framework.Naming`.
+- `Gma.Framework.Caching` owns cache contracts, provider/options seams, adapter markers, cache descriptor metadata, and cache composition feature ids. It references `Gma.Framework.ModuleComposition`, `Gma.Framework.Modules`, and `Gma.Framework.Naming`.
+- `Gma.Framework.Messaging` owns integration event, outbox/inbox, subscription, messaging descriptor contracts, and messaging composition feature ids. It references shared primitives plus DI abstractions, not transport adapters.
+- `Gma.Framework.Tasks` owns task contracts, task descriptor metadata, and task runtime composition feature ids. It does not reference CQRS or runtime adapters.
+- `Gma.Framework.Caching.Cqrs` owns the optional bridge for flushing deferred cache invalidations after successful CQRS unit-of-work commits.
+- `Gma.Framework.Tasks.Cqrs` owns the optional bridge for dispatching application commands from task payload handlers.
+- `Gma.Framework.ProjectionRebuild` owns the task-neutral rebuild loop, checkpoint contracts, source/writer contracts, and metrics; `Gma.Framework.ProjectionRebuild.Tasks` adapts that loop to task progress and control messages.
+- `Gma.Framework.Runtime` owns clock/id abstractions and dependency-free runtime naming helpers.
+- `Gma.Framework.Tenancy` owns tenant context contracts, tenant options, and tenant errors.
+- `Gma.Framework.Security` owns dependency-free claim/security constants shared by HTTP adapters and token issuers.
+- `Gma.Framework.Cqrs` owns command/query contracts, validators, dispatcher contracts, `Unit`, and transactional unit-of-work contracts.
+- `Gma.Framework.Application.Events` owns domain-event handler and dispatcher contracts. It references `Gma.Framework.Domain` only.
+- `Gma.Framework.Pagination` owns normalized paging request helpers and remains dependency-free.
+- `Gma.Framework.Application.Composition` owns constrained application assembly registration only. It may reference `Gma.Framework.Application.Events`, `Gma.Framework.Cqrs`, and small dependency-injection abstractions, but not domain models directly, HTTP, EF, messaging transports, cache backends, logging backends, hosting, or provider packages.
+- Adapter projects such as `Gma.Framework.Infrastructure`, `Gma.Framework.Application.Events.Infrastructure`, `Gma.Framework.Cqrs.Infrastructure`, `Gma.Framework.Runtime.Infrastructure`, `Gma.Framework.Tenancy.Infrastructure`, `Gma.Framework.Tenancy.Api.Serilog`, `Gma.Framework.Tenancy.Caching`, `Gma.Framework.Tenancy.Cqrs`, `Gma.Framework.Tenancy.Tasks`, `Gma.Framework.Caching.Infrastructure`, `Gma.Framework.Caching.Cqrs`, `Gma.Framework.Messaging.Infrastructure`, `Gma.Framework.Messaging.Nats`, `Gma.Framework.Tasks.Infrastructure`, `Gma.Framework.ProjectionRebuild.Tasks`, `Gma.Framework.Persistence.EntityFrameworkCore`, `Gma.Framework.Api.*`, `Gma.Framework.Caching.Redis`, `Gma.Framework.Messaging.Nats.Aspire`, and `Gma.Framework.Logging.Serilog` own concrete runtime packages.
 
 This keeps every module free to depend on shared contracts and primitives without inheriting optional infrastructure choices.
 
 Shared project ownership quick reference:
 
-- `Shared.Infrastructure`: host-level facade that composes the baseline runtime adapters below.
-- `Shared.Application.Events.Infrastructure`: domain-event dispatcher implementation.
-- `Shared.Cqrs.Infrastructure`: request dispatcher, CQRS pipeline behaviors, command unit-of-work behavior, and CQRS runtime registration.
-- `Shared.Runtime.Infrastructure`: default clock and id generator implementations.
-- `Shared.Tenancy.Infrastructure`: default/null tenant context, tenant option validation, and baseline tenancy service wiring.
-- `Shared.Tenancy.Api.Serilog`: optional tenant-to-HTTP-request-log bridge that contributes tenant id to Serilog diagnostic context without making the base Serilog adapter depend on tenancy.
-- `Shared.Tenancy.Caching`: optional tenant-to-cache bridge that resolves tenant-owned cache scope values without making cache infrastructure depend on tenancy.
-- `Shared.Tenancy.Cqrs`: optional tenant-to-CQRS logging bridge that contributes tenant context to CQRS log scopes without making CQRS infrastructure depend on tenancy.
-- `Shared.Tenancy.Tasks`: optional tenant-to-task execution bridge that prepares tenant context for tenant-scoped task handlers without making task infrastructure depend on tenancy.
-- `Shared.Caching.Infrastructure`: HybridCache-backed cache-aside runtime, cache invalidation queue, cache metrics, and cache option validation.
-- `Shared.Caching.Cqrs`: optional command pipeline bridge that flushes deferred cache invalidations after successful CQRS unit-of-work commits.
-- `Shared.Messaging.Infrastructure`: EF outbox/inbox base helpers, outbox publisher, outbox options, a null event bus, and messaging metrics.
-- `Shared.Messaging.Nats`: NATS JetStream publisher/consumer runtime, NATS options, and low-level NATS composition hooks.
-- `Shared.Tasks.Infrastructure`: EF task-run store base, task worker/scheduler hosted services, task control loop, task options, and task metrics.
-- `Shared.Tasks.Cqrs`: optional task-to-CQRS command dispatcher contract and runtime registration. Hosts compose `AddTaskCqrs()` only when task payload handlers dispatch application commands.
-- `Shared.ProjectionRebuild`: task-neutral rebuild runner, source/writer contracts, checkpoint contracts, bounded metrics, and default no-op observer.
-- `Shared.ProjectionRebuild.Tasks`: optional task adapter that maps rebuild progress/control polling to `ITaskRuntimeReporter` and `ITaskControlLoop`.
-- `Shared.Persistence.EntityFrameworkCore`: EF provider selection, design-time DbContext options, persistence options, and domain-event unit-of-work base.
-- `Shared.Observability.Infrastructure`: shared CQRS metric implementations, module-name resolution, and bounded tag normalization. Capability metrics live beside their owning runtime adapters.
-- `Shared.Modules`: module descriptor, descriptor builder, descriptor feature base, generic metadata naming/guard helpers, and custom metadata feature support.
-- `Shared.ModuleComposition`: profile metadata, composition feature requirements/providers, module requirement validation, and host-level validation extensions.
-- `Shared.Authorization`: permission metadata and `WithPermission(...)` / `WithPermissions(...)` / `GetPermissions()` descriptor extensions.
-- `Shared.Cqrs`: command/query contracts, validators, dispatcher contracts, `Unit`, and transactional unit-of-work contracts.
-- `Shared.Cqrs.Infrastructure`: CQRS dispatcher and pipeline behavior implementations.
-- `Shared.Application.Events`: domain-event handler and dispatcher contracts.
-- `Shared.Application.Events.Infrastructure`: domain-event dispatcher implementation.
-- `Shared.Application.Composition`: constrained application assembly registration.
-- `Shared.Naming`: low-level shared naming and identifier syntax primitives.
-- `Shared.Numerics`: dependency-free numeric validation helpers shared by domain and contract metadata.
-- `Shared.Observability`: vendor-neutral metric, log-property, and tag names.
-- `Shared.Pagination`: normalized paging request helpers.
-- `Shared.Runtime`: shared runtime abstractions and dependency-free runtime helpers such as clock/id generator contracts and worker-id normalization.
-- `Shared.Runtime.Infrastructure`: default runtime implementations for clock and id generator contracts.
-- `Shared.Security`: shared claim/security constants.
-- `Shared.Caching`: cache-aside contracts, cache key/tag primitives, provider/options contracts, distributed adapter registration marker, and cache descriptor metadata.
-- `Shared.Tenancy.Caching`: optional tenant-to-cache scope bridge.
-- `Shared.Tenancy.Tasks`: optional tenant-to-task execution context bridge.
-- `Shared.Caching.Cqrs`: optional cache-to-CQRS invalidation bridge.
-- `Shared.Messaging`: integration event contracts, outbox/inbox contracts, subscription registry contracts, and messaging descriptor metadata.
-- `Shared.Tasks`: task payload, handler, control, schedule, run-store, and task descriptor contracts.
-- `Shared.Tasks.Cqrs`: optional task-to-CQRS command dispatcher contract and bridge.
-- `Shared.Tenancy`: tenant context contracts, tenant options, and tenant errors.
-- `Shared.Api`: ASP.NET Core-neutral API primitives and endpoint helpers.
-- `Shared.Api.OpenApi`: Swagger/OpenAPI package ownership.
-- `Shared.Api.Serilog`: tenant-neutral HTTP request logging enrichment package ownership.
-- `Shared.Tenancy.Api.Serilog`: optional tenant-to-request-logging enrichment bridge.
-- `Shared.Logging.Serilog`: host logging configuration package ownership.
-- `Shared.Caching.Redis`: Redis cache adapter package ownership. It depends only on `Shared.Caching` contracts plus Redis packages, not the HybridCache runtime package.
-- `Shared.Messaging.Nats.Aspire`: Aspire/NATS client composition package ownership.
-- `Shared.Administration`: backend-agnostic administration contracts and RBAC/audit abstractions.
-- `Shared.Administration.Cli`: System.CommandLine administration front-door helpers.
-- `Shared.Administration.Api`: administration HTTP front-door helpers.
+- `Gma.Framework.Infrastructure`: host-level facade that composes the baseline runtime adapters below.
+- `Gma.Framework.Application.Events.Infrastructure`: domain-event dispatcher implementation.
+- `Gma.Framework.Cqrs.Infrastructure`: request dispatcher, CQRS pipeline behaviors, command unit-of-work behavior, and CQRS runtime registration.
+- `Gma.Framework.Runtime.Infrastructure`: default clock and id generator implementations.
+- `Gma.Framework.Tenancy.Infrastructure`: default/null tenant context, tenant option validation, and baseline tenancy service wiring.
+- `Gma.Framework.Tenancy.Api.Serilog`: optional tenant-to-HTTP-request-log bridge that contributes tenant id to Serilog diagnostic context without making the base Serilog adapter depend on tenancy.
+- `Gma.Framework.Tenancy.Caching`: optional tenant-to-cache bridge that resolves tenant-owned cache scope values without making cache infrastructure depend on tenancy.
+- `Gma.Framework.Tenancy.Cqrs`: optional tenant-to-CQRS logging bridge that contributes tenant context to CQRS log scopes without making CQRS infrastructure depend on tenancy.
+- `Gma.Framework.Tenancy.Tasks`: optional tenant-to-task execution bridge that prepares tenant context for tenant-scoped task handlers without making task infrastructure depend on tenancy.
+- `Gma.Framework.Caching.Infrastructure`: HybridCache-backed cache-aside runtime, cache invalidation queue, cache metrics, and cache option validation.
+- `Gma.Framework.Caching.Cqrs`: optional command pipeline bridge that flushes deferred cache invalidations after successful CQRS unit-of-work commits.
+- `Gma.Framework.Messaging.Infrastructure`: EF outbox/inbox base helpers, outbox publisher, outbox options, a null event bus, and messaging metrics.
+- `Gma.Framework.Messaging.Nats`: NATS JetStream publisher/consumer runtime, NATS options, and low-level NATS composition hooks.
+- `Gma.Framework.Tasks.Infrastructure`: EF task-run store base, task worker/scheduler hosted services, task control loop, task options, and task metrics.
+- `Gma.Framework.Tasks.Cqrs`: optional task-to-CQRS command dispatcher contract and runtime registration. Hosts compose `AddTaskCqrs()` only when task payload handlers dispatch application commands.
+- `Gma.Framework.ProjectionRebuild`: task-neutral rebuild runner, source/writer contracts, checkpoint contracts, bounded metrics, and default no-op observer.
+- `Gma.Framework.ProjectionRebuild.Tasks`: optional task adapter that maps rebuild progress/control polling to `ITaskRuntimeReporter` and `ITaskControlLoop`.
+- `Gma.Framework.Persistence.EntityFrameworkCore`: EF provider selection, design-time DbContext options, persistence options, and domain-event unit-of-work base.
+- `Gma.Framework.Observability.Infrastructure`: shared CQRS metric implementations, module-name resolution, and bounded tag normalization. Capability metrics live beside their owning runtime adapters.
+- `Gma.Framework.Modules`: module descriptor, descriptor builder, descriptor feature base, generic metadata naming/guard helpers, and custom metadata feature support.
+- `Gma.Framework.ModuleComposition`: profile metadata, composition feature requirements/providers, module requirement validation, and host-level validation extensions.
+- `Gma.Framework.Authorization`: permission metadata and `WithPermission(...)` / `WithPermissions(...)` / `GetPermissions()` descriptor extensions.
+- `Gma.Framework.Cqrs`: command/query contracts, validators, dispatcher contracts, `Unit`, and transactional unit-of-work contracts.
+- `Gma.Framework.Cqrs.Infrastructure`: CQRS dispatcher and pipeline behavior implementations.
+- `Gma.Framework.Application.Events`: domain-event handler and dispatcher contracts.
+- `Gma.Framework.Application.Events.Infrastructure`: domain-event dispatcher implementation.
+- `Gma.Framework.Application.Composition`: constrained application assembly registration.
+- `Gma.Framework.Naming`: low-level shared naming and identifier syntax primitives.
+- `Gma.Framework.Numerics`: dependency-free numeric validation helpers shared by domain and contract metadata.
+- `Gma.Framework.Observability`: vendor-neutral metric, log-property, and tag names.
+- `Gma.Framework.Pagination`: normalized paging request helpers.
+- `Gma.Framework.Runtime`: shared runtime abstractions and dependency-free runtime helpers such as clock/id generator contracts and worker-id normalization.
+- `Gma.Framework.Runtime.Infrastructure`: default runtime implementations for clock and id generator contracts.
+- `Gma.Framework.Security`: shared claim/security constants.
+- `Gma.Framework.Caching`: cache-aside contracts, cache key/tag primitives, provider/options contracts, distributed adapter registration marker, and cache descriptor metadata.
+- `Gma.Framework.Tenancy.Caching`: optional tenant-to-cache scope bridge.
+- `Gma.Framework.Tenancy.Tasks`: optional tenant-to-task execution context bridge.
+- `Gma.Framework.Caching.Cqrs`: optional cache-to-CQRS invalidation bridge.
+- `Gma.Framework.Messaging`: integration event contracts, outbox/inbox contracts, subscription registry contracts, and messaging descriptor metadata.
+- `Gma.Framework.Tasks`: task payload, handler, control, schedule, run-store, and task descriptor contracts.
+- `Gma.Framework.Tasks.Cqrs`: optional task-to-CQRS command dispatcher contract and bridge.
+- `Gma.Framework.Tenancy`: tenant context contracts, tenant options, and tenant errors.
+- `Gma.Framework.Api`: ASP.NET Core-neutral API primitives and endpoint helpers.
+- `Gma.Framework.Api.OpenApi`: Swagger/OpenAPI package ownership.
+- `Gma.Framework.Api.Serilog`: tenant-neutral HTTP request logging enrichment package ownership.
+- `Gma.Framework.Tenancy.Api.Serilog`: optional tenant-to-request-logging enrichment bridge.
+- `Gma.Framework.Logging.Serilog`: host logging configuration package ownership.
+- `Gma.Framework.Caching.Redis`: Redis cache adapter package ownership. It depends only on `Gma.Framework.Caching` contracts plus Redis packages, not the HybridCache runtime package.
+- `Gma.Framework.Messaging.Nats.Aspire`: Aspire/NATS client composition package ownership.
+- `Gma.Framework.Administration`: backend-agnostic administration contracts and RBAC/audit abstractions.
+- `Gma.Framework.Administration.Cli`: System.CommandLine administration front-door helpers.
+- `Gma.Framework.Administration.Api`: administration HTTP front-door helpers.
 
 ## Module Projects
 
@@ -185,21 +185,21 @@ For metadata that belongs to one local type, prefer the attribute-backed helpers
 - put `IntegrationEventNameAttribute` and `IntegrationEventVersionAttribute` on integration event contract types and use `WithPublishedEvent<TEvent>()`;
 - put `IntegrationEventHandlerAttribute` on consumer handler types and register them with `AddIntegrationEventHandler<TEvent,THandler>(consumerModule, producerModule)`;
 - put split task attributes such as `TaskNameAttribute`, `TaskPayloadVersionAttribute`, `TaskDescriptionAttribute`, `TaskKindAttribute`, and optional `TaskWorkerGroupAttribute`/`SupportsTaskControlAttribute` on serialized task payload contract types and use `WithTask<TPayload>()` plus `AddTaskHandler<TPayload,THandler>(moduleName)`;
-- put `[TenantScoped]` from `Shared.Tenancy` on event or task payload contracts that need tenant context.
+- put `[TenantScoped]` from `Gma.Framework.Tenancy` on event or task payload contracts that need tenant context.
 
 These helpers read attributes from known generic types only. They do not scan assemblies, discover modules, register endpoints, start consumers, or compose workers. Keep permissions and cache metadata descriptor-authored until a single local owner type exists for that metadata.
 
 The root descriptor owns only identity and polymorphic capability features. Capability-specific metadata and extensions live beside the capability:
 
-- `Shared.Modules` owns the root descriptor, builder, and custom feature base.
-- `Shared.ModuleComposition` owns module profile metadata plus `WithProfile(...)`, `WithProfiles(...)`, `GetCompositionProfiles()`, `SelectModuleProfile(...)`, `ProvideFeature(...)`, `RequireFeature(...)`, `RequireModule(...)`, and `ValidateModuleComposition()`.
-- `Shared.Authorization` owns permission metadata plus `WithPermission(...)`, `WithPermissions(...)`, and `GetPermissions()`.
-- `Shared.Naming` owns low-level kebab-case segment, module-name, and tenant-id normalization shared by domain events, API/admin composition, CLI command ownership, modules, messaging, caching, and task metadata.
-- `Shared.Messaging` owns published-event and subscription metadata plus `IntegrationEventNameAttribute`, `IntegrationEventVersionAttribute`, `IntegrationEventHandlerAttribute`, `WithPublishedEvent(...)`, `WithPublishedEvent<TEvent>()`, `WithPublishedEvents(...)`, `WithSubscription(...)`, `WithSubscription<TEvent>(producerModule, handlerName)`, `WithSubscriptions(...)`, `GetPublishedEvents()`, and `GetSubscriptions()`.
-- `Shared.Caching` owns cache metadata plus `WithCacheEntry(...)`, `WithCacheEntries(...)`, and `GetCacheEntries()`.
-- `Shared.Caching.Cqrs` owns the optional command pipeline behavior that flushes deferred invalidations after successful CQRS unit-of-work commits.
-- `Shared.Tasks` owns task metadata plus `TaskNameAttribute`, `TaskPayloadVersionAttribute`, `TaskDescriptionAttribute`, `TaskKindAttribute`, `TaskWorkerGroupAttribute`, `SupportsTaskControlAttribute`, `WithTask(...)`, `WithTask<TPayload>()`, `WithTasks(...)`, and `GetTasks()`.
-- `Shared.Tenancy` owns `[TenantScoped]` and tenancy metadata readers. Base messaging/task packages do not reference tenancy.
+- `Gma.Framework.Modules` owns the root descriptor, builder, and custom feature base.
+- `Gma.Framework.ModuleComposition` owns module profile metadata plus `WithProfile(...)`, `WithProfiles(...)`, `GetCompositionProfiles()`, `SelectModuleProfile(...)`, `ProvideFeature(...)`, `RequireFeature(...)`, `RequireModule(...)`, and `ValidateModuleComposition()`.
+- `Gma.Framework.Authorization` owns permission metadata plus `WithPermission(...)`, `WithPermissions(...)`, and `GetPermissions()`.
+- `Gma.Framework.Naming` owns low-level kebab-case segment, module-name, and tenant-id normalization shared by domain events, API/admin composition, CLI command ownership, modules, messaging, caching, and task metadata.
+- `Gma.Framework.Messaging` owns published-event and subscription metadata plus `IntegrationEventNameAttribute`, `IntegrationEventVersionAttribute`, `IntegrationEventHandlerAttribute`, `WithPublishedEvent(...)`, `WithPublishedEvent<TEvent>()`, `WithPublishedEvents(...)`, `WithSubscription(...)`, `WithSubscription<TEvent>(producerModule, handlerName)`, `WithSubscriptions(...)`, `GetPublishedEvents()`, and `GetSubscriptions()`.
+- `Gma.Framework.Caching` owns cache metadata plus `WithCacheEntry(...)`, `WithCacheEntries(...)`, and `GetCacheEntries()`.
+- `Gma.Framework.Caching.Cqrs` owns the optional command pipeline behavior that flushes deferred invalidations after successful CQRS unit-of-work commits.
+- `Gma.Framework.Tasks` owns task metadata plus `TaskNameAttribute`, `TaskPayloadVersionAttribute`, `TaskDescriptionAttribute`, `TaskKindAttribute`, `TaskWorkerGroupAttribute`, `SupportsTaskControlAttribute`, `WithTask(...)`, `WithTask<TPayload>()`, `WithTasks(...)`, and `GetTasks()`.
+- `Gma.Framework.Tenancy` owns `[TenantScoped]` and tenancy metadata readers. Base messaging/task packages do not reference tenancy.
 
 This is an intentional extension seam. The root `ModuleDescriptor` is sealed so its identity surface stays stable; new optional shared capabilities should add a `ModuleDescriptorFeature` subtype and builder/read extensions in their own namespace rather than adding another root property or subclassing the root descriptor.
 Feature keys are stable and capability-prefixed, for example `authorization.permissions`, `messaging.published-events`, `caching.entries`, and `tasks.handlers`. Custom feature keys should follow the same `<capability>.<entry>` shape to avoid collisions across optional packages.
@@ -225,7 +225,7 @@ builder.AddAuthModule(AuthProfile.TenantScoped());
 builder.ValidateModuleComposition();
 ```
 
-`AuthProfile.TenantScoped()` selects the `auth` tenant-scoped profile, provides Auth features, and requires the generic `tenancy.context` feature. `Shared.Tenancy.Infrastructure` provides the baseline context service so CLI/admin hosts can set tenant context explicitly, while `TenancyModule` selects its default profile and additionally provides `tenancy.header-resolution` for HTTP header-based tenant resolution.
+`AuthProfile.TenantScoped()` selects the `auth` tenant-scoped profile, provides Auth features, and requires the generic `tenancy.context` feature. `Gma.Framework.Tenancy.Infrastructure` provides the baseline context service so CLI/admin hosts can set tenant context explicitly, while `TenancyModule` selects its default profile and additionally provides `tenancy.header-resolution` for HTTP header-based tenant resolution.
 
 For tenant-free projects, compose the global profile explicitly:
 
@@ -234,7 +234,7 @@ builder.AddAuthModule(AuthProfile.Global("global"));
 builder.ValidateModuleComposition();
 ```
 
-The global profile omits `TenancyModule`; it does not omit the baseline shared tenant context service. Compose `Shared.Infrastructure` (or `Shared.Tenancy.Infrastructure`) so `ITenantContext` resolves to the configured `Tenancy:LocalDefaultTenantId`, which Auth sets to the global scope value.
+The global profile omits `TenancyModule`; it does not omit the baseline shared tenant context service. Compose `Gma.Framework.Infrastructure` (or `Gma.Framework.Tenancy.Infrastructure`) so `ITenantContext` resolves to the configured `Tenancy:LocalDefaultTenantId`, which Auth sets to the global scope value.
 
 Rules:
 
@@ -248,10 +248,10 @@ Current reusable/example profiles:
 
 - `CatalogProfiles.Default` provides `catalog.items` and requires tenant context, cache-aside/invalidation services, and outbox infrastructure because its handlers directly depend on those contracts.
 - `OrderingProfiles.Default` provides orders plus Ordering-owned catalog item projections. It requires Catalog item facts and tenant context, while NATS consumers and task workers remain optional projection-maintenance enhancements.
-- `NotificationsProfiles.Default` provides durable notification history and broadcasts and requires tenant context. Shared live delivery remains separate through `Shared.Notifications.Infrastructure`, `Shared.Notifications.Api`, and `Shared.Notifications.SignalR`.
-- `TaskRuntimeProfiles.Default` describes the admin front door and requires the persisted run store, reporter, and control channel provided by `TaskRuntime.Persistence`. Worker-only hosts may compose `TaskRuntime.Persistence` with `Shared.Tasks.Infrastructure` directly and still validate the `tasks.run-store` requirement.
+- `NotificationsProfiles.Default` provides durable notification history and broadcasts and requires tenant context. Shared live delivery remains separate through `Gma.Framework.Notifications.Infrastructure`, `Gma.Framework.Notifications.Api`, and `Gma.Framework.Notifications.SignalR`.
+- `TaskRuntimeProfiles.Default` describes the admin front door and requires the persisted run store, reporter, and control channel provided by `Gma.Modules.TaskRuntime.Persistence`. Worker-only hosts may compose `Gma.Modules.TaskRuntime.Persistence` with `Gma.Framework.Tasks.Infrastructure` directly and still validate the `tasks.run-store` requirement.
 
-Current adapter feature catalogs live in the capability packages that own the small public contract: `Shared.Caching.CachingCompositionFeatures`, `Shared.Messaging.MessagingCompositionFeatures`, `Shared.Notifications.NotificationsCompositionFeatures`, and `Shared.Tasks.TasksCompositionFeatures`.
+Current adapter feature catalogs live in the capability packages that own the small public contract: `Gma.Framework.Caching.CachingCompositionFeatures`, `Gma.Framework.Messaging.MessagingCompositionFeatures`, `Gma.Framework.Notifications.NotificationsCompositionFeatures`, and `Gma.Framework.Tasks.TasksCompositionFeatures`.
 
 Compiled module projects are also listed in `tests/Architecture.Tests/Support/ArchitectureCatalog.cs`. That catalog feeds architecture tests only and must not be used for runtime composition.
 
@@ -366,7 +366,7 @@ Avoid:
 - EF Core configurations
 - command-line or HTTP route mapping
 
-Public `.Contracts` projects must not reference `Shared.Administration`. Keep the generic permission code strings there when metadata needs them, and put `AdminPermission` typed constants in `.Admin.Contracts`.
+Public `.Contracts` projects must not reference `Gma.Framework.Administration`. Keep the generic permission code strings there when metadata needs them, and put `AdminPermission` typed constants in `.Admin.Contracts`.
 
 ## AdminApi
 

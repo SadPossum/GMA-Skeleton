@@ -3,9 +3,9 @@ namespace Integration.Tests.Support;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Administration.Application;
-using Administration.Persistence;
-using Administration.Persistence.Entities;
+using Gma.Modules.Administration.Application;
+using Gma.Modules.Administration.Persistence;
+using Gma.Modules.Administration.Persistence.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,20 +15,20 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Notifications.AdminApi;
-using Notifications.Contracts;
-using Notifications.Domain.Aggregates;
-using Notifications.Persistence;
-using Shared.Administration;
-using Shared.Administration.Api;
-using Shared.Application.Events.Infrastructure;
-using Shared.Api.Security;
-using Shared.Cqrs.Infrastructure;
-using Shared.Runtime.Infrastructure;
-using Shared.Security;
-using Shared.Tenancy;
-using Shared.Tenancy.Infrastructure;
-using DomainNotificationSeverity = Notifications.Domain.ValueObjects.NotificationSeverity;
+using Gma.Modules.Notifications.AdminApi;
+using Gma.Modules.Notifications.Contracts;
+using Gma.Modules.Notifications.Domain.Aggregates;
+using Gma.Modules.Notifications.Persistence;
+using Gma.Framework.Administration;
+using Gma.Framework.Administration.Api;
+using Gma.Framework.Application.Events.Infrastructure;
+using Gma.Framework.Api.Security;
+using Gma.Framework.Cqrs.Infrastructure;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Security;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Tenancy.Infrastructure;
+using DomainNotificationSeverity = Gma.Modules.Notifications.Domain.ValueObjects.NotificationSeverity;
 
 internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
 {
@@ -65,7 +65,7 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
         builder.AddRuntimeInfrastructure();
         builder.AddApplicationEventsInfrastructure();
         builder.AddCqrsInfrastructure();
-        builder.Services.AddSharedAdministrationApi(builder.Configuration);
+        builder.Services.AddGmaAdministrationApi(builder.Configuration);
         builder.Services.AddAdministrationApplication(builder.Configuration);
         builder.Services.AddApiSecurityDefaults();
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

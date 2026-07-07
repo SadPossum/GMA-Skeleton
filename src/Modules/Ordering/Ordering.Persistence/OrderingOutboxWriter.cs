@@ -1,10 +1,10 @@
 namespace Ordering.Persistence;
 
 using Microsoft.Extensions.Options;
-using Shared.Messaging;
-using Shared.Messaging.Infrastructure;
-using Shared.Runtime;
-using Shared.Runtime.Time;
+using Gma.Framework.Messaging;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Runtime;
+using Gma.Framework.Runtime.Time;
 
 internal sealed class OrderingOutboxWriter(
     OrderingDbContext dbContext,

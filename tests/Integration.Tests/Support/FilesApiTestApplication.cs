@@ -3,7 +3,7 @@ namespace Integration.Tests.Support;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Files.Api;
+using Gma.Modules.Files.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,15 +11,15 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Shared.Api.Modules;
-using Shared.Api.Security;
-using Shared.Cqrs.Infrastructure;
-using Shared.FileManagement.LocalStorage;
-using Shared.ModuleComposition;
-using Shared.Runtime.Infrastructure;
-using Shared.Security;
-using Shared.Tenancy.Infrastructure;
-using Tenancy.Api;
+using Gma.Framework.Api.Modules;
+using Gma.Framework.Api.Security;
+using Gma.Framework.Cqrs.Infrastructure;
+using Gma.Framework.FileManagement.LocalStorage;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Security;
+using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Modules.Tenancy.Api;
 
 internal sealed class FilesApiTestApplication : IAsyncDisposable
 {

@@ -2,7 +2,7 @@
 
 ## Decision
 
-Keep `Shared.AccessControl` as a tiny backend-agnostic subject package, not as a generic authorization framework.
+Keep `Gma.Framework.AccessControl` as a tiny backend-agnostic subject package, not as a generic authorization framework.
 
 The package owns only the common vocabulary needed to pass the current actor across module boundaries:
 
@@ -94,7 +94,7 @@ External engines such as OPA, Cedar, OpenFGA, or SpiceDB remain optional adapter
 
 ## Tests
 
-- `Shared.AccessControl` tests cover subject normalization and rejection.
+- `Gma.Framework.AccessControl` tests cover subject normalization and rejection.
 - Module tests cover each domain visibility policy or direct application access check.
 - Persistence tests prove typed scopes translate into query filters.
 - Architecture tests keep the shared subject package backend-free and keep external access adapters out of domain projects.

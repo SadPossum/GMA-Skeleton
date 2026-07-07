@@ -2,15 +2,15 @@ namespace Ordering.Tests;
 
 using Catalog.Contracts;
 using Microsoft.Extensions.DependencyInjection;
-using Notifications.Contracts;
+using Gma.Modules.Notifications.Contracts;
 using Ordering.Application;
 using Ordering.Application.Ports;
 using Ordering.Contracts;
 using Ordering.Domain.Aggregates;
-using Shared.Messaging;
-using Shared.Messaging.Infrastructure;
-using Shared.Runtime.Identity;
-using Shared.Runtime.Time;
+using Gma.Framework.Messaging;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Runtime.Identity;
+using Gma.Framework.Runtime.Time;
 using Xunit;
 
 [Trait("Category", "Unit")]

@@ -1,12 +1,12 @@
 namespace Catalog.Domain.Aggregates;
 
-using Shared.Naming;
+using Gma.Framework.Naming;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Errors;
 using Catalog.Domain.Events;
 using Catalog.Domain.ValueObjects;
-using Shared.Domain.Models;
-using Shared.Results;
+using Gma.Framework.Domain.Models;
+using Gma.Framework.Results;
 
 public sealed class CatalogItem : TenantAggregateRoot<Guid>
 {

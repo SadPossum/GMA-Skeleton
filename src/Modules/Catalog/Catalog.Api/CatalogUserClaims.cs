@@ -2,7 +2,7 @@ namespace Catalog.Api;
 
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using Shared.Security;
+using Gma.Framework.Security;
 
 internal static class CatalogUserClaims
 {

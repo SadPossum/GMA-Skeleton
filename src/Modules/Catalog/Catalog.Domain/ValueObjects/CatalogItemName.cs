@@ -2,7 +2,7 @@ namespace Catalog.Domain.ValueObjects;
 
 using Catalog.Domain.Aggregates;
 using Catalog.Domain.Errors;
-using Shared.Results;
+using Gma.Framework.Results;
 
 public readonly record struct CatalogItemName
 {

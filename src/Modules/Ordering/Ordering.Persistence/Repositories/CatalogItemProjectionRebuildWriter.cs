@@ -2,7 +2,7 @@ namespace Ordering.Persistence.Repositories;
 
 using Catalog.Contracts;
 using Ordering.Application.Ports;
-using Shared.ProjectionRebuild;
+using Gma.Framework.ProjectionRebuild;
 
 internal sealed class CatalogItemProjectionRebuildWriter(
     ICatalogItemProjectionRepository repository,

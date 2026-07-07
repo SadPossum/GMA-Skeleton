@@ -5,7 +5,7 @@ using Host.Worker;
 using Integration.Tests.Support;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Shared.ModuleComposition;
+using Gma.Framework.ModuleComposition;
 using Testcontainers.PostgreSql;
 using Xunit;
 

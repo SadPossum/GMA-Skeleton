@@ -1,5 +1,20 @@
 <Project>
   <PropertyGroup>
+    <GmaRepositoryRoot Condition="'$(GmaRepositoryRoot)' == ''">$(MSBuildThisFileDirectory)</GmaRepositoryRoot>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)Gma.SourceRoots.props"
+          Condition="Exists('$(MSBuildThisFileDirectory)Gma.SourceRoots.props')" />
+
+  <PropertyGroup>
+    <GmaFrameworkRoot Condition="'$(GmaFrameworkRoot)' == ''">$(GmaRepositoryRoot)src\Framework\</GmaFrameworkRoot>
+    <GmaModulesRoot Condition="'$(GmaModulesRoot)' == ''">$(GmaRepositoryRoot)src\Modules\</GmaModulesRoot>
+    <GmaModuleAdministrationRoot Condition="'$(GmaModuleAdministrationRoot)' == ''">$(GmaModulesRoot)Administration\</GmaModuleAdministrationRoot>
+    <GmaModuleAuthRoot Condition="'$(GmaModuleAuthRoot)' == ''">$(GmaModulesRoot)Auth\</GmaModuleAuthRoot>
+    <GmaModuleFilesRoot Condition="'$(GmaModuleFilesRoot)' == ''">$(GmaModulesRoot)Files\</GmaModuleFilesRoot>
+    <GmaModuleNotificationsRoot Condition="'$(GmaModuleNotificationsRoot)' == ''">$(GmaModulesRoot)Notifications\</GmaModuleNotificationsRoot>
+    <GmaModuleTaskRuntimeRoot Condition="'$(GmaModuleTaskRuntimeRoot)' == ''">$(GmaModulesRoot)TaskRuntime\</GmaModuleTaskRuntimeRoot>
+    <GmaModuleTenancyRoot Condition="'$(GmaModuleTenancyRoot)' == ''">$(GmaModulesRoot)Tenancy\</GmaModuleTenancyRoot>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

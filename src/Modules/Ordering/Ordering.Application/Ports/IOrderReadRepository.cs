@@ -2,7 +2,7 @@ namespace Ordering.Application.Ports;
 
 using Ordering.Contracts;
 using Ordering.Domain.Visibility;
-using Shared.Pagination;
+using Gma.Framework.Pagination;
 
 public interface IOrderReadRepository
 {

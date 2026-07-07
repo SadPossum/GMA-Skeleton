@@ -14,12 +14,12 @@ These are current audit notes for future refactoring passes. They are intentiona
 - NATS stream names, subjects, durable prefixes, cache key prefixes, and app-owned meter names derive from `ApplicationIdentity:Namespace` unless an adapter-specific physical override is configured.
 - Architecture tests now guard production project package references so `System.CommandLine` stays in CLI front doors and backend adapter packages stay out of module projects.
 - Repeated architecture-test module assembly lists were replaced with one explicit test-only `ArchitectureCatalog`.
-- Feature-module typed admin permission constants moved into optional `<Module>.Admin.Contracts` projects, leaving public `.Contracts` free of `Shared.Administration`.
+- Feature-module typed admin permission constants moved into optional `<Module>.Admin.Contracts` projects, leaving public `.Contracts` free of `Gma.Framework.Administration`.
 
 ## Keep Watching
 
 - Design-time EF factories and provider migration project files are repetitive. A shared design-time helper would reduce boilerplate once the module examples settle.
-- Result primitives now live in `Shared.Results`; keep this package dependency-free and avoid folding unrelated shared-kernel concepts into it.
+- Result primitives now live in `Gma.Framework.Results`; keep this package dependency-free and avoid folding unrelated shared-kernel concepts into it.
 
 ## Reflection And Magic Boundary
 

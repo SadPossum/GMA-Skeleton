@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared.Domain\Shared.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Results\Shared.Results.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Naming\Shared.Naming.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Numerics\Shared.Numerics.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Domain\Gma.Framework.Domain.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Results\Gma.Framework.Results.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Naming\Gma.Framework.Naming.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Numerics\Gma.Framework.Numerics.csproj" />
   </ItemGroup>
 </Project>

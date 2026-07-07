@@ -15,8 +15,8 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Prometheus;
 using ServiceDefaults.Observability;
-using Shared.Naming;
-using Shared.Runtime;
+using Gma.Framework.Naming;
+using Gma.Framework.Runtime;
 
 public static class Extensions
 {

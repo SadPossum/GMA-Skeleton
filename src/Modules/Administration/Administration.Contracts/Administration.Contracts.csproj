@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared.Authorization\Shared.Authorization.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Modules\Shared.Modules.csproj" />
-  </ItemGroup>
-</Project>

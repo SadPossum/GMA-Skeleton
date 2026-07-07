@@ -1,10 +1,10 @@
 namespace Ordering.Contracts;
 
 using Catalog.Contracts;
-using Shared.Messaging;
-using Shared.ModuleComposition;
-using Shared.Tasks;
-using Shared.Tenancy;
+using Gma.Framework.Messaging;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tenancy;
 
 public static class OrderingProfiles
 {
@@ -23,7 +23,7 @@ public static class OrderingProfiles
             new RequiredCompositionFeature(
                 TenancyCompositionFeatures.Context,
                 Provider(DefaultName),
-                reason: "Ordering is tenant-scoped; register TenancyModule or at least Shared.Tenancy.Infrastructure."),
+                reason: "Ordering is tenant-scoped; register TenancyModule or at least Gma.Framework.Tenancy.Infrastructure."),
             CatalogCompositionFeatures.ItemsRequired(
                 Provider(DefaultName),
                 "Ordering decisions are based on Catalog-owned item facts copied into local projections."),
@@ -37,7 +37,7 @@ public static class OrderingProfiles
                 optional: true),
             TasksCompositionFeatures.TenantScopeRequired(
                 Provider(DefaultName),
-                "Catalog projection rebuild tasks are tenant-scoped; compose Shared.Tenancy.Tasks in worker hosts that run them.",
+                "Catalog projection rebuild tasks are tenant-scoped; compose Gma.Framework.Tenancy.Tasks in worker hosts that run them.",
                 optional: true)
         ],
         requiredModules:

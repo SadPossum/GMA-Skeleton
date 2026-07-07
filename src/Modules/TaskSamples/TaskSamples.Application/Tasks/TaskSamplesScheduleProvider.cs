@@ -1,7 +1,7 @@
 namespace TaskSamples.Application.Tasks;
 
 using System.Text.Json;
-using Shared.Tasks;
+using Gma.Framework.Tasks;
 using TaskSamples.Contracts;
 
 internal sealed class TaskSamplesScheduleProvider : ITaskScheduleProvider

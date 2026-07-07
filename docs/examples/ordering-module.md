@@ -128,7 +128,7 @@ Catalog item updated/discontinued
   -> notifications.user_notifications
 ```
 
-Ordering references `Notifications.Contracts` only. It publishes `UserNotificationRequestedIntegrationEvent` under Ordering's producer subject:
+Ordering references `Gma.Modules.Notifications.Contracts` only. It publishes `UserNotificationRequestedIntegrationEvent` under Ordering's producer subject:
 
 ```text
 {application-namespace}.ordering.user-notification-requested.v1

@@ -12,7 +12,7 @@ The project already has an optional task runtime, explicit module metadata, prov
 
 ## Decision
 
-Projection rebuilds are explicit module task handlers backed by `Shared.ProjectionRebuild` plus the optional `Shared.ProjectionRebuild.Tasks` adapter when the caller is the task runtime.
+Projection rebuilds are explicit module task handlers backed by `Gma.Framework.ProjectionRebuild` plus the optional `Gma.Framework.ProjectionRebuild.Tasks` adapter when the caller is the task runtime.
 
 - The consuming module owns the rebuild task, destination projection, writer, and checkpoint table.
 - The producing module exposes source data through a public contract/export port, not through domain, application, or persistence internals.

@@ -1,6 +1,6 @@
 namespace Catalog.Contracts;
 
-using Shared.Messaging;
+using Gma.Framework.Messaging;
 
 public static class CatalogIntegrationSubjects
 {

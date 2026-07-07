@@ -4,9 +4,9 @@ using Ordering.Application.Ports;
 using Ordering.Application.Queries;
 using Ordering.Contracts;
 using Ordering.Domain.Visibility;
-using Shared.Cqrs;
-using Shared.Pagination;
-using Shared.Results;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Pagination;
+using Gma.Framework.Results;
 
 internal sealed class ListOrdersQueryHandler(
     IOrderReadRepository repository)

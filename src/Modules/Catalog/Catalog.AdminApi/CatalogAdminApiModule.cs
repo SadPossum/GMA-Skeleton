@@ -10,14 +10,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
-using Shared.Administration;
-using Shared.Administration.Api;
-using Shared.Api.Observability;
-using Shared.Api.Results;
-using Shared.Cqrs;
-using Shared.ModuleComposition;
-using Shared.Pagination;
-using Shared.Results;
+using Gma.Framework.Administration;
+using Gma.Framework.Administration.Api;
+using Gma.Framework.Api.Observability;
+using Gma.Framework.Api.Results;
+using Gma.Framework.Cqrs;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Pagination;
+using Gma.Framework.Results;
 
 public sealed class CatalogAdminApiModule : IAdminApiModule
 {

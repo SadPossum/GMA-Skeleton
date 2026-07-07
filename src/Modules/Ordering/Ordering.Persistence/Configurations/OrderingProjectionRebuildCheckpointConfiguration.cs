@@ -2,7 +2,7 @@ namespace Ordering.Persistence.Configurations;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Shared.ProjectionRebuild.EntityFrameworkCore;
+using Gma.Framework.ProjectionRebuild.EntityFrameworkCore;
 
 internal sealed class OrderingProjectionRebuildCheckpointConfiguration
     : IEntityTypeConfiguration<OrderingProjectionRebuildCheckpoint>

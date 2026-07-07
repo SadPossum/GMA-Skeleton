@@ -4,12 +4,12 @@ These are temporary working notes for the projection rebuild slice. Keep useful 
 
 ## Current Direction
 
-- Keep rebuild tasks explicit module capabilities on top of `Shared.Tasks`; do not add a second scheduler or hidden projection scanner.
+- Keep rebuild tasks explicit module capabilities on top of `Gma.Framework.Tasks`; do not add a second scheduler or hidden projection scanner.
 - Add a narrow shared projection rebuild package for operational contracts and orchestration only.
-- Keep task progress/control adaptation in `Shared.ProjectionRebuild.Tasks` so the core rebuild loop can be reused by admin endpoints, migration tools, or one-off repair hosts without pretending to be a task run.
+- Keep task progress/control adaptation in `Gma.Framework.ProjectionRebuild.Tasks` so the core rebuild loop can be reused by admin endpoints, migration tools, or one-off repair hosts without pretending to be a task run.
 - Let `TaskRuntime` own run lifecycle, retries, cancellation, worker leases, admin enqueue/list/get/cancel/retry, and progress display.
 - Let the consuming module own projection repair state and checkpoint persistence because it owns the projection table.
-- Keep checkpoint and transaction-boundary contracts in `Shared.ProjectionRebuild` and EF persistence helpers in `Shared.ProjectionRebuild.EntityFrameworkCore` so non-EF modules can use the rebuild loop without taking EF dependencies.
+- Keep checkpoint and transaction-boundary contracts in `Gma.Framework.ProjectionRebuild` and EF persistence helpers in `Gma.Framework.ProjectionRebuild.EntityFrameworkCore` so non-EF modules can use the rebuild loop without taking EF dependencies.
 - The first concrete implementation is `Ordering` rebuilding its local catalog item projection from a `Catalog.Contracts` export source.
 
 ## Architecture Decisions
@@ -72,7 +72,7 @@ These are temporary working notes for the projection rebuild slice. Keep useful 
 - `CatalogItemProjectionRepository` already has idempotent single-row upsert. Prefer reusing that path from the rebuild writer so live event behavior and rebuild behavior stay aligned.
 - Existing architecture tests already compare task metadata to handler registrations. Adding Ordering task metadata and registration should automatically get coverage there.
 - Focused unit tests now cover shared runner behavior, checkpoint resume, cursor override, failed writer behavior, optional transaction-boundary wrapping, bounded metrics, the shared EF checkpoint adapter, Catalog export contracts, Ordering task registration, and Ordering checkpoint state.
-- The dependency-boundary pass moved task progress/control adaptation out of core `Shared.ProjectionRebuild` and into `Shared.ProjectionRebuild.Tasks`.
+- The dependency-boundary pass moved task progress/control adaptation out of core `Gma.Framework.ProjectionRebuild` and into `Gma.Framework.ProjectionRebuild.Tasks`.
 - A Docker-backed integration test composes TaskRuntime, Catalog, and Ordering explicitly, applies migrations, seeds Catalog, runs the real worker, and verifies Ordering projections plus checkpoints across SQL Server and PostgreSQL.
 - The separate projection rebuild store refactor scratch note was folded into this page and the durable architecture docs. Keep future findings here only while they are actively being worked.
 

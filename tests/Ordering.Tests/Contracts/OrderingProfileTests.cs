@@ -2,10 +2,10 @@ namespace Ordering.Tests;
 
 using Catalog.Contracts;
 using Ordering.Contracts;
-using Shared.Messaging;
-using Shared.ModuleComposition;
-using Shared.Tasks;
-using Shared.Tenancy;
+using Gma.Framework.Messaging;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tenancy;
 using Xunit;
 
 [Trait("Category", "Unit")]

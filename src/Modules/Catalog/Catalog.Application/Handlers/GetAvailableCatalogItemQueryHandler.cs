@@ -5,9 +5,9 @@ using Catalog.Application.Queries;
 using Catalog.Contracts;
 using Catalog.Domain.Visibility;
 using Catalog.Domain.Errors;
-using Shared.Caching;
-using Shared.Cqrs;
-using Shared.Results;
+using Gma.Framework.Caching;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Results;
 
 internal sealed class GetAvailableCatalogItemQueryHandler(
     ICatalogItemReadRepository repository,

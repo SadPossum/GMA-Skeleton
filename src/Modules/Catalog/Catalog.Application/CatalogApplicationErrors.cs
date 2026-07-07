@@ -1,7 +1,7 @@
 namespace Catalog.Application;
 
 using Catalog.Domain.Errors;
-using Shared.Results;
+using Gma.Framework.Results;
 
 public static class CatalogApplicationErrors
 {

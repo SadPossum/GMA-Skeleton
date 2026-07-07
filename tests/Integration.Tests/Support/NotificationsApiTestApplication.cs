@@ -12,20 +12,20 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Notifications.Api;
-using Notifications.Domain.Aggregates;
-using Notifications.Persistence;
-using Shared.Application.Events.Infrastructure;
-using Shared.Api.Modules;
-using Shared.Api.Security;
-using Shared.Cqrs.Infrastructure;
-using Shared.Runtime.Infrastructure;
-using Shared.Security;
-using Shared.Tenancy;
-using Shared.Tenancy.Infrastructure;
-using Tenancy.Api;
-using DomainBroadcastAudience = Notifications.Domain.ValueObjects.NotificationBroadcastAudience;
-using DomainNotificationSeverity = Notifications.Domain.ValueObjects.NotificationSeverity;
+using Gma.Modules.Notifications.Api;
+using Gma.Modules.Notifications.Domain.Aggregates;
+using Gma.Modules.Notifications.Persistence;
+using Gma.Framework.Application.Events.Infrastructure;
+using Gma.Framework.Api.Modules;
+using Gma.Framework.Api.Security;
+using Gma.Framework.Cqrs.Infrastructure;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Security;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Modules.Tenancy.Api;
+using DomainBroadcastAudience = Gma.Modules.Notifications.Domain.ValueObjects.NotificationBroadcastAudience;
+using DomainNotificationSeverity = Gma.Modules.Notifications.Domain.ValueObjects.NotificationSeverity;
 
 internal sealed class NotificationsApiTestApplication : IAsyncDisposable
 {

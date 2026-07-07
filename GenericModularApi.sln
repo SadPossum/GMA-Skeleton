@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -11,31 +11,31 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHost", "src\AppHost\AppH
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host.Api", "src\Host.Api\Host.Api.csproj", "{A54BFBB2-7715-4FC8-9D41-2C4D6C04D9FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Api", "src\Modules\Auth\Auth.Api\Auth.Api.csproj", "{B8A26D83-717B-4560-B246-DFE8B07001F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Api", "src\Modules\Auth\Gma.Modules.Auth.Api\Gma.Modules.Auth.Api.csproj", "{B8A26D83-717B-4560-B246-DFE8B07001F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Application", "src\Modules\Auth\Auth.Application\Auth.Application.csproj", "{5D93EE47-08AA-407C-AD35-A3CF1D33A5D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Application", "src\Modules\Auth\Gma.Modules.Auth.Application\Gma.Modules.Auth.Application.csproj", "{5D93EE47-08AA-407C-AD35-A3CF1D33A5D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Contracts", "src\Modules\Auth\Auth.Contracts\Auth.Contracts.csproj", "{332A0097-13D0-48C9-B545-45F2CAAE6DC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Contracts", "src\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj", "{332A0097-13D0-48C9-B545-45F2CAAE6DC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Domain", "src\Shared\Shared.Domain\Shared.Domain.csproj", "{88150CDC-4CE5-4FCD-9052-E6BA7411C393}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Domain", "src\Framework\Gma.Framework.Domain\Gma.Framework.Domain.csproj", "{88150CDC-4CE5-4FCD-9052-E6BA7411C393}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Results", "src\Shared\Shared.Results\Shared.Results.csproj", "{6769E137-D118-4617-A76A-E7F6A10E7F08}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Results", "src\Framework\Gma.Framework.Results\Gma.Framework.Results.csproj", "{6769E137-D118-4617-A76A-E7F6A10E7F08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Domain", "src\Modules\Auth\Auth.Domain\Auth.Domain.csproj", "{A08336A3-9142-4DEF-8F4D-1768E022B1FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Domain", "src\Modules\Auth\Gma.Modules.Auth.Domain\Gma.Modules.Auth.Domain.csproj", "{A08336A3-9142-4DEF-8F4D-1768E022B1FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Infrastructure", "src\Modules\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj", "{C8A3D38C-1480-4125-973E-22EB9BAFEE82}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Infrastructure", "src\Modules\Auth\Gma.Modules.Auth.Infrastructure\Gma.Modules.Auth.Infrastructure.csproj", "{C8A3D38C-1480-4125-973E-22EB9BAFEE82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Persistence", "src\Modules\Auth\Auth.Persistence\Auth.Persistence.csproj", "{C30A508B-F854-4FF4-A649-8E5E23BD0869}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Persistence", "src\Modules\Auth\Gma.Modules.Auth.Persistence\Gma.Modules.Auth.Persistence.csproj", "{C30A508B-F854-4FF4-A649-8E5E23BD0869}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "src\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj", "{6548E4D5-E816-4AE3-8009-F59E4EAFE8DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Infrastructure", "src\Framework\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj", "{6548E4D5-E816-4AE3-8009-F59E4EAFE8DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Api", "src\Shared\Shared.Api\Shared.Api.csproj", "{D70518E8-0A49-43B7-AFB6-E7FF61B56C23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Api", "src\Framework\Gma.Framework.Api\Gma.Framework.Api.csproj", "{D70518E8-0A49-43B7-AFB6-E7FF61B56C23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Persistence.PostgreSqlMigrations", "src\Modules\Auth\Auth.Persistence.PostgreSqlMigrations\Auth.Persistence.PostgreSqlMigrations.csproj", "{9F53EDED-77D2-4685-8CD3-423363631A5D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Persistence.PostgreSqlMigrations", "src\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj", "{9F53EDED-77D2-4685-8CD3-423363631A5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Persistence.SqlServerMigrations", "src\Modules\Auth\Auth.Persistence.SqlServerMigrations\Auth.Persistence.SqlServerMigrations.csproj", "{DE359C3A-047A-4D89-BA5F-6DD3159A17F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Persistence.SqlServerMigrations", "src\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj", "{DE359C3A-047A-4D89-BA5F-6DD3159A17F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tenancy.Api", "src\Modules\Tenancy\Tenancy.Api\Tenancy.Api.csproj", "{8EB97108-3A13-461E-81F9-F06EB8C4490A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Tenancy.Api", "src\Modules\Tenancy\Gma.Modules.Tenancy.Api\Gma.Modules.Tenancy.Api.csproj", "{8EB97108-3A13-461E-81F9-F06EB8C4490A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDefaults", "src\ServiceDefaults\ServiceDefaults.csproj", "{61C7AC02-6F80-4D53-8017-3FDA80E9CFD3}"
 EndProject
@@ -43,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{981C2CF6-E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServiceDefaults", "ServiceDefaults", "{5FC1494C-0D8C-79D1-FFF2-37E95F57AB9F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{C8E42992-5E42-0C2B-DBFE-AA848D06431C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{C8E42992-5E42-0C2B-DBFE-AA848D06431C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}"
 EndProject
@@ -61,15 +61,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Architecture.Tests", "tests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auth", "Auth", "{EDFE54F1-08A0-5241-003B-94DECB51237C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Tests", "tests\Auth.Tests\Auth.Tests.csproj", "{FC1CEFE8-34B4-4F09-BF6A-3A8E309F0D1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Tests", "src\Modules\Auth\tests\Gma.Modules.Auth.Tests\Gma.Modules.Auth.Tests.csproj", "{FC1CEFE8-34B4-4F09-BF6A-3A8E309F0D1D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{28A6993C-471E-82FE-7D9E-AD3B1EC22BD9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integration.Tests", "tests\Integration.Tests\Integration.Tests.csproj", "{9DE91ECB-D487-418C-8E6A-E6B3BE9BEEBF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{D0D6B8B0-AC35-B3FA-0B96-A9B0E4A3253E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{D0D6B8B0-AC35-B3FA-0B96-A9B0E4A3253E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tests", "tests\Shared.Tests\Shared.Tests.csproj", "{F3544BEC-0A14-47D9-A41C-330E9EA694D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tests", "src\Framework\tests\Gma.Framework.Tests\Gma.Framework.Tests.csproj", "{F3544BEC-0A14-47D9-A41C-330E9EA694D9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{08CCF7B8-3A6D-4BDA-AEF7-05DED59C498D}"
 	ProjectSection(SolutionItems) = preProject
@@ -79,6 +79,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
+		Gma.SourceRoots.props.example = Gma.SourceRoots.props.example
+		Gma.Framework.slnx = Gma.Framework.slnx
+		Gma.Modules.Administration.slnx = Gma.Modules.Administration.slnx
+		Gma.Modules.Auth.slnx = Gma.Modules.Auth.slnx
+		Gma.Modules.Files.slnx = Gma.Modules.Files.slnx
+		Gma.Modules.Notifications.slnx = Gma.Modules.Notifications.slnx
+		Gma.Modules.TaskRuntime.slnx = Gma.Modules.TaskRuntime.slnx
+		Gma.Modules.Tenancy.slnx = Gma.Modules.Tenancy.slnx
 		global.json = global.json
 		LICENSE = LICENSE
 		nuget.config = nuget.config
@@ -91,6 +99,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{5D497D58-291
 		eng\build.ps1 = eng\build.ps1
 		eng\check-migrations.ps1 = eng\check-migrations.ps1
 		eng\common.ps1 = eng\common.ps1
+		eng\gma-bootstrap.ps1 = eng\gma-bootstrap.ps1
+		eng\gma-status.ps1 = eng\gma-status.ps1
+		eng\gma-update.ps1 = eng\gma-update.ps1
+		eng\gma-validate.ps1 = eng\gma-validate.ps1
 		eng\new-module.ps1 = eng\new-module.ps1
 		eng\restore.ps1 = eng\restore.ps1
 		eng\run-admin-api.ps1 = eng\run-admin-api.ps1
@@ -130,6 +142,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{929E11CE-B
 		docs\architecture\caching.md = docs\architecture\caching.md
 		docs\architecture\cqrs-and-domain-events.md = docs\architecture\cqrs-and-domain-events.md
 		docs\architecture\file-management.md = docs\architecture\file-management.md
+		docs\architecture\gma-rebrand-and-source-repo-split.md = docs\architecture\gma-rebrand-and-source-repo-split.md
 		docs\architecture\messaging-and-outbox.md = docs\architecture\messaging-and-outbox.md
 		docs\architecture\messaging-consumers.md = docs\architecture\messaging-consumers.md
 		docs\architecture\module-composition-features-task.md = docs\architecture\module-composition-features-task.md
@@ -177,31 +190,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{929E11CE-B
 		docs\templates\module.md = docs\templates\module.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Caching.Redis", "src\Shared\Shared.Caching.Redis\Shared.Caching.Redis.csproj", "{3B886407-E258-4576-BD0A-DF5CCE9674DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Caching.Redis", "src\Framework\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj", "{3B886407-E258-4576-BD0A-DF5CCE9674DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Administration", "src\Shared\Shared.Administration\Shared.Administration.csproj", "{46DD6640-95AF-45B3-BCAE-AEB7756E38AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Administration", "src\Framework\Gma.Framework.Administration\Gma.Framework.Administration.csproj", "{46DD6640-95AF-45B3-BCAE-AEB7756E38AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Administration.Cli", "src\Shared\Shared.Administration.Cli\Shared.Administration.Cli.csproj", "{D34D6414-F6BE-42D9-9354-D8DCB56973D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Administration.Cli", "src\Framework\Gma.Framework.Administration.Cli\Gma.Framework.Administration.Cli.csproj", "{D34D6414-F6BE-42D9-9354-D8DCB56973D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Administration.Application", "src\Modules\Administration\Administration.Application\Administration.Application.csproj", "{C195D2FB-AD43-43AE-9FBB-7393943BC6B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Administration.Application", "src\Modules\Administration\Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj", "{C195D2FB-AD43-43AE-9FBB-7393943BC6B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Administration.Persistence", "src\Modules\Administration\Administration.Persistence\Administration.Persistence.csproj", "{50FAE83D-E243-4529-923F-1AFAADF38DEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Administration.Persistence", "src\Modules\Administration\Gma.Modules.Administration.Persistence\Gma.Modules.Administration.Persistence.csproj", "{50FAE83D-E243-4529-923F-1AFAADF38DEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Administration.Persistence.SqlServerMigrations", "src\Modules\Administration\Administration.Persistence.SqlServerMigrations\Administration.Persistence.SqlServerMigrations.csproj", "{86637825-C37B-4656-ADA4-64ABBC4BF086}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Administration.Persistence.SqlServerMigrations", "src\Modules\Administration\Gma.Modules.Administration.Persistence.SqlServerMigrations\Gma.Modules.Administration.Persistence.SqlServerMigrations.csproj", "{86637825-C37B-4656-ADA4-64ABBC4BF086}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Administration.Persistence.PostgreSqlMigrations", "src\Modules\Administration\Administration.Persistence.PostgreSqlMigrations\Administration.Persistence.PostgreSqlMigrations.csproj", "{6633E3D7-3095-4DD9-AA86-CD8820ED2854}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Administration.Persistence.PostgreSqlMigrations", "src\Modules\Administration\Gma.Modules.Administration.Persistence.PostgreSqlMigrations\Gma.Modules.Administration.Persistence.PostgreSqlMigrations.csproj", "{6633E3D7-3095-4DD9-AA86-CD8820ED2854}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Administration.AdminCli", "src\Modules\Administration\Administration.AdminCli\Administration.AdminCli.csproj", "{3FA3F56D-E9EC-4964-83B9-5569A6FEDDF7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Administration.AdminCli", "src\Modules\Administration\Gma.Modules.Administration.AdminCli\Gma.Modules.Administration.AdminCli.csproj", "{3FA3F56D-E9EC-4964-83B9-5569A6FEDDF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.AdminCli", "src\Modules\Auth\Auth.AdminCli\Auth.AdminCli.csproj", "{6DC62762-F9DF-4469-94CD-B8FA423AD524}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.AdminCli", "src\Modules\Auth\Gma.Modules.Auth.AdminCli\Gma.Modules.Auth.AdminCli.csproj", "{6DC62762-F9DF-4469-94CD-B8FA423AD524}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host.AdminCli", "src\Host.AdminCli\Host.AdminCli.csproj", "{0D3E3625-4321-4BA1-91F0-663A07F2ECD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Administration.Api", "src\Shared\Shared.Administration.Api\Shared.Administration.Api.csproj", "{51C6A470-4BD3-4C6B-96CF-27E38AD6915E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Administration.Api", "src\Framework\Gma.Framework.Administration.Api\Gma.Framework.Administration.Api.csproj", "{51C6A470-4BD3-4C6B-96CF-27E38AD6915E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Administration.AdminApi", "src\Modules\Administration\Administration.AdminApi\Administration.AdminApi.csproj", "{79D833E1-923F-4F0C-B957-5AEA83557A9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Administration.AdminApi", "src\Modules\Administration\Gma.Modules.Administration.AdminApi\Gma.Modules.Administration.AdminApi.csproj", "{79D833E1-923F-4F0C-B957-5AEA83557A9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.AdminApi", "src\Modules\Auth\Auth.AdminApi\Auth.AdminApi.csproj", "{3209CC7F-D191-42EC-A523-12D99988E703}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.AdminApi", "src\Modules\Auth\Gma.Modules.Auth.AdminApi\Gma.Modules.Auth.AdminApi.csproj", "{3209CC7F-D191-42EC-A523-12D99988E703}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host.AdminApi", "src\Host.AdminApi\Host.AdminApi.csproj", "{EF473FBB-9AC4-491D-9150-F0C83A52C9A7}"
 EndProject
@@ -239,7 +252,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ordering.Persistence.SqlSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ordering.Persistence.PostgreSqlMigrations", "src\Modules\Ordering\Ordering.Persistence.PostgreSqlMigrations\Ordering.Persistence.PostgreSqlMigrations.csproj", "{91157732-A0B6-49DA-BBAD-23C0D411A9FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Admin.Contracts", "src\Modules\Auth\Auth.Admin.Contracts\Auth.Admin.Contracts.csproj", "{E51579E8-062E-401F-A561-C09B0F1B8295}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Admin.Contracts", "src\Modules\Auth\Gma.Modules.Auth.Admin.Contracts\Gma.Modules.Auth.Admin.Contracts.csproj", "{E51579E8-062E-401F-A561-C09B0F1B8295}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Admin.Contracts", "src\Modules\Catalog\Catalog.Admin.Contracts\Catalog.Admin.Contracts.csproj", "{AB5E2C2C-DA83-4128-AA20-3422B05AF08A}"
 EndProject
@@ -249,7 +262,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ordering.Tests", "tests\Ord
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Administration", "Administration", "{A9A4E5B2-7E93-4B9D-9293-01D850C0D4E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Administration.Tests", "tests\Administration.Tests\Administration.Tests.csproj", "{83A790D7-8E1B-42C0-84E4-8DF911149F65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Administration.Tests", "src\Modules\Administration\tests\Gma.Modules.Administration.Tests\Gma.Modules.Administration.Tests.csproj", "{83A790D7-8E1B-42C0-84E4-8DF911149F65}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServiceDefaults", "ServiceDefaults", "{F1D8F32C-63CC-4D27-8F96-2E43546F6FC1}"
 EndProject
@@ -259,29 +272,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Catalog", "Catalog", "{CC4E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Tests", "tests\Catalog.Tests\Catalog.Tests.csproj", "{169F35C6-7CAE-49D6-8EED-1590FD75667A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Administration.Contracts", "src\Modules\Administration\Administration.Contracts\Administration.Contracts.csproj", "{655DD506-F42C-4051-A1D2-E13E189FF215}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Administration.Contracts", "src\Modules\Administration\Gma.Modules.Administration.Contracts\Gma.Modules.Administration.Contracts.csproj", "{655DD506-F42C-4051-A1D2-E13E189FF215}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tenancy.Contracts", "src\Modules\Tenancy\Tenancy.Contracts\Tenancy.Contracts.csproj", "{B7937A68-AC71-4848-A01A-302ABC6133F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Tenancy.Contracts", "src\Modules\Tenancy\Gma.Modules.Tenancy.Contracts\Gma.Modules.Tenancy.Contracts.csproj", "{B7937A68-AC71-4848-A01A-302ABC6133F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Api.Serilog", "src\Shared\Shared.Api.Serilog\Shared.Api.Serilog.csproj", "{B4304E57-BC9A-415C-B583-B9BD9616D876}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Api.Serilog", "src\Framework\Gma.Framework.Api.Serilog\Gma.Framework.Api.Serilog.csproj", "{B4304E57-BC9A-415C-B583-B9BD9616D876}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging.Nats.Aspire", "src\Shared\Shared.Messaging.Nats.Aspire\Shared.Messaging.Nats.Aspire.csproj", "{076CF1D2-4897-4A74-B10F-B90E97CA500F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Messaging.Nats.Aspire", "src\Framework\Gma.Framework.Messaging.Nats.Aspire\Gma.Framework.Messaging.Nats.Aspire.csproj", "{076CF1D2-4897-4A74-B10F-B90E97CA500F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Logging.Serilog", "src\Shared\Shared.Logging.Serilog\Shared.Logging.Serilog.csproj", "{B8CE5C8C-BCAD-4206-87C4-80DF5AEA1D12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Logging.Serilog", "src\Framework\Gma.Framework.Logging.Serilog\Gma.Framework.Logging.Serilog.csproj", "{B8CE5C8C-BCAD-4206-87C4-80DF5AEA1D12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Api.OpenApi", "src\Shared\Shared.Api.OpenApi\Shared.Api.OpenApi.csproj", "{1FC3F7C0-4120-42B3-8BB8-0EB6BBC0095D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Api.OpenApi", "src\Framework\Gma.Framework.Api.OpenApi\Gma.Framework.Api.OpenApi.csproj", "{1FC3F7C0-4120-42B3-8BB8-0EB6BBC0095D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Infrastructure.JwtBearer", "src\Modules\Auth\Auth.Infrastructure.JwtBearer\Auth.Infrastructure.JwtBearer.csproj", "{3D683165-CEC8-46ED-B6C2-014B3DF29F3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Auth.Infrastructure.JwtBearer", "src\Modules\Auth\Gma.Modules.Auth.Infrastructure.JwtBearer\Gma.Modules.Auth.Infrastructure.JwtBearer.csproj", "{3D683165-CEC8-46ED-B6C2-014B3DF29F3E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TaskRuntime", "TaskRuntime", "{4F3275E8-1907-051F-9D77-0347C429BFFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRuntime.Contracts", "src\Modules\TaskRuntime\TaskRuntime.Contracts\TaskRuntime.Contracts.csproj", "{A7640A25-E48E-41C4-A836-67396AA6755A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.TaskRuntime.Contracts", "src\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Contracts\Gma.Modules.TaskRuntime.Contracts.csproj", "{A7640A25-E48E-41C4-A836-67396AA6755A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRuntime.Persistence", "src\Modules\TaskRuntime\TaskRuntime.Persistence\TaskRuntime.Persistence.csproj", "{3A3162DF-1B3C-4134-A0A8-C1260B9E87FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.TaskRuntime.Persistence", "src\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Persistence\Gma.Modules.TaskRuntime.Persistence.csproj", "{3A3162DF-1B3C-4134-A0A8-C1260B9E87FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRuntime.Persistence.SqlServerMigrations", "src\Modules\TaskRuntime\TaskRuntime.Persistence.SqlServerMigrations\TaskRuntime.Persistence.SqlServerMigrations.csproj", "{B6F880DB-55F2-43BF-B9C1-7E7625E58997}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations", "src\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations.csproj", "{B6F880DB-55F2-43BF-B9C1-7E7625E58997}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRuntime.Persistence.PostgreSqlMigrations", "src\Modules\TaskRuntime\TaskRuntime.Persistence.PostgreSqlMigrations\TaskRuntime.Persistence.PostgreSqlMigrations.csproj", "{2EE2407A-3562-43C8-B694-59813E59AD21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations", "src\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations\Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations.csproj", "{2EE2407A-3562-43C8-B694-59813E59AD21}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TaskSamples", "TaskSamples", "{5C9DF5BB-08BB-51EE-5FDA-BDD7B0B01D5D}"
 EndProject
@@ -289,141 +302,141 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskSamples.Contracts", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskSamples.Application", "src\Modules\TaskSamples\TaskSamples.Application\TaskSamples.Application.csproj", "{CBA119FB-4BD0-4F4F-8F8C-4316CB791E48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRuntime.Application", "src\Modules\TaskRuntime\TaskRuntime.Application\TaskRuntime.Application.csproj", "{6603C684-8E68-45BB-B87E-8CAF24BE9F21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.TaskRuntime.Application", "src\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Application\Gma.Modules.TaskRuntime.Application.csproj", "{6603C684-8E68-45BB-B87E-8CAF24BE9F21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRuntime.Admin.Contracts", "src\Modules\TaskRuntime\TaskRuntime.Admin.Contracts\TaskRuntime.Admin.Contracts.csproj", "{D6B7DC72-45C7-4A5E-9764-7B5C7255DDE4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.TaskRuntime.Admin.Contracts", "src\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Admin.Contracts\Gma.Modules.TaskRuntime.Admin.Contracts.csproj", "{D6B7DC72-45C7-4A5E-9764-7B5C7255DDE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRuntime.AdminCli", "src\Modules\TaskRuntime\TaskRuntime.AdminCli\TaskRuntime.AdminCli.csproj", "{1FDB4C7B-279B-4C7B-B92E-FD835CFB1531}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.TaskRuntime.AdminCli", "src\Modules\TaskRuntime\Gma.Modules.TaskRuntime.AdminCli\Gma.Modules.TaskRuntime.AdminCli.csproj", "{1FDB4C7B-279B-4C7B-B92E-FD835CFB1531}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRuntime.AdminApi", "src\Modules\TaskRuntime\TaskRuntime.AdminApi\TaskRuntime.AdminApi.csproj", "{B0E6886E-2C3B-421F-B2F3-61E24FC7B493}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.TaskRuntime.AdminApi", "src\Modules\TaskRuntime\Gma.Modules.TaskRuntime.AdminApi\Gma.Modules.TaskRuntime.AdminApi.csproj", "{B0E6886E-2C3B-421F-B2F3-61E24FC7B493}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Naming", "src\Shared\Shared.Naming\Shared.Naming.csproj", "{8B9ACB37-489D-4E14-A53C-CFC098E8325F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Naming", "src\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj", "{8B9ACB37-489D-4E14-A53C-CFC098E8325F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Modules", "src\Shared\Shared.Modules\Shared.Modules.csproj", "{0B29023D-4589-498E-83E8-B103C45A7098}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Modules", "src\Framework\Gma.Framework.Modules\Gma.Framework.Modules.csproj", "{0B29023D-4589-498E-83E8-B103C45A7098}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Observability", "src\Shared\Shared.Observability\Shared.Observability.csproj", "{4E67B85B-FA9E-43AC-93F8-74EE505226C8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Observability", "src\Framework\Gma.Framework.Observability\Gma.Framework.Observability.csproj", "{4E67B85B-FA9E-43AC-93F8-74EE505226C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Caching", "src\Shared\Shared.Caching\Shared.Caching.csproj", "{3F73034E-93D8-463A-BC5C-DE600084FC3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Caching", "src\Framework\Gma.Framework.Caching\Gma.Framework.Caching.csproj", "{3F73034E-93D8-463A-BC5C-DE600084FC3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging", "src\Shared\Shared.Messaging\Shared.Messaging.csproj", "{E7CECB67-1C6F-4D38-9C46-473E53752D41}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Messaging", "src\Framework\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj", "{E7CECB67-1C6F-4D38-9C46-473E53752D41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tasks", "src\Shared\Shared.Tasks\Shared.Tasks.csproj", "{E0BA5F4D-0F8D-4BDB-B8B5-4435B1BD5ECB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tasks", "src\Framework\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj", "{E0BA5F4D-0F8D-4BDB-B8B5-4435B1BD5ECB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Caching.Infrastructure", "src\Shared\Shared.Caching.Infrastructure\Shared.Caching.Infrastructure.csproj", "{816BD8C0-96D7-469D-ADC6-4AD5F06BB051}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Caching.Infrastructure", "src\Framework\Gma.Framework.Caching.Infrastructure\Gma.Framework.Caching.Infrastructure.csproj", "{816BD8C0-96D7-469D-ADC6-4AD5F06BB051}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Observability.Infrastructure", "src\Shared\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj", "{A834C311-01DB-48CD-964A-9AA256234F32}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Observability.Infrastructure", "src\Framework\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj", "{A834C311-01DB-48CD-964A-9AA256234F32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging.Infrastructure", "src\Shared\Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj", "{888A39E1-199F-4EF1-B6BB-2BE012A2F2C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Messaging.Infrastructure", "src\Framework\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj", "{888A39E1-199F-4EF1-B6BB-2BE012A2F2C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Persistence.EntityFrameworkCore", "src\Shared\Shared.Persistence.EntityFrameworkCore\Shared.Persistence.EntityFrameworkCore.csproj", "{8C44BE6D-E357-41C6-BC78-561797A080A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Persistence.EntityFrameworkCore", "src\Framework\Gma.Framework.Persistence.EntityFrameworkCore\Gma.Framework.Persistence.EntityFrameworkCore.csproj", "{8C44BE6D-E357-41C6-BC78-561797A080A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tasks.Infrastructure", "src\Shared\Shared.Tasks.Infrastructure\Shared.Tasks.Infrastructure.csproj", "{A7E085FF-F931-4162-84A4-1AC0BB3E49FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tasks.Infrastructure", "src\Framework\Gma.Framework.Tasks.Infrastructure\Gma.Framework.Tasks.Infrastructure.csproj", "{A7E085FF-F931-4162-84A4-1AC0BB3E49FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tenancy", "src\Shared\Shared.Tenancy\Shared.Tenancy.csproj", "{F8D39D9E-2E73-486E-8B19-8CAE47E766CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tenancy", "src\Framework\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj", "{F8D39D9E-2E73-486E-8B19-8CAE47E766CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Runtime", "src\Shared\Shared.Runtime\Shared.Runtime.csproj", "{DDF058E8-D1AE-4F13-9E11-89C1EAB11DC8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Runtime", "src\Framework\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj", "{DDF058E8-D1AE-4F13-9E11-89C1EAB11DC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Security", "src\Shared\Shared.Security\Shared.Security.csproj", "{089F8DA2-E92D-4B19-BDCA-54AE92591C43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Security", "src\Framework\Gma.Framework.Security\Gma.Framework.Security.csproj", "{089F8DA2-E92D-4B19-BDCA-54AE92591C43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tasks.Cqrs", "src\Shared\Shared.Tasks.Cqrs\Shared.Tasks.Cqrs.csproj", "{DFEA7D5E-3688-47D3-B386-390A7D3A281F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tasks.Cqrs", "src\Framework\Gma.Framework.Tasks.Cqrs\Gma.Framework.Tasks.Cqrs.csproj", "{DFEA7D5E-3688-47D3-B386-390A7D3A281F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging.Nats", "src\Shared\Shared.Messaging.Nats\Shared.Messaging.Nats.csproj", "{D97AC05B-D8E8-40DF-A2A6-D0CE28F5C508}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Messaging.Nats", "src\Framework\Gma.Framework.Messaging.Nats\Gma.Framework.Messaging.Nats.csproj", "{D97AC05B-D8E8-40DF-A2A6-D0CE28F5C508}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tenancy.Infrastructure", "src\Shared\Shared.Tenancy.Infrastructure\Shared.Tenancy.Infrastructure.csproj", "{02897B0E-41DC-46C9-AC56-C2D3F32F8A4D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tenancy.Infrastructure", "src\Framework\Gma.Framework.Tenancy.Infrastructure\Gma.Framework.Tenancy.Infrastructure.csproj", "{02897B0E-41DC-46C9-AC56-C2D3F32F8A4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Cqrs", "src\Shared\Shared.Cqrs\Shared.Cqrs.csproj", "{19933B9B-2E2D-4CBC-914D-2DB489DFC039}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Cqrs", "src\Framework\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj", "{19933B9B-2E2D-4CBC-914D-2DB489DFC039}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Authorization", "src\Shared\Shared.Authorization\Shared.Authorization.csproj", "{1C4E4187-DB7D-46F7-AE25-4A2A45F7956A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Authorization", "src\Framework\Gma.Framework.Authorization\Gma.Framework.Authorization.csproj", "{1C4E4187-DB7D-46F7-AE25-4A2A45F7956A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Application.Events", "src\Shared\Shared.Application.Events\Shared.Application.Events.csproj", "{AAA13440-A4EE-4F5F-BA64-63A0BBEF183F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Application.Events", "src\Framework\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj", "{AAA13440-A4EE-4F5F-BA64-63A0BBEF183F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Pagination", "src\Shared\Shared.Pagination\Shared.Pagination.csproj", "{F2F686C0-5F4B-4607-8FA9-53AA77F8DD1A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Pagination", "src\Framework\Gma.Framework.Pagination\Gma.Framework.Pagination.csproj", "{F2F686C0-5F4B-4607-8FA9-53AA77F8DD1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Cqrs.Infrastructure", "src\Shared\Shared.Cqrs.Infrastructure\Shared.Cqrs.Infrastructure.csproj", "{12AD6EF7-53B6-4B26-853E-B2E68C0C5A6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Cqrs.Infrastructure", "src\Framework\Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj", "{12AD6EF7-53B6-4B26-853E-B2E68C0C5A6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Application.Events.Infrastructure", "src\Shared\Shared.Application.Events.Infrastructure\Shared.Application.Events.Infrastructure.csproj", "{24FA65E8-16E0-4F59-86CB-77CC8D6C0280}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Application.Events.Infrastructure", "src\Framework\Gma.Framework.Application.Events.Infrastructure\Gma.Framework.Application.Events.Infrastructure.csproj", "{24FA65E8-16E0-4F59-86CB-77CC8D6C0280}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Runtime.Infrastructure", "src\Shared\Shared.Runtime.Infrastructure\Shared.Runtime.Infrastructure.csproj", "{CD61FB98-A7F1-4FCD-BA01-21A4F3521006}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Runtime.Infrastructure", "src\Framework\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj", "{CD61FB98-A7F1-4FCD-BA01-21A4F3521006}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Application.Composition", "src\Shared\Shared.Application.Composition\Shared.Application.Composition.csproj", "{C4400B3A-6BC4-4744-8545-FF1ED957E4DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Application.Composition", "src\Framework\Gma.Framework.Application.Composition\Gma.Framework.Application.Composition.csproj", "{C4400B3A-6BC4-4744-8545-FF1ED957E4DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Numerics", "src\Shared\Shared.Numerics\Shared.Numerics.csproj", "{A4013CE7-8758-4587-9756-4B10E3AEF100}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Numerics", "src\Framework\Gma.Framework.Numerics\Gma.Framework.Numerics.csproj", "{A4013CE7-8758-4587-9756-4B10E3AEF100}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.ProjectionRebuild", "src\Shared\Shared.ProjectionRebuild\Shared.ProjectionRebuild.csproj", "{B70F8EF8-26EA-4525-9380-4841541F974B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.ProjectionRebuild", "src\Framework\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj", "{B70F8EF8-26EA-4525-9380-4841541F974B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.ProjectionRebuild.EntityFrameworkCore", "src\Shared\Shared.ProjectionRebuild.EntityFrameworkCore\Shared.ProjectionRebuild.EntityFrameworkCore.csproj", "{618A74ED-7487-4815-9770-6886DEAB44EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.ProjectionRebuild.EntityFrameworkCore", "src\Framework\Gma.Framework.ProjectionRebuild.EntityFrameworkCore\Gma.Framework.ProjectionRebuild.EntityFrameworkCore.csproj", "{618A74ED-7487-4815-9770-6886DEAB44EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Caching.Cqrs", "src\Shared\Shared.Caching.Cqrs\Shared.Caching.Cqrs.csproj", "{C53B59FC-EA50-4C75-9AD5-C208EF4AAEED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Caching.Cqrs", "src\Framework\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj", "{C53B59FC-EA50-4C75-9AD5-C208EF4AAEED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.ProjectionRebuild.Tasks", "src\Shared\Shared.ProjectionRebuild.Tasks\Shared.ProjectionRebuild.Tasks.csproj", "{2021FE15-59C5-4BB4-8645-2ECEB33E25B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.ProjectionRebuild.Tasks", "src\Framework\Gma.Framework.ProjectionRebuild.Tasks\Gma.Framework.ProjectionRebuild.Tasks.csproj", "{2021FE15-59C5-4BB4-8645-2ECEB33E25B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Notifications", "src\Shared\Shared.Notifications\Shared.Notifications.csproj", "{8A167CD7-0083-4D04-A2E3-CD367101F0A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Notifications", "src\Framework\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj", "{8A167CD7-0083-4D04-A2E3-CD367101F0A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Notifications.Infrastructure", "src\Shared\Shared.Notifications.Infrastructure\Shared.Notifications.Infrastructure.csproj", "{BB223283-5289-4D0C-9F05-37B5C2CDBE52}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Notifications.Infrastructure", "src\Framework\Gma.Framework.Notifications.Infrastructure\Gma.Framework.Notifications.Infrastructure.csproj", "{BB223283-5289-4D0C-9F05-37B5C2CDBE52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Notifications.Api", "src\Shared\Shared.Notifications.Api\Shared.Notifications.Api.csproj", "{2252B4FC-7DA8-4AC5-8C1D-B3A855D0C88E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Notifications.Api", "src\Framework\Gma.Framework.Notifications.Api\Gma.Framework.Notifications.Api.csproj", "{2252B4FC-7DA8-4AC5-8C1D-B3A855D0C88E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Notifications.SignalR", "src\Shared\Shared.Notifications.SignalR\Shared.Notifications.SignalR.csproj", "{24C08E26-D48B-4EBA-9782-83FA887AD21D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Notifications.SignalR", "src\Framework\Gma.Framework.Notifications.SignalR\Gma.Framework.Notifications.SignalR.csproj", "{24C08E26-D48B-4EBA-9782-83FA887AD21D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Notifications.Cqrs", "src\Shared\Shared.Notifications.Cqrs\Shared.Notifications.Cqrs.csproj", "{3724306F-CB56-4011-A8D1-19556E0C02CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Notifications.Cqrs", "src\Framework\Gma.Framework.Notifications.Cqrs\Gma.Framework.Notifications.Cqrs.csproj", "{3724306F-CB56-4011-A8D1-19556E0C02CD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifications", "Notifications", "{DE9DAF8A-E684-0FD3-FFDC-40D3E3158533}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Contracts", "src\Modules\Notifications\Notifications.Contracts\Notifications.Contracts.csproj", "{22827C2F-6674-4146-B2AC-716B7462C295}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Contracts", "src\Modules\Notifications\Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj", "{22827C2F-6674-4146-B2AC-716B7462C295}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Domain", "src\Modules\Notifications\Notifications.Domain\Notifications.Domain.csproj", "{3C44D795-890D-42E8-9CD0-943FE909E65A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Domain", "src\Modules\Notifications\Gma.Modules.Notifications.Domain\Gma.Modules.Notifications.Domain.csproj", "{3C44D795-890D-42E8-9CD0-943FE909E65A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Application", "src\Modules\Notifications\Notifications.Application\Notifications.Application.csproj", "{C1B8BF77-9E43-4E23-BAEC-33491B998E31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Application", "src\Modules\Notifications\Gma.Modules.Notifications.Application\Gma.Modules.Notifications.Application.csproj", "{C1B8BF77-9E43-4E23-BAEC-33491B998E31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Persistence", "src\Modules\Notifications\Notifications.Persistence\Notifications.Persistence.csproj", "{117A6F97-276D-4086-923A-53B4212D6522}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Persistence", "src\Modules\Notifications\Gma.Modules.Notifications.Persistence\Gma.Modules.Notifications.Persistence.csproj", "{117A6F97-276D-4086-923A-53B4212D6522}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Persistence.SqlServerMigrations", "src\Modules\Notifications\Notifications.Persistence.SqlServerMigrations\Notifications.Persistence.SqlServerMigrations.csproj", "{CD5ED1C2-8ECC-4C09-A42A-8F5457172E8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Persistence.SqlServerMigrations", "src\Modules\Notifications\Gma.Modules.Notifications.Persistence.SqlServerMigrations\Gma.Modules.Notifications.Persistence.SqlServerMigrations.csproj", "{CD5ED1C2-8ECC-4C09-A42A-8F5457172E8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Persistence.PostgreSqlMigrations", "src\Modules\Notifications\Notifications.Persistence.PostgreSqlMigrations\Notifications.Persistence.PostgreSqlMigrations.csproj", "{973655AA-5577-4083-AD0B-70B48AB8FDBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Persistence.PostgreSqlMigrations", "src\Modules\Notifications\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations.csproj", "{973655AA-5577-4083-AD0B-70B48AB8FDBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Api", "src\Modules\Notifications\Notifications.Api\Notifications.Api.csproj", "{5E205920-1877-4968-974C-391F7D8E2BE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Api", "src\Modules\Notifications\Gma.Modules.Notifications.Api\Gma.Modules.Notifications.Api.csproj", "{5E205920-1877-4968-974C-391F7D8E2BE6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifications", "Notifications", "{A562C114-001B-566E-3A76-1324C06269DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Tests", "tests\Notifications.Tests\Notifications.Tests.csproj", "{88751446-EBB8-4AFC-9250-F747DB4BEDBB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Tests", "src\Modules\Notifications\tests\Gma.Modules.Notifications.Tests\Gma.Modules.Notifications.Tests.csproj", "{88751446-EBB8-4AFC-9250-F747DB4BEDBB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ordering.Api", "src\Modules\Ordering\Ordering.Api\Ordering.Api.csproj", "{644AFBB4-8CB8-4FD3-80F3-725E4484C2B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Admin.Contracts", "src\Modules\Notifications\Notifications.Admin.Contracts\Notifications.Admin.Contracts.csproj", "{EC0E1475-B273-4CDB-A843-8BE1751CAC0A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.Admin.Contracts", "src\Modules\Notifications\Gma.Modules.Notifications.Admin.Contracts\Gma.Modules.Notifications.Admin.Contracts.csproj", "{EC0E1475-B273-4CDB-A843-8BE1751CAC0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.AdminApi", "src\Modules\Notifications\Notifications.AdminApi\Notifications.AdminApi.csproj", "{B13743CA-31A8-4FE6-80E5-F964C9307494}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Notifications.AdminApi", "src\Modules\Notifications\Gma.Modules.Notifications.AdminApi\Gma.Modules.Notifications.AdminApi.csproj", "{B13743CA-31A8-4FE6-80E5-F964C9307494}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.ModuleComposition", "src\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj", "{1C9B6AB1-8670-4E65-A6F3-E20E79274821}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.ModuleComposition", "src\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj", "{1C9B6AB1-8670-4E65-A6F3-E20E79274821}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tenancy.Messaging", "src\Shared\Shared.Tenancy.Messaging\Shared.Tenancy.Messaging.csproj", "{2AC9E2E4-0EDE-41BC-8567-83CAAB8BA092}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tenancy.Messaging", "src\Framework\Gma.Framework.Tenancy.Messaging\Gma.Framework.Tenancy.Messaging.csproj", "{2AC9E2E4-0EDE-41BC-8567-83CAAB8BA092}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tenancy.Messaging.Infrastructure", "src\Shared\Shared.Tenancy.Messaging.Infrastructure\Shared.Tenancy.Messaging.Infrastructure.csproj", "{D3C8E643-DE2E-4023-9701-EB9F48920ACC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tenancy.Messaging.Infrastructure", "src\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj", "{D3C8E643-DE2E-4023-9701-EB9F48920ACC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tenancy.Cqrs", "src\Shared\Shared.Tenancy.Cqrs\Shared.Tenancy.Cqrs.csproj", "{54BB8BAF-5D43-4F7E-A161-AEDF7CB20A4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tenancy.Cqrs", "src\Framework\Gma.Framework.Tenancy.Cqrs\Gma.Framework.Tenancy.Cqrs.csproj", "{54BB8BAF-5D43-4F7E-A161-AEDF7CB20A4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tenancy.Caching", "src\Shared\Shared.Tenancy.Caching\Shared.Tenancy.Caching.csproj", "{03B23DEB-E22A-4364-93C9-C4673227DAAE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tenancy.Caching", "src\Framework\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj", "{03B23DEB-E22A-4364-93C9-C4673227DAAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tenancy.Tasks", "src\Shared\Shared.Tenancy.Tasks\Shared.Tenancy.Tasks.csproj", "{9F002464-E320-421E-9536-CEA3E1D0F047}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tenancy.Tasks", "src\Framework\Gma.Framework.Tenancy.Tasks\Gma.Framework.Tenancy.Tasks.csproj", "{9F002464-E320-421E-9536-CEA3E1D0F047}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Tenancy.Api.Serilog", "src\Shared\Shared.Tenancy.Api.Serilog\Shared.Tenancy.Api.Serilog.csproj", "{74248547-EC6E-41F1-A804-D8338FAB004D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.Tenancy.Api.Serilog", "src\Framework\Gma.Framework.Tenancy.Api.Serilog\Gma.Framework.Tenancy.Api.Serilog.csproj", "{74248547-EC6E-41F1-A804-D8338FAB004D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.AccessControl", "src\Shared\Shared.AccessControl\Shared.AccessControl.csproj", "{DE8816DE-04A5-4783-AB73-8299B80C48AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.AccessControl", "src\Framework\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj", "{DE8816DE-04A5-4783-AB73-8299B80C48AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host.Worker", "src\Host.Worker\Host.Worker.csproj", "{D45C2AF5-DC19-4507-AD32-EC77AF2A42B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.FileManagement", "src\Shared\Shared.FileManagement\Shared.FileManagement.csproj", "{F46555E2-672B-44E4-8147-C893B3592190}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.FileManagement", "src\Framework\Gma.Framework.FileManagement\Gma.Framework.FileManagement.csproj", "{F46555E2-672B-44E4-8147-C893B3592190}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.FileManagement.LocalStorage", "src\Shared\Shared.FileManagement.LocalStorage\Shared.FileManagement.LocalStorage.csproj", "{D7B474FC-BAFB-4AE2-B96F-310620BD252B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.FileManagement.LocalStorage", "src\Framework\Gma.Framework.FileManagement.LocalStorage\Gma.Framework.FileManagement.LocalStorage.csproj", "{D7B474FC-BAFB-4AE2-B96F-310620BD252B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.FileManagement.Minio", "src\Shared\Shared.FileManagement.Minio\Shared.FileManagement.Minio.csproj", "{FF30266F-DEC9-4EF7-AA15-389ABBDEC920}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Framework.FileManagement.Minio", "src\Framework\Gma.Framework.FileManagement.Minio\Gma.Framework.FileManagement.Minio.csproj", "{FF30266F-DEC9-4EF7-AA15-389ABBDEC920}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{5E5414C4-745C-10B3-C49B-D38F53A77034}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Files.Contracts", "src\Modules\Files\Files.Contracts\Files.Contracts.csproj", "{09009F03-5AF8-4A32-B60D-18B972C931A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Files.Contracts", "src\Modules\Files\Gma.Modules.Files.Contracts\Gma.Modules.Files.Contracts.csproj", "{09009F03-5AF8-4A32-B60D-18B972C931A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Files.Application", "src\Modules\Files\Files.Application\Files.Application.csproj", "{92244346-25F6-4542-A867-D926BE58FA6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Files.Application", "src\Modules\Files\Gma.Modules.Files.Application\Gma.Modules.Files.Application.csproj", "{92244346-25F6-4542-A867-D926BE58FA6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Files.Api", "src\Modules\Files\Files.Api\Files.Api.csproj", "{4BF59374-4F52-459B-9261-94D0672069FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gma.Modules.Files.Api", "src\Modules\Files\Gma.Modules.Files.Api\Gma.Modules.Files.Api.csproj", "{4BF59374-4F52-459B-9261-94D0672069FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

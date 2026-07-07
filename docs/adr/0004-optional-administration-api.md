@@ -23,10 +23,10 @@ The same modularity rules still apply:
 
 Add administration HTTP APIs through a separate optional host and adapter:
 
-- `Shared.Administration.Api` contains generic admin API composition, actor resolution, and result mapping.
+- `Gma.Framework.Administration.Api` contains generic admin API composition, actor resolution, and result mapping.
 - `Host.AdminApi` composes only the admin API modules a deployment wants.
-- `Administration.AdminApi` exposes RBAC role management endpoints.
-- `Auth.AdminApi` exposes Auth member management endpoints.
+- `Gma.Modules.Administration.AdminApi` exposes RBAC role management endpoints.
+- `Gma.Modules.Auth.AdminApi` exposes Auth member management endpoints.
 - `Host.Api` does not register admin API modules.
 - Tenant-scoped admin API calls use the configured tenant header plus optional token tenant binding. If the configured token tenant claim is present, it must match the requested tenant; if absent, RBAC remains the tenant authority.
 

@@ -2,8 +2,8 @@ namespace Ordering.Domain.Visibility;
 
 using Ordering.Domain.Errors;
 using Ordering.Domain.ValueObjects;
-using Shared.Naming;
-using Shared.Results;
+using Gma.Framework.Naming;
+using Gma.Framework.Results;
 
 public sealed record OrderViewer
 {

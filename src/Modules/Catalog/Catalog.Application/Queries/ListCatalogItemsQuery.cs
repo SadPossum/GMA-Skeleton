@@ -1,8 +1,8 @@
 namespace Catalog.Application.Queries;
 
 using Catalog.Contracts;
-using Shared.Cqrs;
-using Shared.Pagination;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Pagination;
 
 public sealed record ListCatalogItemsQuery(
     int Page = PageRequest.DefaultPage,

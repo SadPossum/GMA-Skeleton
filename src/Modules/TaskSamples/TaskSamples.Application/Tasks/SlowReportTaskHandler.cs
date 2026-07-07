@@ -1,10 +1,10 @@
 namespace TaskSamples.Application.Tasks;
 
-using Shared.Cqrs;
-using Shared.Results;
-using Shared.Runtime.Time;
-using Shared.Tasks;
-using Shared.Tasks.Cqrs;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Results;
+using Gma.Framework.Runtime.Time;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tasks.Cqrs;
 using TaskSamples.Contracts;
 
 internal sealed class SlowReportTaskHandler(

@@ -1,10 +1,10 @@
 namespace Catalog.Tests;
 
 using Catalog.Contracts;
-using Shared.Caching;
-using Shared.Messaging;
-using Shared.ModuleComposition;
-using Shared.Tenancy;
+using Gma.Framework.Caching;
+using Gma.Framework.Messaging;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Tenancy;
 using Xunit;
 
 [Trait("Category", "Unit")]

@@ -1,24 +1,24 @@
-using Auth.Api;
-using Auth.Contracts;
+using Gma.Modules.Auth.Api;
+using Gma.Modules.Auth.Contracts;
 using ServiceDefaults;
-using Shared.Api.Modules;
-using Shared.Api.OpenApi;
-using Shared.Api.Security;
-using Shared.Api.Serilog;
-using Shared.Caching.Cqrs;
-using Shared.Caching.Redis;
-using Shared.Infrastructure;
-using Shared.Logging.Serilog;
-using Shared.Messaging.Infrastructure;
-using Shared.Messaging.Nats.Aspire;
-using Shared.ModuleComposition;
-using Shared.Notifications.Api;
-using Shared.Notifications.Cqrs;
-using Shared.Notifications.SignalR;
-using Shared.Tenancy.Api.Serilog;
-using Shared.Tenancy.Caching;
-using Shared.Tenancy.Messaging.Infrastructure;
-using Tenancy.Api;
+using Gma.Framework.Api.Modules;
+using Gma.Framework.Api.OpenApi;
+using Gma.Framework.Api.Security;
+using Gma.Framework.Api.Serilog;
+using Gma.Framework.Caching.Cqrs;
+using Gma.Framework.Caching.Redis;
+using Gma.Framework.Infrastructure;
+using Gma.Framework.Logging.Serilog;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Messaging.Nats.Aspire;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Notifications.Api;
+using Gma.Framework.Notifications.Cqrs;
+using Gma.Framework.Notifications.SignalR;
+using Gma.Framework.Tenancy.Api.Serilog;
+using Gma.Framework.Tenancy.Caching;
+using Gma.Framework.Tenancy.Messaging.Infrastructure;
+using Gma.Modules.Tenancy.Api;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +27,7 @@ builder.Host.UseConfiguredSerilog();
 builder.AddUserNotificationsCqrs();
 builder.AddRedisCaching();
 builder.AddCachingCqrs();
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddTenantSerilogRequestLogging();
 builder.AddTenantCaching();
 builder.AddMessagingInfrastructure();
@@ -42,13 +42,13 @@ builder.AddAuthModule(AuthProfile.TenantScoped());
 // module-scaffold:public-api-modules
 
 builder.AddServiceDefaults();
-builder.AddSharedOpenApi();
+builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
 
 WebApplication app = builder.Build();
 
-app.UseSharedOpenApi();
-app.UseSharedSerilogRequestLogging();
+app.UseGmaOpenApi();
+app.UseGmaSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

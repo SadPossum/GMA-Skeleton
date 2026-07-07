@@ -7,17 +7,17 @@ It does not own feature-specific administration behavior. Feature modules expose
 ## Projects
 
 ```text
-Administration.Application
-Administration.Persistence
-Administration.Persistence.SqlServerMigrations
-Administration.Persistence.PostgreSqlMigrations
-Administration.AdminCli
-Administration.AdminApi
+Gma.Modules.Administration.Application
+Gma.Modules.Administration.Persistence
+Gma.Modules.Administration.Persistence.SqlServerMigrations
+Gma.Modules.Administration.Persistence.PostgreSqlMigrations
+Gma.Modules.Administration.AdminCli
+Gma.Modules.Administration.AdminApi
 ```
 
 ## Public Contracts
 
-The module currently has no separate `.Contracts` project. Shared administration contracts live in `Shared.Administration`.
+The module currently has no separate `.Contracts` project. Shared administration contracts live in `Gma.Framework.Administration`.
 
 Application-facing records include:
 
@@ -65,7 +65,7 @@ Bootstrap configuration:
 
 ## Admin API
 
-`Administration.AdminApi` is optional and is composed by `Host.AdminApi`.
+`Gma.Modules.Administration.AdminApi` is optional and is composed by `Host.AdminApi`.
 
 Routes:
 
@@ -155,8 +155,8 @@ The Administration module does not publish integration events in this milestone.
 
 Relevant coverage:
 
-- bootstrap option validation in `Administration.Tests`;
-- permission parsing and deny-by-default authorization in `Shared.Tests`;
+- bootstrap option validation in `Gma.Modules.Administration.Tests`;
+- permission parsing and deny-by-default authorization in `Gma.Framework.Tests`;
 - owner wildcard and tenant-scoped grants through integration tests;
 - SQL Server and PostgreSQL migrations through Docker integration tests;
 - CLI RBAC and Auth admin flows in `AdminCliIntegrationTests`;

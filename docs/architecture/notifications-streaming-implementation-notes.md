@@ -6,20 +6,20 @@ This slice adds optional, front-door-focused user notifications and live streami
 
 ## Decisions To Preserve
 
-- Modules depend only on `Shared.Notifications`.
-- `Shared.Notifications.Infrastructure` owns in-memory fanout, bounded subscriber queues, payload serialization, fail-open sink delivery, and metrics.
-- `Shared.Notifications.Cqrs` owns the optional post-commit command pipeline bridge for queued notification requests.
-- `Shared.Notifications.Api` owns the authenticated SSE endpoint.
-- `Shared.Notifications.SignalR` owns SignalR hubs, groups, and browser query-string bearer-token support for the notification hub path.
+- Modules depend only on `Gma.Framework.Notifications`.
+- `Gma.Framework.Notifications.Infrastructure` owns in-memory fanout, bounded subscriber queues, payload serialization, fail-open sink delivery, and metrics.
+- `Gma.Framework.Notifications.Cqrs` owns the optional post-commit command pipeline bridge for queued notification requests.
+- `Gma.Framework.Notifications.Api` owns the authenticated SSE endpoint.
+- `Gma.Framework.Notifications.SignalR` owns SignalR hubs, groups, and browser query-string bearer-token support for the notification hub path.
 - `Notifications` owns durable user notification history/read state when explicitly composed.
-- `Notifications.Contracts` owns `UserNotificationRequestedIntegrationEvent`; producers may reference that contracts package and publish producer-scoped subjects through their own outbox.
-- `Notifications.Application` owns the reusable notification request projector, but producer subscriptions are host/example composition. Use `AddUserNotificationRequestSubscription(producerModule)` instead of hardcoding Catalog or any other producer into the reusable module.
-- `Notifications.Persistence` owns the `notifications.inbox_messages` table and idempotent consumer state.
-- `Notifications.Api` exposes current-user history/read APIs and durable SSE history stream with `afterSequence`.
-- `Notifications.AdminApi` exposes tenant-wide history/list/get/stream APIs behind admin RBAC.
+- `Gma.Modules.Notifications.Contracts` owns `UserNotificationRequestedIntegrationEvent`; producers may reference that contracts package and publish producer-scoped subjects through their own outbox.
+- `Gma.Modules.Notifications.Application` owns the reusable notification request projector, but producer subscriptions are host/example composition. Use `AddUserNotificationRequestSubscription(producerModule)` instead of hardcoding Catalog or any other producer into the reusable module.
+- `Gma.Modules.Notifications.Persistence` owns the `notifications.inbox_messages` table and idempotent consumer state.
+- `Gma.Modules.Notifications.Api` exposes current-user history/read APIs and durable SSE history stream with `afterSequence`.
+- `Gma.Modules.Notifications.AdminApi` exposes tenant-wide history/list/get/stream APIs behind admin RBAC.
 - `Notifications` broadcast notifications are stored once and read per recipient through receipts; do not fan out broad notifications into one row per user/admin.
 - Broadcast audiences are `tenant-users`, `tenant-admins`, `platform-users`, and `platform-admins`. Tenant broadcasts require tenant id; platform broadcasts must not carry tenant id.
-- Broadcast list/read/stream handlers normalize tenant id, recipient kind, recipient id, and receipt scope through `NotificationBroadcastRecipientContext` before calling persistence. Public APIs may pass the `Notifications.Contracts.NotificationBroadcastRecipientKind` enum; application ports must not accept raw recipient-kind strings.
+- Broadcast list/read/stream handlers normalize tenant id, recipient kind, recipient id, and receipt scope through `NotificationBroadcastRecipientContext` before calling persistence. Public APIs may pass the `Gma.Modules.Notifications.Contracts.NotificationBroadcastRecipientKind` enum; application ports must not accept raw recipient-kind strings.
 - Notification contract enums own their JSON converters. Severity values write `info`, `success`, `warning`, or `error`; broadcast audiences write lowercase kebab-case values; recipient kinds write `user` or `admin`; SSE item kinds write `notification` or `heartbeat`. Numeric, unknown, and undefined enum values should fail before reaching application handlers.
 - Broadcast stream cursors are separate from direct history stream cursors. A future unified feed needs a dedicated feed cursor.
 - Durable history and broadcast stream polling uses module-owned `Notifications:DurableStreams` options. Keep the option limits aligned with the query validators so bad configuration fails at startup instead of creating a silent stream loop. Poll-time query failures must log and close the stream rather than continuing forever.
@@ -30,9 +30,9 @@ This slice adds optional, front-door-focused user notifications and live streami
 
 ## Audit Checklist
 
-- No module references `Shared.Notifications.Cqrs`, `Shared.Notifications.Api`, `Shared.Notifications.SignalR`, SignalR packages, or ASP.NET notification internals.
+- No module references `Gma.Framework.Notifications.Cqrs`, `Gma.Framework.Notifications.Api`, `Gma.Framework.Notifications.SignalR`, SignalR packages, or ASP.NET notification internals.
 - Domain projects do not reference notifications.
-- Application projects may reference `Shared.Notifications` only when they explicitly enqueue or publish front-door notifications.
+- Application projects may reference `Gma.Framework.Notifications` only when they explicitly enqueue or publish front-door notifications.
 - SSE requires authenticated users and tenant match when tenancy is enabled.
 - SignalR requires authenticated users and tenant claim when tenancy is enabled.
 - Publisher cancellation propagates; sink failures fail open and are logged/metered.

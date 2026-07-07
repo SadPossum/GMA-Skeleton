@@ -1,23 +1,23 @@
 namespace Architecture.Tests;
 
-using Administration.Persistence;
-using Auth.Domain.Services;
-using Auth.Infrastructure;
-using Auth.Infrastructure.JwtBearer;
-using Auth.Persistence;
+using Gma.Modules.Administration.Persistence;
+using Gma.Modules.Auth.Domain.Services;
+using Gma.Modules.Auth.Infrastructure;
+using Gma.Modules.Auth.Infrastructure.JwtBearer;
+using Gma.Modules.Auth.Persistence;
 using Catalog.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Notifications.Persistence;
+using Gma.Modules.Notifications.Persistence;
 using Ordering.Persistence;
-using Shared.Administration;
-using Shared.Api.Security;
-using Shared.Messaging;
-using Shared.Cqrs.UnitOfWork;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Administration;
+using Gma.Framework.Api.Security;
+using Gma.Framework.Messaging;
+using Gma.Framework.Cqrs.UnitOfWork;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 using Xunit;
 
 [Trait("Category", "Architecture")]
@@ -104,7 +104,7 @@ public sealed class ModuleRegistrationIdempotencyTests
             typeof(NotificationsDbContext),
             [
                 (typeof(IUnitOfWork), "NotificationsUnitOfWork"),
-                (typeof(Shared.Notifications.IUserNotificationHistoryWriter), "NotificationHistoryWriter"),
+                (typeof(Gma.Framework.Notifications.IUserNotificationHistoryWriter), "NotificationHistoryWriter"),
                 (typeof(IInboxStore), "NotificationsInboxStore")
             ]);
     }

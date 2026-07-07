@@ -1,4 +1,4 @@
-﻿# Development Guidelines
+# Development Guidelines
 
 ## Core Rule
 
@@ -46,56 +46,56 @@ If a hotfix lands directly on `main`, merge `main` back into `dev` before contin
 | Typed admin permission constants | `<Module>.Admin.Contracts` |
 | CLI admin commands | `<Module>.AdminCli` |
 | HTTP admin routes | `<Module>.AdminApi` |
-| Generic admin contracts | `Shared.Administration` |
-| HTTP admin adapter | `Shared.Administration.Api` |
-| CLI admin adapter | `Shared.Administration.Cli` |
-| Shared module metadata | `Shared.Modules` |
-| Shared composition profiles and feature validation | `Shared.ModuleComposition` |
-| Shared permission metadata | `Shared.Authorization` |
-| Shared naming primitives | `Shared.Naming` |
-| Shared numeric primitives | `Shared.Numerics` |
-| Shared result/error primitives | `Shared.Results` |
-| Shared observability names | `Shared.Observability` |
-| Shared clock/id abstractions | `Shared.Runtime` |
-| Shared claim/security constants | `Shared.Security` |
-| Shared cache contracts | `Shared.Caching` |
-| Shared messaging contracts | `Shared.Messaging` |
-| Shared user notification contracts | `Shared.Notifications` |
-| Shared notification-to-CQRS bridge | `Shared.Notifications.Cqrs` |
-| Shared task contracts | `Shared.Tasks` |
-| Shared task-to-CQRS bridge | `Shared.Tasks.Cqrs` |
-| Shared projection rebuild contracts/runtime | `Shared.ProjectionRebuild` |
-| Shared projection rebuild task bridge | `Shared.ProjectionRebuild.Tasks` |
-| Shared CQRS contracts | `Shared.Cqrs` |
-| Shared tenancy contracts | `Shared.Tenancy` |
-| Shared application assembly registration | `Shared.Application.Composition` |
-| Shared domain-event application contracts | `Shared.Application.Events` |
-| Shared domain-event dispatcher runtime | `Shared.Application.Events.Infrastructure` |
-| Shared paging request helpers | `Shared.Pagination` |
-| Shared domain abstractions | `Shared.Domain` |
-| Shared host-level runtime facade | `Shared.Infrastructure` |
-| Shared CQRS runtime | `Shared.Cqrs.Infrastructure` |
-| Shared clock/id runtime | `Shared.Runtime.Infrastructure` |
-| Shared cache runtime | `Shared.Caching.Infrastructure` |
-| Shared cache-to-CQRS bridge | `Shared.Caching.Cqrs` |
-| Shared tenancy-to-cache scope bridge | `Shared.Tenancy.Caching` |
-| Shared tenancy-to-CQRS logging bridge | `Shared.Tenancy.Cqrs` |
-| Shared tenancy-to-task execution bridge | `Shared.Tenancy.Tasks` |
-| Shared messaging runtime | `Shared.Messaging.Infrastructure` |
-| Shared NATS messaging transport | `Shared.Messaging.Nats` |
-| Shared notification runtime | `Shared.Notifications.Infrastructure` |
-| Shared notification SSE adapter | `Shared.Notifications.Api` |
-| Shared notification SignalR adapter | `Shared.Notifications.SignalR` |
-| Shared task runtime | `Shared.Tasks.Infrastructure` |
-| Shared EF persistence helpers | `Shared.Persistence.EntityFrameworkCore` |
-| Shared default tenancy runtime | `Shared.Tenancy.Infrastructure` |
-| Shared CQRS metric implementations and bounded tag helpers | `Shared.Observability.Infrastructure` |
-| HTTP helpers | `Shared.Api` |
-| OpenAPI/Swagger helpers | `Shared.Api.OpenApi` |
-| HTTP request logging enrichment | `Shared.Api.Serilog` |
-| Tenant HTTP request logging enrichment | `Shared.Tenancy.Api.Serilog` |
-| Host Serilog configuration | `Shared.Logging.Serilog` |
-| Aspire NATS client composition | `Shared.Messaging.Nats.Aspire` |
+| Generic admin contracts | `Gma.Framework.Administration` |
+| HTTP admin adapter | `Gma.Framework.Administration.Api` |
+| CLI admin adapter | `Gma.Framework.Administration.Cli` |
+| Framework module metadata | `Gma.Framework.Modules` |
+| Framework composition profiles and feature validation | `Gma.Framework.ModuleComposition` |
+| Framework permission metadata | `Gma.Framework.Authorization` |
+| Framework naming primitives | `Gma.Framework.Naming` |
+| Framework numeric primitives | `Gma.Framework.Numerics` |
+| Framework result/error primitives | `Gma.Framework.Results` |
+| Framework observability names | `Gma.Framework.Observability` |
+| Framework clock/id abstractions | `Gma.Framework.Runtime` |
+| Framework claim/security constants | `Gma.Framework.Security` |
+| Framework cache contracts | `Gma.Framework.Caching` |
+| Framework messaging contracts | `Gma.Framework.Messaging` |
+| Framework user notification contracts | `Gma.Framework.Notifications` |
+| Framework notification-to-CQRS bridge | `Gma.Framework.Notifications.Cqrs` |
+| Framework task contracts | `Gma.Framework.Tasks` |
+| Framework task-to-CQRS bridge | `Gma.Framework.Tasks.Cqrs` |
+| Framework projection rebuild contracts/runtime | `Gma.Framework.ProjectionRebuild` |
+| Framework projection rebuild task bridge | `Gma.Framework.ProjectionRebuild.Tasks` |
+| Framework CQRS contracts | `Gma.Framework.Cqrs` |
+| Framework tenancy contracts | `Gma.Framework.Tenancy` |
+| Framework application assembly registration | `Gma.Framework.Application.Composition` |
+| Framework domain-event application contracts | `Gma.Framework.Application.Events` |
+| Framework domain-event dispatcher runtime | `Gma.Framework.Application.Events.Infrastructure` |
+| Framework paging request helpers | `Gma.Framework.Pagination` |
+| Framework domain abstractions | `Gma.Framework.Domain` |
+| Framework host-level runtime facade | `Gma.Framework.Infrastructure` |
+| Framework CQRS runtime | `Gma.Framework.Cqrs.Infrastructure` |
+| Framework clock/id runtime | `Gma.Framework.Runtime.Infrastructure` |
+| Framework cache runtime | `Gma.Framework.Caching.Infrastructure` |
+| Framework cache-to-CQRS bridge | `Gma.Framework.Caching.Cqrs` |
+| Framework tenancy-to-cache scope bridge | `Gma.Framework.Tenancy.Caching` |
+| Framework tenancy-to-CQRS logging bridge | `Gma.Framework.Tenancy.Cqrs` |
+| Framework tenancy-to-task execution bridge | `Gma.Framework.Tenancy.Tasks` |
+| Framework messaging runtime | `Gma.Framework.Messaging.Infrastructure` |
+| Framework NATS messaging transport | `Gma.Framework.Messaging.Nats` |
+| Framework notification runtime | `Gma.Framework.Notifications.Infrastructure` |
+| Framework notification SSE adapter | `Gma.Framework.Notifications.Api` |
+| Framework notification SignalR adapter | `Gma.Framework.Notifications.SignalR` |
+| Framework task runtime | `Gma.Framework.Tasks.Infrastructure` |
+| Framework EF persistence helpers | `Gma.Framework.Persistence.EntityFrameworkCore` |
+| Framework default tenancy runtime | `Gma.Framework.Tenancy.Infrastructure` |
+| Framework CQRS metric implementations and bounded tag helpers | `Gma.Framework.Observability.Infrastructure` |
+| HTTP helpers | `Gma.Framework.Api` |
+| OpenAPI/Swagger helpers | `Gma.Framework.Api.OpenApi` |
+| HTTP request logging enrichment | `Gma.Framework.Api.Serilog` |
+| Tenant HTTP request logging enrichment | `Gma.Framework.Tenancy.Api.Serilog` |
+| Host Serilog configuration | `Gma.Framework.Logging.Serilog` |
+| Aspire NATS client composition | `Gma.Framework.Messaging.Nats.Aspire` |
 | Tests for boundaries | `Architecture.Tests` |
 | Module metrics class | Owning module Application or Infrastructure project |
 | Exporter configuration | `ServiceDefaults` |
@@ -140,7 +140,7 @@ When a new module becomes compiled code, update `Architecture.Tests/Support/Arch
 
 Do:
 
-- depend on `Shared.*` abstractions;
+- depend on `Gma.Framework.*` abstractions;
 - depend on your own module projects;
 - depend on another module's `.Contracts` project when truly needed.
 
@@ -176,7 +176,7 @@ Guidelines:
 
 ## Request Boundaries
 
-Normalize request-bound paging inputs with `Shared.Pagination.PageRequest` before calling repositories or cache-key builders. Repository read ports should accept `PageRequest` rather than raw `page` / `pageSize` integers, and EF queries should use `PageRequest.SkipCount` plus `PageRequest.PageSize`.
+Normalize request-bound paging inputs with `Gma.Framework.Pagination.PageRequest` before calling repositories or cache-key builders. Repository read ports should accept `PageRequest` rather than raw `page` / `pageSize` integers, and EF queries should use `PageRequest.SkipCount` plus `PageRequest.PageSize`.
 
 Do not copy local `Math.Max`/`Math.Clamp` paging rules into handlers. Shared defaults and maximums keep API, admin API, CLI, cache keys, and EF `Skip` arithmetic aligned. `PageRequest` normalizes through `Normalize(...)`, its public constructor, and its default struct instance.
 
@@ -232,15 +232,15 @@ If yes, tests must cover tenant isolation.
 
 ## Resource Access Policies
 
-Use `Shared.AccessControl` only for shared product/resource actor vocabulary such as `AccessSubject`. Put business visibility rules in the owning module, preferably in the domain, and make list/search/feed/export reads flow through typed access scopes that persistence must consume.
+Use `Gma.Framework.AccessControl` only for shared product/resource actor vocabulary such as `AccessSubject`. Put business visibility rules in the owning module, preferably in the domain, and make list/search/feed/export reads flow through typed access scopes that persistence must consume.
 
 Rules:
 
-- keep admin operation authorization in `Shared.Administration` and the optional `Administration` module unless an explicit adapter is added later;
+- keep admin operation authorization in `Gma.Framework.Administration` and the optional `Administration` module unless an explicit adapter is added later;
 - define business access actors, policies, and query scopes in the owning module domain when the rule is part of product behavior;
 - use direct application checks for simple operational rules that do not shape persistence;
 - construct `AccessSubject` explicitly at front doors, workers, or tests;
-- keep ASP.NET Core, EF, Auth, Administration, Tenancy runtime, NATS, Redis, and external policy engines out of `Shared.AccessControl`;
+- keep ASP.NET Core, EF, Auth, Administration, Tenancy runtime, NATS, Redis, and external policy engines out of `Gma.Framework.AccessControl`;
 - treat missing scopes as deny-by-default failures, not implicit allow;
 - load minimal access summaries before single-resource authorization when the full resource should not be loaded for unauthorized callers;
 - return not-found-shaped results for private resources when a forbidden response would reveal existence;
@@ -275,7 +275,7 @@ Rules:
 - application handlers resolve the owning writer through `IOutboxWriterRegistry`;
 - module outbox writer stores integration events;
 - public integration events inherit `IntegrationEvent` so event id, occurrence time, event name, and version validation stay centralized;
-- tenant-owned integration events inherit `TenantIntegrationEvent` from `Shared.Tenancy.Messaging`; compose `AddTenantAwareMessaging()` in hosts that publish or consume them;
+- tenant-owned integration events inherit `TenantIntegrationEvent` from `Gma.Framework.Tenancy.Messaging`; compose `AddTenantAwareMessaging()` in hosts that publish or consume them;
 - hosted publisher sends to `IEventBus` only in hosts that explicitly opt into publishing;
 - consumers implement `IIntegrationEventHandler<TEvent>`;
 - each consuming module owns an inbox table and registers an `IInboxStore`;
@@ -294,7 +294,7 @@ Rules:
 - use notifications only for front-door user delivery, not module-to-module command/query communication;
 - keep durable business facts in domain events, integration events, outbox, NATS, and inbox;
 - enqueue notification intent through `IUserNotificationRequestQueue` from transactional command handlers only for best-effort live delivery;
-- publish `UserNotificationRequestedIntegrationEvent` from `Notifications.Contracts` through the producing module outbox when notification history creation must be durable;
+- publish `UserNotificationRequestedIntegrationEvent` from `Gma.Modules.Notifications.Contracts` through the producing module outbox when notification history creation must be durable;
 - publish through `IUserNotificationPublisher` only from front doors, workers, or other code that is already safely outside the current database commit;
 - put reusable notification payload contracts in the owning module `.Contracts` project and make them implement `IUserNotificationPayload`;
 - put notification identity on the payload type with `NotificationNameAttribute`, `NotificationVersionAttribute`, and `NotificationDescriptionAttribute`;
@@ -303,7 +303,7 @@ Rules:
 - do not rely on notifications for authorization, tenant resolution, or guaranteed delivery;
 - compose the optional `Notifications` module when users need persisted history or read/unread state;
 - treat shared-publisher notification history as durable only after a publish request reaches the shared publisher; use outbox/NATS/inbox and the Notifications request event for guaranteed creation from business facts;
-- do not reference `Shared.Notifications.Api`, `Shared.Notifications.SignalR`, SignalR packages, or ASP.NET streaming internals from modules;
+- do not reference `Gma.Framework.Notifications.Api`, `Gma.Framework.Notifications.SignalR`, SignalR packages, or ASP.NET streaming internals from modules;
 - compose `AddUserNotificationsCqrs()` in hosts whose command handlers enqueue notification requests;
 - compose `AddUserNotificationServerSentEvents()` and `AddUserNotificationSignalR()` only in hosts that need live user delivery.
 
@@ -318,15 +318,15 @@ Rules:
 - register task handlers explicitly through the attribute-backed `AddTaskHandler<TPayload,THandler>(moduleName)` overload from the owning module application registration;
 - keep payload code independent from scheduler packages, HTTP, CLI, and other module internals;
 - use `TaskExecutionContext` for run identity, tenant, node, worker id, worker group, attempt, correlation, and cancellation intent;
-- mark tenant-scoped task payloads with `TenantScopedAttribute` from `Shared.Tenancy` and compose `AddTenantTaskExecutionContext()` from `Shared.Tenancy.Tasks` only in worker hosts that actually run them;
+- mark tenant-scoped task payloads with `TenantScopedAttribute` from `Gma.Framework.Tenancy` and compose `AddTenantTaskExecutionContext()` from `Gma.Framework.Tenancy.Tasks` only in worker hosts that actually run them;
 - use explicit task payload versions when changing payload shape; keep old handlers registered until old queued work is drained;
 - use deduplication keys for operator/API/schedule paths where duplicate active work would be harmful;
 - let code-defined schedules use the default version-aware dedupe key shape unless the module has a documented reason to override it: `schedule:<module>:<task>:<schedule>:v<payload-version>:<occurrence>`;
 - expose or accept task run statuses through `TaskRunStatusNames` wire names such as `retry-scheduled`; keep enum names as compatibility input only;
 - report heartbeat and progress through `ITaskRuntimeReporter`;
 - read system-to-runner control messages through `ITaskControlLoop` or `TaskControlLoopExtensions`;
-- dispatch normal application commands from payload code through `ITaskCommandDispatcher` from `Shared.Tasks.Cqrs` or CQRS contracts, and compose `AddTaskCqrs()` only in hosts whose task handlers need it;
-- adapt projection rebuilds to task progress/control through `TaskProjectionRebuildRunner<TSnapshot>` from `Shared.ProjectionRebuild.Tasks`;
+- dispatch normal application commands from payload code through `ITaskCommandDispatcher` from `Gma.Framework.Tasks.Cqrs` or CQRS contracts, and compose `AddTaskCqrs()` only in hosts whose task handlers need it;
+- adapt projection rebuilds to task progress/control through `TaskProjectionRebuildRunner<TSnapshot>` from `Gma.Framework.ProjectionRebuild.Tasks`;
 - keep runtime stores behind `ITaskRunStore` and use `TaskRunStatusTransitions` for claim, retry, cancellation, and terminal-state rules;
 - persist requester metadata from `TaskRunRequest.RequestedBy` when the runtime owns a durable store;
 - compose `AddTaskRuntimePersistence()` and `AddTaskWorkerRuntime()` only in hosts that should run tasks;
@@ -341,7 +341,7 @@ Rules:
 - keep admin HTTP APIs optional and composed by `Host.AdminApi`;
 - keep `Host.Api` free of admin module registration unless a future plan explicitly adds admin APIs;
 - keep public permission code strings and permission metadata in `.Contracts` when other tooling needs them;
-- declare typed `AdminPermission` constants in `.Admin.Contracts` so `.Contracts` does not reference `Shared.Administration`;
+- declare typed `AdminPermission` constants in `.Admin.Contracts` so `.Contracts` does not reference `Gma.Framework.Administration`;
 - declare admin operation names as dotted lowercase constants and create operations through `AdminOperation.Create`;
 - normalize RBAC actor ids, tenant ids, permission codes, and operation names through `AdminActor`, `TenantIds`, `AdminPermission`, and `AdminOperation`, including in persistence entities. `AdminActor` is factory-created; do not add public constructors or local actor-id trimming;
 - create admin audit records through `AdminAuditRecord` and use `AdminAuditResults` constants for result values;
@@ -361,8 +361,8 @@ Rules:
 - keep generated password responses disabled for admin HTTP unless explicitly configured for a controlled environment;
 - require `--yes` for destructive non-interactive commands;
 - never log or audit passwords, tokens, token hashes, refresh tokens, or raw secrets;
-- keep `System.CommandLine` references isolated to `.AdminCli`, `Shared.Administration.Cli`, and `Host.AdminCli`;
-- keep admin HTTP route mapping isolated to `.AdminApi`, `Shared.Administration.Api`, and `Host.AdminApi`.
+- keep `System.CommandLine` references isolated to `.AdminCli`, `Gma.Framework.Administration.Cli`, and `Host.AdminCli`;
+- keep admin HTTP route mapping isolated to `.AdminApi`, `Gma.Framework.Administration.Api`, and `Host.AdminApi`.
 
 ## Observability
 
@@ -390,7 +390,7 @@ Rules:
 - Prefer small, explicit classes.
 - Keep application-layer DI registration host-agnostic. Use `IServiceCollection`; pass `IConfiguration` only for application-owned options.
 - Use `AddApplicationServicesFromAssembly(typeof(DependencyInjection).Assembly)` from module application registration for CQRS handlers, validators, and domain-event handlers. This is the project's only default reflection-based application registration convention.
-- Keep integration-event subscriptions explicit with `AddIntegrationEventHandler<TEvent,THandler>(consumerModule, producerModule)`; put event identity/version on the event contract through `EventType`/`EventVersion` constants plus `IntegrationEventNameAttribute` and `IntegrationEventVersionAttribute`, durable handler identity on the handler through `IntegrationEventHandlerAttribute`, and tenant behavior through `[TenantScoped]` from `Shared.Tenancy` when needed.
+- Keep integration-event subscriptions explicit with `AddIntegrationEventHandler<TEvent,THandler>(consumerModule, producerModule)`; put event identity/version on the event contract through `EventType`/`EventVersion` constants plus `IntegrationEventNameAttribute` and `IntegrationEventVersionAttribute`, durable handler identity on the handler through `IntegrationEventHandlerAttribute`, and tenant behavior through `[TenantScoped]` from `Gma.Framework.Tenancy` when needed.
 - Keep user-notification metadata local to the notification payload through `NotificationNameAttribute`, `NotificationVersionAttribute`, and `NotificationDescriptionAttribute`; module descriptors should call `WithUserNotification<TPayload>()` rather than repeat names and versions.
 - Keep one application handler class per file under `<Module>.Application/Handlers`.
 - Keep one public contract type per file under `<Module>.Contracts`.

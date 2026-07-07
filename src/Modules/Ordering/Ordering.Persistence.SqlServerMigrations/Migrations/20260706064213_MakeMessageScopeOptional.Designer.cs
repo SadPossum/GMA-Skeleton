@@ -168,7 +168,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     b.ToTable("projection_rebuild_checkpoints", "ordering");
                 });
 
-            modelBuilder.Entity("Shared.Messaging.Infrastructure.InboxMessage", b =>
+            modelBuilder.Entity("Gma.Framework.Messaging.Infrastructure.InboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");

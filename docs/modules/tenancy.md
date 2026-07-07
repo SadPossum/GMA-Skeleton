@@ -5,10 +5,10 @@ The Tenancy module enables tenant resolution for projects that need tenant isola
 ## Project
 
 ```text
-Tenancy.Api
+Gma.Modules.Tenancy.Api
 ```
 
-The module is intentionally small. Shared tenancy abstractions live in `Shared.Tenancy` and default/null implementations live in `Shared.Tenancy.Infrastructure`, which the core shared infrastructure composes by default.
+The module is intentionally small. Framework tenancy abstractions live in `Gma.Framework.Tenancy` and default/null implementations live in `Gma.Framework.Tenancy.Infrastructure`, which the framework infrastructure composes by default.
 
 ## Runtime Behavior
 
@@ -62,7 +62,7 @@ Tenant-scoped endpoints should call:
 .RequireTenant()
 ```
 
-This applies the tenant endpoint filter from `Shared.Api`.
+This applies the tenant endpoint filter from `Gma.Framework.Api`.
 
 ## Persistence Usage
 

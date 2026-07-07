@@ -6,13 +6,13 @@ This is an implementation task brief for a future architecture slice. It should 
 
 Initial slice implemented:
 
-- `Shared.ModuleComposition` owns validated profile/feature/module requirement primitives and host validation extensions.
+- `Gma.Framework.ModuleComposition` owns validated profile/feature/module requirement primitives and host validation extensions.
 - Auth exposes `AuthProfile.Global(...)` and `AuthProfile.TenantScoped()` through public contracts and profile-aware API/Admin API/Admin CLI front doors.
 - Tenancy exposes a default profile that provides `tenancy.context` and `tenancy.header-resolution`; shared tenancy infrastructure provides the baseline `tenancy.context` service for non-HTTP/admin composition.
 - Runtime hosts validate composition explicitly with `ValidateModuleComposition()`.
 - Follow-up slice implemented package-owned feature catalogs for caching, messaging, notifications, and tasks; shared adapters now advertise concrete capabilities through composition metadata.
 - Catalog, Ordering, Notifications, and TaskRuntime expose default profiles in their `.Contracts/Metadata` folders, and their public/admin front doors select those profiles explicitly.
-- Auth global-profile tests now prove composition with `Shared.Infrastructure` and without `TenancyModule`; the profile uses the shared null/default tenant context and stores the configured global scope in the existing tenant/scope column.
+- Auth global-profile tests now prove composition with `Gma.Framework.Infrastructure` and without `TenancyModule`; the profile uses the shared null/default tenant context and stores the configured global scope in the existing tenant/scope column.
 - Remaining follow-up work is mostly optional worker-host examples, broader API/Admin API/Admin CLI global-profile smoke coverage when those hosts are made tenant-free, and any future decoupling of tenant-shaped metadata from outbox/inbox/task records.
 
 ## Summary
@@ -82,7 +82,7 @@ The repo already has useful building blocks:
 - `ModuleDescriptor` has a generic `Features` list.
 - Capability packages already add descriptor features such as permissions, published events, subscriptions, cache entries, tasks, and notifications.
 - Runtime composition is explicit through host calls such as `AddModule<TModule>()`, `AddAdminApiModule<TModule>()`, `AddMessagingInfrastructure()`, `AddConfiguredNatsJetStreamMessaging()`, `AddNatsJetStreamConsumers()`, and `AddTaskWorkerRuntime()`.
-- Optional cross-boundary packages already exist in spirit, for example `Shared.Caching.Cqrs`, `Shared.Notifications.Cqrs`, `Shared.Messaging.Nats.Aspire`, and `Shared.ProjectionRebuild.Tasks`.
+- Optional cross-boundary packages already exist in spirit, for example `Gma.Framework.Caching.Cqrs`, `Gma.Framework.Notifications.Cqrs`, `Gma.Framework.Messaging.Nats.Aspire`, and `Gma.Framework.ProjectionRebuild.Tasks`.
 - Existing docs already say metadata is not runtime discovery and that new optional capabilities should add `ModuleDescriptorFeature` subtypes rather than bloating the root descriptor.
 
 The missing piece is a generic composition feature registry plus validation layer.
@@ -105,7 +105,7 @@ Examples:
 TenancyModule
   provides tenancy.context
 
-Shared.Messaging.Infrastructure
+Gma.Framework.Messaging.Infrastructure
   provides messaging.outbox.contracts
 
 Configured NATS publishing adapter
@@ -161,10 +161,10 @@ The exact names should be normalized and stable, but the implementation should n
 Prefer a small package under shared modules/composition, for example:
 
 ```text
-src/Shared/Shared.ModuleComposition
+src/Framework/Gma.Framework.ModuleComposition
 ```
 
-If the implementation fits better inside `Shared.Modules`, keep the public API separate enough that it can be moved later.
+If the implementation fits better inside `Gma.Framework.Modules`, keep the public API separate enough that it can be moved later.
 
 Suggested primitives:
 
@@ -305,7 +305,7 @@ AuthProfile.Global("global")
   -> no tenancy.context requirement
   -> stores "global" in existing TenantId/scope column
   -> tokens/admin reads use the same global scope
-  -> still composes baseline Shared.Infrastructure so ITenantContext resolves to the configured default scope
+  -> still composes baseline Gma.Framework.Infrastructure so ITenantContext resolves to the configured default scope
 
 AuthProfile.TenantScoped()
   -> requires tenancy.context
@@ -329,36 +329,36 @@ Use small adapter packages when one feature adds behavior on top of another feat
 Existing examples:
 
 ```text
-Shared.Caching.Cqrs
+Gma.Framework.Caching.Cqrs
   Caching + CQRS post-commit behavior
 
-Shared.Notifications.Cqrs
+Gma.Framework.Notifications.Cqrs
   Notifications + CQRS post-commit behavior
 
-Shared.Tenancy.Api.Serilog
+Gma.Framework.Tenancy.Api.Serilog
   Tenancy + HTTP request logging enrichment
 
-Shared.Tenancy.Caching
+Gma.Framework.Tenancy.Caching
   Tenancy + cache scope value resolution
 
-Shared.Tenancy.Cqrs
+Gma.Framework.Tenancy.Cqrs
   Tenancy + CQRS logging scope enrichment
 
-Shared.Tenancy.Messaging
+Gma.Framework.Tenancy.Messaging
   tenant integration-event base type
   tenant messaging composition feature ids
 
-Shared.Tenancy.Messaging.Infrastructure
+Gma.Framework.Tenancy.Messaging.Infrastructure
   generic messaging scope resolver
   tenant context setup for consumers
 
-Shared.Tenancy.Tasks
+Gma.Framework.Tenancy.Tasks
   tenant context setup for task workers
 
-Shared.Messaging.Nats.Aspire
+Gma.Framework.Messaging.Nats.Aspire
   Messaging + Aspire/NATS connection composition
 
-Shared.ProjectionRebuild.Tasks
+Gma.Framework.ProjectionRebuild.Tasks
   Projection rebuild + TaskRuntime progress/control bridge
 ```
 
@@ -366,10 +366,10 @@ Future examples:
 
 ```text
 
-Shared.Tenancy.Outbox
+Gma.Framework.Tenancy.Outbox
   optional tenant metadata storage/mapping for outbox rows
 
-Shared.AccessControl.Administration
+Gma.Framework.AccessControl.Administration
   optional adapter from admin RBAC decisions to resource-policy decisions
 ```
 
@@ -377,11 +377,11 @@ These packages should depend only on the smallest contracts needed from each sid
 
 ## Tenancy And Outbox Decoupling Direction
 
-Shared messaging/outbox code is tenant-neutral in source: base integration events, envelopes, outbox records, and inbox records expose generic message scope metadata. Tenant-owned event contracts live in `Shared.Tenancy.Messaging`; runtime scope/context behavior lives in `Shared.Tenancy.Messaging.Infrastructure`.
+Shared messaging/outbox code is tenant-neutral in source: base integration events, envelopes, outbox records, and inbox records expose generic message scope metadata. Tenant-owned event contracts live in `Gma.Framework.Tenancy.Messaging`; runtime scope/context behavior lives in `Gma.Framework.Tenancy.Messaging.Infrastructure`.
 
-Shared caching runtime is tenant-neutral in source: `Shared.Caching.Infrastructure` formats logical cache scopes through a generic `ICacheScopeValueResolver`. Tenant-owned cache keys require the `caching.tenant-scope` feature provided by `Shared.Tenancy.Caching`.
+Shared caching runtime is tenant-neutral in source: `Gma.Framework.Caching.Infrastructure` formats logical cache scopes through a generic `ICacheScopeValueResolver`. Tenant-owned cache keys require the `caching.tenant-scope` feature provided by `Gma.Framework.Tenancy.Caching`.
 
-Shared task worker runtime is tenant-neutral in source: `Shared.Tasks.Infrastructure` prepares execution context through generic `ITaskExecutionContextContributor` instances. Tenant-scoped task payloads require the `tasks.tenant-scope` feature provided by `Shared.Tenancy.Tasks`.
+Shared task worker runtime is tenant-neutral in source: `Gma.Framework.Tasks.Infrastructure` prepares execution context through generic `ITaskExecutionContextContributor` instances. Tenant-scoped task payloads require the `tasks.tenant-scope` feature provided by `Gma.Framework.Tenancy.Tasks`.
 
 The implemented shape is:
 
@@ -474,7 +474,7 @@ Selected modules:
 
 Provided features:
   auth.members by auth/global
-  messaging.outbox by Shared.Messaging.Infrastructure
+  messaging.outbox by Gma.Framework.Messaging.Infrastructure
 
 Required features:
   catalog durable-events requires messaging.outbox satisfied
@@ -545,7 +545,7 @@ Docs must explain:
 
 ## Open Questions For Implementation
 
-- Should the package be named `Shared.ModuleComposition`, `Shared.Composition`, or stay under `Shared.Modules`?
+- Should the package be named `Gma.Framework.ModuleComposition`, `Gma.Framework.Composition`, or stay under `Gma.Framework.Modules`?
 - Should validation run through an explicit `builder.ValidateModuleComposition()` call, an `IHostedService`, options validation, or all of these for different host types?
 - Should provided features be multi-provider by default, exclusive by default, or require a per-feature policy?
 - Should module profile descriptors live only in contracts metadata, or should runtime selected profiles be separate objects?

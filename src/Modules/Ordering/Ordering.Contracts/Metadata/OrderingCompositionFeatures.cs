@@ -1,6 +1,6 @@
 namespace Ordering.Contracts;
 
-using Shared.ModuleComposition;
+using Gma.Framework.ModuleComposition;
 
 public static class OrderingCompositionFeatures
 {

@@ -1,6 +1,6 @@
 namespace Catalog.Tests;
 
-using Shared.Naming;
+using Gma.Framework.Naming;
 using System.Text.Json;
 using Catalog.Contracts;
 using Catalog.Domain.Aggregates;

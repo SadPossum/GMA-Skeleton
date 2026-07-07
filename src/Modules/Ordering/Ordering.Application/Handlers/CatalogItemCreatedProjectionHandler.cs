@@ -3,7 +3,7 @@ namespace Ordering.Application.Handlers;
 using Catalog.Contracts;
 using Ordering.Application.Ports;
 using Ordering.Contracts;
-using Shared.Messaging;
+using Gma.Framework.Messaging;
 
 [IntegrationEventHandler(OrderingModuleMetadata.CatalogItemCreatedProjectionHandlerName)]
 internal sealed class CatalogItemCreatedProjectionHandler(ICatalogItemProjectionRepository repository)

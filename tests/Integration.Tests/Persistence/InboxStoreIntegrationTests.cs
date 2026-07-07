@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ordering.Persistence;
-using Shared.Messaging;
-using Shared.Messaging.Infrastructure;
-using Shared.Runtime.Infrastructure;
-using Shared.Tenancy.Infrastructure;
+using Gma.Framework.Messaging;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Tenancy.Infrastructure;
 using Testcontainers.PostgreSql;
 using Xunit;
 

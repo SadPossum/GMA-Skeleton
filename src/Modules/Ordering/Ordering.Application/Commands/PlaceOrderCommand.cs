@@ -1,8 +1,8 @@
 namespace Ordering.Application.Commands;
 
 using Ordering.Contracts;
-using Shared.AccessControl;
-using Shared.Cqrs;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
 
 public sealed record PlaceOrderCommand(
     Guid CatalogItemId,

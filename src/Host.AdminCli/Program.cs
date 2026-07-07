@@ -1,17 +1,17 @@
-using Administration.AdminCli;
-using Auth.AdminCli;
-using Auth.Contracts;
+using Gma.Modules.Administration.AdminCli;
+using Gma.Modules.Auth.AdminCli;
+using Gma.Modules.Auth.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Shared.Administration.Cli;
-using Shared.Caching.Cqrs;
-using Shared.Caching.Redis;
-using Shared.Infrastructure;
-using Shared.Messaging.Infrastructure;
-using Shared.ModuleComposition;
-using Shared.Tenancy.Caching;
-using Shared.Tenancy.Messaging.Infrastructure;
+using Gma.Framework.Administration.Cli;
+using Gma.Framework.Caching.Cqrs;
+using Gma.Framework.Caching.Redis;
+using Gma.Framework.Infrastructure;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Tenancy.Caching;
+using Gma.Framework.Tenancy.Messaging.Infrastructure;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 
@@ -24,10 +24,10 @@ try
             ContentRootPath = AppContext.BaseDirectory
         });
 
-    builder.Services.AddSharedAdministrationCli();
+    builder.Services.AddGmaAdministrationCli();
     builder.AddRedisCaching();
     builder.AddCachingCqrs();
-    builder.AddSharedInfrastructure();
+    builder.AddGmaInfrastructure();
     builder.AddTenantCaching();
     builder.AddMessagingInfrastructure();
     builder.AddTenantAwareMessaging();

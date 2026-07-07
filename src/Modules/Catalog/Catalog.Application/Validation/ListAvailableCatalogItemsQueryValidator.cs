@@ -2,8 +2,8 @@ namespace Catalog.Application.Validation;
 
 using Catalog.Application.Queries;
 using Catalog.Contracts;
-using Shared.AccessControl;
-using Shared.Cqrs;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
 
 internal sealed class ListAvailableCatalogItemsQueryValidator : IQueryValidator<ListAvailableCatalogItemsQuery>
 {

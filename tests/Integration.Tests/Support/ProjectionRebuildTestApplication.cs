@@ -14,16 +14,16 @@ using Ordering.Application;
 using Ordering.Application.Tasks;
 using Ordering.Contracts;
 using Ordering.Persistence;
-using Shared.Persistence.EntityFrameworkCore;
-using Shared.Results;
-using Shared.Runtime.Infrastructure;
-using Shared.Tasks;
-using Shared.Tasks.Infrastructure;
-using Shared.Tenancy;
-using Shared.Tenancy.Infrastructure;
-using Shared.Tenancy.Tasks;
-using TaskRuntime.Application;
-using TaskRuntime.Persistence;
+using Gma.Framework.Persistence.EntityFrameworkCore;
+using Gma.Framework.Results;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tasks.Infrastructure;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Framework.Tenancy.Tasks;
+using Gma.Modules.TaskRuntime.Application;
+using Gma.Modules.TaskRuntime.Persistence;
 
 internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
 {

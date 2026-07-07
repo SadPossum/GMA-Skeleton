@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Shared.Modules\Shared.Modules.csproj" />
-    <ProjectReference Include="..\Shared.Naming\Shared.Naming.csproj" />
-  </ItemGroup>
-</Project>

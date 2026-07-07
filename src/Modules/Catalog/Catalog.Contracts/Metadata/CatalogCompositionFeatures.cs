@@ -1,6 +1,6 @@
 namespace Catalog.Contracts;
 
-using Shared.ModuleComposition;
+using Gma.Framework.ModuleComposition;
 
 public static class CatalogCompositionFeatures
 {

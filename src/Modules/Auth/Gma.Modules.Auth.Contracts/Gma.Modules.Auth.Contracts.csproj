@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Authorization\Gma.Framework.Authorization.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging\Gma.Framework.Messaging.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Modules\Gma.Framework.Modules.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Naming\Gma.Framework.Naming.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy.Messaging\Gma.Framework.Tenancy.Messaging.csproj" />
+  </ItemGroup>
+</Project>

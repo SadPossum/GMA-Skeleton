@@ -1,10 +1,10 @@
 namespace Catalog.Contracts;
 
-using Shared.Authorization;
-using Shared.Caching;
-using Shared.Messaging;
-using Shared.ModuleComposition;
-using Shared.Modules;
+using Gma.Framework.Authorization;
+using Gma.Framework.Caching;
+using Gma.Framework.Messaging;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Modules;
 
 public static class CatalogModuleMetadata
 {

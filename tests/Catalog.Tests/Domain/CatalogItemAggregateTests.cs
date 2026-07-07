@@ -1,12 +1,12 @@
 namespace Catalog.Tests;
 
-using Shared.Naming;
+using Gma.Framework.Naming;
 using Catalog.Domain.Aggregates;
 using Catalog.Domain.Errors;
 using Catalog.Domain.Events;
-using Shared.Domain;
-using Shared.Numerics;
-using Shared.Results;
+using Gma.Framework.Domain;
+using Gma.Framework.Numerics;
+using Gma.Framework.Results;
 using Xunit;
 
 [Trait("Category", "Unit")]

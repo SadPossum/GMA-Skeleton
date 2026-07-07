@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gma.Modules.Administration.Contracts\Gma.Modules.Administration.Contracts.csproj" />
+    <ProjectReference Include="..\Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration\Gma.Framework.Administration.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Persistence.EntityFrameworkCore\Gma.Framework.Persistence.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Runtime\Gma.Framework.Runtime.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Naming\Gma.Framework.Naming.csproj" />
+  </ItemGroup>
+</Project>

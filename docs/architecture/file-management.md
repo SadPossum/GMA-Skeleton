@@ -4,7 +4,7 @@ File management is split into shared storage plumbing and an optional front-door
 
 ## Shared Storage
 
-`Shared.FileManagement` owns the backend-neutral contract:
+`Gma.Framework.FileManagement` owns the backend-neutral contract:
 
 - `IFileStorage`
 - `FileStorageObjectKey`
@@ -15,12 +15,12 @@ File management is split into shared storage plumbing and an optional front-door
 
 Concrete adapters live beside it:
 
-- `Shared.FileManagement.LocalStorage`
-- `Shared.FileManagement.Minio`
+- `Gma.Framework.FileManagement.LocalStorage`
+- `Gma.Framework.FileManagement.Minio`
 
-Modules depend on `Shared.FileManagement`, not on MinIO or local disk. Hosts decide the provider by registering an adapter and setting `FileManagement:Provider`.
+Modules depend on `Gma.Framework.FileManagement`, not on MinIO or local disk. Hosts decide the provider by registering an adapter and setting `FileManagement:Provider`.
 
-The core `Shared.FileManagement` project deliberately has no NuGet package references and no project references. Composition objects, host registration, and adapter-specific packages stay outside the core storage contract so it cannot accidentally depend on tenancy, ASP.NET Core, MinIO, local disk registration, or host infrastructure.
+The core `Gma.Framework.FileManagement` project deliberately has no NuGet package references and no project references. Composition objects, host registration, and adapter-specific packages stay outside the core storage contract so it cannot accidentally depend on tenancy, ASP.NET Core, MinIO, local disk registration, or host infrastructure.
 
 ## Configuration
 
@@ -98,7 +98,7 @@ files/{global-or-tenant-hash}/user-{subject-hash}/{file-id}
 
 The HTTP API never uses the user-supplied filename or raw user/tenant ids as a storage key. The filename is kept only as metadata after validation. Another user in the same tenant cannot download or delete a file by guessing its id because their subject hash resolves to a different object key.
 
-This front door is intentionally private-file oriented. Feature modules that need public files, cross-user sharing, business-specific ACLs, ownership transfer, review workflows, or lifecycle state should own those rules in their own module and use `Shared.FileManagement` as the byte-storage contract.
+This front door is intentionally private-file oriented. Feature modules that need public files, cross-user sharing, business-specific ACLs, ownership transfer, review workflows, or lifecycle state should own those rules in their own module and use `Gma.Framework.FileManagement` as the byte-storage contract.
 
 ## First Slice Boundary
 

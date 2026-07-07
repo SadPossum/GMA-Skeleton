@@ -1,6 +1,6 @@
 namespace Ordering.Tests;
 
-using Shared.Naming;
+using Gma.Framework.Naming;
 using Catalog.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,14 +10,14 @@ using Ordering.Application.Ports;
 using Ordering.Contracts;
 using Ordering.Domain.Aggregates;
 using Ordering.Domain.Errors;
-using Shared.AccessControl;
-using Shared.Cqrs;
-using Shared.Messaging;
-using Shared.Tenancy;
-using Shared.Numerics;
-using Shared.Results;
-using Shared.Cqrs.Infrastructure;
-using Shared.Runtime.Infrastructure;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Messaging;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Numerics;
+using Gma.Framework.Results;
+using Gma.Framework.Cqrs.Infrastructure;
+using Gma.Framework.Runtime.Infrastructure;
 using Xunit;
 
 [Trait("Category", "Unit")]

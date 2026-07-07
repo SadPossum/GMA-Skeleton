@@ -1,23 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Catalog\Catalog.Contracts\Catalog.Contracts.csproj" />
-    <ProjectReference Include="..\..\Notifications\Notifications.Contracts\Notifications.Contracts.csproj" />
+    <ProjectReference Include="..\..\Notifications\Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
     <ProjectReference Include="..\Ordering.Contracts\Ordering.Contracts.csproj" />
     <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Application.Composition\Shared.Application.Composition.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.AccessControl\Shared.AccessControl.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Results\Shared.Results.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Messaging\Shared.Messaging.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Runtime\Shared.Runtime.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Cqrs\Shared.Cqrs.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Naming\Shared.Naming.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Pagination\Shared.Pagination.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.ProjectionRebuild\Shared.ProjectionRebuild.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.ProjectionRebuild.Tasks\Shared.ProjectionRebuild.Tasks.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Tasks\Shared.Tasks.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Application.Composition\Gma.Framework.Application.Composition.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Results\Gma.Framework.Results.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging\Gma.Framework.Messaging.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Runtime\Gma.Framework.Runtime.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Naming\Gma.Framework.Naming.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Pagination\Gma.Framework.Pagination.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ProjectionRebuild.Tasks\Gma.Framework.ProjectionRebuild.Tasks.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tasks\Gma.Framework.Tasks.csproj" />
   </ItemGroup>
 </Project>

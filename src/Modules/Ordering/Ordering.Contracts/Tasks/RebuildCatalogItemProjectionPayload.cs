@@ -1,7 +1,7 @@
 namespace Ordering.Contracts;
 
-using Shared.Tasks;
-using Shared.Tenancy;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tenancy;
 
 [TaskName(TaskName)]
 [TaskPayloadVersion(PayloadVersion)]

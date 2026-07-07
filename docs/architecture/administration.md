@@ -15,9 +15,9 @@ Administration is an optional first-class capability. It has CLI and HTTP front 
 Shared contracts:
 
 ```text
-Shared.Administration
-Shared.Administration.Api
-Shared.Administration.Cli
+Gma.Framework.Administration
+Gma.Framework.Administration.Api
+Gma.Framework.Administration.Cli
 ```
 
 Optional host:
@@ -30,25 +30,25 @@ Host.AdminApi
 Optional persisted RBAC/audit module:
 
 ```text
-Administration.Application
-Administration.Persistence
-Administration.Persistence.SqlServerMigrations
-Administration.Persistence.PostgreSqlMigrations
-Administration.AdminCli
-Administration.AdminApi
+Gma.Modules.Administration.Application
+Gma.Modules.Administration.Persistence
+Gma.Modules.Administration.Persistence.SqlServerMigrations
+Gma.Modules.Administration.Persistence.PostgreSqlMigrations
+Gma.Modules.Administration.AdminCli
+Gma.Modules.Administration.AdminApi
 ```
 
 Feature admin front doors:
 
 ```text
-Auth.Admin.Contracts
-Auth.AdminCli
-Auth.AdminApi
+Gma.Modules.Auth.Admin.Contracts
+Gma.Modules.Auth.AdminCli
+Gma.Modules.Auth.AdminApi
 ```
 
 ## Shared Contracts
 
-`Shared.Administration` contains backend-agnostic administration concepts:
+`Gma.Framework.Administration` contains backend-agnostic administration concepts:
 
 - `AdminPermission`
 - `AdminOperation`
@@ -64,7 +64,7 @@ Custom `IAdminAuthorizationService` implementations should return `AdminAuthoriz
 
 ## CLI Adapter
 
-`Shared.Administration.Cli` is the only shared project that knows about `System.CommandLine`.
+`Gma.Framework.Administration.Cli` is the only shared project that knows about `System.CommandLine`.
 
 It owns:
 
@@ -82,7 +82,7 @@ Admin permission code strings live in public `.Contracts` so module metadata can
 
 ## API Adapter
 
-`Shared.Administration.Api` is the only shared admin project that knows about ASP.NET Core HTTP mapping.
+`Gma.Framework.Administration.Api` is the only shared admin project that knows about ASP.NET Core HTTP mapping.
 
 It owns:
 
@@ -108,10 +108,10 @@ gma-admin
 It explicitly composes admin modules:
 
 ```csharp
-builder.AddSharedAdministrationCli();
+builder.AddGmaAdministrationCli();
 builder.AddRedisCaching(); // no-op unless Redis caching is enabled
 builder.AddCachingCqrs();
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddMessagingInfrastructure(); // outbox writer registry without hosted publishers
 builder.AddAdminModule<AdministrationAdminCliModule>();
 builder.AddAdminModule<AuthAdminCliModule>();
@@ -232,8 +232,8 @@ HTTP request
 ## Rules
 
 - `Host.Api` should not register admin modules.
-- Only `.AdminCli`, `Shared.Administration.Cli`, and `Host.AdminCli` may reference `System.CommandLine`.
-- Only `.AdminApi`, `Shared.Administration.Api`, and `Host.AdminApi` should map admin HTTP routes.
+- Only `.AdminCli`, `Gma.Framework.Administration.Cli`, and `Host.AdminCli` may reference `System.CommandLine`.
+- Only `.AdminApi`, `Gma.Framework.Administration.Api`, and `Host.AdminApi` should map admin HTTP routes.
 - Admin modules may call their own module application layer and shared admin contracts.
 - Admin modules must not contain business rules or EF code.
 - The Administration module must not reference Auth internals.

@@ -32,7 +32,7 @@ public static ModuleDescriptor Descriptor { get; } = ModuleDescriptor
     .Build();
 ```
 
-`TaskNameAttribute`, `TaskPayloadVersionAttribute`, `TaskDescriptionAttribute`, `TaskKindAttribute`, `TaskWorkerGroupAttribute`, `SupportsTaskControlAttribute`, `ModuleTaskDescriptor`, `WithTask<TPayload>()`, `WithTask(...)`, and `WithTasks(...)` live in `Shared.Tasks`. Tenant scope is a `Shared.Tenancy` metadata attribute, not a task-package field. The descriptor is discoverability and policy metadata. It is not runtime module discovery and does not register a worker.
+`TaskNameAttribute`, `TaskPayloadVersionAttribute`, `TaskDescriptionAttribute`, `TaskKindAttribute`, `TaskWorkerGroupAttribute`, `SupportsTaskControlAttribute`, `ModuleTaskDescriptor`, `WithTask<TPayload>()`, `WithTask(...)`, and `WithTasks(...)` live in `Gma.Framework.Tasks`. Tenant scope is a `Gma.Framework.Tenancy` metadata attribute, not a task-package field. The descriptor is discoverability and policy metadata. It is not runtime module discovery and does not register a worker.
 Task handler identity is `(module, task, payload version)` so modules can keep old payload handlers alive while introducing a new payload shape. Worker group, tenant scope, kind, and control-message support are routing and policy metadata that must still match the module descriptor.
 
 ## Payload Contracts
@@ -64,7 +64,7 @@ services.AddTaskHandler<GenerateReportTaskPayload, GenerateReportTaskHandler>(Ca
 
 `AddTaskHandler<TPayload,THandler>(moduleName)` reads task-owned attributes and generic metadata contributors from the payload type. The older explicit overload remains available for unusual cases, but the attribute-backed overload is the default for module-owned tasks. Architecture tests compare registered handlers, payload attributes, and module descriptors so task docs, module metadata, and runtime registration drift together.
 
-Projection rebuilds are a task use case, not a separate scheduler. Use `Shared.ProjectionRebuild` for the task-neutral batch/checkpoint loop and `Shared.ProjectionRebuild.Tasks` when a task handler needs to adapt rebuild progress/control to task runtime services. Keep the source contract, writer, cursor semantics, and checkpoint persistence in the producer/consumer modules that own the data. See [Projection Rebuild Tasks](projection-rebuild-tasks.md).
+Projection rebuilds are a task use case, not a separate scheduler. Use `Gma.Framework.ProjectionRebuild` for the task-neutral batch/checkpoint loop and `Gma.Framework.ProjectionRebuild.Tasks` when a task handler needs to adapt rebuild progress/control to task runtime services. Keep the source contract, writer, cursor semantics, and checkpoint persistence in the producer/consumer modules that own the data. See [Projection Rebuild Tasks](projection-rebuild-tasks.md).
 
 ## Communication
 
@@ -81,7 +81,7 @@ System-to-runner communication uses `ITaskControlChannel`, `ITaskControlLoop`, a
 
 `TaskControlCommandNames` defines the standard control commands `tasks.cancel`, `tasks.drain`, `tasks.pause`, and `tasks.resume`. `ITaskControlLoop` is a small helper over the lower-level channel: it polls pending messages, returns a `TaskControlPollResult`, and lets payload code mark messages handled or failed after the handler has actually acted on them. `TaskControlLoopExtensions` adds reusable cooperative behavior for cancel/drain and pause-until-resume loops.
 
-Task payload code that needs to call application behavior should use `ITaskCommandDispatcher` from `Shared.Tasks.Cqrs` or normal CQRS contracts. Hosts compose `AddTaskCqrs()` only when at least one registered task handler needs command dispatch. This keeps payloads independent from HTTP, CLI, scheduler APIs, and module internals.
+Task payload code that needs to call application behavior should use `ITaskCommandDispatcher` from `Gma.Framework.Tasks.Cqrs` or normal CQRS contracts. Hosts compose `AddTaskCqrs()` only when at least one registered task handler needs command dispatch. This keeps payloads independent from HTTP, CLI, scheduler APIs, and module internals.
 
 ## Runtime Store Contract
 
@@ -110,7 +110,7 @@ Concrete runtimes persist these concepts in an optional runtime module or adapte
 
 ## EF Runtime Module
 
-`TaskRuntime.Persistence` owns the `tasks` schema and maps:
+`Gma.Modules.TaskRuntime.Persistence` owns the `tasks` schema and maps:
 
 - `task_runs`
 - `task_control_messages`
@@ -120,7 +120,7 @@ Provider-specific migrations exist for SQL Server and PostgreSQL. The store uses
 Compose it explicitly:
 
 ```csharp
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddTaskInfrastructure();
 builder.AddTaskRuntimePersistence();
 builder.AddTaskCqrs(); // only when registered task handlers use ITaskCommandDispatcher
@@ -193,7 +193,7 @@ External schedulers can still be added later as explicit adapters that create th
 
 ## Optional Admin
 
-`TaskRuntime.AdminCli` and `TaskRuntime.AdminApi` are optional front doors. They are not registered in `Host.Api`, `Host.AdminCli`, or `Host.AdminApi` by default.
+`Gma.Modules.TaskRuntime.AdminCli` and `Gma.Modules.TaskRuntime.AdminApi` are optional front doors. They are not registered in `Host.Api`, `Host.AdminCli`, or `Host.AdminApi` by default.
 
 CLI commands:
 
@@ -222,11 +222,11 @@ The default remains small: persistent tasks, hosted workers, code-defined schedu
 
 - Default hosts do not start task workers.
 - Domain projects do not reference scheduler, hosting, EF, HTTP, or admin APIs.
-- Application payloads depend on `Shared.Tasks`, `Shared.Tasks.Cqrs` when they dispatch application commands, `Shared.ProjectionRebuild.Tasks` when they adapt rebuilds to task progress/control, CQRS contracts, and module ports.
+- Application payloads depend on `Gma.Framework.Tasks`, `Gma.Framework.Tasks.Cqrs` when they dispatch application commands, `Gma.Framework.ProjectionRebuild.Tasks` when they adapt rebuilds to task progress/control, CQRS contracts, and module ports.
 - External scheduler packages stay in explicit adapter projects.
 - Store implementations use `ITaskRunStore` and `TaskRunStatusTransitions` instead of ad hoc status changes.
 - Task worker hosts call `AddTaskWorkerRuntime()` explicitly and must also compose a concrete `ITaskRunStore`.
 - `Host.Worker` calls `AddTaskWorkerRuntime()` only when `Tasks:Worker:Enabled=true`; disabled task settings must not register worker hosted services.
-- `Shared.Tasks.Infrastructure` is tenant-neutral. Worker hosts that execute payloads marked with `TenantScopedAttribute` must also compose `AddTenantTaskExecutionContext()` from `Shared.Tenancy.Tasks`.
+- `Gma.Framework.Tasks.Infrastructure` is tenant-neutral. Worker hosts that execute payloads marked with `TenantScopedAttribute` must also compose `AddTenantTaskExecutionContext()` from `Gma.Framework.Tenancy.Tasks`.
 - Task scheduler hosts call `AddTaskRunScheduling()` explicitly and must also compose a concrete `ITaskRunStore`.
 - Running a task on another node must still use module contracts, integration events, or control messages, not direct cross-module internals.

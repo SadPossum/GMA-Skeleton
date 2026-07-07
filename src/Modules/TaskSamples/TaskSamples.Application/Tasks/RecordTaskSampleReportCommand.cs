@@ -1,6 +1,6 @@
 namespace TaskSamples.Application.Tasks;
 
-using Shared.Cqrs;
+using Gma.Framework.Cqrs;
 
 public sealed record RecordTaskSampleReportCommand(
     string ReportName,

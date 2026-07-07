@@ -1,11 +1,11 @@
 namespace Ordering.Application.Queries;
 
 using Ordering.Contracts;
-using Shared.AccessControl;
-using Shared.Cqrs;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
 
 public sealed record ListOrdersQuery(
     AccessSubject Subject,
-    int Page = Shared.Pagination.PageRequest.DefaultPage,
-    int PageSize = Shared.Pagination.PageRequest.DefaultPageSize)
+    int Page = Gma.Framework.Pagination.PageRequest.DefaultPage,
+    int PageSize = Gma.Framework.Pagination.PageRequest.DefaultPageSize)
     : IQuery<OrderListResponse>;

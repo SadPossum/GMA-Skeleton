@@ -188,5 +188,43 @@ Docker tests require Docker and set `GMA_REQUIRE_DOCKER_TESTS=true`:
 The normal full test command may skip Docker tests locally when Docker is unavailable:
 
 ```powershell
-dotnet test GenericModularApi.sln --no-build --logger "console;verbosity=minimal"
+dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
 ```
+
+## Focused Solution Entrypoints
+
+Use `GenericModularApi.slnx` for the full skeleton/composition repository. Use the focused `.slnx` files when working inside a future source repository boundary:
+
+```text
+Gma.Framework.slnx
+Gma.Modules.Administration.slnx
+Gma.Modules.Auth.slnx
+Gma.Modules.Files.slnx
+Gma.Modules.Notifications.slnx
+Gma.Modules.TaskRuntime.slnx
+Gma.Modules.Tenancy.slnx
+```
+
+Focused framework and module tests are colocated with their future source roots, for example `src/Framework/tests/Gma.Framework.Tests` and `src/Modules/Auth/tests/Gma.Modules.Auth.Tests`. Cross-module architecture, integration, and example tests stay under the repository-level `tests/` folder.
+
+## Source-First GMA Development
+
+The current repository still contains the framework and reusable modules directly, but project references are ready for future source submodule composition. Framework references go through `GmaFrameworkRoot`, with checked-in defaults in `Directory.Build.props`.
+
+To create a local override file:
+
+```powershell
+.\eng\gma-bootstrap.ps1
+```
+
+This copies `Gma.SourceRoots.props.example` to ignored `Gma.SourceRoots.props`. Edit that local file when a production app stores the framework or reusable modules outside the default `src/Framework` and `src/Modules` layout.
+
+Useful source-first helpers:
+
+```powershell
+.\eng\gma-status.ps1
+.\eng\gma-update.ps1
+.\eng\gma-validate.ps1 -FocusedSolutions
+```
+
+`gma-status` reports dirty working tree and submodule state when submodules exist. `gma-update` is a no-op until `.gitmodules` exists. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.

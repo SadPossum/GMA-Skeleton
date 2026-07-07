@@ -6,19 +6,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Shared.Cqrs;
-using Shared.Tasks;
-using Shared.Tasks.Cqrs;
-using Shared.Tasks.Infrastructure;
-using Shared.Results;
-using Shared.Persistence.EntityFrameworkCore;
-using Shared.Runtime.Time;
-using TaskRuntime.Application;
-using TaskRuntime.Application.Commands;
-using TaskRuntime.Application.Queries;
-using TaskRuntime.Persistence;
-using Shared.Tenancy.Infrastructure;
-using Shared.Tenancy.Tasks;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tasks.Cqrs;
+using Gma.Framework.Tasks.Infrastructure;
+using Gma.Framework.Results;
+using Gma.Framework.Persistence.EntityFrameworkCore;
+using Gma.Framework.Runtime.Time;
+using Gma.Modules.TaskRuntime.Application;
+using Gma.Modules.TaskRuntime.Application.Commands;
+using Gma.Modules.TaskRuntime.Application.Queries;
+using Gma.Modules.TaskRuntime.Persistence;
+using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Framework.Tenancy.Tasks;
 using TaskSamples.Application;
 using TaskSamples.Application.Tasks;
 using TaskSamples.Contracts;
@@ -385,7 +385,7 @@ internal sealed class TaskRuntimeTestApplication : IAsyncDisposable
 
     public async Task<TaskRunSnapshot> WaitForStatusAsync(
         Guid runId,
-        Shared.Tasks.TaskRunStatus expectedStatus,
+        Gma.Framework.Tasks.TaskRunStatus expectedStatus,
         TimeSpan timeout)
     {
         DateTimeOffset deadline = DateTimeOffset.UtcNow.Add(timeout);

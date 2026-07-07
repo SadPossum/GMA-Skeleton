@@ -2,7 +2,7 @@ namespace Catalog.Persistence.SqlServerMigrations;
 
 using Catalog.Persistence;
 using Microsoft.EntityFrameworkCore.Design;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 public sealed class CatalogSqlServerDesignTimeDbContextFactory : IDesignTimeDbContextFactory<CatalogDbContext>
 {

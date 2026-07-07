@@ -6,12 +6,12 @@ using Ordering.Application.Ports;
 using Ordering.Contracts;
 using Ordering.Domain.Aggregates;
 using Ordering.Domain.Errors;
-using Shared.AccessControl;
-using Shared.Cqrs;
-using Shared.Runtime.Identity;
-using Shared.Tenancy;
-using Shared.Runtime.Time;
-using Shared.Results;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Runtime.Identity;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Runtime.Time;
+using Gma.Framework.Results;
 
 internal sealed class PlaceOrderCommandHandler(
     IOrderRepository orderRepository,

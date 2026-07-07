@@ -26,9 +26,9 @@ Use small attributes owned by the package that understands the metadata.
 
 Examples:
 
-- `Shared.Messaging` owns event and consumer-handler identity only.
-- `Shared.Tasks` owns task payload identity, payload version, kind, worker routing, and task-control metadata only if those concepts remain in `Shared.Tasks`.
-- `Shared.Tenancy` owns tenant semantics such as tenant-scoped or tenant-independent markers.
+- `Gma.Framework.Messaging` owns event and consumer-handler identity only.
+- `Gma.Framework.Tasks` owns task payload identity, payload version, kind, worker routing, and task-control metadata only if those concepts remain in `Gma.Framework.Tasks`.
+- `Gma.Framework.Tenancy` owns tenant semantics such as tenant-scoped or tenant-independent markers.
 - A future small shared metadata package may own reusable doc/display metadata if needed, or the repo can use BCL metadata where appropriate.
 
 Descriptor helpers compose metadata from the packages that are referenced. Base packages should not mention optional package concepts.
@@ -109,14 +109,14 @@ Internally:
 - `WithPublishedEvent<TEvent>()` reads only messaging-owned event metadata.
 - `WithSubscription<TEvent>(producerModule, handlerName)` reads only producer event metadata plus explicit producer/handler context, unless a handler-aware overload is added in an application-facing package.
 - `WithTask<TPayload>()` reads task-owned task metadata.
-- tenancy-aware helpers or descriptor features enrich tenant scope only when `Shared.Tenancy` is referenced.
+- tenancy-aware helpers or descriptor features enrich tenant scope only when `Gma.Framework.Tenancy` is referenced.
 - runtime registration helpers such as `AddIntegrationEventHandler<TEvent,THandler>(consumerModule, producerModule)` and `AddTaskHandler<TPayload,THandler>(moduleName)` read only the attributes owned by their packages and any explicitly referenced optional packages.
 
 ## Implementation Plan
 
 1. Audit the current uncommitted metadata-attribute draft.
 2. Replace broad attributes with smaller package-owned attributes.
-3. Remove tenancy fields from `Shared.Messaging` and `Shared.Tasks` descriptors unless they move into tenancy-owned metadata features.
+3. Remove tenancy fields from `Gma.Framework.Messaging` and `Gma.Framework.Tasks` descriptors unless they move into tenancy-owned metadata features.
 4. Introduce tenancy-owned metadata readers/features if the current descriptors still need tenant scope for architecture docs, runtime policy, or validation.
 5. Update Auth, Catalog, Ordering, and TaskSamples to use the split attributes.
 6. Keep module descriptors explicit and builder-authored.
@@ -138,8 +138,8 @@ Add or update tests for:
 - descriptor helpers throw clear missing-attribute exceptions;
 - descriptor metadata and runtime registrations still match;
 - module descriptors do not silently drift from local attributes;
-- `Shared.Messaging` does not reference `Shared.Tenancy`;
-- `Shared.Tasks` does not reference `Shared.Tenancy` unless there is a deliberate ADR and narrow package split;
+- `Gma.Framework.Messaging` does not reference `Gma.Framework.Tenancy`;
+- `Gma.Framework.Tasks` does not reference `Gma.Framework.Tenancy` unless there is a deliberate ADR and narrow package split;
 - no broad assembly scanning or Scrutor-style package dependency is introduced;
 - docs index and local links remain valid.
 

@@ -6,7 +6,7 @@ Temporary working notes for the tenant model conventions refactor.
 
 - Keep tenant ownership explicit in models through `ITenantScoped`, `TenantAggregateRoot<TId>`, or `TenantEntity<TId>`.
 - Do not add shadow `TenantId` properties. Tenant id remains domain/application data, not a host-side persistence trick.
-- Centralize EF tenant property and `TenantFilter` configuration in `Shared.Persistence.EntityFrameworkCore`.
+- Centralize EF tenant property and `TenantFilter` configuration in `Gma.Framework.Persistence.EntityFrameworkCore`.
 - Use a `TenantAwareDbContext<TContext>` base so filters can reference context-instance tenant values and write guards run for every `SaveChanges`.
 - Keep infrastructure records conservative. Outbox/inbox/task/audit/projection rows may contain tenant ids without being tenant-owned domain entities.
 

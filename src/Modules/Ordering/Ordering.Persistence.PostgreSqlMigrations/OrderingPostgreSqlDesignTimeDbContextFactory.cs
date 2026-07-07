@@ -2,7 +2,7 @@ namespace Ordering.Persistence.PostgreSqlMigrations;
 
 using Microsoft.EntityFrameworkCore.Design;
 using Ordering.Persistence;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 public sealed class OrderingPostgreSqlDesignTimeDbContextFactory : IDesignTimeDbContextFactory<OrderingDbContext>
 {

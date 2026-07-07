@@ -2,7 +2,7 @@ namespace Catalog.Application.Ports;
 
 using Catalog.Contracts;
 using Catalog.Domain.Visibility;
-using Shared.Pagination;
+using Gma.Framework.Pagination;
 
 public interface ICatalogItemReadRepository
 {

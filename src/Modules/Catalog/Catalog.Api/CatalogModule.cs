@@ -9,16 +9,16 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
-using Shared.Api.Modules;
-using Shared.Api.Observability;
-using Shared.Api.Results;
-using Shared.Api.Tenancy;
-using Shared.AccessControl;
-using Shared.Cqrs;
-using Shared.ModuleComposition;
-using Shared.Pagination;
-using Shared.Results;
-using Shared.Tenancy;
+using Gma.Framework.Api.Modules;
+using Gma.Framework.Api.Observability;
+using Gma.Framework.Api.Results;
+using Gma.Framework.Api.Tenancy;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Pagination;
+using Gma.Framework.Results;
+using Gma.Framework.Tenancy;
 
 public sealed class CatalogModule : IModule
 {

@@ -7,17 +7,17 @@ Use concise names that match project names. Do not root-prefix namespaces with `
 Namespace starts with the owning project name:
 
 ```text
-Auth.Application
-Auth.Domain.Aggregates
-Shared.Messaging.Infrastructure
-Tenancy.Api
+Gma.Modules.Auth.Application
+Gma.Modules.Auth.Domain.Aggregates
+Gma.Framework.Messaging.Infrastructure
+Gma.Modules.Tenancy.Api
 ```
 
 Do not use:
 
 ```text
-GenericModularApi.Auth.Application
-GenericModularApi.Modules.Auth.Application
+GenericModularApi.Gma.Modules.Auth.Application
+GenericModularApi.Modules.Gma.Modules.Auth.Application
 ```
 
 Architecture tests enforce this convention for source files.
@@ -27,8 +27,8 @@ Architecture tests enforce this convention for source files.
 Every `.csproj` under `src/` and `tests/` should live in a folder with the same name as the project file:
 
 ```text
-src/Modules/Auth/Auth.Application/Auth.Application.csproj
-tests/Auth.Tests/Auth.Tests.csproj
+src/Modules/Auth/Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj
+src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj
 ```
 
 This keeps project references, namespaces, solution folders, and file-system navigation aligned.
@@ -38,80 +38,87 @@ Do not set `<RootNamespace>` or `<AssemblyName>` in project files unless a separ
 Module project names:
 
 ```text
-<Module>.Contracts
-<Module>.Domain
-<Module>.Application
-<Module>.Infrastructure
-<Module>.Persistence
-<Module>.Persistence.SqlServerMigrations
-<Module>.Persistence.PostgreSqlMigrations
-<Module>.Api
-<Module>.Admin.Contracts
-<Module>.AdminCli
-<Module>.AdminApi
+Gma.Modules.<Module>.Contracts
+Gma.Modules.<Module>.Domain
+Gma.Modules.<Module>.Application
+Gma.Modules.<Module>.Infrastructure
+Gma.Modules.<Module>.Persistence
+Gma.Modules.<Module>.Persistence.SqlServerMigrations
+Gma.Modules.<Module>.Persistence.PostgreSqlMigrations
+Gma.Modules.<Module>.Api
+Gma.Modules.<Module>.Admin.Contracts
+Gma.Modules.<Module>.AdminCli
+Gma.Modules.<Module>.AdminApi
+Gma.Modules.<Module>.Tests
 ```
 
-Shared project names:
+Reusable module tests live under the module root so a future source repository can carry its own test suite:
 
 ```text
-Shared.Api
-Shared.AccessControl
-Shared.Administration
-Shared.Administration.Api
-Shared.Administration.Cli
-Shared.Application.Composition
-Shared.Application.Events
-Shared.Application.Events.Infrastructure
-Shared.Api.OpenApi
-Shared.Api.Serilog
-Shared.Authorization
-Shared.Caching
-Shared.Caching.Cqrs
-Shared.Caching.Infrastructure
-Shared.Caching.Redis
-Shared.Cqrs
-Shared.Cqrs.Infrastructure
-Shared.Domain
-Shared.FileManagement
-Shared.FileManagement.LocalStorage
-Shared.FileManagement.Minio
-Shared.Results
-Shared.Infrastructure
-Shared.Logging.Serilog
-Shared.Messaging
-Shared.Messaging.Infrastructure
-Shared.Messaging.Nats
-Shared.Messaging.Nats.Aspire
-Shared.ModuleComposition
-Shared.Modules
-Shared.Naming
-Shared.Numerics
-Shared.Notifications
-Shared.Notifications.Cqrs
-Shared.Notifications.Infrastructure
-Shared.Notifications.Api
-Shared.Notifications.SignalR
-Shared.Observability
-Shared.Observability.Infrastructure
-Shared.Pagination
-Shared.Persistence.EntityFrameworkCore
-Shared.ProjectionRebuild
-Shared.ProjectionRebuild.EntityFrameworkCore
-Shared.ProjectionRebuild.Tasks
-Shared.Runtime
-Shared.Runtime.Infrastructure
-Shared.Security
-Shared.Tasks
-Shared.Tasks.Cqrs
-Shared.Tasks.Infrastructure
-Shared.Tenancy
-Shared.Tenancy.Api.Serilog
-Shared.Tenancy.Caching
-Shared.Tenancy.Cqrs
-Shared.Tenancy.Infrastructure
-Shared.Tenancy.Messaging
-Shared.Tenancy.Messaging.Infrastructure
-Shared.Tenancy.Tasks
+src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj
+```
+
+Framework project names:
+
+```text
+Gma.Framework.Api
+Gma.Framework.AccessControl
+Gma.Framework.Administration
+Gma.Framework.Administration.Api
+Gma.Framework.Administration.Cli
+Gma.Framework.Application.Composition
+Gma.Framework.Application.Events
+Gma.Framework.Application.Events.Infrastructure
+Gma.Framework.Api.OpenApi
+Gma.Framework.Api.Serilog
+Gma.Framework.Authorization
+Gma.Framework.Caching
+Gma.Framework.Caching.Cqrs
+Gma.Framework.Caching.Infrastructure
+Gma.Framework.Caching.Redis
+Gma.Framework.Cqrs
+Gma.Framework.Cqrs.Infrastructure
+Gma.Framework.Domain
+Gma.Framework.FileManagement
+Gma.Framework.FileManagement.LocalStorage
+Gma.Framework.FileManagement.Minio
+Gma.Framework.Results
+Gma.Framework.Infrastructure
+Gma.Framework.Logging.Serilog
+Gma.Framework.Messaging
+Gma.Framework.Messaging.Infrastructure
+Gma.Framework.Messaging.Nats
+Gma.Framework.Messaging.Nats.Aspire
+Gma.Framework.ModuleComposition
+Gma.Framework.Modules
+Gma.Framework.Naming
+Gma.Framework.Numerics
+Gma.Framework.Notifications
+Gma.Framework.Notifications.Cqrs
+Gma.Framework.Notifications.Infrastructure
+Gma.Framework.Notifications.Api
+Gma.Framework.Notifications.SignalR
+Gma.Framework.Observability
+Gma.Framework.Observability.Infrastructure
+Gma.Framework.Pagination
+Gma.Framework.Persistence.EntityFrameworkCore
+Gma.Framework.ProjectionRebuild
+Gma.Framework.ProjectionRebuild.EntityFrameworkCore
+Gma.Framework.ProjectionRebuild.Tasks
+Gma.Framework.Runtime
+Gma.Framework.Runtime.Infrastructure
+Gma.Framework.Security
+Gma.Framework.Tasks
+Gma.Framework.Tasks.Cqrs
+Gma.Framework.Tasks.Infrastructure
+Gma.Framework.Tenancy
+Gma.Framework.Tenancy.Api.Serilog
+Gma.Framework.Tenancy.Caching
+Gma.Framework.Tenancy.Cqrs
+Gma.Framework.Tenancy.Infrastructure
+Gma.Framework.Tenancy.Messaging
+Gma.Framework.Tenancy.Messaging.Infrastructure
+Gma.Framework.Tenancy.Tasks
 ```
 
 ## Folders

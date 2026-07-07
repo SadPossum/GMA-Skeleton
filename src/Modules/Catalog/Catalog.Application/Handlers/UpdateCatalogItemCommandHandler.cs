@@ -6,11 +6,11 @@ using Catalog.Application.Ports;
 using Catalog.Contracts;
 using Catalog.Domain.Aggregates;
 using Catalog.Domain.Errors;
-using Shared.Caching;
-using Shared.Cqrs;
-using Shared.Runtime.Identity;
-using Shared.Runtime.Time;
-using Shared.Results;
+using Gma.Framework.Caching;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Runtime.Identity;
+using Gma.Framework.Runtime.Time;
+using Gma.Framework.Results;
 
 internal sealed class UpdateCatalogItemCommandHandler(
     ICatalogItemRepository repository,

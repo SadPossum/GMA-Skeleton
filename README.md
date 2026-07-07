@@ -65,6 +65,20 @@ Docker-backed tests are skippable by default. To require them:
 .\eng\test-docker.ps1 -NoBuild
 ```
 
+Standalone source-repo entrypoints are available for focused framework/module work:
+
+```powershell
+dotnet build Gma.Framework.slnx --no-restore
+dotnet build Gma.Modules.Auth.slnx --no-restore
+dotnet build Gma.Modules.Notifications.slnx --no-restore
+```
+
+For future source-submodule layouts, create a local source-root override with:
+
+```powershell
+.\eng\gma-bootstrap.ps1
+```
+
 ## Documentation
 
 Start with [docs/README.md](docs/README.md).

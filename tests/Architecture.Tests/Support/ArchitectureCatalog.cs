@@ -1,20 +1,20 @@
 namespace Architecture.Tests;
 
 using System.Reflection;
-using Administration.AdminCli;
-using Administration.AdminApi;
-using Administration.Application;
-using Administration.Contracts;
-using Administration.Persistence;
-using Auth.Admin.Contracts;
-using Auth.AdminCli;
-using Auth.AdminApi;
-using Auth.Api;
-using Auth.Contracts;
-using Auth.Domain.Aggregates;
-using Auth.Infrastructure;
-using Auth.Infrastructure.JwtBearer;
-using Auth.Persistence;
+using Gma.Modules.Administration.AdminCli;
+using Gma.Modules.Administration.AdminApi;
+using Gma.Modules.Administration.Application;
+using Gma.Modules.Administration.Contracts;
+using Gma.Modules.Administration.Persistence;
+using Gma.Modules.Auth.Admin.Contracts;
+using Gma.Modules.Auth.AdminCli;
+using Gma.Modules.Auth.AdminApi;
+using Gma.Modules.Auth.Api;
+using Gma.Modules.Auth.Contracts;
+using Gma.Modules.Auth.Domain.Aggregates;
+using Gma.Modules.Auth.Infrastructure;
+using Gma.Modules.Auth.Infrastructure.JwtBearer;
+using Gma.Modules.Auth.Persistence;
 using Catalog.AdminCli;
 using Catalog.Admin.Contracts;
 using Catalog.AdminApi;
@@ -22,52 +22,52 @@ using Catalog.Api;
 using Catalog.Contracts;
 using Catalog.Domain.Aggregates;
 using Catalog.Persistence;
-using Files.Api;
-using Files.Application;
-using Files.Contracts;
-using Notifications.Admin.Contracts;
-using Notifications.AdminApi;
-using Notifications.Api;
-using Notifications.Contracts;
-using Notifications.Domain.Aggregates;
-using Notifications.Persistence;
+using Gma.Modules.Files.Api;
+using Gma.Modules.Files.Application;
+using Gma.Modules.Files.Contracts;
+using Gma.Modules.Notifications.Admin.Contracts;
+using Gma.Modules.Notifications.AdminApi;
+using Gma.Modules.Notifications.Api;
+using Gma.Modules.Notifications.Contracts;
+using Gma.Modules.Notifications.Domain.Aggregates;
+using Gma.Modules.Notifications.Persistence;
 using Host.AdminApi;
 using Host.AdminCli;
 using Ordering.Api;
 using Ordering.Contracts;
 using Ordering.Domain.Aggregates;
 using Ordering.Persistence;
-using Shared.Modules;
-using TaskRuntime.Admin.Contracts;
-using TaskRuntime.AdminCli;
-using TaskRuntime.AdminApi;
-using TaskRuntime.Contracts;
-using TaskRuntime.Persistence;
+using Gma.Framework.Modules;
+using Gma.Modules.TaskRuntime.Admin.Contracts;
+using Gma.Modules.TaskRuntime.AdminCli;
+using Gma.Modules.TaskRuntime.AdminApi;
+using Gma.Modules.TaskRuntime.Contracts;
+using Gma.Modules.TaskRuntime.Persistence;
 using TaskSamples.Application;
 using TaskSamples.Contracts;
-using Tenancy.Api;
-using Tenancy.Contracts;
+using Gma.Modules.Tenancy.Api;
+using Gma.Modules.Tenancy.Contracts;
 
 internal static class ArchitectureCatalog
 {
     public static IReadOnlyList<ModuleProject> ModuleProjects { get; } =
     [
-        new("Administration", "Administration.AdminCli", ModuleProjectKind.AdminCli, typeof(AdministrationAdminCliModule).Assembly),
-        new("Administration", "Administration.AdminApi", ModuleProjectKind.AdminApi, typeof(AdministrationAdminApiModule).Assembly),
-        new("Administration", "Administration.Application", ModuleProjectKind.Application, typeof(Administration.Application.DependencyInjection).Assembly),
-        new("Administration", "Administration.Contracts", ModuleProjectKind.Contracts, typeof(AdministrationModuleMetadata).Assembly),
-        new("Administration", "Administration.Persistence", ModuleProjectKind.Persistence, typeof(Administration.Persistence.DependencyInjection).Assembly),
+        new("Administration", "Gma.Modules.Administration.AdminCli", ModuleProjectKind.AdminCli, typeof(AdministrationAdminCliModule).Assembly),
+        new("Administration", "Gma.Modules.Administration.AdminApi", ModuleProjectKind.AdminApi, typeof(AdministrationAdminApiModule).Assembly),
+        new("Administration", "Gma.Modules.Administration.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Administration.Application.DependencyInjection).Assembly),
+        new("Administration", "Gma.Modules.Administration.Contracts", ModuleProjectKind.Contracts, typeof(AdministrationModuleMetadata).Assembly),
+        new("Administration", "Gma.Modules.Administration.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.Administration.Persistence.DependencyInjection).Assembly),
 
-        new("Auth", "Auth.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(AuthAdminPermissions).Assembly),
-        new("Auth", "Auth.AdminCli", ModuleProjectKind.AdminCli, typeof(AuthAdminCliModule).Assembly),
-        new("Auth", "Auth.AdminApi", ModuleProjectKind.AdminApi, typeof(AuthAdminApiModule).Assembly),
-        new("Auth", "Auth.Api", ModuleProjectKind.Api, typeof(AuthModule).Assembly),
-        new("Auth", "Auth.Application", ModuleProjectKind.Application, typeof(Auth.Application.DependencyInjection).Assembly),
-        new("Auth", "Auth.Contracts", ModuleProjectKind.Contracts, typeof(AuthModuleMetadata).Assembly),
-        new("Auth", "Auth.Domain", ModuleProjectKind.Domain, typeof(Member).Assembly),
-        new("Auth", "Auth.Infrastructure", ModuleProjectKind.Infrastructure, typeof(Auth.Infrastructure.DependencyInjection).Assembly),
-        new("Auth", "Auth.Infrastructure.JwtBearer", ModuleProjectKind.Infrastructure, typeof(Auth.Infrastructure.JwtBearer.DependencyInjection).Assembly),
-        new("Auth", "Auth.Persistence", ModuleProjectKind.Persistence, typeof(Auth.Persistence.DependencyInjection).Assembly),
+        new("Auth", "Gma.Modules.Auth.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(AuthAdminPermissions).Assembly),
+        new("Auth", "Gma.Modules.Auth.AdminCli", ModuleProjectKind.AdminCli, typeof(AuthAdminCliModule).Assembly),
+        new("Auth", "Gma.Modules.Auth.AdminApi", ModuleProjectKind.AdminApi, typeof(AuthAdminApiModule).Assembly),
+        new("Auth", "Gma.Modules.Auth.Api", ModuleProjectKind.Api, typeof(AuthModule).Assembly),
+        new("Auth", "Gma.Modules.Auth.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Auth.Application.DependencyInjection).Assembly),
+        new("Auth", "Gma.Modules.Auth.Contracts", ModuleProjectKind.Contracts, typeof(AuthModuleMetadata).Assembly),
+        new("Auth", "Gma.Modules.Auth.Domain", ModuleProjectKind.Domain, typeof(Member).Assembly),
+        new("Auth", "Gma.Modules.Auth.Infrastructure", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Infrastructure.DependencyInjection).Assembly),
+        new("Auth", "Gma.Modules.Auth.Infrastructure.JwtBearer", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Infrastructure.JwtBearer.DependencyInjection).Assembly),
+        new("Auth", "Gma.Modules.Auth.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.Auth.Persistence.DependencyInjection).Assembly),
 
         new("Catalog", "Catalog.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(CatalogAdminPermissions).Assembly),
         new("Catalog", "Catalog.AdminCli", ModuleProjectKind.AdminCli, typeof(CatalogAdminCliModule).Assembly),
@@ -78,17 +78,17 @@ internal static class ArchitectureCatalog
         new("Catalog", "Catalog.Domain", ModuleProjectKind.Domain, typeof(CatalogItem).Assembly),
         new("Catalog", "Catalog.Persistence", ModuleProjectKind.Persistence, typeof(Catalog.Persistence.DependencyInjection).Assembly),
 
-        new("Files", "Files.Api", ModuleProjectKind.Api, typeof(FilesModule).Assembly),
-        new("Files", "Files.Application", ModuleProjectKind.Application, typeof(Files.Application.DependencyInjection).Assembly),
-        new("Files", "Files.Contracts", ModuleProjectKind.Contracts, typeof(FilesModuleMetadata).Assembly),
+        new("Files", "Gma.Modules.Files.Api", ModuleProjectKind.Api, typeof(FilesModule).Assembly),
+        new("Files", "Gma.Modules.Files.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Files.Application.DependencyInjection).Assembly),
+        new("Files", "Gma.Modules.Files.Contracts", ModuleProjectKind.Contracts, typeof(FilesModuleMetadata).Assembly),
 
-        new("Notifications", "Notifications.Api", ModuleProjectKind.Api, typeof(NotificationsModule).Assembly),
-        new("Notifications", "Notifications.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(NotificationsAdminPermissions).Assembly),
-        new("Notifications", "Notifications.AdminApi", ModuleProjectKind.AdminApi, typeof(NotificationsAdminApiModule).Assembly),
-        new("Notifications", "Notifications.Application", ModuleProjectKind.Application, typeof(Notifications.Application.DependencyInjection).Assembly),
-        new("Notifications", "Notifications.Contracts", ModuleProjectKind.Contracts, typeof(NotificationsModuleMetadata).Assembly),
-        new("Notifications", "Notifications.Domain", ModuleProjectKind.Domain, typeof(UserNotification).Assembly),
-        new("Notifications", "Notifications.Persistence", ModuleProjectKind.Persistence, typeof(Notifications.Persistence.DependencyInjection).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.Api", ModuleProjectKind.Api, typeof(NotificationsModule).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(NotificationsAdminPermissions).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.AdminApi", ModuleProjectKind.AdminApi, typeof(NotificationsAdminApiModule).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Notifications.Application.DependencyInjection).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.Contracts", ModuleProjectKind.Contracts, typeof(NotificationsModuleMetadata).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.Domain", ModuleProjectKind.Domain, typeof(UserNotification).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.Notifications.Persistence.DependencyInjection).Assembly),
 
         new("Ordering", "Ordering.Api", ModuleProjectKind.Api, typeof(OrderingModule).Assembly),
         new("Ordering", "Ordering.Application", ModuleProjectKind.Application, typeof(Ordering.Application.DependencyInjection).Assembly),
@@ -96,18 +96,18 @@ internal static class ArchitectureCatalog
         new("Ordering", "Ordering.Domain", ModuleProjectKind.Domain, typeof(Order).Assembly),
         new("Ordering", "Ordering.Persistence", ModuleProjectKind.Persistence, typeof(Ordering.Persistence.DependencyInjection).Assembly),
 
-        new("TaskRuntime", "TaskRuntime.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(TaskRuntimeAdminPermissions).Assembly),
-        new("TaskRuntime", "TaskRuntime.AdminCli", ModuleProjectKind.AdminCli, typeof(TaskRuntimeAdminCliModule).Assembly),
-        new("TaskRuntime", "TaskRuntime.AdminApi", ModuleProjectKind.AdminApi, typeof(TaskRuntimeAdminApiModule).Assembly),
-        new("TaskRuntime", "TaskRuntime.Application", ModuleProjectKind.Application, typeof(TaskRuntime.Application.DependencyInjection).Assembly),
-        new("TaskRuntime", "TaskRuntime.Contracts", ModuleProjectKind.Contracts, typeof(TaskRuntimeModuleMetadata).Assembly),
-        new("TaskRuntime", "TaskRuntime.Persistence", ModuleProjectKind.Persistence, typeof(TaskRuntime.Persistence.DependencyInjection).Assembly),
+        new("TaskRuntime", "Gma.Modules.TaskRuntime.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(TaskRuntimeAdminPermissions).Assembly),
+        new("TaskRuntime", "Gma.Modules.TaskRuntime.AdminCli", ModuleProjectKind.AdminCli, typeof(TaskRuntimeAdminCliModule).Assembly),
+        new("TaskRuntime", "Gma.Modules.TaskRuntime.AdminApi", ModuleProjectKind.AdminApi, typeof(TaskRuntimeAdminApiModule).Assembly),
+        new("TaskRuntime", "Gma.Modules.TaskRuntime.Application", ModuleProjectKind.Application, typeof(Gma.Modules.TaskRuntime.Application.DependencyInjection).Assembly),
+        new("TaskRuntime", "Gma.Modules.TaskRuntime.Contracts", ModuleProjectKind.Contracts, typeof(TaskRuntimeModuleMetadata).Assembly),
+        new("TaskRuntime", "Gma.Modules.TaskRuntime.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.TaskRuntime.Persistence.DependencyInjection).Assembly),
 
         new("TaskSamples", "TaskSamples.Application", ModuleProjectKind.Application, typeof(TaskSamples.Application.DependencyInjection).Assembly),
         new("TaskSamples", "TaskSamples.Contracts", ModuleProjectKind.Contracts, typeof(TaskSamplesModuleMetadata).Assembly),
 
-        new("Tenancy", "Tenancy.Api", ModuleProjectKind.Api, typeof(TenancyModule).Assembly),
-        new("Tenancy", "Tenancy.Contracts", ModuleProjectKind.Contracts, typeof(TenancyModuleMetadata).Assembly),
+        new("Tenancy", "Gma.Modules.Tenancy.Api", ModuleProjectKind.Api, typeof(TenancyModule).Assembly),
+        new("Tenancy", "Gma.Modules.Tenancy.Contracts", ModuleProjectKind.Contracts, typeof(TenancyModuleMetadata).Assembly),
     ];
 
     public static IReadOnlyList<ModuleDescriptor> ModuleDescriptors { get; } =
@@ -151,15 +151,15 @@ internal static class ArchitectureCatalog
         typeof(AuthAdminCliModule).Assembly,
         typeof(CatalogAdminCliModule).Assembly,
         typeof(TaskRuntimeAdminCliModule).Assembly,
-        typeof(Shared.Administration.Cli.AdminCliExecutor).Assembly,
+        typeof(Gma.Framework.Administration.Cli.AdminCliExecutor).Assembly,
         AdminCliAssemblyReference.Assembly,
     ];
 
     public static IReadOnlyList<Assembly> CommandLineCheckedAssemblies { get; } = ModuleBoundaryAssemblies
         .Concat(
         [
-            typeof(Shared.Administration.Cli.AdminCliExecutor).Assembly,
-            typeof(Shared.Administration.Api.AdminApiExecutor).Assembly,
+            typeof(Gma.Framework.Administration.Cli.AdminCliExecutor).Assembly,
+            typeof(Gma.Framework.Administration.Api.AdminApiExecutor).Assembly,
             AdminApiAssemblyReference.Assembly,
         ])
         .Distinct()

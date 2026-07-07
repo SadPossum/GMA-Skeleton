@@ -1,0 +1,52 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Framework/">
+    <Project Path="src/Framework/Gma.Framework.Administration.Api/Gma.Framework.Administration.Api.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Administration.Cli/Gma.Framework.Administration.Cli.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Administration/Gma.Framework.Administration.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Api/Gma.Framework.Api.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Application.Composition/Gma.Framework.Application.Composition.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Application.Events/Gma.Framework.Application.Events.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Authorization/Gma.Framework.Authorization.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Cqrs/Gma.Framework.Cqrs.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Domain/Gma.Framework.Domain.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Messaging.Infrastructure/Gma.Framework.Messaging.Infrastructure.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Messaging/Gma.Framework.Messaging.csproj" />
+    <Project Path="src/Framework/Gma.Framework.ModuleComposition/Gma.Framework.ModuleComposition.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Modules/Gma.Framework.Modules.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Naming/Gma.Framework.Naming.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Numerics/Gma.Framework.Numerics.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Observability.Infrastructure/Gma.Framework.Observability.Infrastructure.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Observability/Gma.Framework.Observability.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Pagination/Gma.Framework.Pagination.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Persistence.EntityFrameworkCore/Gma.Framework.Persistence.EntityFrameworkCore.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Results/Gma.Framework.Results.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Runtime.Infrastructure/Gma.Framework.Runtime.Infrastructure.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Runtime/Gma.Framework.Runtime.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Security/Gma.Framework.Security.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Tenancy.Infrastructure/Gma.Framework.Tenancy.Infrastructure.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Tenancy.Messaging/Gma.Framework.Tenancy.Messaging.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Tenancy/Gma.Framework.Tenancy.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Auth/">
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Admin.Contracts/Gma.Modules.Auth.Admin.Contracts.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.AdminApi/Gma.Modules.Auth.AdminApi.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.AdminCli/Gma.Modules.Auth.AdminCli.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Api/Gma.Modules.Auth.Api.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Contracts/Gma.Modules.Auth.Contracts.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Domain/Gma.Modules.Auth.Domain.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Infrastructure.JwtBearer/Gma.Modules.Auth.Infrastructure.JwtBearer.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Infrastructure/Gma.Modules.Auth.Infrastructure.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Persistence.PostgreSqlMigrations/Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Persistence.SqlServerMigrations/Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj" />
+    <Project Path="src/Modules/Auth/Gma.Modules.Auth.Persistence/Gma.Modules.Auth.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Tenancy/">
+    <Project Path="src/Modules/Tenancy/Gma.Modules.Tenancy.Contracts/Gma.Modules.Tenancy.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,6 +1,6 @@
 namespace Integration.Tests.Support;
 
-using Auth.Persistence;
+using Gma.Modules.Auth.Persistence;
 using Host.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -10,9 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NATS.Client.Core;
-using Shared.Messaging;
-using Shared.Tenancy;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Messaging;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 internal sealed class AuthTestApplication(
     string provider,
@@ -121,7 +121,7 @@ internal sealed class AuthTestApplication(
         AuthDbContext dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
         Guid id = Guid.NewGuid();
 
-        dbContext.OutboxMessages.Add(new Shared.Messaging.Infrastructure.OutboxMessage(
+        dbContext.OutboxMessages.Add(new Gma.Framework.Messaging.Infrastructure.OutboxMessage(
             id,
             "gma.auth.test.v1",
             "Integration.Tests.TestEvent",

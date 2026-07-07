@@ -1,15 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
     <ProjectReference Include="..\Catalog.Contracts\Catalog.Contracts.csproj" />
     <ProjectReference Include="..\Catalog.Persistence\Catalog.Persistence.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.AccessControl\Shared.AccessControl.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Api\Shared.Api.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Cqrs\Shared.Cqrs.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Security\Shared.Security.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Pagination\Shared.Pagination.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Results\Shared.Results.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Api\Gma.Framework.Api.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Security\Gma.Framework.Security.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Pagination\Gma.Framework.Pagination.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Results\Gma.Framework.Results.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj" />
   </ItemGroup>
 </Project>

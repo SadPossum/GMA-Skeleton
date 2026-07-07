@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.FileManagement\Gma.Framework.FileManagement.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Modules\Gma.Framework.Modules.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj" />
+  </ItemGroup>
+</Project>

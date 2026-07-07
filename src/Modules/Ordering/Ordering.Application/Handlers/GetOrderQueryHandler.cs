@@ -5,8 +5,8 @@ using Ordering.Application.Queries;
 using Ordering.Contracts;
 using Ordering.Domain.Errors;
 using Ordering.Domain.Visibility;
-using Shared.Cqrs;
-using Shared.Results;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Results;
 
 internal sealed class GetOrderQueryHandler(
     IOrderReadRepository repository)

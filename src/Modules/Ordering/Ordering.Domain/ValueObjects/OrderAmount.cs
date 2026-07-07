@@ -1,8 +1,8 @@
 namespace Ordering.Domain.ValueObjects;
 
 using Ordering.Domain.Aggregates;
-using Shared.Numerics;
-using Shared.Results;
+using Gma.Framework.Numerics;
+using Gma.Framework.Results;
 
 public readonly record struct OrderAmount
 {

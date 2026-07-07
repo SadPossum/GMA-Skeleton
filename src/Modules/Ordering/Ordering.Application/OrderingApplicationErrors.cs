@@ -1,7 +1,7 @@
 namespace Ordering.Application;
 
 using Ordering.Domain.Errors;
-using Shared.Results;
+using Gma.Framework.Results;
 
 public static class OrderingApplicationErrors
 {

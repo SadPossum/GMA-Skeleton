@@ -13,6 +13,7 @@
 # Local agent/workspace state
 .agents/
 .codex/
+Gma.SourceRoots.props
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

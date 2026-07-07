@@ -1,8 +1,8 @@
 namespace Catalog.Application.Queries;
 
 using Catalog.Contracts;
-using Shared.AccessControl;
-using Shared.Cqrs;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
 
 public sealed record GetAvailableCatalogItemQuery(
     Guid ItemId,

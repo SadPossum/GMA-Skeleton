@@ -7,11 +7,11 @@ using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Shared.Cqrs;
-using Shared.Caching;
-using Shared.Caching.Cqrs;
-using Shared.Caching.Redis;
-using Shared.Results;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Caching;
+using Gma.Framework.Caching.Cqrs;
+using Gma.Framework.Caching.Redis;
+using Gma.Framework.Results;
 using Xunit;
 
 [Trait("Category", "Integration")]

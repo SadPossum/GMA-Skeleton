@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Shared.Notifications;
-using Shared.Security;
-using Shared.Tenancy;
+using Gma.Framework.Notifications;
+using Gma.Framework.Security;
+using Gma.Framework.Tenancy;
 
 internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled = true)
     : WebApplicationFactory<ApiAssemblyReference>

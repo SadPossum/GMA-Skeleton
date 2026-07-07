@@ -1,30 +1,30 @@
-using Administration.AdminApi;
-using Auth.AdminApi;
-using Auth.Contracts;
+using Gma.Modules.Administration.AdminApi;
+using Gma.Modules.Auth.AdminApi;
+using Gma.Modules.Auth.Contracts;
 using ServiceDefaults;
-using Shared.Administration.Api;
-using Shared.Api.OpenApi;
-using Shared.Api.Security;
-using Shared.Api.Serilog;
-using Shared.Caching.Cqrs;
-using Shared.Caching.Redis;
-using Shared.Infrastructure;
-using Shared.Logging.Serilog;
-using Shared.Messaging.Infrastructure;
-using Shared.Messaging.Nats.Aspire;
-using Shared.ModuleComposition;
-using Shared.Tenancy.Api.Serilog;
-using Shared.Tenancy.Caching;
-using Shared.Tenancy.Messaging.Infrastructure;
+using Gma.Framework.Administration.Api;
+using Gma.Framework.Api.OpenApi;
+using Gma.Framework.Api.Security;
+using Gma.Framework.Api.Serilog;
+using Gma.Framework.Caching.Cqrs;
+using Gma.Framework.Caching.Redis;
+using Gma.Framework.Infrastructure;
+using Gma.Framework.Logging.Serilog;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Messaging.Nats.Aspire;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Tenancy.Api.Serilog;
+using Gma.Framework.Tenancy.Caching;
+using Gma.Framework.Tenancy.Messaging.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseConfiguredSerilog();
 
-builder.Services.AddSharedAdministrationApi(builder.Configuration);
+builder.Services.AddGmaAdministrationApi(builder.Configuration);
 builder.AddRedisCaching();
 builder.AddCachingCqrs();
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddTenantSerilogRequestLogging();
 builder.AddTenantCaching();
 builder.AddMessagingInfrastructure();
@@ -36,13 +36,13 @@ builder.AddAdminApiModule<AdministrationAdminApiModule>();
 builder.AddAuthAdminApiModule(AuthProfile.TenantScoped());
 
 builder.AddServiceDefaults();
-builder.AddSharedOpenApi();
+builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
 
 WebApplication app = builder.Build();
 
-app.UseSharedOpenApi();
-app.UseSharedSerilogRequestLogging();
+app.UseGmaOpenApi();
+app.UseGmaSerilogRequestLogging();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

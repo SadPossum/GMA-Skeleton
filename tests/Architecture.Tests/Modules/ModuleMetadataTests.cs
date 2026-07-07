@@ -6,16 +6,16 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Administration;
-using Shared.Authorization;
-using Shared.Caching;
-using Shared.Messaging;
-using Shared.ModuleComposition;
-using Shared.Modules;
-using Shared.Notifications;
-using Shared.Tasks;
-using Shared.Tenancy;
-using TaskRuntime.Contracts;
+using Gma.Framework.Administration;
+using Gma.Framework.Authorization;
+using Gma.Framework.Caching;
+using Gma.Framework.Messaging;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Modules;
+using Gma.Framework.Notifications;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tenancy;
+using Gma.Modules.TaskRuntime.Contracts;
 using Xunit;
 
 [Trait("Category", "Architecture")]
@@ -53,23 +53,23 @@ public sealed partial class ModuleMetadataTests
         [
             new(
                 typeof(ModuleDescriptorPermissionExtensions),
-                "Shared.Authorization",
+                "Gma.Framework.Authorization",
                 ["GetPermissions", "WithPermission", "WithPermissions"]),
             new(
                 typeof(ModuleDescriptorCachingExtensions),
-                "Shared.Caching",
+                "Gma.Framework.Caching",
                 ["GetCacheEntries", "WithCacheEntries", "WithCacheEntry"]),
             new(
                 typeof(ModuleDescriptorMessagingExtensions),
-                "Shared.Messaging",
+                "Gma.Framework.Messaging",
                 ["GetPublishedEvents", "GetSubscriptions", "WithPublishedEvent", "WithPublishedEvents", "WithSubscription", "WithSubscriptions"]),
             new(
                 typeof(ModuleDescriptorNotificationExtensions),
-                "Shared.Notifications",
+                "Gma.Framework.Notifications",
                 ["GetUserNotifications", "WithUserNotification", "WithUserNotifications"]),
             new(
                 typeof(ModuleDescriptorTaskExtensions),
-                "Shared.Tasks",
+                "Gma.Framework.Tasks",
                 ["GetTasks", "WithTask", "WithTasks"])
         ];
 
@@ -137,8 +137,8 @@ public sealed partial class ModuleMetadataTests
         string[] offenders = baseMetadataAssemblies
             .Where(assembly => assembly
                 .GetReferencedAssemblies()
-                .Any(reference => string.Equals(reference.Name, "Shared.Tenancy", StringComparison.Ordinal)))
-            .Select(assembly => $"{assembly.GetName().Name} references Shared.Tenancy.")
+                .Any(reference => string.Equals(reference.Name, "Gma.Framework.Tenancy", StringComparison.Ordinal)))
+            .Select(assembly => $"{assembly.GetName().Name} references Gma.Framework.Tenancy.")
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -178,7 +178,7 @@ public sealed partial class ModuleMetadataTests
             .ToArray();
 
         Assert.Empty(offenders);
-        Assert.Equal("Shared.Tenancy", typeof(TenantScopedAttribute).Assembly.GetName().Name);
+        Assert.Equal("Gma.Framework.Tenancy", typeof(TenantScopedAttribute).Assembly.GetName().Name);
         Assert.True(typeof(IModuleMetadataContributor).IsAssignableFrom(typeof(TenantScopedAttribute)));
     }
 
@@ -895,7 +895,7 @@ public sealed partial class ModuleMetadataTests
         IConfiguration configuration,
         ModuleProject project)
     {
-        Type? dependencyInjection = project.Assembly.GetType($"{project.ModulePrefix}.Application.DependencyInjection");
+        Type? dependencyInjection = project.Assembly.GetType($"{project.ProjectName}.DependencyInjection");
         MethodInfo? registrationMethod = dependencyInjection
             ?.GetMethods(BindingFlags.Public | BindingFlags.Static)
             .SingleOrDefault(method => string.Equals(method.Name, $"Add{project.ModulePrefix}Application", StringComparison.Ordinal));

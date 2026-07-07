@@ -1,9 +1,9 @@
 namespace TaskSamples.Application.Tasks;
 
-using Shared.Cqrs;
-using Shared.Results;
-using Shared.Tasks;
-using Shared.Tasks.Cqrs;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Results;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tasks.Cqrs;
 using TaskSamples.Contracts;
 
 internal sealed class GenerateReportTaskV2Handler(ITaskCommandDispatcher dispatcher)

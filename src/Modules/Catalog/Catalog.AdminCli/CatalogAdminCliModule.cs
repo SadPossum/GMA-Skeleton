@@ -9,12 +9,12 @@ using Catalog.Contracts;
 using Catalog.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Shared.Administration;
-using Shared.Administration.Cli;
-using Shared.Cqrs;
-using Shared.ModuleComposition;
-using Shared.Pagination;
-using Shared.Results;
+using Gma.Framework.Administration;
+using Gma.Framework.Administration.Cli;
+using Gma.Framework.Cqrs;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Pagination;
+using Gma.Framework.Results;
 
 public sealed class CatalogAdminCliModule : IAdminCliModule
 {

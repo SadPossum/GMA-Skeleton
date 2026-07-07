@@ -1,9 +1,9 @@
 namespace Catalog.Tests;
 
-using Shared.Naming;
+using Gma.Framework.Naming;
 using Catalog.Domain.Aggregates;
 using Catalog.Domain.Events;
-using Shared.Domain;
+using Gma.Framework.Domain;
 using Xunit;
 
 [Trait("Category", "Unit")]

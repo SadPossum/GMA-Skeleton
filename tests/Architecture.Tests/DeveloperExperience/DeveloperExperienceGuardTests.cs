@@ -1,23 +1,23 @@
 namespace Architecture.Tests;
 
-using Auth.Persistence;
+using Gma.Modules.Auth.Persistence;
 using Catalog.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Notifications.Persistence;
+using Gma.Modules.Notifications.Persistence;
 using Ordering.Persistence;
-using Shared.Domain;
-using Shared.Naming;
+using Gma.Framework.Domain;
+using Gma.Framework.Naming;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using Shared.Administration;
-using Shared.Cqrs;
-using Shared.Observability;
-using Shared.Results;
-using Shared.Messaging.Infrastructure;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Administration;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Observability;
+using Gma.Framework.Results;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 using Xunit;
 
 [Trait("Category", "Architecture")]
@@ -122,6 +122,14 @@ public sealed partial class DeveloperExperienceGuardTests
             ".gitignore",
             "Directory.Build.props",
             "Directory.Packages.props",
+            "Gma.SourceRoots.props.example",
+            "Gma.Framework.slnx",
+            "Gma.Modules.Administration.slnx",
+            "Gma.Modules.Auth.slnx",
+            "Gma.Modules.Files.slnx",
+            "Gma.Modules.Notifications.slnx",
+            "Gma.Modules.TaskRuntime.slnx",
+            "Gma.Modules.Tenancy.slnx",
             "global.json",
             "LICENSE",
             "nuget.config",
@@ -144,6 +152,7 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             ".agents/",
             ".codex/",
+            "Gma.SourceRoots.props",
             ".vs/",
             "[Tt]est[Rr]esult*/",
             "[Bb]in/",
@@ -408,14 +417,14 @@ public sealed partial class DeveloperExperienceGuardTests
         string openApiProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Api.OpenApi",
-            "Shared.Api.OpenApi.csproj"));
+            "Framework",
+            "Gma.Framework.Api.OpenApi",
+            "Gma.Framework.Api.OpenApi.csproj"));
         string openApiSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Api.OpenApi",
+            "Framework",
+            "Gma.Framework.Api.OpenApi",
             "DependencyInjection.cs"));
 
         Assert.Contains("Swashbuckle.AspNetCore", openApiProject, StringComparison.Ordinal);
@@ -428,8 +437,8 @@ public sealed partial class DeveloperExperienceGuardTests
         {
             string source = File.ReadAllText(hostProgram);
 
-            Assert.Contains("AddSharedOpenApi()", source, StringComparison.Ordinal);
-            Assert.Contains("UseSharedOpenApi()", source, StringComparison.Ordinal);
+            Assert.Contains("AddGmaOpenApi()", source, StringComparison.Ordinal);
+            Assert.Contains("UseGmaOpenApi()", source, StringComparison.Ordinal);
             Assert.DoesNotContain("AddEndpointsApiExplorer", source, StringComparison.Ordinal);
             Assert.DoesNotContain("AddSwaggerGen", source, StringComparison.Ordinal);
             Assert.DoesNotContain("UseSwagger", source, StringComparison.Ordinal);
@@ -499,8 +508,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string sharedSecurity = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Api",
+            "Framework",
+            "Gma.Framework.Api",
             "Security",
             "ApiSecurityServiceCollectionExtensions.cs"));
 
@@ -526,14 +535,14 @@ public sealed partial class DeveloperExperienceGuardTests
         string claimNamesPath = Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Security",
+            "Framework",
+            "Gma.Framework.Security",
             "ApplicationClaimNames.cs");
         string compatibilityClaimNamesPath = Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Security",
+            "Framework",
+            "Gma.Framework.Security",
             "GmaClaimNames.cs");
         string[] rawClaimNameLiterals =
         [
@@ -544,6 +553,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] offenders = Directory
             .EnumerateFiles(Path.Combine(repositoryRoot, "src"), "*.cs", SearchOption.AllDirectories)
             .Where(path => !HasIgnoredPathSegment(path))
+            .Where(path => !IsTestSourcePath(path))
             .Where(path => !string.Equals(path, claimNamesPath, StringComparison.OrdinalIgnoreCase))
             .Where(path => !string.Equals(path, compatibilityClaimNamesPath, StringComparison.OrdinalIgnoreCase))
             .SelectMany(path =>
@@ -601,64 +611,64 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Auth",
-            "Auth.Api",
+            "Gma.Modules.Auth.Api",
             "AuthModule.cs"));
         string authAdminApiModule = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.AdminApi",
+            "Gma.Modules.Auth.AdminApi",
             "AuthAdminApiModule.cs"));
         string authAdminCliModule = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.AdminCli",
+            "Gma.Modules.Auth.AdminCli",
             "AuthAdminCliModule.cs"));
         string authInfrastructureProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.Infrastructure",
-            "Auth.Infrastructure.csproj"));
+            "Gma.Modules.Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure.csproj"));
         string authInfrastructureSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure",
             "DependencyInjection.cs"));
         string authJwtBearerProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.Infrastructure.JwtBearer",
-            "Auth.Infrastructure.JwtBearer.csproj"));
+            "Gma.Modules.Auth.Infrastructure.JwtBearer",
+            "Gma.Modules.Auth.Infrastructure.JwtBearer.csproj"));
         string authAdminCliProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.AdminCli",
-            "Auth.AdminCli.csproj"));
+            "Gma.Modules.Auth.AdminCli",
+            "Gma.Modules.Auth.AdminCli.csproj"));
         string authApiProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.Api",
-            "Auth.Api.csproj"));
+            "Gma.Modules.Auth.Api",
+            "Gma.Modules.Auth.Api.csproj"));
         string authAdminApiProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.AdminApi",
-            "Auth.AdminApi.csproj"));
+            "Gma.Modules.Auth.AdminApi",
+            "Gma.Modules.Auth.AdminApi.csproj"));
 
         Assert.Contains("AddAuthInfrastructure(builder.Configuration)", authApiModule, StringComparison.Ordinal);
         Assert.Contains("AddAuthJwtBearerAuthentication()", authApiModule, StringComparison.Ordinal);
@@ -674,10 +684,10 @@ public sealed partial class DeveloperExperienceGuardTests
         Assert.Contains("System.IdentityModel.Tokens.Jwt", authInfrastructureProject, StringComparison.Ordinal);
         Assert.Contains("Microsoft.Extensions.Identity.Core", authInfrastructureProject, StringComparison.Ordinal);
         Assert.Contains("Microsoft.AspNetCore.Authentication.JwtBearer", authJwtBearerProject, StringComparison.Ordinal);
-        Assert.Contains("Auth.Infrastructure.csproj", authJwtBearerProject, StringComparison.Ordinal);
-        Assert.Contains("Auth.Infrastructure.JwtBearer.csproj", authApiProject, StringComparison.Ordinal);
-        Assert.Contains("Auth.Infrastructure.JwtBearer.csproj", authAdminApiProject, StringComparison.Ordinal);
-        Assert.DoesNotContain("Auth.Infrastructure.JwtBearer.csproj", authAdminCliProject, StringComparison.Ordinal);
+        Assert.Contains("Gma.Modules.Auth.Infrastructure.csproj", authJwtBearerProject, StringComparison.Ordinal);
+        Assert.Contains("Gma.Modules.Auth.Infrastructure.JwtBearer.csproj", authApiProject, StringComparison.Ordinal);
+        Assert.Contains("Gma.Modules.Auth.Infrastructure.JwtBearer.csproj", authAdminApiProject, StringComparison.Ordinal);
+        Assert.DoesNotContain("Gma.Modules.Auth.Infrastructure.JwtBearer.csproj", authAdminCliProject, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -697,32 +707,32 @@ public sealed partial class DeveloperExperienceGuardTests
         string sharedApiProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Api",
-            "Shared.Api.csproj"));
+            "Framework",
+            "Gma.Framework.Api",
+            "Gma.Framework.Api.csproj"));
         string serilogHostAdapterProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Logging.Serilog",
-            "Shared.Logging.Serilog.csproj"));
+            "Framework",
+            "Gma.Framework.Logging.Serilog",
+            "Gma.Framework.Logging.Serilog.csproj"));
         string serilogAdapterProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Api.Serilog",
-            "Shared.Api.Serilog.csproj"));
+            "Framework",
+            "Gma.Framework.Api.Serilog",
+            "Gma.Framework.Api.Serilog.csproj"));
         string tenantSerilogBridgeProject = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Tenancy.Api.Serilog",
-            "Shared.Tenancy.Api.Serilog.csproj"));
+            "Framework",
+            "Gma.Framework.Tenancy.Api.Serilog",
+            "Gma.Framework.Tenancy.Api.Serilog.csproj"));
         string sharedExtension = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Api.Serilog",
+            "Framework",
+            "Gma.Framework.Api.Serilog",
             "RequestLoggingApplicationBuilderExtensions.cs"));
 
         Assert.DoesNotContain("Serilog", sharedApiProject, StringComparison.Ordinal);
@@ -730,8 +740,8 @@ public sealed partial class DeveloperExperienceGuardTests
         Assert.Contains("Serilog.Settings.Configuration", serilogHostAdapterProject, StringComparison.Ordinal);
         Assert.Contains("Serilog.Sinks.Console", serilogHostAdapterProject, StringComparison.Ordinal);
         Assert.Contains("Serilog.AspNetCore", serilogAdapterProject, StringComparison.Ordinal);
-        Assert.DoesNotContain("Shared.Tenancy", serilogAdapterProject, StringComparison.Ordinal);
-        Assert.Contains("Shared.Tenancy", tenantSerilogBridgeProject, StringComparison.Ordinal);
+        Assert.DoesNotContain("Gma.Framework.Tenancy", serilogAdapterProject, StringComparison.Ordinal);
+        Assert.Contains("Gma.Framework.Tenancy", tenantSerilogBridgeProject, StringComparison.Ordinal);
         Assert.Contains("UseSerilogRequestLogging", sharedExtension, StringComparison.Ordinal);
         Assert.Contains("EnrichDiagnosticContext", sharedExtension, StringComparison.Ordinal);
 
@@ -743,7 +753,7 @@ public sealed partial class DeveloperExperienceGuardTests
             Assert.DoesNotContain("UseSerilog(", source, StringComparison.Ordinal);
             Assert.DoesNotContain("ReadFrom.Configuration", source, StringComparison.Ordinal);
             Assert.Contains("AddTenantSerilogRequestLogging()", source, StringComparison.Ordinal);
-            Assert.Contains("UseSharedSerilogRequestLogging()", source, StringComparison.Ordinal);
+            Assert.Contains("UseGmaSerilogRequestLogging()", source, StringComparison.Ordinal);
             Assert.DoesNotContain("UseSerilogRequestLogging", source, StringComparison.Ordinal);
             Assert.DoesNotContain("EnrichDiagnosticContext", source, StringComparison.Ordinal);
         }
@@ -780,23 +790,23 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         HashSet<string> allowedRelativePaths = new(StringComparer.OrdinalIgnoreCase)
         {
-            NormalizePath(Path.Combine("src", "Shared", "Shared.Application.Composition", "ApplicationServiceCollectionExtensions.cs")),
-            NormalizePath(Path.Combine("src", "Shared", "Shared.Cqrs.Infrastructure", "RequestDispatcher.cs")),
-            NormalizePath(Path.Combine("src", "Shared", "Shared.Application.Events.Infrastructure", "DomainEventDispatcher.cs")),
-            NormalizePath(Path.Combine("src", "Shared", "Shared.Modules", "ModuleMetadataAttributeReader.cs")),
-            NormalizePath(Path.Combine("src", "Shared", "Shared.Messaging.Infrastructure", "IntegrationEventHandlerInvoker.cs")),
-            NormalizePath(Path.Combine("src", "Shared", "Shared.Tasks.Infrastructure", "TaskHandlerInvoker.cs")),
-            NormalizePath(Path.Combine("src", "Shared", "Shared.Persistence.EntityFrameworkCore", "TenantEntityTypeBuilderExtensions.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Application.Composition", "ApplicationServiceCollectionExtensions.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Cqrs.Infrastructure", "RequestDispatcher.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Application.Events.Infrastructure", "DomainEventDispatcher.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Modules", "ModuleMetadataAttributeReader.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Messaging.Infrastructure", "IntegrationEventHandlerInvoker.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Tasks.Infrastructure", "TaskHandlerInvoker.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Persistence.EntityFrameworkCore", "TenantEntityTypeBuilderExtensions.cs")),
             NormalizePath(Path.Combine("src", "Host.Api", "ApiAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Host.AdminApi", "AdminApiAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Host.AdminCli", "AdminCliAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Host.Worker", "WorkerAssemblyReference.cs")),
-            NormalizePath(Path.Combine("src", "Modules", "Administration", "Administration.Persistence", "AdminDbContext.cs")),
-            NormalizePath(Path.Combine("src", "Modules", "Auth", "Auth.Persistence", "AuthDbContext.cs")),
+            NormalizePath(Path.Combine("src", "Modules", "Administration", "Gma.Modules.Administration.Persistence", "AdminDbContext.cs")),
+            NormalizePath(Path.Combine("src", "Modules", "Auth", "Gma.Modules.Auth.Persistence", "AuthDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Catalog", "Catalog.Persistence", "CatalogDbContext.cs")),
-            NormalizePath(Path.Combine("src", "Modules", "Notifications", "Notifications.Persistence", "NotificationsDbContext.cs")),
+            NormalizePath(Path.Combine("src", "Modules", "Notifications", "Gma.Modules.Notifications.Persistence", "NotificationsDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Ordering", "Ordering.Persistence", "OrderingDbContext.cs")),
-            NormalizePath(Path.Combine("src", "Modules", "TaskRuntime", "TaskRuntime.Persistence", "TaskRuntimeDbContext.cs"))
+            NormalizePath(Path.Combine("src", "Modules", "TaskRuntime", "Gma.Modules.TaskRuntime.Persistence", "TaskRuntimeDbContext.cs"))
         };
         string[] reflectionTokens =
         [
@@ -818,6 +828,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] sourceOffenders = Directory
             .EnumerateFiles(srcRoot, "*.cs", SearchOption.AllDirectories)
             .Where(path => !HasIgnoredPathSegment(path))
+            .Where(path => !IsTestSourcePath(path))
             .Select(path => new
             {
                 Path = path,
@@ -994,7 +1005,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .SelectMany(projectPath =>
             {
                 XDocument project = XDocument.Load(projectPath);
-                string relativePath = Path.GetRelativePath(repositoryRoot, projectPath);
+                string relativePath = NormalizePath(Path.GetRelativePath(repositoryRoot, projectPath));
                 string? property(string propertyName) =>
                     project.Descendants(propertyName).SingleOrDefault()?.Value.Trim();
                 bool hasPackage(string packageId) =>
@@ -1127,6 +1138,10 @@ public sealed partial class DeveloperExperienceGuardTests
             {
                 string expectedFolderName = ProjectNameFromSolutionPath(project.Path)
                     .Replace(".Tests", string.Empty, StringComparison.Ordinal);
+                if (string.Equals(expectedFolderName, "Gma.Framework", StringComparison.Ordinal))
+                {
+                    expectedFolderName = "Framework";
+                }
 
                 if (!parents.TryGetValue(project.Guid, out string? parentGuid) ||
                     !folderNames.TryGetValue(parentGuid, out string? parentName))
@@ -1149,7 +1164,7 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Shared_source_projects_are_nested_under_shared_solution_folder()
+    public void Framework_source_projects_are_nested_under_framework_solution_folder()
     {
         string repositoryRoot = FindRepositoryRoot();
         string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GenericModularApi.sln"));
@@ -1170,8 +1185,8 @@ public sealed partial class DeveloperExperienceGuardTests
                            !parents.ContainsKey(item.Key))
             .Select(item => item.Key)
             .Single();
-        string sharedFolderGuid = folderNames
-            .Where(item => string.Equals(item.Value, "Shared", StringComparison.Ordinal) &&
+        string frameworkFolderGuid = folderNames
+            .Where(item => string.Equals(item.Value, "Framework", StringComparison.Ordinal) &&
                            parents.TryGetValue(item.Key, out string? parentGuid) &&
                            string.Equals(parentGuid, srcFolderGuid, StringComparison.OrdinalIgnoreCase))
             .Select(item => item.Key)
@@ -1183,12 +1198,13 @@ public sealed partial class DeveloperExperienceGuardTests
                 match.Groups["name"].Value,
                 match.Groups["path"].Value,
                 match.Groups["guid"].Value))
-            .Where(project => project.Path.StartsWith(@"src\Shared\", StringComparison.OrdinalIgnoreCase) &&
+            .Where(project => project.Path.StartsWith(@"src\Framework\", StringComparison.OrdinalIgnoreCase) &&
+                              !project.Path.Contains(@"\tests\", StringComparison.OrdinalIgnoreCase) &&
                               project.Path.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
             .Where(project =>
                 !parents.TryGetValue(project.Guid, out string? parentGuid) ||
-                !string.Equals(parentGuid, sharedFolderGuid, StringComparison.OrdinalIgnoreCase))
-            .Select(project => $"{project.Path} is not nested under src/Shared solution folder.")
+                !string.Equals(parentGuid, frameworkFolderGuid, StringComparison.OrdinalIgnoreCase))
+            .Select(project => $"{project.Path} is not nested under src/Framework solution folder.")
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -1196,14 +1212,78 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Naming_conventions_document_all_shared_project_names()
+    public void Source_root_configuration_supports_source_first_submodule_layouts()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string buildProps = File.ReadAllText(Path.Combine(repositoryRoot, "Directory.Build.props"));
+        string sourceRootsExample = File.ReadAllText(Path.Combine(repositoryRoot, "Gma.SourceRoots.props.example"));
+        string[] requiredProperties =
+        [
+            "GmaFrameworkRoot",
+            "GmaModulesRoot",
+            "GmaModuleAdministrationRoot",
+            "GmaModuleAuthRoot",
+            "GmaModuleFilesRoot",
+            "GmaModuleNotificationsRoot",
+            "GmaModuleTaskRuntimeRoot",
+            "GmaModuleTenancyRoot"
+        ];
+        string[] offenders = requiredProperties
+            .Where(property => !buildProps.Contains(property, StringComparison.Ordinal) ||
+                               !sourceRootsExample.Contains(property, StringComparison.Ordinal))
+            .Select(property => $"Missing source-root property {property}.")
+            .Concat(!buildProps.Contains("Gma.SourceRoots.props", StringComparison.Ordinal)
+                ? ["Directory.Build.props does not import Gma.SourceRoots.props."]
+                : [])
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void External_framework_project_references_use_source_root_property()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string frameworkRoot = Path.Combine(repositoryRoot, "src", "Framework");
+        string[] offenders = Directory
+            .EnumerateFiles(repositoryRoot, "*.csproj", SearchOption.AllDirectories)
+            .Where(path => (IsUnder(path, Path.Combine(repositoryRoot, "src")) ||
+                            IsUnder(path, Path.Combine(repositoryRoot, "tests"))) &&
+                           !IsUnder(path, frameworkRoot))
+            .Where(path => !HasIgnoredPathSegment(path))
+            .SelectMany(path =>
+            {
+                XDocument project = XDocument.Load(path);
+                string relativeProjectPath = NormalizePath(Path.GetRelativePath(repositoryRoot, path));
+
+                return project
+                    .Descendants("ProjectReference")
+                    .Select(reference => reference.Attribute("Include")?.Value)
+                    .Where(referencePath => !string.IsNullOrWhiteSpace(referencePath))
+                    .Where(referencePath =>
+                        referencePath!.Contains("Framework", StringComparison.OrdinalIgnoreCase) ||
+                        referencePath.Contains("Gma.Framework", StringComparison.Ordinal))
+                    .Where(referencePath => !referencePath!.StartsWith("$(GmaFrameworkRoot)", StringComparison.Ordinal))
+                    .Select(referencePath => $"{relativeProjectPath}->{referencePath}");
+            })
+            .Concat(FindRawFrameworkReferencesInModuleGenerator(repositoryRoot))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void Naming_conventions_document_all_framework_project_names()
     {
         string repositoryRoot = FindRepositoryRoot();
         string namingConventions = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "guidelines", "naming-conventions.md"));
         string[] offenders = Directory
-            .EnumerateFiles(Path.Combine(repositoryRoot, "src", "Shared"), "*.csproj", SearchOption.AllDirectories)
+            .EnumerateFiles(Path.Combine(repositoryRoot, "src", "Framework"), "*.csproj", SearchOption.AllDirectories)
             .Where(path => !HasIgnoredPathSegment(path))
             .Select(Path.GetFileNameWithoutExtension)
+            .Where(projectName => projectName is not null && !projectName.EndsWith(".Tests", StringComparison.Ordinal))
             .Where(projectName => projectName is not null && !namingConventions.Contains(projectName, StringComparison.Ordinal))
             .Select(projectName => $"docs/guidelines/naming-conventions.md missing {projectName}")
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -1229,15 +1309,16 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Architecture_overview_documents_shared_project_dependency_map()
+    public void Architecture_overview_documents_framework_project_dependency_map()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Shared");
+        string sharedRoot = Path.Combine(repositoryRoot, "src", "Framework");
         string overview = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "architecture", "overview.md"));
         Dictionary<string, string[]> documentedDependencies = ParseDependencyDirectionBlocks(overview);
         string[] offenders = Directory
             .EnumerateFiles(sharedRoot, "*.csproj", SearchOption.AllDirectories)
             .Where(path => !HasIgnoredPathSegment(path))
+            .Where(path => !Path.GetFileNameWithoutExtension(path).EndsWith(".Tests", StringComparison.Ordinal))
             .SelectMany(projectPath =>
             {
                 string projectName = Path.GetFileNameWithoutExtension(projectPath);
@@ -1291,6 +1372,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Where(path => !HasIgnoredPathSegment(path))
             .Select(path => Path.GetFileNameWithoutExtension(path))
             .Where(projectName => !IsProviderMigrationProject(projectName))
+            .Where(projectName => !projectName.EndsWith(".Tests", StringComparison.Ordinal))
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -1300,6 +1382,66 @@ public sealed partial class DeveloperExperienceGuardTests
             .ToArray();
 
         Assert.Equal(moduleProjects, catalogProjects);
+    }
+
+    [Fact]
+    public void Reusable_package_solutions_are_present_and_include_colocated_tests()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        Dictionary<string, string[]> requiredProjectsBySolution = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Gma.Framework.slnx"] =
+            [
+                "src/Framework/Gma.Framework.Results/Gma.Framework.Results.csproj",
+                "src/Framework/tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj"
+            ],
+            ["Gma.Modules.Administration.slnx"] =
+            [
+                "src/Modules/Administration/Gma.Modules.Administration.Application/Gma.Modules.Administration.Application.csproj",
+                "src/Modules/Administration/tests/Gma.Modules.Administration.Tests/Gma.Modules.Administration.Tests.csproj"
+            ],
+            ["Gma.Modules.Auth.slnx"] =
+            [
+                "src/Modules/Auth/Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj",
+                "src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj"
+            ],
+            ["Gma.Modules.Files.slnx"] =
+            [
+                "src/Modules/Files/Gma.Modules.Files.Api/Gma.Modules.Files.Api.csproj"
+            ],
+            ["Gma.Modules.Notifications.slnx"] =
+            [
+                "src/Modules/Notifications/Gma.Modules.Notifications.Application/Gma.Modules.Notifications.Application.csproj",
+                "src/Modules/Notifications/tests/Gma.Modules.Notifications.Tests/Gma.Modules.Notifications.Tests.csproj"
+            ],
+            ["Gma.Modules.TaskRuntime.slnx"] =
+            [
+                "src/Modules/TaskRuntime/Gma.Modules.TaskRuntime.Application/Gma.Modules.TaskRuntime.Application.csproj"
+            ],
+            ["Gma.Modules.Tenancy.slnx"] =
+            [
+                "src/Modules/Tenancy/Gma.Modules.Tenancy.Api/Gma.Modules.Tenancy.Api.csproj"
+            ]
+        };
+
+        string[] offenders = requiredProjectsBySolution
+            .SelectMany(item =>
+            {
+                string solutionPath = Path.Combine(repositoryRoot, item.Key);
+                if (!File.Exists(solutionPath))
+                {
+                    return [$"{item.Key} is missing"];
+                }
+
+                string solution = File.ReadAllText(solutionPath);
+                return item.Value
+                    .Where(projectPath => !solution.Contains(projectPath, StringComparison.OrdinalIgnoreCase))
+                    .Select(projectPath => $"{item.Key} missing {projectPath}");
+            })
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
     }
 
     [Fact]
@@ -1410,10 +1552,9 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Test_sources_live_under_intent_folders()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string testsRoot = Path.Combine(repositoryRoot, "tests");
-        string[] offenders = EnumerateSourceFiles(testsRoot)
-            .Where(path => FindOwningProjectName(path)?.EndsWith(".Tests", StringComparison.Ordinal) == true)
-            .Where(path => !HasProjectIntentFolder(path, testsRoot))
+        string[] offenders = EnumerateSourceFiles(repositoryRoot)
+            .Where(IsTestSourcePath)
+            .Where(path => !HasProjectIntentFolder(path, FindOwningProjectDirectory(path)!))
             .Select(path => Path.GetRelativePath(repositoryRoot, path))
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -1425,10 +1566,12 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Unit_tests_that_redirect_console_use_console_test_collection()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string testsRoot = Path.Combine(repositoryRoot, "tests");
         string collectionDefinition = File.ReadAllText(Path.Combine(
-            testsRoot,
-            "Shared.Tests",
+            repositoryRoot,
+            "src",
+            "Framework",
+            "tests",
+            "Gma.Framework.Tests",
             "Support",
             "ConsoleTestIsolation.cs"));
         string[] consoleRedirectTokens =
@@ -1437,8 +1580,9 @@ public sealed partial class DeveloperExperienceGuardTests
             "Console.SetError(",
             "Console.SetIn("
         ];
-        string[] offenders = EnumerateSourceFiles(testsRoot)
-            .Where(path => !IsUnder(path, Path.Combine(testsRoot, "Integration.Tests")))
+        string[] offenders = EnumerateSourceFiles(repositoryRoot)
+            .Where(IsTestSourcePath)
+            .Where(path => !string.Equals(FindOwningProjectName(path), "Integration.Tests", StringComparison.Ordinal))
             .Where(path =>
             {
                 string source = File.ReadAllText(path);
@@ -1504,8 +1648,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string helperSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Application.Composition",
+            "Framework",
+            "Gma.Framework.Application.Composition",
             "ApplicationServiceCollectionExtensions.cs"));
         string[] handlerRegistrationTokens =
         [
@@ -1554,9 +1698,10 @@ public sealed partial class DeveloperExperienceGuardTests
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
         string[] misplacedRegistrationOffenders = EnumerateSourceFiles(srcRoot)
+            .Where(path => !IsTestSourcePath(path))
             .Where(path => File.ReadAllText(path).Contains("AddApplicationServicesFromAssembly(", StringComparison.Ordinal))
             .Where(path => !path.EndsWith(
-                Path.Combine("Shared.Application.Composition", "ApplicationServiceCollectionExtensions.cs"),
+                Path.Combine("Gma.Framework.Application.Composition", "ApplicationServiceCollectionExtensions.cs"),
                 StringComparison.OrdinalIgnoreCase))
             .Where(path => !path.EndsWith(
                 Path.Combine(".Application", "DependencyInjection.cs"),
@@ -1587,9 +1732,9 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         string[] scaffoldOffenders =
         [
-            scaffolder.Contains("using Shared.Application.Composition;", StringComparison.Ordinal)
+            scaffolder.Contains("using Gma.Framework.Application.Composition;", StringComparison.Ordinal)
                 ? string.Empty
-                : "eng/new-module.ps1 should scaffold Shared.Application.Composition usage.",
+                : "eng/new-module.ps1 should scaffold Gma.Framework.Application.Composition usage.",
             scaffolder.Contains(registrationCall, StringComparison.Ordinal)
                 ? string.Empty
                 : "eng/new-module.ps1 should scaffold AddApplicationServicesFromAssembly."
@@ -1617,9 +1762,9 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] guardedRoots =
         [
-            Path.Combine(repositoryRoot, "src", "Shared", "Shared.Modules"),
-            Path.Combine(repositoryRoot, "src", "Shared", "Shared.Caching"),
-            Path.Combine(repositoryRoot, "src", "Shared", "Shared.Tasks")
+            Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Modules"),
+            Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Caching"),
+            Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Tasks")
         ];
         string[] offenders = guardedRoots
             .SelectMany(EnumerateSourceFiles)
@@ -1628,7 +1773,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 Path = path,
                 Source = File.ReadAllText(path)
             })
-            .Where(item => item.Source.Contains("Shared.Messaging", StringComparison.Ordinal) ||
+            .Where(item => item.Source.Contains("Gma.Framework.Messaging", StringComparison.Ordinal) ||
                            item.Source.Contains("IntegrationEventNaming", StringComparison.Ordinal))
             .Select(item => Path.GetRelativePath(repositoryRoot, item.Path))
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -1646,9 +1791,9 @@ public sealed partial class DeveloperExperienceGuardTests
             .Concat(
             [
                 typeof(AdminOperationExecutionStatus).Assembly,
-                typeof(Shared.Caching.CacheScope).Assembly,
+                typeof(Gma.Framework.Caching.CacheScope).Assembly,
                 typeof(InboxMessageStatus).Assembly,
-                typeof(Shared.Tasks.TaskRunStatus).Assembly
+                typeof(Gma.Framework.Tasks.TaskRunStatus).Assembly
             ])
             .Distinct()
             .ToArray();
@@ -1740,6 +1885,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .ToArray();
         string[] offenders = EnumerateSourceFiles(modulesRoot)
             .Where(path => !IsGeneratedMigrationSource(path))
+            .Where(path => !IsTestSourcePath(path))
             .SelectMany(path =>
             {
                 string source = File.ReadAllText(path);
@@ -1770,7 +1916,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Concat(
             [
                 typeof(AdminErrors).Assembly,
-                typeof(Shared.Tenancy.TenantErrors).Assembly,
+                typeof(Gma.Framework.Tenancy.TenantErrors).Assembly,
                 typeof(Error).Assembly,
             ])
             .Distinct()
@@ -1815,8 +1961,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string source = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Pagination",
+            "Framework",
+            "Gma.Framework.Pagination",
             "PageRequest.cs"));
 
         Assert.DoesNotMatch(PositionalPageRequestPattern(), source);
@@ -1844,8 +1990,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string source = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Api",
+            "Framework",
+            "Gma.Framework.Api",
             "Results",
             "ApiErrorStatusCode.cs"));
 
@@ -1860,8 +2006,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string source = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Administration",
+            "Framework",
+            "Gma.Framework.Administration",
             "AdminOperationExecutionResult.cs"));
 
         Assert.DoesNotMatch(PositionalAdminOperationExecutionResultPattern(), source);
@@ -1875,8 +2021,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string source = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Api",
+            "Framework",
+            "Gma.Framework.Api",
             "Observability",
             "ModuleEndpointMetadata.cs"));
 
@@ -1893,7 +2039,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Auth",
-            "Auth.Domain",
+            "Gma.Modules.Auth.Domain",
             "Services",
             "ITokenService.cs"));
 
@@ -1910,7 +2056,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Auth",
-            "Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure",
             "Services",
             "JwtTokenService.cs"));
 
@@ -1925,8 +2071,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string messagingRoot = Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Messaging");
+            "Framework",
+            "Gma.Framework.Messaging");
         Dictionary<string, string> sources = new(StringComparer.Ordinal)
         {
             ["IntegrationEventEnvelope"] = File.ReadAllText(Path.Combine(messagingRoot, "IntegrationEventEnvelope.cs")),
@@ -2153,7 +2299,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        Assert.Equal([Path.Combine("src", "Shared", "Shared.Naming", "TenantIds.cs")], tenantIdHelpers);
+        Assert.Equal([Path.Combine("src", "Framework", "Gma.Framework.Naming", "TenantIds.cs")], tenantIdHelpers);
         Assert.Empty(domainTrimOffenders);
     }
 
@@ -2166,7 +2312,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Auth",
-            "Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure",
             "Services",
             "RefreshTokenHashingService.cs"));
 
@@ -2187,14 +2333,14 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Auth",
-            "Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure",
             "DependencyInjection.cs"));
         string applicationSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.Application",
+            "Gma.Modules.Auth.Application",
             "DependencyInjection.cs"));
 
         string[] infrastructureRequiredTokens =
@@ -2212,10 +2358,10 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         string[] offenders = infrastructureRequiredTokens
             .Where(token => !infrastructureSource.Contains(token, StringComparison.Ordinal))
-            .Select(token => $"Auth.Infrastructure dependency injection missing {token}")
+            .Select(token => $"Gma.Modules.Auth.Infrastructure dependency injection missing {token}")
             .Concat(applicationRequiredTokens
                 .Where(token => !applicationSource.Contains(token, StringComparison.Ordinal))
-                .Select(token => $"Auth.Application dependency injection missing {token}"))
+                .Select(token => $"Gma.Modules.Auth.Application dependency injection missing {token}"))
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -2231,14 +2377,14 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Auth",
-            "Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure",
             "JwtSettings.cs"));
         string refreshTokenHashingOptions = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Modules",
             "Auth",
-            "Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure",
             "RefreshTokenHashingOptions.cs"));
 
         Assert.Contains("public string SigningKey { get; set; } = string.Empty;", jwtSettings, StringComparison.Ordinal);
@@ -2466,24 +2612,24 @@ public sealed partial class DeveloperExperienceGuardTests
                 string hostName = Path.GetFileName(hostDirectory);
                 List<string> hostOffenders = [];
 
-                if (!project.Contains("Shared.Caching.Redis", StringComparison.Ordinal))
+                if (!project.Contains("Gma.Framework.Caching.Redis", StringComparison.Ordinal))
                 {
-                    hostOffenders.Add($"{hostName} does not reference Shared.Caching.Redis");
+                    hostOffenders.Add($"{hostName} does not reference Gma.Framework.Caching.Redis");
                 }
 
-                if (!project.Contains("Shared.Caching.Cqrs", StringComparison.Ordinal))
+                if (!project.Contains("Gma.Framework.Caching.Cqrs", StringComparison.Ordinal))
                 {
-                    hostOffenders.Add($"{hostName} does not reference Shared.Caching.Cqrs");
+                    hostOffenders.Add($"{hostName} does not reference Gma.Framework.Caching.Cqrs");
                 }
 
-                if (!project.Contains("Shared.Tenancy.Caching", StringComparison.Ordinal))
+                if (!project.Contains("Gma.Framework.Tenancy.Caching", StringComparison.Ordinal))
                 {
-                    hostOffenders.Add($"{hostName} does not reference Shared.Tenancy.Caching");
+                    hostOffenders.Add($"{hostName} does not reference Gma.Framework.Tenancy.Caching");
                 }
 
                 int redisIndex = program.IndexOf("builder.AddRedisCaching();", StringComparison.Ordinal);
                 int cachingBridgeIndex = program.IndexOf("builder.AddCachingCqrs();", StringComparison.Ordinal);
-                int sharedInfrastructureIndex = program.IndexOf("builder.AddSharedInfrastructure();", StringComparison.Ordinal);
+                int sharedInfrastructureIndex = program.IndexOf("builder.AddGmaInfrastructure();", StringComparison.Ordinal);
                 int tenantCachingIndex = program.IndexOf("builder.AddTenantCaching();", StringComparison.Ordinal);
                 if (redisIndex < 0)
                 {
@@ -2500,7 +2646,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 }
                 else if (sharedInfrastructureIndex < 0 || cachingBridgeIndex > sharedInfrastructureIndex)
                 {
-                    hostOffenders.Add($"{hostName} must call AddCachingCqrs before AddSharedInfrastructure");
+                    hostOffenders.Add($"{hostName} must call AddCachingCqrs before AddGmaInfrastructure");
                 }
 
                 if (tenantCachingIndex < 0)
@@ -2509,7 +2655,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 }
                 else if (sharedInfrastructureIndex < 0 || tenantCachingIndex < sharedInfrastructureIndex)
                 {
-                    hostOffenders.Add($"{hostName} must call AddTenantCaching after AddSharedInfrastructure");
+                    hostOffenders.Add($"{hostName} must call AddTenantCaching after AddGmaInfrastructure");
                 }
 
                 if (!appsettings.Contains("\"Redis\"", StringComparison.Ordinal) ||
@@ -2533,26 +2679,26 @@ public sealed partial class DeveloperExperienceGuardTests
         string queueSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Caching.Infrastructure",
+            "Framework",
+            "Gma.Framework.Caching.Infrastructure",
             "CacheInvalidationQueue.cs"));
         string assemblyInfo = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Caching.Infrastructure",
+            "Framework",
+            "Gma.Framework.Caching.Infrastructure",
             "Properties",
             "AssemblyInfo.cs"));
         string bridgeSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Caching.Cqrs",
+            "Framework",
+            "Gma.Framework.Caching.Cqrs",
             "CacheInvalidationCommandBehavior.cs"));
 
         Assert.Contains("internal interface ICacheInvalidationQueueFlusher", queueSource, StringComparison.Ordinal);
         Assert.DoesNotContain("public interface ICacheInvalidationQueueFlusher", queueSource, StringComparison.Ordinal);
-        Assert.Contains("InternalsVisibleTo(\"Shared.Caching.Cqrs\")", assemblyInfo, StringComparison.Ordinal);
+        Assert.Contains("InternalsVisibleTo(\"Gma.Framework.Caching.Cqrs\")", assemblyInfo, StringComparison.Ordinal);
         Assert.Contains("ICacheInvalidationQueueFlusher", bridgeSource, StringComparison.Ordinal);
     }
 
@@ -2561,7 +2707,7 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string repositoryRoot = FindRepositoryRoot();
         string program = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"));
-        int sharedInfrastructureIndex = program.IndexOf("builder.AddSharedInfrastructure();", StringComparison.Ordinal);
+        int sharedInfrastructureIndex = program.IndexOf("builder.AddGmaInfrastructure();", StringComparison.Ordinal);
         int tenancyModuleIndex = program.IndexOf("builder.AddModule<TenancyModule>();", StringComparison.Ordinal);
 
         Assert.True(sharedInfrastructureIndex >= 0, "Host.Api must compose shared infrastructure.");
@@ -2587,8 +2733,8 @@ public sealed partial class DeveloperExperienceGuardTests
             .Where(path =>
             {
                 string source = File.ReadAllText(path);
-                return source.Contains("using Shared.Infrastructure;", StringComparison.Ordinal) ||
-                       source.Contains("AddSharedInfrastructure()", StringComparison.Ordinal);
+                return source.Contains("using Gma.Framework.Infrastructure;", StringComparison.Ordinal) ||
+                       source.Contains("AddGmaInfrastructure()", StringComparison.Ordinal);
             })
             .Select(path => Path.GetRelativePath(repositoryRoot, path))
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -2646,7 +2792,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Auth",
-            "Auth.Persistence");
+            "Gma.Modules.Auth.Persistence");
         string[] offenders = expectedTokensByFile
             .SelectMany(item =>
             {
@@ -2672,7 +2818,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Auth",
-            "Auth.Application");
+            "Gma.Modules.Auth.Application");
         string policySource = File.ReadAllText(Path.Combine(authApplicationRoot, "Security", "AuthPasswordPolicy.cs"));
         string[] passwordPolicyValidatorFiles =
         [
@@ -2706,7 +2852,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Administration",
-            "Administration.Application",
+            "Gma.Modules.Administration.Application",
             "DependencyInjection.cs"));
         string[] requiredTokens =
         [
@@ -2716,7 +2862,7 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         string[] offenders = requiredTokens
             .Where(token => !source.Contains(token, StringComparison.Ordinal))
-            .Select(token => $"Administration.Application dependency injection missing {token}")
+            .Select(token => $"Gma.Modules.Administration.Application dependency injection missing {token}")
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -2775,24 +2921,58 @@ public sealed partial class DeveloperExperienceGuardTests
         string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
         string[] offenders = Directory
             .EnumerateDirectories(modulesRoot)
-            .Select(modulePath =>
+            .SelectMany(modulePath =>
             {
-                string moduleName = Path.GetFileName(modulePath);
-                string persistenceProject = Path.Combine(modulePath, $"{moduleName}.Persistence", $"{moduleName}.Persistence.csproj");
-                string sqlServerMigrationProject = Path.Combine(modulePath, $"{moduleName}.Persistence.SqlServerMigrations", $"{moduleName}.Persistence.SqlServerMigrations.csproj");
-                string postgreSqlMigrationProject = Path.Combine(modulePath, $"{moduleName}.Persistence.PostgreSqlMigrations", $"{moduleName}.Persistence.PostgreSqlMigrations.csproj");
+                string[] projectNames = Directory
+                    .EnumerateFiles(modulePath, "*.csproj", SearchOption.AllDirectories)
+                    .Where(path => !HasIgnoredPathSegment(path))
+                    .Where(path => !HasPathSegment(path, "tests"))
+                    .Select(path => Path.GetFileNameWithoutExtension(path)!)
+                    .Order(StringComparer.Ordinal)
+                    .ToArray();
+                HashSet<string> projectNameSet = projectNames.ToHashSet(StringComparer.Ordinal);
+                string[] persistenceProjects = projectNames
+                    .Where(projectName => projectName.EndsWith(".Persistence", StringComparison.Ordinal))
+                    .ToArray();
+                string[] migrationProjectsWithoutPersistence = projectNames
+                    .Where(IsProviderMigrationProject)
+                    .Select(projectName =>
+                    {
+                        string persistenceProjectName = projectName
+                            .Replace(".Persistence.SqlServerMigrations", ".Persistence", StringComparison.Ordinal)
+                            .Replace(".Persistence.PostgreSqlMigrations", ".Persistence", StringComparison.Ordinal);
 
-                bool hasPersistence = File.Exists(persistenceProject);
-                bool hasSqlServerMigrations = File.Exists(sqlServerMigrationProject);
-                bool hasPostgreSqlMigrations = File.Exists(postgreSqlMigrationProject);
+                        return projectNameSet.Contains(persistenceProjectName)
+                            ? null
+                            : $"{Path.GetRelativePath(repositoryRoot, modulePath)}: {projectName} has no {persistenceProjectName}";
+                    })
+                    .Where(offender => offender is not null)
+                    .Select(offender => offender!)
+                    .ToArray();
 
-                return hasPersistence == hasSqlServerMigrations &&
-                       hasPersistence == hasPostgreSqlMigrations
-                    ? null
-                    : $"{Path.GetRelativePath(repositoryRoot, modulePath)}: persistence={hasPersistence}, sqlServerMigrations={hasSqlServerMigrations}, postgreSqlMigrations={hasPostgreSqlMigrations}";
+                string[] persistenceProjectsWithoutMigrations = persistenceProjects
+                    .SelectMany(projectName =>
+                    {
+                        string sqlServerMigrationProject = $"{projectName}.SqlServerMigrations";
+                        string postgreSqlMigrationProject = $"{projectName}.PostgreSqlMigrations";
+
+                        return new[]
+                        {
+                            projectNameSet.Contains(sqlServerMigrationProject)
+                                ? null
+                                : $"{Path.GetRelativePath(repositoryRoot, modulePath)}: {projectName} missing {sqlServerMigrationProject}",
+                            projectNameSet.Contains(postgreSqlMigrationProject)
+                                ? null
+                                : $"{Path.GetRelativePath(repositoryRoot, modulePath)}: {projectName} missing {postgreSqlMigrationProject}"
+                        };
+                    })
+                    .Where(offender => offender is not null)
+                    .Select(offender => offender!)
+                    .ToArray();
+
+                return migrationProjectsWithoutPersistence
+                    .Concat(persistenceProjectsWithoutMigrations);
             })
-            .Where(offender => offender is not null)
-            .Select(offender => offender!)
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -2842,7 +3022,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] requiredFastTokens =
         [
             ". (Join-Path $PSScriptRoot 'common.ps1')",
-            "GenericModularApi.sln",
+            "GenericModularApi.slnx",
             "--filter",
             "Category!=Docker",
             "console;verbosity=minimal"
@@ -2925,6 +3105,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] offenders = EnumeratePackageReferences(repositoryRoot)
             .Where(reference => string.Equals(reference.PackageId, "System.CommandLine", StringComparison.Ordinal))
+            .Where(reference => !IsTestProjectPath(reference.ProjectPath))
             .Where(reference => !IsCliProject(reference.ProjectPath))
             .Select(reference => $"{reference.ProjectPath}:{reference.PackageId}")
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -3096,7 +3277,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Administration",
-            "Administration.Persistence");
+            "Gma.Modules.Administration.Persistence");
         string[] forbiddenTokens =
         [
             "actorId.Trim()",
@@ -3128,15 +3309,15 @@ public sealed partial class DeveloperExperienceGuardTests
             Path.Combine(
                 repositoryRoot,
                 "src",
-                "Shared",
-                "Shared.Administration",
+                "Framework",
+                "Gma.Framework.Administration",
                 "AdminOperationRunner.cs"),
             Path.Combine(
                 repositoryRoot,
                 "src",
                 "Modules",
                 "Administration",
-                "Administration.AdminCli",
+                "Gma.Modules.Administration.AdminCli",
                 "AdministrationAdminCliModule.cs")
         ];
         string[] forbiddenTokens =
@@ -3199,7 +3380,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Administration",
-            "Administration.Persistence");
+            "Gma.Modules.Administration.Persistence");
         string[] offenders = expectedTokensByFile
             .SelectMany(item =>
             {
@@ -3324,7 +3505,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string scaffolder = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-module.ps1"));
         Dictionary<string, string[]> expectedTokensByPath = new()
         {
-            [Path.Combine("Auth", "Auth.Persistence", "AuthDbContext.cs")] =
+            [Path.Combine("Auth", "Gma.Modules.Auth.Persistence", "AuthDbContext.cs")] =
             [
                 ": TenantAwareDbContext<AuthDbContext>(options, tenantContext)",
                 "this.ApplyTenantConventions(modelBuilder);"
@@ -3339,7 +3520,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 ": TenantAwareDbContext<OrderingDbContext>(options, tenantContext)",
                 "this.ApplyTenantConventions(modelBuilder);"
             ],
-            [Path.Combine("Notifications", "Notifications.Persistence", "NotificationsDbContext.cs")] =
+            [Path.Combine("Notifications", "Gma.Modules.Notifications.Persistence", "NotificationsDbContext.cs")] =
             [
                 ": TenantAwareDbContext<NotificationsDbContext>(options, tenantContext)",
                 "this.ApplyTenantConventions(modelBuilder);"
@@ -3363,9 +3544,9 @@ public sealed partial class DeveloperExperienceGuardTests
             .ToArray();
         string[] scaffoldRequiredTokens =
         [
-            "using Shared.Persistence.EntityFrameworkCore;",
-            "using Shared.Tenancy;",
-            @"Shared\Shared.Tenancy\Shared.Tenancy.csproj",
+            "using Gma.Framework.Persistence.EntityFrameworkCore;",
+            "using Gma.Framework.Tenancy;",
+            @"$(GmaFrameworkRoot)Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj",
             "ITenantContext tenantContext",
             ": TenantAwareDbContext<${Name}DbContext>(options, tenantContext)",
             "this.ApplyTenantConventions(modelBuilder);",
@@ -3457,7 +3638,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "src",
             "Modules",
             "Administration",
-            "Administration.Application",
+            "Gma.Modules.Administration.Application",
             "AdminRoleName.cs"));
 
         Assert.Contains("candidate.Length > MaxLength", source, StringComparison.Ordinal);
@@ -3487,48 +3668,48 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Shared_core_projects_keep_dependency_free_or_abstractions_only_shape()
+    public void Framework_core_projects_keep_dependency_free_or_abstractions_only_shape()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Shared");
+        string sharedRoot = Path.Combine(repositoryRoot, "src", "Framework");
         string[] dependencyFreeProjects =
         [
-            Path.Combine(sharedRoot, "Shared.Results", "Shared.Results.csproj"),
-            Path.Combine(sharedRoot, "Shared.Naming", "Shared.Naming.csproj"),
-            Path.Combine(sharedRoot, "Shared.Numerics", "Shared.Numerics.csproj"),
-            Path.Combine(sharedRoot, "Shared.Pagination", "Shared.Pagination.csproj"),
-            Path.Combine(sharedRoot, "Shared.Security", "Shared.Security.csproj")
+            Path.Combine(sharedRoot, "Gma.Framework.Results", "Gma.Framework.Results.csproj"),
+            Path.Combine(sharedRoot, "Gma.Framework.Naming", "Gma.Framework.Naming.csproj"),
+            Path.Combine(sharedRoot, "Gma.Framework.Numerics", "Gma.Framework.Numerics.csproj"),
+            Path.Combine(sharedRoot, "Gma.Framework.Pagination", "Gma.Framework.Pagination.csproj"),
+            Path.Combine(sharedRoot, "Gma.Framework.Security", "Gma.Framework.Security.csproj")
         ];
-        string notificationsProjectPath = Path.Combine(sharedRoot, "Shared.Notifications", "Shared.Notifications.csproj");
+        string notificationsProjectPath = Path.Combine(sharedRoot, "Gma.Framework.Notifications", "Gma.Framework.Notifications.csproj");
         XDocument notificationsProject = XDocument.Load(notificationsProjectPath);
         HashSet<string> allowedNotificationsProjectReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-            @"..\Shared.Modules\Shared.Modules.csproj",
-            @"..\Shared.Naming\Shared.Naming.csproj"
+            @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+            @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+            @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
         };
-        string modulesProjectPath = Path.Combine(sharedRoot, "Shared.Modules", "Shared.Modules.csproj");
+        string modulesProjectPath = Path.Combine(sharedRoot, "Gma.Framework.Modules", "Gma.Framework.Modules.csproj");
         XDocument modulesProject = XDocument.Load(modulesProjectPath);
         HashSet<string> allowedModulesProjectReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            @"..\Shared.Naming\Shared.Naming.csproj"
+            @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
         };
-        string domainProjectPath = Path.Combine(sharedRoot, "Shared.Domain", "Shared.Domain.csproj");
+        string domainProjectPath = Path.Combine(sharedRoot, "Gma.Framework.Domain", "Gma.Framework.Domain.csproj");
         XDocument domainProject = XDocument.Load(domainProjectPath);
         HashSet<string> allowedDomainProjectReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            @"..\Shared.Naming\Shared.Naming.csproj",
-            @"..\Shared.Numerics\Shared.Numerics.csproj"
+            @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+            @"..\Gma.Framework.Numerics\Gma.Framework.Numerics.csproj"
         };
         string applicationProjectPath = Path.Combine(
             sharedRoot,
-            "Shared.Application.Composition",
-            "Shared.Application.Composition.csproj");
+            "Gma.Framework.Application.Composition",
+            "Gma.Framework.Application.Composition.csproj");
         XDocument applicationProject = XDocument.Load(applicationProjectPath);
         HashSet<string> allowedApplicationProjectReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            @"..\Shared.Application.Events\Shared.Application.Events.csproj",
-            @"..\Shared.Cqrs\Shared.Cqrs.csproj"
+            @"..\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj",
+            @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"
         };
         HashSet<string> allowedApplicationPackageReferences = new(StringComparer.Ordinal)
         {
@@ -3616,18 +3797,18 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Shared_application_boundary_projects_stay_source_narrow()
+    public void Framework_application_boundary_projects_stay_source_narrow()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Shared");
+        string sharedRoot = Path.Combine(repositoryRoot, "src", "Framework");
         IReadOnlyDictionary<string, string[]> expectedProjectSources = new Dictionary<string, string[]>(
             StringComparer.Ordinal)
         {
-            ["Shared.Application.Composition"] =
+            ["Gma.Framework.Application.Composition"] =
             [
                 "ApplicationServiceCollectionExtensions.cs"
             ],
-            ["Shared.Application.Events"] =
+            ["Gma.Framework.Application.Events"] =
             [
                 "IDomainEventDispatcher.cs",
                 "IDomainEventHandler.cs"
@@ -3657,7 +3838,7 @@ public sealed partial class DeveloperExperienceGuardTests
         IReadOnlyDictionary<string, string[]> forbiddenTokensByProject = new Dictionary<string, string[]>(
             StringComparer.Ordinal)
         {
-            ["Shared.Application.Composition"] =
+            ["Gma.Framework.Application.Composition"] =
             [
                 "DbContext",
                 "IHostedService",
@@ -3677,7 +3858,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 "ITask",
                 "IUnitOfWork"
             ],
-            ["Shared.Application.Events"] =
+            ["Gma.Framework.Application.Events"] =
             [
                 "IServiceCollection",
                 "Microsoft.Extensions.DependencyInjection",
@@ -3720,8 +3901,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void File_management_core_stays_dependency_neutral()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string projectRoot = Path.Combine(repositoryRoot, "src", "Shared", "Shared.FileManagement");
-        XDocument project = XDocument.Load(Path.Combine(projectRoot, "Shared.FileManagement.csproj"));
+        string projectRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.FileManagement");
+        XDocument project = XDocument.Load(Path.Combine(projectRoot, "Gma.Framework.FileManagement.csproj"));
         string[] packageReferences = GetProjectIncludes(project, "PackageReference");
         string[] projectReferences = GetProjectIncludes(project, "ProjectReference");
         string[] forbiddenSourceOffenders = Directory
@@ -3734,10 +3915,10 @@ public sealed partial class DeveloperExperienceGuardTests
                 string[] forbiddenTokens =
                 [
                     "using Microsoft.Extensions",
-                    "using Shared.Tenancy",
-                    "Shared.Tenancy",
-                    "using Shared.ModuleComposition",
-                    "Shared.ModuleComposition"
+                    "using Gma.Framework.Tenancy",
+                    "Gma.Framework.Tenancy",
+                    "using Gma.Framework.ModuleComposition",
+                    "Gma.Framework.ModuleComposition"
                 ];
 
                 return forbiddenTokens
@@ -3753,146 +3934,146 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Shared_project_dependency_manifest_matches_intended_adapter_boundaries()
+    public void Framework_project_dependency_manifest_matches_intended_adapter_boundaries()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = Path.Combine(repositoryRoot, "src", "Shared");
-        SharedProjectShape[] expectedShapes =
+        string sharedRoot = Path.Combine(repositoryRoot, "src", "Framework");
+        FrameworkProjectShape[] expectedShapes =
         [
             new(
-                "Shared.Administration",
+                "Gma.Framework.Administration",
                 ["Microsoft.Extensions.Logging.Abstractions"],
                 [],
                 [
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Results\Shared.Results.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Administration.Api",
+                "Gma.Framework.Administration.Api",
                 [],
                 ["Microsoft.AspNetCore.App"],
                 [
-                    @"..\Shared.Administration\Shared.Administration.csproj",
-                    @"..\Shared.Api\Shared.Api.csproj",
-                    @"..\Shared.Cqrs\Shared.Cqrs.csproj",
-                    @"..\Shared.Results\Shared.Results.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Security\Shared.Security.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Administration\Gma.Framework.Administration.csproj",
+                    @"..\Gma.Framework.Api\Gma.Framework.Api.csproj",
+                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Security\Gma.Framework.Security.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Administration.Cli",
+                "Gma.Framework.Administration.Cli",
                 ["Microsoft.Extensions.Hosting", "System.CommandLine"],
                 [],
                 [
-                    @"..\Shared.Administration\Shared.Administration.csproj",
-                    @"..\Shared.Cqrs\Shared.Cqrs.csproj",
-                    @"..\Shared.Results\Shared.Results.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj"
+                    @"..\Gma.Framework.Administration\Gma.Framework.Administration.csproj",
+                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
                 ]),
             new(
-                "Shared.AccessControl",
+                "Gma.Framework.AccessControl",
                 [],
                 [],
                 [
-                    @"..\Shared.Naming\Shared.Naming.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
                 ]),
             new(
-                "Shared.Api",
+                "Gma.Framework.Api",
                 [],
                 ["Microsoft.AspNetCore.App"],
                 [
-                    @"..\Shared.Results\Shared.Results.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Api.OpenApi",
+                "Gma.Framework.Api.OpenApi",
                 ["Swashbuckle.AspNetCore"],
                 ["Microsoft.AspNetCore.App"],
                 []),
             new(
-                "Shared.Api.Serilog",
+                "Gma.Framework.Api.Serilog",
                 ["Serilog.AspNetCore"],
                 ["Microsoft.AspNetCore.App"],
                 [
-                    @"..\Shared.Api\Shared.Api.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj"
+                    @"..\Gma.Framework.Api\Gma.Framework.Api.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj"
                 ]),
             new(
-                "Shared.Tenancy.Api.Serilog",
+                "Gma.Framework.Tenancy.Api.Serilog",
                 [],
                 ["Microsoft.AspNetCore.App"],
                 [
-                    @"..\Shared.Api.Serilog\Shared.Api.Serilog.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Api.Serilog\Gma.Framework.Api.Serilog.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Application.Events.Infrastructure",
+                "Gma.Framework.Application.Events.Infrastructure",
                 ["Microsoft.Extensions.Hosting"],
                 [],
                 [
-                    @"..\Shared.Application.Events\Shared.Application.Events.csproj",
-                    @"..\Shared.Domain\Shared.Domain.csproj"
+                    @"..\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj",
+                    @"..\Gma.Framework.Domain\Gma.Framework.Domain.csproj"
                 ]),
             new(
-                "Shared.Application.Composition",
+                "Gma.Framework.Application.Composition",
                 ["Microsoft.Extensions.DependencyInjection.Abstractions"],
                 [],
                 [
-                    @"..\Shared.Application.Events\Shared.Application.Events.csproj",
-                    @"..\Shared.Cqrs\Shared.Cqrs.csproj"
+                    @"..\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj",
+                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"
                 ]),
             new(
-                "Shared.Application.Events",
+                "Gma.Framework.Application.Events",
                 [],
                 [],
                 [
-                    @"..\Shared.Domain\Shared.Domain.csproj"
+                    @"..\Gma.Framework.Domain\Gma.Framework.Domain.csproj"
                 ]),
             new(
-                "Shared.Cqrs.Infrastructure",
+                "Gma.Framework.Cqrs.Infrastructure",
                 ["Microsoft.Extensions.Hosting"],
                 [],
                 [
-                    @"..\Shared.Cqrs\Shared.Cqrs.csproj",
-                    @"..\Shared.Results\Shared.Results.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj",
-                    @"..\Shared.Runtime.Infrastructure\Shared.Runtime.Infrastructure.csproj"
+                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
+                    @"..\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj"
                 ]),
             new(
-                "Shared.Cqrs",
+                "Gma.Framework.Cqrs",
                 [],
                 [],
                 [
-                    @"..\Shared.Results\Shared.Results.csproj"
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj"
                 ]),
             new(
-                "Shared.Authorization",
+                "Gma.Framework.Authorization",
                 [],
                 [],
                 [
-                    @"..\Shared.Modules\Shared.Modules.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj"
+                    @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
                 ]),
             new(
-                "Shared.Caching",
+                "Gma.Framework.Caching",
                 [],
                 [],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Modules\Shared.Modules.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
                 ]),
             new(
-                "Shared.Caching.Redis",
+                "Gma.Framework.Caching.Redis",
                 [
                     "Microsoft.Extensions.Caching.StackExchangeRedis",
                     "Microsoft.Extensions.Configuration.Binder",
@@ -3901,26 +4082,26 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.Caching\Shared.Caching.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj"
+                    @"..\Gma.Framework.Caching\Gma.Framework.Caching.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"
                 ]),
             new(
-                "Shared.Caching.Cqrs",
+                "Gma.Framework.Caching.Cqrs",
                 [
                     "Microsoft.Extensions.Hosting"
                 ],
                 [],
                 [
-                    @"..\Shared.Caching\Shared.Caching.csproj",
-                    @"..\Shared.Caching.Infrastructure\Shared.Caching.Infrastructure.csproj",
-                    @"..\Shared.Cqrs\Shared.Cqrs.csproj",
-                    @"..\Shared.Cqrs.Infrastructure\Shared.Cqrs.Infrastructure.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj",
-                    @"..\Shared.Results\Shared.Results.csproj"
+                    @"..\Gma.Framework.Caching\Gma.Framework.Caching.csproj",
+                    @"..\Gma.Framework.Caching.Infrastructure\Gma.Framework.Caching.Infrastructure.csproj",
+                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj"
                 ]),
             new(
-                "Shared.Caching.Infrastructure",
+                "Gma.Framework.Caching.Infrastructure",
                 [
                     "Microsoft.Extensions.Caching.Hybrid",
                     "Microsoft.Extensions.Configuration.Binder",
@@ -3928,29 +4109,29 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.Caching\Shared.Caching.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj",
-                    @"..\Shared.Runtime.Infrastructure\Shared.Runtime.Infrastructure.csproj"
+                    @"..\Gma.Framework.Caching\Gma.Framework.Caching.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj"
                 ]),
             new(
-                "Shared.Domain",
+                "Gma.Framework.Domain",
                 [],
                 [],
                 [
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Numerics\Shared.Numerics.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Numerics\Gma.Framework.Numerics.csproj"
                 ]),
             new(
-                "Shared.FileManagement",
+                "Gma.Framework.FileManagement",
                 [],
                 [],
                 []),
             new(
-                "Shared.FileManagement.LocalStorage",
+                "Gma.Framework.FileManagement.LocalStorage",
                 [
                     "Microsoft.Extensions.Configuration.Binder",
                     "Microsoft.Extensions.Hosting",
@@ -3958,11 +4139,11 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.FileManagement\Shared.FileManagement.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj"
+                    @"..\Gma.Framework.FileManagement\Gma.Framework.FileManagement.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"
                 ]),
             new(
-                "Shared.FileManagement.Minio",
+                "Gma.Framework.FileManagement.Minio",
                 [
                     "Microsoft.Extensions.Configuration.Binder",
                     "Microsoft.Extensions.Hosting",
@@ -3971,53 +4152,53 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.FileManagement\Shared.FileManagement.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj"
+                    @"..\Gma.Framework.FileManagement\Gma.Framework.FileManagement.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"
                 ]),
-            new("Shared.Results", [], [], []),
+            new("Gma.Framework.Results", [], [], []),
             new(
-                "Shared.Infrastructure",
+                "Gma.Framework.Infrastructure",
                 [
                     "Microsoft.Extensions.Hosting"
                 ],
                 [],
                 [
-                    @"..\Shared.Application.Events.Infrastructure\Shared.Application.Events.Infrastructure.csproj",
-                    @"..\Shared.Cqrs.Infrastructure\Shared.Cqrs.Infrastructure.csproj",
-                    @"..\Shared.Runtime.Infrastructure\Shared.Runtime.Infrastructure.csproj",
-                    @"..\Shared.Tenancy.Cqrs\Shared.Tenancy.Cqrs.csproj",
-                    @"..\Shared.Tenancy.Infrastructure\Shared.Tenancy.Infrastructure.csproj"
+                    @"..\Gma.Framework.Application.Events.Infrastructure\Gma.Framework.Application.Events.Infrastructure.csproj",
+                    @"..\Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj",
+                    @"..\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj",
+                    @"..\Gma.Framework.Tenancy.Cqrs\Gma.Framework.Tenancy.Cqrs.csproj",
+                    @"..\Gma.Framework.Tenancy.Infrastructure\Gma.Framework.Tenancy.Infrastructure.csproj"
                 ]),
             new(
-                "Shared.Logging.Serilog",
+                "Gma.Framework.Logging.Serilog",
                 ["Serilog.AspNetCore", "Serilog.Settings.Configuration", "Serilog.Sinks.Console"],
                 [],
                 []),
             new(
-                "Shared.Messaging",
+                "Gma.Framework.Messaging",
                 ["Microsoft.Extensions.DependencyInjection.Abstractions"],
                 [],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Modules\Shared.Modules.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Numerics\Shared.Numerics.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Numerics\Gma.Framework.Numerics.csproj"
                 ]),
             new(
-                "Shared.Messaging.Nats.Aspire",
+                "Gma.Framework.Messaging.Nats.Aspire",
                 ["Aspire.NATS.Net"],
                 [],
-                [@"..\Shared.Messaging.Nats\Shared.Messaging.Nats.csproj"]),
+                [@"..\Gma.Framework.Messaging.Nats\Gma.Framework.Messaging.Nats.csproj"]),
             new(
-                "Shared.ModuleComposition",
+                "Gma.Framework.ModuleComposition",
                 ["Microsoft.Extensions.Hosting"],
                 [],
                 [
-                    @"..\Shared.Modules\Shared.Modules.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj"
+                    @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
                 ]),
             new(
-                "Shared.Messaging.Nats",
+                "Gma.Framework.Messaging.Nats",
                 [
                     "Microsoft.Extensions.Configuration.Binder",
                     "Microsoft.Extensions.Hosting",
@@ -4025,14 +4206,14 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.Messaging\Shared.Messaging.csproj",
-                    @"..\Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj"
+                    @"..\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj",
+                    @"..\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
                 ]),
             new(
-                "Shared.Messaging.Infrastructure",
+                "Gma.Framework.Messaging.Infrastructure",
                 [
                     "Microsoft.EntityFrameworkCore",
                     "Microsoft.EntityFrameworkCore.Relational",
@@ -4041,59 +4222,59 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.Messaging\Shared.Messaging.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj",
-                    @"..\Shared.Runtime.Infrastructure\Shared.Runtime.Infrastructure.csproj"
+                    @"..\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj"
                 ]),
             new(
-                "Shared.Modules",
+                "Gma.Framework.Modules",
                 [],
                 [],
-                [@"..\Shared.Naming\Shared.Naming.csproj"]),
-            new("Shared.Naming", [], [], []),
-            new("Shared.Numerics", [], [], []),
+                [@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"]),
+            new("Gma.Framework.Naming", [], [], []),
+            new("Gma.Framework.Numerics", [], [], []),
             new(
-                "Shared.Notifications",
+                "Gma.Framework.Notifications",
                 [],
                 [],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Modules\Shared.Modules.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
                 ]),
             new(
-                "Shared.Notifications.Cqrs",
+                "Gma.Framework.Notifications.Cqrs",
                 [
                     "Microsoft.Extensions.Hosting"
                 ],
                 [],
                 [
-                    @"..\Shared.Cqrs\Shared.Cqrs.csproj",
-                    @"..\Shared.Cqrs.Infrastructure\Shared.Cqrs.Infrastructure.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Notifications\Shared.Notifications.csproj",
-                    @"..\Shared.Notifications.Infrastructure\Shared.Notifications.Infrastructure.csproj",
-                    @"..\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj",
-                    @"..\Shared.Results\Shared.Results.csproj"
+                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj",
+                    @"..\Gma.Framework.Notifications.Infrastructure\Gma.Framework.Notifications.Infrastructure.csproj",
+                    @"..\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj"
                 ]),
             new(
-                "Shared.Notifications.Api",
+                "Gma.Framework.Notifications.Api",
                 [],
                 ["Microsoft.AspNetCore.App"],
                 [
-                    @"..\Shared.Api\Shared.Api.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Notifications\Shared.Notifications.csproj",
-                    @"..\Shared.Security\Shared.Security.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Api\Gma.Framework.Api.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj",
+                    @"..\Gma.Framework.Security\Gma.Framework.Security.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Notifications.Infrastructure",
+                "Gma.Framework.Notifications.Infrastructure",
                 [
                     "Microsoft.Extensions.DependencyInjection",
                     "Microsoft.Extensions.Hosting",
@@ -4102,43 +4283,43 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Notifications\Shared.Notifications.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj",
-                    @"..\Shared.Runtime.Infrastructure\Shared.Runtime.Infrastructure.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj"
                 ]),
             new(
-                "Shared.Notifications.SignalR",
+                "Gma.Framework.Notifications.SignalR",
                 ["Microsoft.AspNetCore.Authentication.JwtBearer"],
                 ["Microsoft.AspNetCore.App"],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Notifications\Shared.Notifications.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj",
-                    @"..\Shared.Security\Shared.Security.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\Gma.Framework.Security\Gma.Framework.Security.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Observability",
+                "Gma.Framework.Observability",
                 [],
                 [],
-                [@"..\Shared.Naming\Shared.Naming.csproj"]),
-            new("Shared.Pagination", [], [], []),
+                [@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"]),
+            new("Gma.Framework.Pagination", [], [], []),
             new(
-                "Shared.Observability.Infrastructure",
+                "Gma.Framework.Observability.Infrastructure",
                 ["Microsoft.Extensions.Options.ConfigurationExtensions"],
                 [],
                 [
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
                 ]),
             new(
-                "Shared.Persistence.EntityFrameworkCore",
+                "Gma.Framework.Persistence.EntityFrameworkCore",
                 [
                     "Microsoft.EntityFrameworkCore.SqlServer",
                     "Microsoft.Extensions.Configuration.Binder",
@@ -4147,46 +4328,46 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.Application.Events\Shared.Application.Events.csproj",
-                    @"..\Shared.Cqrs\Shared.Cqrs.csproj",
-                    @"..\Shared.Domain\Shared.Domain.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj",
+                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\Gma.Framework.Domain\Gma.Framework.Domain.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.ProjectionRebuild",
+                "Gma.Framework.ProjectionRebuild",
                 [
                     "Microsoft.Extensions.DependencyInjection.Abstractions",
                     "Microsoft.Extensions.Options"
                 ],
                 [],
                 [
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
                 ]),
             new(
-                "Shared.ProjectionRebuild.Tasks",
+                "Gma.Framework.ProjectionRebuild.Tasks",
                 ["Microsoft.Extensions.DependencyInjection.Abstractions"],
                 [],
                 [
-                    @"..\Shared.ProjectionRebuild\Shared.ProjectionRebuild.csproj",
-                    @"..\Shared.Tasks\Shared.Tasks.csproj"
+                    @"..\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj",
+                    @"..\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"
                 ]),
             new(
-                "Shared.ProjectionRebuild.EntityFrameworkCore",
+                "Gma.Framework.ProjectionRebuild.EntityFrameworkCore",
                 [
                     "Microsoft.EntityFrameworkCore",
                     "Microsoft.EntityFrameworkCore.Relational"
                 ],
                 [],
                 [
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.ProjectionRebuild\Shared.ProjectionRebuild.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj"
                 ]),
             new(
-                "Shared.Runtime.Infrastructure",
+                "Gma.Framework.Runtime.Infrastructure",
                 [
                     "Microsoft.Extensions.Configuration.Binder",
                     "Microsoft.Extensions.Options.ConfigurationExtensions",
@@ -4194,31 +4375,31 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
                 ]),
             new(
-                "Shared.Tasks",
+                "Gma.Framework.Tasks",
                 ["Microsoft.Extensions.DependencyInjection.Abstractions"],
                 [],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Modules\Shared.Modules.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
                 ]),
             new(
-                "Shared.Tasks.Cqrs",
+                "Gma.Framework.Tasks.Cqrs",
                 ["Microsoft.Extensions.Hosting"],
                 [],
                 [
-                    @"..\Shared.Cqrs\Shared.Cqrs.csproj",
-                    @"..\Shared.Cqrs.Infrastructure\Shared.Cqrs.Infrastructure.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Results\Shared.Results.csproj",
-                    @"..\Shared.Tasks\Shared.Tasks.csproj"
+                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"
                 ]),
             new(
-                "Shared.Tasks.Infrastructure",
+                "Gma.Framework.Tasks.Infrastructure",
                 [
                     "Microsoft.EntityFrameworkCore",
                     "Microsoft.EntityFrameworkCore.Relational",
@@ -4227,107 +4408,108 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 [],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Observability.Infrastructure\Shared.Observability.Infrastructure.csproj",
-                    @"..\Shared.Runtime\Shared.Runtime.csproj",
-                    @"..\Shared.Runtime.Infrastructure\Shared.Runtime.Infrastructure.csproj",
-                    @"..\Shared.Tasks\Shared.Tasks.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj",
+                    @"..\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"
                 ]),
             new(
-                "Shared.Runtime",
+                "Gma.Framework.Runtime",
                 [],
                 [],
-                [@"..\Shared.Naming\Shared.Naming.csproj"]),
-            new("Shared.Security", [], [], []),
+                [@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"]),
+            new("Gma.Framework.Security", [], [], []),
             new(
-                "Shared.Tenancy",
+                "Gma.Framework.Tenancy",
                 [],
                 [],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Modules\Shared.Modules.csproj",
-                    @"..\Shared.Results\Shared.Results.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj"
                 ]),
             new(
-                "Shared.Tenancy.Infrastructure",
+                "Gma.Framework.Tenancy.Infrastructure",
                 [
                     "Microsoft.Extensions.Configuration.Binder",
                     "Microsoft.Extensions.Hosting"
                 ],
                 [],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Tenancy.Caching",
+                "Gma.Framework.Tenancy.Caching",
                 ["Microsoft.Extensions.Hosting"],
                 [],
                 [
-                    @"..\Shared.Caching\Shared.Caching.csproj",
-                    @"..\Shared.Caching.Infrastructure\Shared.Caching.Infrastructure.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Caching\Gma.Framework.Caching.csproj",
+                    @"..\Gma.Framework.Caching.Infrastructure\Gma.Framework.Caching.Infrastructure.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Tenancy.Cqrs",
+                "Gma.Framework.Tenancy.Cqrs",
                 [
                     "Microsoft.Extensions.DependencyInjection.Abstractions",
                     "Microsoft.Extensions.Hosting"
                 ],
                 [],
                 [
-                    @"..\Shared.Cqrs.Infrastructure\Shared.Cqrs.Infrastructure.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Observability\Shared.Observability.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Tenancy.Messaging",
+                "Gma.Framework.Tenancy.Messaging",
                 [],
                 [],
                 [
-                    @"..\Shared.Messaging\Shared.Messaging.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
-                "Shared.Tenancy.Messaging.Infrastructure",
+                "Gma.Framework.Tenancy.Messaging.Infrastructure",
                 [
                     "Microsoft.Extensions.DependencyInjection.Abstractions",
                     "Microsoft.Extensions.Hosting"
                 ],
                 [],
                 [
-                    @"..\Shared.Messaging\Shared.Messaging.csproj",
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj",
-                    @"..\Shared.Tenancy.Messaging\Shared.Tenancy.Messaging.csproj"
+                    @"..\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj",
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj",
+                    @"..\Gma.Framework.Tenancy.Messaging\Gma.Framework.Tenancy.Messaging.csproj"
                 ]),
             new(
-                "Shared.Tenancy.Tasks",
+                "Gma.Framework.Tenancy.Tasks",
                 ["Microsoft.Extensions.Hosting"],
                 [],
                 [
-                    @"..\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared.Tasks\Shared.Tasks.csproj",
-                    @"..\Shared.Tasks.Infrastructure\Shared.Tasks.Infrastructure.csproj",
-                    @"..\Shared.Tenancy\Shared.Tenancy.csproj"
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj",
+                    @"..\Gma.Framework.Tasks.Infrastructure\Gma.Framework.Tasks.Infrastructure.csproj",
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ])
         ];
         HashSet<string> expectedProjectNames = expectedShapes
             .Select(shape => shape.ProjectName)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        string[] undocumentedSharedProjects = Directory
+        string[] undocumentedFrameworkProjects = Directory
             .EnumerateFiles(sharedRoot, "*.csproj", SearchOption.AllDirectories)
             .Where(path => !HasIgnoredPathSegment(path))
+            .Where(path => !IsTestProjectPath(path))
             .Select(Path.GetFileNameWithoutExtension)
             .Where(projectName => projectName is not null && !expectedProjectNames.Contains(projectName))
-            .Select(projectName => $"Shared project '{projectName}' missing dependency manifest entry.")
+            .Select(projectName => $"Framework project '{projectName}' missing dependency manifest entry.")
             .ToArray();
         string[] manifestOffenders = expectedShapes
             .SelectMany(shape =>
@@ -4342,20 +4524,20 @@ public sealed partial class DeveloperExperienceGuardTests
             })
             .ToArray();
 
-        Assert.Empty(undocumentedSharedProjects
+        Assert.Empty(undocumentedFrameworkProjects
             .Concat(manifestOffenders)
             .Order(StringComparer.OrdinalIgnoreCase));
     }
 
     [Fact]
-    public void Projects_under_src_and_tests_reference_split_shared_packages_they_import_directly()
+    public void Projects_under_src_and_tests_reference_framework_packages_they_import_directly()
     {
         string repositoryRoot = FindRepositoryRoot();
         string srcRoot = Path.Combine(repositoryRoot, "src");
         string testsRoot = Path.Combine(repositoryRoot, "tests");
-        string sharedRoot = Path.Combine(srcRoot, "Shared");
-        string[] sharedProjectNames = Directory
-            .EnumerateFiles(sharedRoot, "*.csproj", SearchOption.AllDirectories)
+        string frameworkRoot = Path.Combine(srcRoot, "Framework");
+        string[] frameworkProjectNames = Directory
+            .EnumerateFiles(frameworkRoot, "*.csproj", SearchOption.AllDirectories)
             .Where(path => !HasIgnoredPathSegment(path))
             .Select(Path.GetFileNameWithoutExtension)
             .Where(projectName => !string.IsNullOrWhiteSpace(projectName))
@@ -4385,7 +4567,7 @@ public sealed partial class DeveloperExperienceGuardTests
                         string source = File.ReadAllText(sourcePath);
                         string relativeSourcePath = Path.GetRelativePath(repositoryRoot, sourcePath);
 
-                        return SharedUsingNamespacePattern()
+                        return FrameworkUsingNamespacePattern()
                             .Matches(source)
                             .Select(match => match.Groups["namespace"].Value)
                             .Distinct(StringComparer.Ordinal)
@@ -4393,15 +4575,15 @@ public sealed partial class DeveloperExperienceGuardTests
                             {
                                 SourcePath = relativeSourcePath,
                                 ImportedNamespace = importedNamespace,
-                                SharedProjectName = FindBestProjectNamespaceMatch(importedNamespace, sharedProjectNames)
+                                FrameworkProjectName = FindBestProjectNamespaceMatch(importedNamespace, frameworkProjectNames)
                             });
                     })
                     .Where(import =>
-                        import.SharedProjectName is not null &&
-                        !string.Equals(import.SharedProjectName, projectName, StringComparison.OrdinalIgnoreCase) &&
-                        !directReferences.Contains(import.SharedProjectName))
+                        import.FrameworkProjectName is not null &&
+                        !string.Equals(import.FrameworkProjectName, projectName, StringComparison.OrdinalIgnoreCase) &&
+                        !directReferences.Contains(import.FrameworkProjectName))
                     .Select(import =>
-                        $"{relativeProjectPath} imports {import.SharedProjectName} via {import.SourcePath}:{import.ImportedNamespace} without a direct ProjectReference")
+                        $"{relativeProjectPath} imports {import.FrameworkProjectName} via {import.SourcePath}:{import.ImportedNamespace} without a direct ProjectReference")
                     .Distinct(StringComparer.OrdinalIgnoreCase);
             })
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -4479,10 +4661,10 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Shared_infrastructure_facade_stays_tiny_and_host_level_only()
+    public void Framework_infrastructure_facade_stays_tiny_and_host_level_only()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string facadeRoot = Path.Combine(repositoryRoot, "src", "Shared", "Shared.Infrastructure");
+        string facadeRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Infrastructure");
         string[] expectedSourceFiles =
         [
             NormalizePath("DependencyInjection.cs"),
@@ -4497,12 +4679,12 @@ public sealed partial class DeveloperExperienceGuardTests
         string dependencyInjection = File.ReadAllText(Path.Combine(facadeRoot, "DependencyInjection.cs"));
         string[] requiredTokens =
         [
-            "public static IHostApplicationBuilder AddSharedInfrastructure(this IHostApplicationBuilder builder)",
+            "public static IHostApplicationBuilder AddGmaInfrastructure(this IHostApplicationBuilder builder)",
             "builder.AddTenancyInfrastructure();",
             "builder.AddRuntimeInfrastructure();",
             "builder.AddApplicationEventsInfrastructure();",
             "builder.AddCqrsInfrastructure();",
-            "SharedInfrastructureRegistrationMarker"
+            "GmaInfrastructureRegistrationMarker"
         ];
         string[] forbiddenTokens =
         [
@@ -4523,16 +4705,16 @@ public sealed partial class DeveloperExperienceGuardTests
         Assert.Equal(expectedSourceFiles.Order(StringComparer.OrdinalIgnoreCase), sourceFiles);
         Assert.Empty(requiredTokens
             .Where(token => !dependencyInjection.Contains(token, StringComparison.Ordinal))
-            .Select(token => $"Shared.Infrastructure facade missing {token}")
+            .Select(token => $"Gma.Framework.Infrastructure facade missing {token}")
             .ToArray());
         Assert.Empty(forbiddenTokens
             .Where(token => dependencyInjection.Contains(token, StringComparison.Ordinal))
-            .Select(token => $"Shared.Infrastructure facade must not compose optional adapter/runtime concern {token}")
+            .Select(token => $"Gma.Framework.Infrastructure facade must not compose optional adapter/runtime concern {token}")
             .ToArray());
     }
 
     [Fact]
-    public void Shared_infrastructure_facade_project_references_stay_host_or_facade_tests_only()
+    public void Framework_infrastructure_facade_project_references_stay_host_or_facade_tests_only()
     {
         string repositoryRoot = FindRepositoryRoot();
         HashSet<string> allowedProjectPaths = new(StringComparer.OrdinalIgnoreCase)
@@ -4542,7 +4724,7 @@ public sealed partial class DeveloperExperienceGuardTests
             NormalizePath(Path.Combine("src", "Host.AdminCli", "Host.AdminCli.csproj")),
             NormalizePath(Path.Combine("src", "Host.Worker", "Host.Worker.csproj")),
             NormalizePath(Path.Combine("tests", "Integration.Tests", "Integration.Tests.csproj")),
-            NormalizePath(Path.Combine("tests", "Shared.Tests", "Shared.Tests.csproj"))
+            NormalizePath(Path.Combine("src", "Framework", "tests", "Gma.Framework.Tests", "Gma.Framework.Tests.csproj"))
         };
 
         string[] offenders = Directory
@@ -4559,7 +4741,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Descendants("ProjectReference")
                     .Select(element => element.Attribute("Include")?.Value)
                     .Where(referencePath => !string.IsNullOrWhiteSpace(referencePath))
-                    .Where(referencePath => referencePath!.Contains("Shared.Infrastructure", StringComparison.OrdinalIgnoreCase))
+                    .Where(referencePath => referencePath!.Contains("Gma.Framework.Infrastructure", StringComparison.OrdinalIgnoreCase))
                     .Where(_ => !allowedProjectPaths.Contains(relativeProjectPath))
                     .Select(referencePath => $"{relativeProjectPath}->{referencePath}");
             })
@@ -4597,87 +4779,87 @@ public sealed partial class DeveloperExperienceGuardTests
                 [],
                 [],
                 [
-                    @"..\Modules\Administration\Administration.AdminApi\Administration.AdminApi.csproj",
-                    @"..\Modules\Administration\Administration.Persistence.PostgreSqlMigrations\Administration.Persistence.PostgreSqlMigrations.csproj",
-                    @"..\Modules\Administration\Administration.Persistence.SqlServerMigrations\Administration.Persistence.SqlServerMigrations.csproj",
-                    @"..\Modules\Auth\Auth.AdminApi\Auth.AdminApi.csproj",
-                    @"..\Modules\Auth\Auth.Contracts\Auth.Contracts.csproj",
-                    @"..\Modules\Auth\Auth.Persistence.PostgreSqlMigrations\Auth.Persistence.PostgreSqlMigrations.csproj",
-                    @"..\Modules\Auth\Auth.Persistence.SqlServerMigrations\Auth.Persistence.SqlServerMigrations.csproj",
+                    @"..\Modules\Administration\Gma.Modules.Administration.AdminApi\Gma.Modules.Administration.AdminApi.csproj",
+                    @"..\Modules\Administration\Gma.Modules.Administration.Persistence.PostgreSqlMigrations\Gma.Modules.Administration.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\Administration\Gma.Modules.Administration.Persistence.SqlServerMigrations\Gma.Modules.Administration.Persistence.SqlServerMigrations.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.AdminApi\Gma.Modules.Auth.AdminApi.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj",
                     @"..\ServiceDefaults\ServiceDefaults.csproj",
-                    @"..\Shared\Shared.Administration.Api\Shared.Administration.Api.csproj",
-                    @"..\Shared\Shared.Api\Shared.Api.csproj",
-                    @"..\Shared\Shared.Api.OpenApi\Shared.Api.OpenApi.csproj",
-                    @"..\Shared\Shared.Api.Serilog\Shared.Api.Serilog.csproj",
-                    @"..\Shared\Shared.Caching.Cqrs\Shared.Caching.Cqrs.csproj",
-                    @"..\Shared\Shared.Caching.Redis\Shared.Caching.Redis.csproj",
-                    @"..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj",
-                    @"..\Shared\Shared.Logging.Serilog\Shared.Logging.Serilog.csproj",
-                    @"..\Shared\Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj",
-                    @"..\Shared\Shared.Messaging.Nats.Aspire\Shared.Messaging.Nats.Aspire.csproj",
-                    @"..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared\Shared.Tenancy.Api.Serilog\Shared.Tenancy.Api.Serilog.csproj",
-                    @"..\Shared\Shared.Tenancy.Caching\Shared.Tenancy.Caching.csproj",
-                    @"..\Shared\Shared.Tenancy.Messaging.Infrastructure\Shared.Tenancy.Messaging.Infrastructure.csproj"
+                    @"..\Framework\Gma.Framework.Administration.Api\Gma.Framework.Administration.Api.csproj",
+                    @"..\Framework\Gma.Framework.Api\Gma.Framework.Api.csproj",
+                    @"..\Framework\Gma.Framework.Api.OpenApi\Gma.Framework.Api.OpenApi.csproj",
+                    @"..\Framework\Gma.Framework.Api.Serilog\Gma.Framework.Api.Serilog.csproj",
+                    @"..\Framework\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj",
+                    @"..\Framework\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj",
+                    @"..\Framework\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Logging.Serilog\Gma.Framework.Logging.Serilog.csproj",
+                    @"..\Framework\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Messaging.Nats.Aspire\Gma.Framework.Messaging.Nats.Aspire.csproj",
+                    @"..\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Api.Serilog\Gma.Framework.Tenancy.Api.Serilog.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj"
                 ]),
             new(
                 Path.Combine("Host.AdminCli", "Host.AdminCli.csproj"),
                 ["Microsoft.Extensions.Hosting", "System.CommandLine"],
                 [],
                 [
-                    @"..\Modules\Administration\Administration.AdminCli\Administration.AdminCli.csproj",
-                    @"..\Modules\Administration\Administration.Persistence.PostgreSqlMigrations\Administration.Persistence.PostgreSqlMigrations.csproj",
-                    @"..\Modules\Administration\Administration.Persistence.SqlServerMigrations\Administration.Persistence.SqlServerMigrations.csproj",
-                    @"..\Modules\Auth\Auth.AdminCli\Auth.AdminCli.csproj",
-                    @"..\Modules\Auth\Auth.Contracts\Auth.Contracts.csproj",
-                    @"..\Modules\Auth\Auth.Persistence.PostgreSqlMigrations\Auth.Persistence.PostgreSqlMigrations.csproj",
-                    @"..\Modules\Auth\Auth.Persistence.SqlServerMigrations\Auth.Persistence.SqlServerMigrations.csproj",
-                    @"..\Shared\Shared.Administration.Cli\Shared.Administration.Cli.csproj",
-                    @"..\Shared\Shared.Caching.Cqrs\Shared.Caching.Cqrs.csproj",
-                    @"..\Shared\Shared.Caching.Redis\Shared.Caching.Redis.csproj",
-                    @"..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj",
-                    @"..\Shared\Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj",
-                    @"..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared\Shared.Tenancy.Caching\Shared.Tenancy.Caching.csproj",
-                    @"..\Shared\Shared.Tenancy.Messaging.Infrastructure\Shared.Tenancy.Messaging.Infrastructure.csproj"
+                    @"..\Modules\Administration\Gma.Modules.Administration.AdminCli\Gma.Modules.Administration.AdminCli.csproj",
+                    @"..\Modules\Administration\Gma.Modules.Administration.Persistence.PostgreSqlMigrations\Gma.Modules.Administration.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\Administration\Gma.Modules.Administration.Persistence.SqlServerMigrations\Gma.Modules.Administration.Persistence.SqlServerMigrations.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.AdminCli\Gma.Modules.Auth.AdminCli.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj",
+                    @"..\Framework\Gma.Framework.Administration.Cli\Gma.Framework.Administration.Cli.csproj",
+                    @"..\Framework\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj",
+                    @"..\Framework\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj",
+                    @"..\Framework\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj"
                 ]),
             new(
                 Path.Combine("Host.Api", "Host.Api.csproj"),
                 [],
                 [],
                 [
-                    @"..\Modules\Auth\Auth.Api\Auth.Api.csproj",
-                    @"..\Modules\Auth\Auth.Contracts\Auth.Contracts.csproj",
-                    @"..\Modules\Auth\Auth.Persistence.PostgreSqlMigrations\Auth.Persistence.PostgreSqlMigrations.csproj",
-                    @"..\Modules\Auth\Auth.Persistence.SqlServerMigrations\Auth.Persistence.SqlServerMigrations.csproj",
-                    @"..\Modules\Tenancy\Tenancy.Api\Tenancy.Api.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Api\Gma.Modules.Auth.Api.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj",
+                    @"..\Modules\Tenancy\Gma.Modules.Tenancy.Api\Gma.Modules.Tenancy.Api.csproj",
                     @"..\ServiceDefaults\ServiceDefaults.csproj",
-                    @"..\Shared\Shared.Api\Shared.Api.csproj",
-                    @"..\Shared\Shared.Api.OpenApi\Shared.Api.OpenApi.csproj",
-                    @"..\Shared\Shared.Api.Serilog\Shared.Api.Serilog.csproj",
-                    @"..\Shared\Shared.Caching.Cqrs\Shared.Caching.Cqrs.csproj",
-                    @"..\Shared\Shared.Caching.Redis\Shared.Caching.Redis.csproj",
-                    @"..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj",
-                    @"..\Shared\Shared.Logging.Serilog\Shared.Logging.Serilog.csproj",
-                    @"..\Shared\Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj",
-                    @"..\Shared\Shared.Messaging.Nats.Aspire\Shared.Messaging.Nats.Aspire.csproj",
-                    @"..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared\Shared.Notifications.Api\Shared.Notifications.Api.csproj",
-                    @"..\Shared\Shared.Notifications.Cqrs\Shared.Notifications.Cqrs.csproj",
-                    @"..\Shared\Shared.Notifications.SignalR\Shared.Notifications.SignalR.csproj",
-                    @"..\Shared\Shared.Tenancy.Api.Serilog\Shared.Tenancy.Api.Serilog.csproj",
-                    @"..\Shared\Shared.Tenancy.Caching\Shared.Tenancy.Caching.csproj",
-                    @"..\Shared\Shared.Tenancy.Messaging.Infrastructure\Shared.Tenancy.Messaging.Infrastructure.csproj"
+                    @"..\Framework\Gma.Framework.Api\Gma.Framework.Api.csproj",
+                    @"..\Framework\Gma.Framework.Api.OpenApi\Gma.Framework.Api.OpenApi.csproj",
+                    @"..\Framework\Gma.Framework.Api.Serilog\Gma.Framework.Api.Serilog.csproj",
+                    @"..\Framework\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj",
+                    @"..\Framework\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj",
+                    @"..\Framework\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Logging.Serilog\Gma.Framework.Logging.Serilog.csproj",
+                    @"..\Framework\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Messaging.Nats.Aspire\Gma.Framework.Messaging.Nats.Aspire.csproj",
+                    @"..\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Framework\Gma.Framework.Notifications.Api\Gma.Framework.Notifications.Api.csproj",
+                    @"..\Framework\Gma.Framework.Notifications.Cqrs\Gma.Framework.Notifications.Cqrs.csproj",
+                    @"..\Framework\Gma.Framework.Notifications.SignalR\Gma.Framework.Notifications.SignalR.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Api.Serilog\Gma.Framework.Tenancy.Api.Serilog.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj"
                 ]),
             new(
                 Path.Combine("Host.Worker", "Host.Worker.csproj"),
                 ["Microsoft.Extensions.Hosting"],
                 [],
                 [
-                    @"..\Modules\Auth\Auth.Contracts\Auth.Contracts.csproj",
-                    @"..\Modules\Auth\Auth.Persistence\Auth.Persistence.csproj",
-                    @"..\Modules\Auth\Auth.Persistence.PostgreSqlMigrations\Auth.Persistence.PostgreSqlMigrations.csproj",
-                    @"..\Modules\Auth\Auth.Persistence.SqlServerMigrations\Auth.Persistence.SqlServerMigrations.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence\Gma.Modules.Auth.Persistence.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\Catalog\Catalog.Application\Catalog.Application.csproj",
                     @"..\Modules\Catalog\Catalog.Contracts\Catalog.Contracts.csproj",
                     @"..\Modules\Catalog\Catalog.Persistence\Catalog.Persistence.csproj",
@@ -4688,25 +4870,25 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\Ordering\Ordering.Persistence\Ordering.Persistence.csproj",
                     @"..\Modules\Ordering\Ordering.Persistence.PostgreSqlMigrations\Ordering.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Ordering\Ordering.Persistence.SqlServerMigrations\Ordering.Persistence.SqlServerMigrations.csproj",
-                    @"..\Modules\TaskRuntime\TaskRuntime.Application\TaskRuntime.Application.csproj",
-                    @"..\Modules\TaskRuntime\TaskRuntime.Contracts\TaskRuntime.Contracts.csproj",
-                    @"..\Modules\TaskRuntime\TaskRuntime.Persistence\TaskRuntime.Persistence.csproj",
-                    @"..\Modules\TaskRuntime\TaskRuntime.Persistence.PostgreSqlMigrations\TaskRuntime.Persistence.PostgreSqlMigrations.csproj",
-                    @"..\Modules\TaskRuntime\TaskRuntime.Persistence.SqlServerMigrations\TaskRuntime.Persistence.SqlServerMigrations.csproj",
+                    @"..\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Application\Gma.Modules.TaskRuntime.Application.csproj",
+                    @"..\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Contracts\Gma.Modules.TaskRuntime.Contracts.csproj",
+                    @"..\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Persistence\Gma.Modules.TaskRuntime.Persistence.csproj",
+                    @"..\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations\Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\TaskSamples\TaskSamples.Application\TaskSamples.Application.csproj",
                     @"..\ServiceDefaults\ServiceDefaults.csproj",
-                    @"..\Shared\Shared.Caching.Cqrs\Shared.Caching.Cqrs.csproj",
-                    @"..\Shared\Shared.Caching.Redis\Shared.Caching.Redis.csproj",
-                    @"..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj",
-                    @"..\Shared\Shared.Logging.Serilog\Shared.Logging.Serilog.csproj",
-                    @"..\Shared\Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj",
-                    @"..\Shared\Shared.Messaging.Nats.Aspire\Shared.Messaging.Nats.Aspire.csproj",
-                    @"..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj",
-                    @"..\Shared\Shared.Tasks.Cqrs\Shared.Tasks.Cqrs.csproj",
-                    @"..\Shared\Shared.Tasks.Infrastructure\Shared.Tasks.Infrastructure.csproj",
-                    @"..\Shared\Shared.Tenancy.Caching\Shared.Tenancy.Caching.csproj",
-                    @"..\Shared\Shared.Tenancy.Messaging.Infrastructure\Shared.Tenancy.Messaging.Infrastructure.csproj",
-                    @"..\Shared\Shared.Tenancy.Tasks\Shared.Tenancy.Tasks.csproj"
+                    @"..\Framework\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj",
+                    @"..\Framework\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj",
+                    @"..\Framework\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Logging.Serilog\Gma.Framework.Logging.Serilog.csproj",
+                    @"..\Framework\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Messaging.Nats.Aspire\Gma.Framework.Messaging.Nats.Aspire.csproj",
+                    @"..\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Framework\Gma.Framework.Tasks.Cqrs\Gma.Framework.Tasks.Cqrs.csproj",
+                    @"..\Framework\Gma.Framework.Tasks.Infrastructure\Gma.Framework.Tasks.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj",
+                    @"..\Framework\Gma.Framework.Tenancy.Tasks\Gma.Framework.Tenancy.Tasks.csproj"
                 ]),
             new(
                 Path.Combine("ServiceDefaults", "ServiceDefaults.csproj"),
@@ -4721,8 +4903,8 @@ public sealed partial class DeveloperExperienceGuardTests
                 ],
                 ["Microsoft.AspNetCore.App"],
                 [
-                    @"..\Shared\Shared.Naming\Shared.Naming.csproj",
-                    @"..\Shared\Shared.Runtime\Shared.Runtime.csproj"
+                    @"..\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Framework\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
                 ])
         ];
         HashSet<string> expectedProjectPaths = expectedShapes
@@ -4766,11 +4948,11 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Shared_administration_core_remains_backend_agnostic()
+    public void Framework_administration_core_remains_backend_agnostic()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedAdministrationRoot = Path.Combine(repositoryRoot, "src", "Shared", "Shared.Administration");
-        string projectPath = Path.Combine(sharedAdministrationRoot, "Shared.Administration.csproj");
+        string sharedAdministrationRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Administration");
+        string projectPath = Path.Combine(sharedAdministrationRoot, "Gma.Framework.Administration.csproj");
         XDocument project = XDocument.Load(projectPath);
         string[] forbiddenPackages =
         [
@@ -4795,13 +4977,13 @@ public sealed partial class DeveloperExperienceGuardTests
             .Descendants("PackageReference")
             .Select(element => element.Attribute("Include")?.Value)
             .Where(packageId => packageId is not null && forbiddenPackages.Contains(packageId, StringComparer.Ordinal))
-            .Select(packageId => $"Shared.Administration.csproj:{packageId}")
+            .Select(packageId => $"Gma.Framework.Administration.csproj:{packageId}")
             .ToArray();
         string[] frameworkOffenders = project
             .Descendants("FrameworkReference")
             .Select(element => element.Attribute("Include")?.Value)
             .Where(reference => reference is not null && forbiddenFrameworkReferences.Contains(reference, StringComparer.Ordinal))
-            .Select(reference => $"Shared.Administration.csproj:{reference}")
+            .Select(reference => $"Gma.Framework.Administration.csproj:{reference}")
             .ToArray();
         string[] sourceOffenders = EnumerateSourceFiles(sharedAdministrationRoot)
             .SelectMany(path =>
@@ -4821,11 +5003,11 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Shared_access_control_core_remains_backend_agnostic()
+    public void Framework_access_control_core_remains_backend_agnostic()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedAccessControlRoot = Path.Combine(repositoryRoot, "src", "Shared", "Shared.AccessControl");
-        string projectPath = Path.Combine(sharedAccessControlRoot, "Shared.AccessControl.csproj");
+        string sharedAccessControlRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.AccessControl");
+        string projectPath = Path.Combine(sharedAccessControlRoot, "Gma.Framework.AccessControl.csproj");
         XDocument project = XDocument.Load(projectPath);
         string[] forbiddenPackages =
         [
@@ -4859,13 +5041,13 @@ public sealed partial class DeveloperExperienceGuardTests
             .Descendants("PackageReference")
             .Select(element => element.Attribute("Include")?.Value)
             .Where(packageId => packageId is not null && forbiddenPackages.Contains(packageId, StringComparer.Ordinal))
-            .Select(packageId => $"Shared.AccessControl.csproj:{packageId}")
+            .Select(packageId => $"Gma.Framework.AccessControl.csproj:{packageId}")
             .ToArray();
         string[] frameworkOffenders = project
             .Descendants("FrameworkReference")
             .Select(element => element.Attribute("Include")?.Value)
             .Where(reference => reference is not null && forbiddenFrameworkReferences.Contains(reference, StringComparer.Ordinal))
-            .Select(reference => $"Shared.AccessControl.csproj:{reference}")
+            .Select(reference => $"Gma.Framework.AccessControl.csproj:{reference}")
             .ToArray();
         string[] sourceOffenders = EnumerateSourceFiles(sharedAccessControlRoot)
             .SelectMany(path =>
@@ -4912,10 +5094,10 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Replace(".PostgreSqlMigrations", string.Empty, StringComparison.Ordinal);
                 string expectedReference = $"..\\{owningPersistenceProject}\\{owningPersistenceProject}.csproj";
                 const string SharedEfDesignHelperReference =
-                    @"..\..\..\Shared\Shared.Persistence.EntityFrameworkCore\Shared.Persistence.EntityFrameworkCore.csproj";
+                    @"..\..\..\Framework\Gma.Framework.Persistence.EntityFrameworkCore\Gma.Framework.Persistence.EntityFrameworkCore.csproj";
 
-                return !string.Equals(reference.ReferencePath, expectedReference, StringComparison.OrdinalIgnoreCase) &&
-                       !string.Equals(reference.ReferencePath, SharedEfDesignHelperReference, StringComparison.OrdinalIgnoreCase);
+                return !string.Equals(reference.ReferencePath, NormalizePath(expectedReference), StringComparison.OrdinalIgnoreCase) &&
+                       !string.Equals(reference.ReferencePath, NormalizePath(SharedEfDesignHelperReference), StringComparison.OrdinalIgnoreCase);
             })
             .Select(reference => $"{reference.ProjectPath}->{reference.ReferencePath}")
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -4943,13 +5125,14 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string repositoryRoot = FindRepositoryRoot();
         string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
-        HashSet<string> allowedProjectReferences = new(StringComparer.OrdinalIgnoreCase)
-        {
-            @"..\..\..\Shared\Shared.Domain\Shared.Domain.csproj",
-            @"..\..\..\Shared\Shared.Naming\Shared.Naming.csproj",
-            @"..\..\..\Shared\Shared.Numerics\Shared.Numerics.csproj",
-            @"..\..\..\Shared\Shared.Results\Shared.Results.csproj"
-        };
+        HashSet<string> allowedProjectReferences = new(
+            [
+                NormalizePath(@"..\..\..\Framework\Gma.Framework.Domain\Gma.Framework.Domain.csproj"),
+                NormalizePath(@"..\..\..\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj"),
+                NormalizePath(@"..\..\..\Framework\Gma.Framework.Numerics\Gma.Framework.Numerics.csproj"),
+                NormalizePath(@"..\..\..\Framework\Gma.Framework.Results\Gma.Framework.Results.csproj")
+            ],
+            StringComparer.OrdinalIgnoreCase);
         string[] offenders = Directory
             .EnumerateFiles(modulesRoot, "*.Domain.csproj", SearchOption.AllDirectories)
             .Where(path => !HasIgnoredPathSegment(path))
@@ -4961,7 +5144,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Descendants("ProjectReference")
                     .Select(element => element.Attribute("Include")?.Value)
                     .Where(reference => !string.IsNullOrWhiteSpace(reference))
-                    .Where(reference => !allowedProjectReferences.Contains(reference!))
+                    .Where(reference => !allowedProjectReferences.Contains(NormalizePath(reference!)))
                     .Select(reference => $"{relativePath}->ProjectReference:{reference}")
                     .ToArray();
                 string[] packageReferences = project
@@ -5318,7 +5501,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] offenders = EnumerateProjectReferences(repositoryRoot)
             .Where(reference => IsPublicModuleContractsProject(reference.ProjectPath))
-            .Where(reference => reference.ReferencePath.Contains("Shared.Administration", StringComparison.OrdinalIgnoreCase))
+            .Where(reference => reference.ReferencePath.Contains("Gma.Framework.Administration", StringComparison.OrdinalIgnoreCase))
             .Select(reference => $"{reference.ProjectPath}->{reference.ReferencePath}")
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -5332,7 +5515,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] offenders = EnumerateProjectReferences(repositoryRoot)
             .Where(reference => IsModuleFrontDoorProject(reference.ProjectPath))
-            .Where(reference => reference.ReferencePath.Contains("Shared.Infrastructure", StringComparison.OrdinalIgnoreCase))
+            .Where(reference => reference.ReferencePath.Contains("Gma.Framework.Infrastructure", StringComparison.OrdinalIgnoreCase))
             .Select(reference => $"{reference.ProjectPath}->{reference.ReferencePath}")
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -5431,17 +5614,17 @@ public sealed partial class DeveloperExperienceGuardTests
             ".Build()",
             "$metadataDescriptorLines = @(",
             "$metadataDescriptor = $metadataDescriptorLines -join \"`r`n\"",
-            "using Shared.Modules;",
-            "Shared\\Shared.Modules\\Shared.Modules.csproj",
-            "using Shared.Authorization;",
-            "Shared\\Shared.Authorization\\Shared.Authorization.csproj",
-            "Shared\\Shared.Messaging\\Shared.Messaging.csproj",
+            "using Gma.Framework.Modules;",
+            "$(GmaFrameworkRoot)Gma.Framework.Modules\\Gma.Framework.Modules.csproj",
+            "using Gma.Framework.Authorization;",
+            "$(GmaFrameworkRoot)Gma.Framework.Authorization\\Gma.Framework.Authorization.csproj",
+            "$(GmaFrameworkRoot)Gma.Framework.Messaging\\Gma.Framework.Messaging.csproj",
             "Write-GmaFile (Join-Path $moduleRoot \"$Name.Contracts\\Metadata\\${Name}ModuleMetadata.cs\")",
             "tenantScoped: true",
             "ModuleCacheTag",
             "ModuleCacheEntry",
-            "using Shared.Caching;",
-            "Shared\\Shared.Caching\\Shared.Caching.csproj",
+            "using Gma.Framework.Caching;",
+            "$(GmaFrameworkRoot)Gma.Framework.Caching\\Gma.Framework.Caching.csproj",
             ".WithPermission($metadataPermissionDescriptor)",
             ".WithCacheEntry(new ModuleCacheDescriptor(ModuleCacheEntry, CacheScope.Tenant, [ModuleCacheTag]))",
             "public static CacheKey ModuleKey(params string[] segments) => CacheKey.Tenant(",
@@ -5457,7 +5640,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "IAdminCliModule",
             "IAdminCliCommandRegistry",
             "using Microsoft.AspNetCore.Http;",
-            "using Shared.Administration.Cli;",
+            "using Gma.Framework.Administration.Cli;",
             "AdminPermissionCodes",
             "AdminOperationNames",
             "ModulePermissionDescriptor(${Name}AdminPermissionCodes.Manage",
@@ -5687,8 +5870,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string scaffolder = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-module.ps1"));
         string[] requiredTokens =
         [
-            "using Shared.Naming;",
-            "using Shared.Runtime.Identity;",
+            "using Gma.Framework.Naming;",
+            "using Gma.Framework.Runtime.Identity;",
             "IIdGenerator idGenerator",
             ": EfInboxStore<${Name}DbContext>(dbContext, clock, idGenerator,"
         ];
@@ -5709,7 +5892,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] requiredTokens =
         [
             "using Microsoft.Extensions.Options;",
-            "using Shared.Naming;",
+            "using Gma.Framework.Naming;",
             ": EfOutboxStore<${Name}DbContext>(dbContext, options, ${Name}Migrations.Schema);"
         ];
         string[] forbiddenTokens =
@@ -5739,8 +5922,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string scaffolder = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-module.ps1"));
         string[] requiredTokens =
         [
-            "Shared.Administration.Cli",
-            "using Shared.Administration.Cli;",
+            "Gma.Framework.Administration.Cli",
+            "using Gma.Framework.Administration.Cli;",
             "IAdminCliModule"
         ];
         string[] forbiddenTokens =
@@ -5778,8 +5961,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] requiredTokens =
         [
             "using Microsoft.Extensions.Options;",
-            "using Shared.Runtime;",
-            "using Shared.Runtime.Time;",
+            "using Gma.Framework.Runtime;",
+            "using Gma.Framework.Runtime.Time;",
             "IOptions<ApplicationIdentityOptions> applicationIdentity",
             ": EfOutboxWriter<${Name}DbContext>(dbContext, clock, applicationIdentity, ${Name}Migrations.Schema);"
         ];
@@ -5808,8 +5991,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string scaffolder = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-module.ps1"));
         List<string> requiredTokens =
         [
-            @"Shared\Shared.Naming\Shared.Naming.csproj",
-            "using Shared.Naming;"
+            @"$(GmaFrameworkRoot)Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+            "using Gma.Framework.Naming;"
         ];
         if (scaffolder.Contains("TenantId", StringComparison.Ordinal))
         {
@@ -5818,7 +6001,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
         string[] forbiddenTokens =
         [
-            "using Shared.Domain;"
+            "using Gma.Framework.Domain;"
         ];
         string[] offenders = requiredTokens
             .Where(token => !scaffolder.Contains(token, StringComparison.Ordinal))
@@ -5970,6 +6153,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
         string[] offenders = EnumerateSourceFiles(modulesRoot)
             .Where(path => !IsGeneratedMigrationSource(path))
+            .Where(path => !IsTestSourcePath(path))
             .SelectMany(path =>
             {
                 string source = File.ReadAllText(path);
@@ -5984,10 +6168,10 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Shared_infrastructure_centralizes_direct_time_and_id_creation()
+    public void Framework_infrastructure_centralizes_direct_time_and_id_creation()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedInfrastructureRoot = Path.Combine(repositoryRoot, "src", "Shared", "Shared.Runtime.Infrastructure");
+        string sharedInfrastructureRoot = Path.Combine(repositoryRoot, "src", "Framework", "Gma.Framework.Runtime.Infrastructure");
         string[] forbiddenTokens =
         [
             "Guid.NewGuid(",
@@ -6019,43 +6203,43 @@ public sealed partial class DeveloperExperienceGuardTests
         string coreSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Infrastructure",
+            "Framework",
+            "Gma.Framework.Infrastructure",
             "DependencyInjection.cs"));
         string cachingSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Caching.Infrastructure",
+            "Framework",
+            "Gma.Framework.Caching.Infrastructure",
             "DependencyInjection.cs"));
         string messagingSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Messaging.Infrastructure",
+            "Framework",
+            "Gma.Framework.Messaging.Infrastructure",
             "DependencyInjection.cs"));
         string natsSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Messaging.Nats",
+            "Framework",
+            "Gma.Framework.Messaging.Nats",
             "DependencyInjection.cs"));
         string tenancySource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Tenancy.Infrastructure",
+            "Framework",
+            "Gma.Framework.Tenancy.Infrastructure",
             "DependencyInjection.cs"));
         (string SourceName, string Source, string[] Tokens)[] requiredSources =
         [
             new(
-                "Shared.Infrastructure",
+                "Gma.Framework.Infrastructure",
                 coreSource,
                 [
                     "builder.AddTenancyInfrastructure();"
                 ]),
             new(
-                "Shared.Tenancy.Infrastructure",
+                "Gma.Framework.Tenancy.Infrastructure",
                 tenancySource,
                 [
                     "new TenantOptionsValidator()",
@@ -6063,7 +6247,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     ".ValidateOnStart()"
                 ]),
             new(
-                "Shared.Caching.Infrastructure",
+                "Gma.Framework.Caching.Infrastructure",
                 cachingSource,
                 [
                     "new CachingOptionsValidator()",
@@ -6072,7 +6256,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     ".ValidateOnStart()"
                 ]),
             new(
-                "Shared.Messaging.Infrastructure",
+                "Gma.Framework.Messaging.Infrastructure",
                 messagingSource,
                 [
                     "new OutboxOptionsValidator()",
@@ -6080,7 +6264,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     ".ValidateOnStart()"
                 ]),
             new(
-                "Shared.Messaging.Nats",
+                "Gma.Framework.Messaging.Nats",
                 natsSource,
                 [
                     "new NatsJetStreamOptionsValidator()",
@@ -6107,8 +6291,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string source = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Messaging.Infrastructure",
+            "Framework",
+            "Gma.Framework.Messaging.Infrastructure",
             "DependencyInjection.cs"));
 
         AssertMethodContains(source, "AddMessagingInfrastructure", "builder.AddRuntimeInfrastructure();");
@@ -6117,8 +6301,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string natsSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Messaging.Nats",
+            "Framework",
+            "Gma.Framework.Messaging.Nats",
             "DependencyInjection.cs"));
         AssertMethodContains(natsSource, "AddNatsJetStreamMessaging", "builder.AddMessagingInfrastructure();");
         AssertMethodContains(natsSource, "AddNatsJetStreamConsumers", "builder.AddMessagingInfrastructure();");
@@ -6130,8 +6314,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string allowedRelativePath = NormalizePath(Path.Combine(
             "src",
-            "Shared",
-            "Shared.Observability",
+            "Framework",
+            "Gma.Framework.Observability",
             "ObservabilityInstrumentNames.cs"));
         string[] sharedInstrumentNames =
         [
@@ -6181,8 +6365,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string cqrsRoot = Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Cqrs.Infrastructure");
+            "Framework",
+            "Gma.Framework.Cqrs.Infrastructure");
         string[] behaviorFiles =
         [
             Path.Combine(cqrsRoot, "ValidationCommandBehavior.cs"),
@@ -6209,8 +6393,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string sharedInfrastructureSource = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Infrastructure",
+            "Framework",
+            "Gma.Framework.Infrastructure",
             "DependencyInjection.cs"));
         string scaffolder = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-module.ps1"));
         string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
@@ -6466,8 +6650,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string source = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Caching.Redis",
+            "Framework",
+            "Gma.Framework.Caching.Redis",
             "DependencyInjection.cs"));
         string[] requiredTokens =
         [
@@ -6476,7 +6660,7 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         string[] offenders = requiredTokens
             .Where(token => !source.Contains(token, StringComparison.Ordinal))
-            .Select(token => $"Shared.Caching.Redis dependency injection missing {token}")
+            .Select(token => $"Gma.Framework.Caching.Redis dependency injection missing {token}")
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -6513,8 +6697,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string source = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
-            "Shared",
-            "Shared.Administration.Api",
+            "Framework",
+            "Gma.Framework.Administration.Api",
             "DependencyInjection.cs"));
         string[] requiredTokens =
         [
@@ -6523,7 +6707,7 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         string[] offenders = requiredTokens
             .Where(token => !source.Contains(token, StringComparison.Ordinal))
-            .Select(token => $"Shared.Administration.Api dependency injection missing {token}")
+            .Select(token => $"Gma.Framework.Administration.Api dependency injection missing {token}")
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -6539,8 +6723,17 @@ public sealed partial class DeveloperExperienceGuardTests
     private static string ModuleNameFromAssembly(Assembly assembly)
     {
         string assemblyName = assembly.GetName().Name ?? string.Empty;
-        int separatorIndex = assemblyName.IndexOf('.', StringComparison.Ordinal);
-        string modulePrefix = separatorIndex > 0 ? assemblyName[..separatorIndex] : assemblyName;
+        ModuleProject? project = ArchitectureCatalog.ModuleProjects
+            .FirstOrDefault(item => ReferenceEquals(item.Assembly, assembly) || item.Assembly == assembly);
+        if (project is not null)
+        {
+            return ResolveModuleName(project.ModulePrefix);
+        }
+
+        string[] segments = assemblyName.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        string modulePrefix = segments is ["Gma", "Modules", { } reusableModule, ..]
+            ? reusableModule
+            : segments.FirstOrDefault() ?? assemblyName;
 
         return ResolveModuleName(modulePrefix);
     }
@@ -6721,7 +6914,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Descendants("ProjectReference")
                     .Select(element => element.Attribute("Include")?.Value)
                     .Where(referencePath => !string.IsNullOrWhiteSpace(referencePath))
-                    .Select(referencePath => new ProjectReference(relativePath, referencePath!));
+                    .Select(referencePath => new ProjectReference(relativePath, NormalizePath(referencePath!)));
             });
     }
 
@@ -6731,7 +6924,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string projectName = Path.GetFileNameWithoutExtension(normalizedPath);
 
         return string.Equals(projectName, "Host.AdminCli", StringComparison.Ordinal) ||
-               string.Equals(projectName, "Shared.Administration.Cli", StringComparison.Ordinal) ||
+               string.Equals(projectName, "Gma.Framework.Administration.Cli", StringComparison.Ordinal) ||
                (IsModuleProject(normalizedPath) &&
                 projectName.EndsWith(".AdminCli", StringComparison.Ordinal));
     }
@@ -6739,12 +6932,28 @@ public sealed partial class DeveloperExperienceGuardTests
     private static bool IsModuleProject(string projectPath) =>
         NormalizePath(projectPath).StartsWith(
             $"src{Path.DirectorySeparatorChar}Modules{Path.DirectorySeparatorChar}",
-            StringComparison.OrdinalIgnoreCase);
+            StringComparison.OrdinalIgnoreCase) &&
+        !IsTestProjectPath(projectPath);
 
     private static bool IsProductionProjectPath(string projectPath) =>
         NormalizePath(projectPath).StartsWith(
             $"src{Path.DirectorySeparatorChar}",
-            StringComparison.OrdinalIgnoreCase);
+            StringComparison.OrdinalIgnoreCase) &&
+        !IsTestProjectPath(projectPath);
+
+    private static bool IsTestProjectPath(string projectPath)
+    {
+        string normalizedPath = NormalizePath(projectPath);
+        string projectName = Path.GetFileNameWithoutExtension(normalizedPath);
+
+        return normalizedPath.StartsWith(
+                   $"tests{Path.DirectorySeparatorChar}",
+                   StringComparison.OrdinalIgnoreCase) ||
+               projectName.EndsWith(".Tests", StringComparison.Ordinal);
+    }
+
+    private static bool IsTestSourcePath(string sourcePath) =>
+        FindOwningProjectName(sourcePath)?.EndsWith(".Tests", StringComparison.Ordinal) == true;
 
     private static bool IsPublicModuleContractsProject(string projectPath)
     {
@@ -6761,31 +6970,31 @@ public sealed partial class DeveloperExperienceGuardTests
         string normalizedReference = NormalizePath(referencePath);
         HashSet<string> allowedSharedReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            NormalizePath(@"..\..\..\Shared\Shared.AccessControl\Shared.AccessControl.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Application.Events\Shared.Application.Events.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Application.Composition\Shared.Application.Composition.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Caching\Shared.Caching.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Cqrs\Shared.Cqrs.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Domain\Shared.Domain.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.FileManagement\Shared.FileManagement.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Naming\Shared.Naming.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Results\Shared.Results.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Messaging\Shared.Messaging.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Notifications\Shared.Notifications.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Pagination\Shared.Pagination.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.ProjectionRebuild\Shared.ProjectionRebuild.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.ProjectionRebuild.Tasks\Shared.ProjectionRebuild.Tasks.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Runtime\Shared.Runtime.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tasks.Cqrs\Shared.Tasks.Cqrs.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tasks\Shared.Tasks.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj")
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Application.Composition\Gma.Framework.Application.Composition.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Caching\Gma.Framework.Caching.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Domain\Gma.Framework.Domain.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.FileManagement\Gma.Framework.FileManagement.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Results\Gma.Framework.Results.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Pagination\Gma.Framework.Pagination.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild.Tasks\Gma.Framework.ProjectionRebuild.Tasks.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks.Cqrs\Gma.Framework.Tasks.Cqrs.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj")
         };
 
         return allowedSharedReferences.Contains(normalizedReference) ||
-               (string.Equals(moduleName, "Administration", StringComparison.Ordinal) &&
+               (IsLogicalModuleName(moduleName, "Administration") &&
                 string.Equals(
                     normalizedReference,
-                    NormalizePath(@"..\..\..\Shared\Shared.Administration\Shared.Administration.csproj"),
+                    NormalizePath(@"..\..\..\Framework\Gma.Framework.Administration\Gma.Framework.Administration.csproj"),
                     StringComparison.OrdinalIgnoreCase)) ||
                string.Equals(
                    normalizedReference,
@@ -6803,23 +7012,23 @@ public sealed partial class DeveloperExperienceGuardTests
         string normalizedReference = NormalizePath(referencePath);
         HashSet<string> allowedSharedReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            NormalizePath(@"..\..\..\Shared\Shared.AccessControl\Shared.AccessControl.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Api\Shared.Api.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Cqrs\Shared.Cqrs.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Naming\Shared.Naming.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Notifications\Shared.Notifications.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Pagination\Shared.Pagination.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Results\Shared.Results.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Security\Shared.Security.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tasks\Shared.Tasks.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj")
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Api\Gma.Framework.Api.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Pagination\Gma.Framework.Pagination.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Results\Gma.Framework.Results.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Security\Gma.Framework.Security.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj")
         };
 
         if (isAdminApi)
         {
-            allowedSharedReferences.Add(NormalizePath(@"..\..\..\Shared\Shared.Administration.Api\Shared.Administration.Api.csproj"));
-            allowedSharedReferences.Add(NormalizePath(@"..\..\..\Shared\Shared.Administration\Shared.Administration.csproj"));
+            allowedSharedReferences.Add(NormalizePath(@"..\..\..\Framework\Gma.Framework.Administration.Api\Gma.Framework.Administration.Api.csproj"));
+            allowedSharedReferences.Add(NormalizePath(@"..\..\..\Framework\Gma.Framework.Administration\Gma.Framework.Administration.csproj"));
         }
 
         return allowedSharedReferences.Contains(normalizedReference) ||
@@ -6885,15 +7094,15 @@ public sealed partial class DeveloperExperienceGuardTests
         string normalizedReference = NormalizePath(referencePath);
         HashSet<string> allowedSharedReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            NormalizePath(@"..\..\..\Shared\Shared.Administration.Cli\Shared.Administration.Cli.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Administration\Shared.Administration.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Cqrs\Shared.Cqrs.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Pagination\Shared.Pagination.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Results\Shared.Results.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Runtime\Shared.Runtime.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tasks\Shared.Tasks.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj")
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Administration.Cli\Gma.Framework.Administration.Cli.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Administration\Gma.Framework.Administration.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Pagination\Gma.Framework.Pagination.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Results\Gma.Framework.Results.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj")
         };
 
         return allowedSharedReferences.Contains(normalizedReference) ||
@@ -6925,51 +7134,51 @@ public sealed partial class DeveloperExperienceGuardTests
 
         return string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Authorization\Shared.Authorization.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Authorization\Gma.Framework.Authorization.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Caching\Shared.Caching.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Caching\Gma.Framework.Caching.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.FileManagement\Shared.FileManagement.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.FileManagement\Gma.Framework.FileManagement.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Messaging\Shared.Messaging.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Modules\Shared.Modules.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Modules\Gma.Framework.Modules.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Naming\Shared.Naming.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Notifications\Shared.Notifications.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.ProjectionRebuild\Shared.ProjectionRebuild.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Tasks\Shared.Tasks.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Tenancy.Messaging\Shared.Tenancy.Messaging.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Tenancy.Messaging\Gma.Framework.Tenancy.Messaging.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                IsOtherModuleContractsReference(moduleName, normalizedReference);
     }
@@ -6984,7 +7193,7 @@ public sealed partial class DeveloperExperienceGuardTests
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Shared\Shared.Administration\Shared.Administration.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Administration\Gma.Framework.Administration.csproj"),
                    StringComparison.OrdinalIgnoreCase);
     }
 
@@ -6993,31 +7202,31 @@ public sealed partial class DeveloperExperienceGuardTests
         string normalizedReference = NormalizePath(referencePath);
         HashSet<string> allowedSharedReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            NormalizePath(@"..\..\..\Shared\Shared.AccessControl\Shared.AccessControl.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Application.Events\Shared.Application.Events.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Cqrs\Shared.Cqrs.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Domain\Shared.Domain.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Messaging\Shared.Messaging.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.ModuleComposition\Shared.ModuleComposition.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Naming\Shared.Naming.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Notifications\Shared.Notifications.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Pagination\Shared.Pagination.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Persistence.EntityFrameworkCore\Shared.Persistence.EntityFrameworkCore.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.ProjectionRebuild.EntityFrameworkCore\Shared.ProjectionRebuild.EntityFrameworkCore.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.ProjectionRebuild\Shared.ProjectionRebuild.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Results\Shared.Results.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Runtime\Shared.Runtime.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tasks\Shared.Tasks.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tasks.Infrastructure\Shared.Tasks.Infrastructure.csproj"),
-            NormalizePath(@"..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj")
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Domain\Gma.Framework.Domain.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Pagination\Gma.Framework.Pagination.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Persistence.EntityFrameworkCore\Gma.Framework.Persistence.EntityFrameworkCore.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild.EntityFrameworkCore\Gma.Framework.ProjectionRebuild.EntityFrameworkCore.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Results\Gma.Framework.Results.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks.Infrastructure\Gma.Framework.Tasks.Infrastructure.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj")
         };
 
         return allowedSharedReferences.Contains(normalizedReference) ||
-               (string.Equals(moduleName, "Administration", StringComparison.Ordinal) &&
+               (IsLogicalModuleName(moduleName, "Administration") &&
                 string.Equals(
                     normalizedReference,
-                    NormalizePath(@"..\..\..\Shared\Shared.Administration\Shared.Administration.csproj"),
+                    NormalizePath(@"..\..\..\Framework\Gma.Framework.Administration\Gma.Framework.Administration.csproj"),
                     StringComparison.OrdinalIgnoreCase)) ||
                string.Equals(
                    normalizedReference,
@@ -7038,13 +7247,28 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         const string Prefix = "..";
         string[] segments = normalizedReference.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+        string targetProjectName = segments.Length == 5 ? segments[3] : string.Empty;
+        string expectedExampleContractsProject = segments.Length == 5 ? $"{segments[2]}.Contracts" : string.Empty;
+        string expectedReusableContractsProject = segments.Length == 5 ? $"Gma.Modules.{segments[2]}.Contracts" : string.Empty;
 
         return segments.Length == 5 &&
                string.Equals(segments[0], Prefix, StringComparison.Ordinal) &&
                string.Equals(segments[1], Prefix, StringComparison.Ordinal) &&
-               !string.Equals(segments[2], moduleName, StringComparison.OrdinalIgnoreCase) &&
-               string.Equals(segments[3], $"{segments[2]}.Contracts", StringComparison.OrdinalIgnoreCase) &&
-               string.Equals(segments[4], $"{segments[2]}.Contracts.csproj", StringComparison.OrdinalIgnoreCase);
+               !string.Equals(segments[2], LogicalModuleNameFromProjectName(moduleName), StringComparison.OrdinalIgnoreCase) &&
+               (string.Equals(targetProjectName, expectedExampleContractsProject, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(targetProjectName, expectedReusableContractsProject, StringComparison.OrdinalIgnoreCase)) &&
+               string.Equals(segments[4], $"{targetProjectName}.csproj", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsLogicalModuleName(string projectModuleName, string expectedModuleName) =>
+        string.Equals(LogicalModuleNameFromProjectName(projectModuleName), expectedModuleName, StringComparison.Ordinal);
+
+    private static string LogicalModuleNameFromProjectName(string projectModuleName)
+    {
+        string[] segments = projectModuleName.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        return segments is ["Gma", "Modules", { } reusableModule, ..]
+            ? reusableModule
+            : segments.FirstOrDefault() ?? projectModuleName;
     }
 
     private static bool IsModuleFrontDoorProject(string projectPath)
@@ -7078,12 +7302,28 @@ public sealed partial class DeveloperExperienceGuardTests
     private static bool IsAllowedDirectTimeOrIdSource(string relativePath, string token) =>
         (string.Equals(token, "Guid.NewGuid(", StringComparison.Ordinal) &&
              relativePath.EndsWith(
-             $"{Path.DirectorySeparatorChar}Shared.Runtime.Infrastructure{Path.DirectorySeparatorChar}Identity{Path.DirectorySeparatorChar}GuidIdGenerator.cs",
+             $"{Path.DirectorySeparatorChar}Gma.Framework.Runtime.Infrastructure{Path.DirectorySeparatorChar}Identity{Path.DirectorySeparatorChar}GuidIdGenerator.cs",
              StringComparison.OrdinalIgnoreCase)) ||
         (token.EndsWith("UtcNow", StringComparison.Ordinal) &&
          relativePath.EndsWith(
-             $"{Path.DirectorySeparatorChar}Shared.Runtime.Infrastructure{Path.DirectorySeparatorChar}Time{Path.DirectorySeparatorChar}SystemClock.cs",
+             $"{Path.DirectorySeparatorChar}Gma.Framework.Runtime.Infrastructure{Path.DirectorySeparatorChar}Time{Path.DirectorySeparatorChar}SystemClock.cs",
              StringComparison.OrdinalIgnoreCase));
+
+    private static IEnumerable<string> FindRawFrameworkReferencesInModuleGenerator(string repositoryRoot)
+    {
+        string scaffolderPath = Path.Combine(repositoryRoot, "eng", "new-module.ps1");
+        string scaffolder = File.ReadAllText(scaffolderPath);
+        string[] forbiddenTokens =
+        [
+            @"..\..\..\Framework\",
+            @"..\Framework\",
+            @"..\..\src\Framework\"
+        ];
+
+        return forbiddenTokens
+            .Where(token => scaffolder.Contains(token, StringComparison.OrdinalIgnoreCase))
+            .Select(token => $"eng/new-module.ps1 contains raw framework reference token {token}.");
+    }
 
     private static bool IsBackendAdapterPackage(string packageId)
     {
@@ -7114,8 +7354,35 @@ public sealed partial class DeveloperExperienceGuardTests
                packagePrefixes.Any(packageId.StartsWith);
     }
 
-    private static string NormalizePath(string path) =>
-        path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+    private static string NormalizePath(string path)
+    {
+        string normalized = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        string frameworkRootMarker = $"$GmaFrameworkRoot{Path.DirectorySeparatorChar}";
+
+        if (normalized.StartsWith("$(GmaFrameworkRoot)", StringComparison.OrdinalIgnoreCase))
+        {
+            return frameworkRootMarker + normalized["$(GmaFrameworkRoot)".Length..].TrimStart(Path.DirectorySeparatorChar);
+        }
+
+        string[] legacyFrameworkPrefixes =
+        [
+            @"..\..\..\..\Framework\",
+            @"..\..\..\Framework\",
+            @"..\..\src\Framework\",
+            @"..\Framework\"
+        ];
+
+        foreach (string legacyPrefix in legacyFrameworkPrefixes)
+        {
+            string normalizedPrefix = legacyPrefix.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            if (normalized.StartsWith(normalizedPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return frameworkRootMarker + normalized[normalizedPrefix.Length..];
+            }
+        }
+
+        return normalized;
+    }
 
     private static string? FindBestProjectNamespaceMatch(string importedNamespace, string[] projectNames) =>
         projectNames.FirstOrDefault(projectName =>
@@ -7142,6 +7409,17 @@ public sealed partial class DeveloperExperienceGuardTests
 
     private static string? FindOwningProjectName(string sourcePath)
     {
+        string? projectDirectory = FindOwningProjectDirectory(sourcePath);
+
+        return projectDirectory is null
+            ? null
+            : Path.GetFileNameWithoutExtension(Directory
+                .EnumerateFiles(projectDirectory, "*.csproj", SearchOption.TopDirectoryOnly)
+                .Single());
+    }
+
+    private static string? FindOwningProjectDirectory(string sourcePath)
+    {
         DirectoryInfo? directory = new(Path.GetDirectoryName(sourcePath)!);
 
         while (directory is not null)
@@ -7152,7 +7430,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
             if (projectPath is not null)
             {
-                return Path.GetFileNameWithoutExtension(projectPath);
+                return directory.FullName;
             }
 
             directory = directory.Parent;
@@ -7179,14 +7457,14 @@ public sealed partial class DeveloperExperienceGuardTests
         };
     }
 
-    private static bool HasProjectIntentFolder(string sourcePath, string testsRoot)
+    private static bool HasProjectIntentFolder(string sourcePath, string testProjectRoot)
     {
-        string relativePath = Path.GetRelativePath(testsRoot, sourcePath);
+        string relativePath = Path.GetRelativePath(testProjectRoot, sourcePath);
         string[] segments = relativePath.Split(
             [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
             StringSplitOptions.RemoveEmptyEntries);
 
-        return segments.Length >= 3;
+        return segments.Length >= 2;
     }
 
     private static bool HasCategoryTrait(string source, string category) =>
@@ -7412,7 +7690,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Descendants(elementName)
             .Select(element => element.Attribute("Include")?.Value)
             .Where(value => !string.IsNullOrWhiteSpace(value))
-            .Select(value => value!)
+            .Select(value => NormalizePath(value!))
             .ToArray();
 
     private static IEnumerable<string> CompareDependencySet(
@@ -7421,8 +7699,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] expected,
         string[] actual)
     {
-        HashSet<string> expectedSet = expected.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        HashSet<string> actualSet = actual.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> expectedSet = expected.Select(NormalizePath).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> actualSet = actual.Select(NormalizePath).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         return expectedSet
             .Except(actualSet, StringComparer.OrdinalIgnoreCase)
@@ -7542,8 +7820,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string normalized = NormalizePath(relativePath);
         string[] allowed =
         [
-            Path.Combine("src", "Modules", "Administration", "Administration.Persistence", "Entities", "AdminAuditEntry.cs"),
-            Path.Combine("src", "Modules", "Auth", "Auth.Infrastructure", "JwtSettings.cs")
+            Path.Combine("src", "Modules", "Administration", "Gma.Modules.Administration.Persistence", "Entities", "AdminAuditEntry.cs"),
+            Path.Combine("src", "Modules", "Auth", "Gma.Modules.Auth.Infrastructure", "JwtSettings.cs")
         ];
 
         return allowed.Any(path => string.Equals(normalized, path, StringComparison.OrdinalIgnoreCase));
@@ -7662,7 +7940,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
     private sealed record ProjectReference(string ProjectPath, string ReferencePath);
 
-    private sealed record SharedProjectShape(
+    private sealed record FrameworkProjectShape(
         string ProjectName,
         string[] PackageReferences,
         string[] FrameworkReferences,
@@ -7681,8 +7959,8 @@ public sealed partial class DeveloperExperienceGuardTests
     [GeneratedRegex(@"^\s*namespace\s+(?<name>[A-Za-z_][A-Za-z0-9_.]*)\s*[;{]", RegexOptions.Multiline)]
     private static partial Regex NamespacePattern();
 
-    [GeneratedRegex(@"^\s*(?:global\s+)?using\s+(?:static\s+)?(?:(?:[A-Za-z_][A-Za-z0-9_.]*)\s*=\s*)?(?<namespace>Shared\.[A-Za-z_][A-Za-z0-9_.]*)\s*;", RegexOptions.Multiline)]
-    private static partial Regex SharedUsingNamespacePattern();
+    [GeneratedRegex(@"^\s*(?:global\s+)?using\s+(?:static\s+)?(?:(?:[A-Za-z_][A-Za-z0-9_.]*)\s*=\s*)?(?<namespace>Gma\.Framework\.[A-Za-z_][A-Za-z0-9_.]*)\s*;", RegexOptions.Multiline)]
+    private static partial Regex FrameworkUsingNamespacePattern();
 
     [GeneratedRegex(@"^\s*(?:global\s+)?using\s+(?:static\s+)?(?:(?:[A-Za-z_][A-Za-z0-9_.]*)\s*=\s*)?(?<namespace>[A-Za-z_][A-Za-z0-9_.]*)\s*;", RegexOptions.Multiline)]
     private static partial Regex UsingNamespacePattern();

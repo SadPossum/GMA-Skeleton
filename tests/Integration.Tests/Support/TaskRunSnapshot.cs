@@ -1,6 +1,6 @@
 namespace Integration.Tests.Support;
 
-using Shared.Tasks;
+using Gma.Framework.Tasks;
 
 internal sealed record TaskRunSnapshot(
     Guid Id,

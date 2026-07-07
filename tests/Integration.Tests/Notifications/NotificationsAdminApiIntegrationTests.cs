@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Integration.Tests.Support;
-using Notifications.Admin.Contracts;
-using Notifications.Contracts;
-using Shared.Administration;
+using Gma.Modules.Notifications.Admin.Contracts;
+using Gma.Modules.Notifications.Contracts;
+using Gma.Framework.Administration;
 using Xunit;
 
 public sealed class NotificationsAdminApiIntegrationTests

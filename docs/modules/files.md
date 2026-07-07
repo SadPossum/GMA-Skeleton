@@ -11,7 +11,7 @@ It provides:
 
 - `files.objects`
 
-Use it when a host wants a centralized upload/download/delete surface for private user files such as profile images, attachments, imports, or exports. Feature modules can bypass the front door and use `Shared.FileManagement` directly when they own public files, cross-user sharing, or business-specific file lifecycle rules.
+Use it when a host wants a centralized upload/download/delete surface for private user files such as profile images, attachments, imports, or exports. Feature modules can bypass the front door and use `Gma.Framework.FileManagement` directly when they own public files, cross-user sharing, or business-specific file lifecycle rules.
 
 ## Endpoints
 

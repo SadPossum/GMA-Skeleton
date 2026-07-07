@@ -2,7 +2,7 @@ namespace Ordering.Domain.ValueObjects;
 
 using Ordering.Domain.Aggregates;
 using Ordering.Domain.Errors;
-using Shared.Results;
+using Gma.Framework.Results;
 
 public readonly record struct OrderUserId
 {

@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Framework/">
+    <Project Path="src/Framework/Gma.Framework.Api/Gma.Framework.Api.csproj" />
+    <Project Path="src/Framework/Gma.Framework.ModuleComposition/Gma.Framework.ModuleComposition.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Modules/Gma.Framework.Modules.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Naming/Gma.Framework.Naming.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Results/Gma.Framework.Results.csproj" />
+    <Project Path="src/Framework/Gma.Framework.Tenancy/Gma.Framework.Tenancy.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Tenancy/">
+    <Project Path="src/Modules/Tenancy/Gma.Modules.Tenancy.Api/Gma.Modules.Tenancy.Api.csproj" />
+    <Project Path="src/Modules/Tenancy/Gma.Modules.Tenancy.Contracts/Gma.Modules.Tenancy.Contracts.csproj" />
+  </Folder>
+</Solution>

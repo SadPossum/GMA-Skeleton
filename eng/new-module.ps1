@@ -60,7 +60,7 @@ function Add-GmaProject {
 
     Invoke-GmaDotNet -Arguments @(
         'sln',
-        (Join-GmaPath 'GenericModularApi.sln'),
+        (Join-GmaPath 'GenericModularApi.slnx'),
         'add',
         $ProjectPath,
         '--solution-folder',
@@ -112,21 +112,21 @@ if ($Cache) {
 }
 $metadataDescriptorLines += '        .Build()'
 $metadataDescriptor = $metadataDescriptorLines -join "`r`n"
-$metadataUsings = @("using Shared.Modules;")
+$metadataUsings = @("using Gma.Framework.Modules;")
 if ($AdminCli -or $AdminApi) {
-    $metadataUsings = @("using Shared.Authorization;") + $metadataUsings
+    $metadataUsings = @("using Gma.Framework.Authorization;") + $metadataUsings
 }
 if ($Cache) {
-    $metadataUsings = @("using Shared.Caching;") + $metadataUsings
+    $metadataUsings = @("using Gma.Framework.Caching;") + $metadataUsings
 }
 $contractsProjectReferences = @(
-    '    <ProjectReference Include="..\..\..\Shared\Shared.Modules\Shared.Modules.csproj" />'
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Modules\Gma.Framework.Modules.csproj" />'
 )
 if ($AdminCli -or $AdminApi) {
-    $contractsProjectReferences += '    <ProjectReference Include="..\..\..\Shared\Shared.Authorization\Shared.Authorization.csproj" />'
+    $contractsProjectReferences += '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Authorization\Gma.Framework.Authorization.csproj" />'
 }
 if ($Cache) {
-    $contractsProjectReferences += '    <ProjectReference Include="..\..\..\Shared\Shared.Caching\Shared.Caching.csproj" />'
+    $contractsProjectReferences += '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Caching\Gma.Framework.Caching.csproj" />'
 }
 
 Write-GmaFile $contractsProject @"
@@ -166,8 +166,8 @@ public static class ${Name}AdminPermissionCodes
 Write-GmaFile $domainProject @"
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared.Domain\Shared.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Results\Shared.Results.csproj" />
+    <ProjectReference Include="`$(GmaFrameworkRoot)Gma.Framework.Domain\Gma.Framework.Domain.csproj" />
+    <ProjectReference Include="`$(GmaFrameworkRoot)Gma.Framework.Results\Gma.Framework.Results.csproj" />
   </ItemGroup>
 </Project>
 "@
@@ -175,18 +175,18 @@ Write-GmaFile $domainProject @"
 $applicationReferences = @(
     "    <ProjectReference Include=`"..\$Name.Contracts\$Name.Contracts.csproj`" />",
     "    <ProjectReference Include=`"..\$Name.Domain\$Name.Domain.csproj`" />",
-    '    <ProjectReference Include="..\..\..\Shared\Shared.Application.Events\Shared.Application.Events.csproj" />',
-    '    <ProjectReference Include="..\..\..\Shared\Shared.Application.Composition\Shared.Application.Composition.csproj" />',
-    '    <ProjectReference Include="..\..\..\Shared\Shared.Results\Shared.Results.csproj" />'
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj" />',
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Application.Composition\Gma.Framework.Application.Composition.csproj" />',
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Results\Gma.Framework.Results.csproj" />'
 )
 $applicationUsings = @(
     'using Microsoft.Extensions.DependencyInjection;',
-    'using Shared.Application.Composition;'
+    'using Gma.Framework.Application.Composition;'
 )
 
 if ($Cache) {
-    $applicationReferences += '    <ProjectReference Include="..\..\..\Shared\Shared.Caching\Shared.Caching.csproj" />'
-    $applicationUsings += 'using Shared.Caching;'
+    $applicationReferences += '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Caching\Gma.Framework.Caching.csproj" />'
+    $applicationUsings += 'using Gma.Framework.Caching;'
 }
 
 Write-GmaFile $applicationProject @"
@@ -221,7 +221,7 @@ if ($Cache) {
 namespace $Name.Application;
 
 using $Name.Contracts;
-using Shared.Caching;
+using Gma.Framework.Caching;
 
 internal static class ${Name}Cache
 {
@@ -240,7 +240,7 @@ internal static class ${Name}Cache
 $apiReferences = @(
     "    <ProjectReference Include=`"..\$Name.Application\$Name.Application.csproj`" />",
     "    <ProjectReference Include=`"..\$Name.Contracts\$Name.Contracts.csproj`" />",
-    '    <ProjectReference Include="..\..\..\Shared\Shared.Api\Shared.Api.csproj" />'
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Api\Gma.Framework.Api.csproj" />'
 )
 
 $apiUsings = @(
@@ -251,8 +251,8 @@ $apiUsings = @(
     'using Microsoft.AspNetCore.Routing;',
     'using Microsoft.Extensions.DependencyInjection;',
     'using Microsoft.Extensions.Hosting;',
-    'using Shared.Api.Modules;',
-    'using Shared.Api.Observability;'
+    'using Gma.Framework.Api.Modules;',
+    'using Gma.Framework.Api.Observability;'
 )
 
 $apiServices = @("        builder.Services.Add${Name}Application();")
@@ -308,27 +308,27 @@ if ($Persistence) {
 
     $dbContextUsings = @(
         'using Microsoft.EntityFrameworkCore;',
-        'using Shared.Persistence.EntityFrameworkCore;',
-        'using Shared.Tenancy;'
+        'using Gma.Framework.Persistence.EntityFrameworkCore;',
+        'using Gma.Framework.Tenancy;'
     )
     if ($Outbox -or $Inbox) {
-        $dbContextUsings += 'using Shared.Messaging.Infrastructure;'
+        $dbContextUsings += 'using Gma.Framework.Messaging.Infrastructure;'
     }
 
     $persistenceProjectReferences = @(
         "    <ProjectReference Include=`"..\$Name.Contracts\$Name.Contracts.csproj`" />",
         "    <ProjectReference Include=`"..\$Name.Application\$Name.Application.csproj`" />",
         "    <ProjectReference Include=`"..\$Name.Domain\$Name.Domain.csproj`" />",
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Application.Events\Shared.Application.Events.csproj" />',
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Domain\Shared.Domain.csproj" />',
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Persistence.EntityFrameworkCore\Shared.Persistence.EntityFrameworkCore.csproj" />',
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Tenancy\Shared.Tenancy.csproj" />'
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj" />',
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Domain\Gma.Framework.Domain.csproj" />',
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Persistence.EntityFrameworkCore\Gma.Framework.Persistence.EntityFrameworkCore.csproj" />',
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj" />'
     )
     if ($Outbox -or $Inbox) {
-        $persistenceProjectReferences += '    <ProjectReference Include="..\..\..\Shared\Shared.Naming\Shared.Naming.csproj" />'
-        $persistenceProjectReferences += '    <ProjectReference Include="..\..\..\Shared\Shared.Messaging\Shared.Messaging.csproj" />'
-        $persistenceProjectReferences += '    <ProjectReference Include="..\..\..\Shared\Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj" />'
-        $persistenceProjectReferences += '    <ProjectReference Include="..\..\..\Shared\Shared.Runtime\Shared.Runtime.csproj" />'
+        $persistenceProjectReferences += '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Naming\Gma.Framework.Naming.csproj" />'
+        $persistenceProjectReferences += '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging\Gma.Framework.Messaging.csproj" />'
+        $persistenceProjectReferences += '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />'
+        $persistenceProjectReferences += '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Runtime\Gma.Framework.Runtime.csproj" />'
     }
 
     Write-GmaFile $persistenceProject @"
@@ -378,8 +378,8 @@ public static class ${Name}Migrations
     Write-GmaFile (Join-Path $moduleRoot "$Name.Persistence\${Name}UnitOfWork.cs") @"
 namespace $Name.Persistence;
 
-using Shared.Application.Events;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Application.Events;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 internal sealed class ${Name}UnitOfWork(${Name}DbContext dbContext, IDomainEventDispatcher domainEventDispatcher)
     : EfDomainEventUnitOfWork<${Name}DbContext>(${Name}Migrations.Schema, dbContext, domainEventDispatcher)
@@ -392,8 +392,8 @@ internal sealed class ${Name}UnitOfWork(${Name}DbContext dbContext, IDomainEvent
         'using Microsoft.Extensions.DependencyInjection;',
         'using Microsoft.Extensions.DependencyInjection.Extensions;',
         'using Microsoft.Extensions.Hosting;',
-        'using Shared.Cqrs.UnitOfWork;',
-        'using Shared.Persistence.EntityFrameworkCore;'
+        'using Gma.Framework.Cqrs.UnitOfWork;',
+        'using Gma.Framework.Persistence.EntityFrameworkCore;'
     )
     $persistenceServices = @(
         "        builder.Services.AddPersistenceOptions(builder.Configuration);",
@@ -410,7 +410,7 @@ internal sealed class ${Name}UnitOfWork(${Name}DbContext dbContext, IDomainEvent
     )
 
     if ($Outbox -or $Inbox) {
-        $persistenceUsings += 'using Shared.Messaging;'
+        $persistenceUsings += 'using Gma.Framework.Messaging;'
     }
     if ($Outbox) {
         $persistenceServices += "        builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IOutboxWriter, ${Name}OutboxWriter>());"
@@ -441,9 +441,9 @@ $($persistenceServices -join "`r`n")
 namespace $Name.Persistence;
 
 using Microsoft.Extensions.Options;
-using Shared.Messaging.Infrastructure;
-using Shared.Runtime;
-using Shared.Runtime.Time;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Runtime;
+using Gma.Framework.Runtime.Time;
 
 internal sealed class ${Name}OutboxWriter(
     ${Name}DbContext dbContext,
@@ -456,7 +456,7 @@ internal sealed class ${Name}OutboxWriter(
 namespace $Name.Persistence;
 
 using Microsoft.Extensions.Options;
-using Shared.Messaging.Infrastructure;
+using Gma.Framework.Messaging.Infrastructure;
 
 internal sealed class ${Name}OutboxStore(${Name}DbContext dbContext, IOptions<OutboxOptions> options)
     : EfOutboxStore<${Name}DbContext>(dbContext, options, ${Name}Migrations.Schema);
@@ -467,8 +467,8 @@ namespace $Name.Persistence.Configurations;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Shared.Messaging.Infrastructure;
-using Shared.Naming;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Naming;
 
 internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessage>
 {
@@ -482,9 +482,9 @@ internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outb
         Write-GmaFile (Join-Path $moduleRoot "$Name.Persistence\${Name}InboxStore.cs") @"
 namespace $Name.Persistence;
 
-using Shared.Messaging.Infrastructure;
-using Shared.Runtime.Identity;
-using Shared.Runtime.Time;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Runtime.Identity;
+using Gma.Framework.Runtime.Time;
 
 internal sealed class ${Name}InboxStore(${Name}DbContext dbContext, ISystemClock clock, IIdGenerator idGenerator)
     : EfInboxStore<${Name}DbContext>(dbContext, clock, idGenerator, ${Name}Migrations.Schema);
@@ -495,8 +495,8 @@ namespace $Name.Persistence.Configurations;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Shared.Messaging.Infrastructure;
-using Shared.Naming;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Naming;
 
 internal sealed class InboxMessageConfiguration : IEntityTypeConfiguration<InboxMessage>
 {
@@ -531,7 +531,7 @@ namespace $Name.Persistence.SqlServerMigrations;
 
 using $Name.Persistence;
 using Microsoft.EntityFrameworkCore.Design;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 public sealed class ${Name}SqlServerDesignTimeDbContextFactory : IDesignTimeDbContextFactory<${Name}DbContext>
 {
@@ -573,7 +573,7 @@ namespace $Name.Persistence.PostgreSqlMigrations;
 
 using $Name.Persistence;
 using Microsoft.EntityFrameworkCore.Design;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 public sealed class ${Name}PostgreSqlDesignTimeDbContextFactory : IDesignTimeDbContextFactory<${Name}DbContext>
 {
@@ -592,11 +592,11 @@ public sealed class ${Name}PostgreSqlDesignTimeDbContextFactory : IDesignTimeDbC
 }
 
 if ($AdminCli -or $AdminApi) {
-    Write-GmaFile $adminContractsProject @"
+Write-GmaFile $adminContractsProject @"
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\$Name.Contracts\$Name.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Administration\Shared.Administration.csproj" />
+    <ProjectReference Include="`$(GmaFrameworkRoot)Gma.Framework.Administration\Gma.Framework.Administration.csproj" />
   </ItemGroup>
 </Project>
 "@
@@ -605,7 +605,7 @@ if ($AdminCli -or $AdminApi) {
 namespace $Name.Admin.Contracts;
 
 using $Name.Contracts;
-using Shared.Administration;
+using Gma.Framework.Administration;
 
 public static class ${Name}AdminPermissions
 {
@@ -627,8 +627,8 @@ if ($AdminCli) {
         "    <ProjectReference Include=`"..\$Name.Admin.Contracts\$Name.Admin.Contracts.csproj`" />",
         "    <ProjectReference Include=`"..\$Name.Application\$Name.Application.csproj`" />",
         "    <ProjectReference Include=`"..\$Name.Contracts\$Name.Contracts.csproj`" />",
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Administration.Cli\Shared.Administration.Cli.csproj" />',
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Administration\Shared.Administration.csproj" />'
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration.Cli\Gma.Framework.Administration.Cli.csproj" />',
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration\Gma.Framework.Administration.csproj" />'
     )
     $adminCliServices = @("        builder.Services.Add${Name}Application();")
 
@@ -653,8 +653,8 @@ $($adminCliReferences -join "`r`n")
         "using $Name.Contracts;",
         'using Microsoft.Extensions.DependencyInjection;',
         'using Microsoft.Extensions.Hosting;',
-        'using Shared.Administration;',
-        'using Shared.Administration.Cli;',
+        'using Gma.Framework.Administration;',
+        'using Gma.Framework.Administration.Cli;',
         'using System.CommandLine;'
     )
     if ($Persistence) {
@@ -687,9 +687,9 @@ if ($AdminApi) {
         "    <ProjectReference Include=`"..\$Name.Admin.Contracts\$Name.Admin.Contracts.csproj`" />",
         "    <ProjectReference Include=`"..\$Name.Application\$Name.Application.csproj`" />",
         "    <ProjectReference Include=`"..\$Name.Contracts\$Name.Contracts.csproj`" />",
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Administration.Api\Shared.Administration.Api.csproj" />',
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Administration\Shared.Administration.csproj" />',
-        '    <ProjectReference Include="..\..\..\Shared\Shared.Api\Shared.Api.csproj" />'
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration.Api\Gma.Framework.Administration.Api.csproj" />',
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration\Gma.Framework.Administration.csproj" />',
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Api\Gma.Framework.Api.csproj" />'
     )
     $adminApiServices = @("        builder.Services.Add${Name}Application();")
 
@@ -717,8 +717,8 @@ $($adminApiReferences -join "`r`n")
         'using Microsoft.AspNetCore.Routing;',
         'using Microsoft.Extensions.DependencyInjection;',
         'using Microsoft.Extensions.Hosting;',
-        'using Shared.Administration.Api;',
-        'using Shared.Api.Observability;'
+        'using Gma.Framework.Administration.Api;',
+        'using Gma.Framework.Api.Observability;'
     )
     if ($Persistence) {
         $adminApiUsings += "using $Name.Persistence;"

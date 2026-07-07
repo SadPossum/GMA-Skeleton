@@ -1,12 +1,12 @@
 namespace Ordering.Tests;
 
-using Shared.Naming;
+using Gma.Framework.Naming;
 using Catalog.Contracts;
 using Ordering.Application.Ports;
 using Ordering.Domain.Aggregates;
 using Ordering.Domain.Errors;
 using Ordering.Persistence;
-using Shared.ProjectionRebuild;
+using Gma.Framework.ProjectionRebuild;
 using Xunit;
 
 [Trait("Category", "Unit")]

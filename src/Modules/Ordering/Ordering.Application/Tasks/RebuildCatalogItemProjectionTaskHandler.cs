@@ -2,9 +2,9 @@ namespace Ordering.Application.Tasks;
 
 using Catalog.Contracts;
 using Ordering.Contracts;
-using Shared.ProjectionRebuild;
-using Shared.ProjectionRebuild.Tasks;
-using Shared.Tasks;
+using Gma.Framework.ProjectionRebuild;
+using Gma.Framework.ProjectionRebuild.Tasks;
+using Gma.Framework.Tasks;
 
 internal sealed class RebuildCatalogItemProjectionTaskHandler(
     ICatalogItemProjectionExportSource source,

@@ -1,25 +1,25 @@
 namespace Integration.Tests.Support;
 
-using Administration.AdminCli;
-using Administration.Persistence;
-using Auth.AdminCli;
-using Auth.Application.Commands;
-using Auth.Contracts;
-using Auth.Domain.Errors;
-using Auth.Persistence;
+using Gma.Modules.Administration.AdminCli;
+using Gma.Modules.Administration.Persistence;
+using Gma.Modules.Auth.AdminCli;
+using Gma.Modules.Auth.Application.Commands;
+using Gma.Modules.Auth.Contracts;
+using Gma.Modules.Auth.Domain.Errors;
+using Gma.Modules.Auth.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Shared.Administration.Cli;
-using Shared.Cqrs;
-using Shared.Tenancy;
-using Shared.Caching.Cqrs;
-using Shared.Results;
-using Shared.Infrastructure;
-using Shared.Messaging.Infrastructure;
-using Shared.Tenancy.Caching;
-using Shared.Tenancy.Messaging.Infrastructure;
+using Gma.Framework.Administration.Cli;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Caching.Cqrs;
+using Gma.Framework.Results;
+using Gma.Framework.Infrastructure;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Tenancy.Caching;
+using Gma.Framework.Tenancy.Messaging.Infrastructure;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Text.RegularExpressions;
@@ -49,9 +49,9 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
             ["Caching:Enabled"] = "false"
         });
 
-        builder.Services.AddSharedAdministrationCli();
+        builder.Services.AddGmaAdministrationCli();
         builder.AddCachingCqrs();
-        builder.AddSharedInfrastructure();
+        builder.AddGmaInfrastructure();
         builder.AddTenantCaching();
         builder.AddMessagingInfrastructure();
         builder.AddTenantAwareMessaging();

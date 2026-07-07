@@ -1,7 +1,7 @@
 namespace Catalog.Application.Validation;
 
 using Catalog.Application.Queries;
-using Shared.Cqrs;
+using Gma.Framework.Cqrs;
 
 internal sealed class GetCatalogItemQueryValidator : IQueryValidator<GetCatalogItemQuery>
 {

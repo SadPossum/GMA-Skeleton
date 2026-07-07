@@ -2,12 +2,12 @@ namespace Ordering.Application.Handlers;
 
 using System.Text.Json;
 using Catalog.Contracts;
-using Notifications.Contracts;
+using Gma.Modules.Notifications.Contracts;
 using Ordering.Application.Ports;
 using Ordering.Contracts;
-using Shared.Messaging;
-using Shared.Runtime.Identity;
-using Shared.Runtime.Time;
+using Gma.Framework.Messaging;
+using Gma.Framework.Runtime.Identity;
+using Gma.Framework.Runtime.Time;
 
 internal sealed class CatalogItemChangeNotificationPublisher(
     IOrderRepository orderRepository,

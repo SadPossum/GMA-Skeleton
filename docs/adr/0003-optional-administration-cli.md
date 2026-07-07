@@ -14,12 +14,12 @@ The project goal is still a small optional-module modular monolith. Admin suppor
 
 Add administration as an optional CLI-first capability:
 
-- `Shared.Administration` contains generic contracts.
-- `Shared.Administration.Cli` contains `System.CommandLine` integration.
+- `Gma.Framework.Administration` contains generic contracts.
+- `Gma.Framework.Administration.Cli` contains `System.CommandLine` integration.
 - `Host.AdminCli` is a separate packable .NET tool named `gma-admin`.
 - `Administration` owns persisted RBAC and audit in the `admin` schema.
 - Feature modules expose CLI front doors through `<Module>.AdminCli`.
-- Auth exposes user administration through `Auth.AdminCli`.
+- Auth exposes user administration through `Gma.Modules.Auth.AdminCli`.
 
 `Host.Api` does not register admin modules in this milestone.
 

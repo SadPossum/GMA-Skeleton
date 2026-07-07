@@ -5,7 +5,7 @@ using Catalog.Domain.Visibility;
 using Catalog.Persistence;
 using Catalog.Persistence.QueryScopes;
 using Microsoft.EntityFrameworkCore;
-using Shared.Tenancy;
+using Gma.Framework.Tenancy;
 using Xunit;
 
 [Trait("Category", "Unit")]

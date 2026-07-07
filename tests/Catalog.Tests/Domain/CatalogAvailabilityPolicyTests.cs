@@ -3,7 +3,7 @@ namespace Catalog.Tests;
 using Catalog.Domain.Errors;
 using Catalog.Domain.ValueObjects;
 using Catalog.Domain.Visibility;
-using Shared.Results;
+using Gma.Framework.Results;
 using Xunit;
 
 [Trait("Category", "Unit")]

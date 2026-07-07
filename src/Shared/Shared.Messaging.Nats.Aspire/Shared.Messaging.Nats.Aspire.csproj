@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="Aspire.NATS.Net" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Shared.Messaging.Nats\Shared.Messaging.Nats.csproj" />
-  </ItemGroup>
-</Project>

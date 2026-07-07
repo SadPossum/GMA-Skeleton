@@ -7,7 +7,7 @@ param(
 
 Invoke-GmaDotNet -Arguments @('tool', 'restore')
 
-$arguments = @('restore', (Join-GmaPath 'GenericModularApi.sln'))
+$arguments = @('restore', (Join-GmaPath 'GenericModularApi.slnx'))
 $arguments += $DotNetArguments | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
 
 Invoke-GmaDotNet -Arguments $arguments

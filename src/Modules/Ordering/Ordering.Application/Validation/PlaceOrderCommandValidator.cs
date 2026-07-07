@@ -2,8 +2,8 @@ namespace Ordering.Application.Validation;
 
 using Ordering.Application.Commands;
 using Catalog.Contracts;
-using Shared.AccessControl;
-using Shared.Cqrs;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
 
 internal sealed class PlaceOrderCommandValidator : ICommandValidator<PlaceOrderCommand>
 {

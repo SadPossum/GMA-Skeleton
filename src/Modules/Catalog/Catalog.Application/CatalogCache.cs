@@ -2,7 +2,7 @@ namespace Catalog.Application;
 
 using System.Globalization;
 using Catalog.Contracts;
-using Shared.Caching;
+using Gma.Framework.Caching;
 
 internal static class CatalogCache
 {

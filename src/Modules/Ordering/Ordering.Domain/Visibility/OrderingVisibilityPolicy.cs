@@ -1,6 +1,6 @@
 namespace Ordering.Domain.Visibility;
 
-using Shared.Results;
+using Gma.Framework.Results;
 
 public static class OrderingVisibilityPolicy
 {

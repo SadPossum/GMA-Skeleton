@@ -1,12 +1,12 @@
 # Messaging Consumers
 
-NATS consumers are optional infrastructure. Production HTTP hosts enable publishing through the configured `Shared.Messaging.Nats.Aspire` adapter with `AddConfiguredNatsJetStreamMessaging()`. Consumer-capable hosts use `AddConfiguredNatsJetStreamConsumers()`, which is a no-op unless `NatsConsumers:Enabled=true` and requires `ConnectionStrings:nats` when consumers are enabled.
+NATS consumers are optional infrastructure. Production HTTP hosts enable publishing through the configured `Gma.Framework.Messaging.Nats.Aspire` adapter with `AddConfiguredNatsJetStreamMessaging()`. Consumer-capable hosts use `AddConfiguredNatsJetStreamConsumers()`, which is a no-op unless `NatsConsumers:Enabled=true` and requires `ConnectionStrings:nats` when consumers are enabled.
 Consumers start only when a host explicitly composes the consumer adapter and modules that register subscriptions.
-`AddNatsJetStreamConsumers()` lives in `Shared.Messaging.Nats`, composes `AddMessagingInfrastructure()` idempotently for custom hosts, and messaging infrastructure composes only the runtime clock/id baseline it needs. It does not discover modules or subscriptions. A host still has to register each subscribing module explicitly.
+`AddNatsJetStreamConsumers()` lives in `Gma.Framework.Messaging.Nats`, composes `AddMessagingInfrastructure()` idempotently for custom hosts, and messaging infrastructure composes only the runtime clock/id baseline it needs. It does not discover modules or subscriptions. A host still has to register each subscribing module explicitly.
 
 ## Contracts
 
-Consumer-facing contracts live in `Shared.Messaging`:
+Consumer-facing contracts live in `Gma.Framework.Messaging`:
 
 - `IIntegrationEventHandler<TEvent>`
 - `IntegrationEventSubscription`
@@ -20,7 +20,7 @@ Create `InboxProcessResult` values through its factories. `Processed` and `Dupli
 
 ## Runtime
 
-`NatsJetStreamConsumerService` lives in `Shared.Messaging.Nats`.
+`NatsJetStreamConsumerService` lives in `Gma.Framework.Messaging.Nats`.
 
 The service:
 
@@ -28,7 +28,7 @@ The service:
 - creates a durable JetStream pull consumer per subscription;
 - names durable consumers as a NATS-safe physical key shaped like `<application-namespace>-<environment>-<consumer-module>-<handler-name>`;
 - deserializes messages by subscription event type;
-- runs registered processing-context contributors before the handler, such as `Shared.Tenancy.Messaging.Infrastructure` setting tenant context for tenant-scoped subscriptions;
+- runs registered processing-context contributors before the handler, such as `Gma.Framework.Tenancy.Messaging.Infrastructure` setting tenant context for tenant-scoped subscriptions;
 - invokes the handler through DI with a cached typed delegate;
 - acknowledges only after the inbox store returns processed or duplicate;
 - negatively acknowledges failed processing so JetStream can redeliver.
@@ -61,7 +61,7 @@ Consumer runtime values are validated at startup. A configured `DurablePrefix` m
 
 ## Inbox
 
-Each module maps `InboxMessage` into its own schema. EF-backed modules should use `ConfigureInboxMessage(...)` from `Shared.Messaging.Infrastructure`; the shared `EfInboxStore<TDbContext>` handles the common idempotency flow, but the table belongs to the module.
+Each module maps `InboxMessage` into its own schema. EF-backed modules should use `ConfigureInboxMessage(...)` from `Gma.Framework.Messaging.Infrastructure`; the shared `EfInboxStore<TDbContext>` handles the common idempotency flow, but the table belongs to the module.
 On success, handler effects and the inbox processed marker commit in the same transaction.
 On failure, handler effects are rolled back before failure metadata is recorded.
 Handler timeout cancellation is treated as a failed attempt and is negatively acknowledged for retry.

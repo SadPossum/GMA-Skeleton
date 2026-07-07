@@ -1,7 +1,7 @@
 namespace Catalog.Admin.Contracts;
 
 using Catalog.Contracts;
-using Shared.Administration;
+using Gma.Framework.Administration;
 
 public static class CatalogAdminPermissions
 {

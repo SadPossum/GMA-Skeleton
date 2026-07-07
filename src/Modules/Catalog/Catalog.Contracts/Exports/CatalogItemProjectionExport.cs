@@ -1,7 +1,7 @@
 namespace Catalog.Contracts;
 
-using Shared.Messaging;
-using Shared.Naming;
+using Gma.Framework.Messaging;
+using Gma.Framework.Naming;
 
 public sealed record CatalogItemProjectionExport
 {

@@ -5,18 +5,18 @@ The Auth module is a reusable first-party module. It proves the architecture end
 ## Projects
 
 ```text
-Auth.Contracts
-Auth.Domain
-Auth.Application
-Auth.Infrastructure
-Auth.Infrastructure.JwtBearer
-Auth.Persistence
-Auth.Persistence.SqlServerMigrations
-Auth.Persistence.PostgreSqlMigrations
-Auth.Api
-Auth.Admin.Contracts
-Auth.AdminCli
-Auth.AdminApi
+Gma.Modules.Auth.Contracts
+Gma.Modules.Auth.Domain
+Gma.Modules.Auth.Application
+Gma.Modules.Auth.Infrastructure
+Gma.Modules.Auth.Infrastructure.JwtBearer
+Gma.Modules.Auth.Persistence
+Gma.Modules.Auth.Persistence.SqlServerMigrations
+Gma.Modules.Auth.Persistence.PostgreSqlMigrations
+Gma.Modules.Auth.Api
+Gma.Modules.Auth.Admin.Contracts
+Gma.Modules.Auth.AdminCli
+Gma.Modules.Auth.AdminApi
 ```
 
 ## Public Endpoints
@@ -49,7 +49,7 @@ Authorization: Bearer <access-token>
 
 ## Contracts
 
-`Auth.Contracts` contains:
+`Gma.Modules.Auth.Contracts` contains:
 
 - `Api/` self-service request/response records such as `RegisterMemberRequest`, `LoginMemberRequest`, `RefreshTokenRequest`, `SignOutRequest`, and `AuthTokensResponse`;
 - `Admin/` admin member projection/response records used by CLI and admin HTTP flows;
@@ -59,7 +59,7 @@ Authorization: Bearer <access-token>
 
 These types are the public surface of the module.
 
-Permission code strings live in `Auth.Contracts` for module metadata. Typed `AdminPermission` constants live in `Auth.Admin.Contracts` so public contracts do not reference the shared administration framework.
+Permission code strings live in `Gma.Modules.Auth.Contracts` for module metadata. Typed `AdminPermission` constants live in `Gma.Modules.Auth.Admin.Contracts` so public contracts do not reference the shared administration framework.
 
 ## Domain Model
 
@@ -133,7 +133,7 @@ Auth infrastructure provides:
 - versioned HMAC-SHA256 refresh token hashing;
 - access token generation and validation parameters.
 
-Core Auth infrastructure and the JWT bearer adapter live in separate projects. CLI/admin-command hosts use `Auth.Infrastructure` and `services.AddAuthInfrastructure(configuration)` for hashing and token services without adding HTTP authentication schemes or ASP.NET Core bearer packages. HTTP Auth surfaces explicitly reference `Auth.Infrastructure.JwtBearer` and call `AddAuthJwtBearerAuthentication()` when they need bearer-token validation.
+Core Auth infrastructure and the JWT bearer adapter live in separate projects. CLI/admin-command hosts use `Gma.Modules.Auth.Infrastructure` and `services.AddAuthInfrastructure(configuration)` for hashing and token services without adding HTTP authentication schemes or ASP.NET Core bearer packages. HTTP Auth surfaces explicitly reference `Gma.Modules.Auth.Infrastructure.JwtBearer` and call `AddAuthJwtBearerAuthentication()` when they need bearer-token validation.
 
 Auth application options validate `Auth:RefreshTokenLifetimeDays` so misconfigured refresh-token sessions fail at composition/startup instead of producing immediately expired or nonsensical sessions.
 
@@ -141,7 +141,7 @@ Refresh tokens are stored as hashes, never as raw token values.
 The HMAC key is configured through `Auth:RefreshTokens:Pepper`. The option class intentionally has no secret default. Checked-in development settings provide a disposable local placeholder, and deployments must override it through a secret provider, for example `Auth__RefreshTokens__Pepper`.
 
 JWT signing is configured through `Auth:Jwt`. The signing key must be at least 32 bytes and should also come from a secret provider outside local development. `Auth:Jwt:Issuer` and `Auth:Jwt:Audience` default to `ApplicationIdentity:DisplayName` when they are not explicitly configured.
-Auth access tokens use `ClaimTypes.NameIdentifier` for the member id and shared `ApplicationClaimNames` constants for tenant and session claims. Keep claim-name changes centralized in `Shared.Security.ApplicationClaimNames` so public Auth endpoints, admin APIs, token validation, and test token helpers stay aligned.
+Auth access tokens use `ClaimTypes.NameIdentifier` for the member id and shared `ApplicationClaimNames` constants for tenant and session claims. Keep claim-name changes centralized in `Gma.Framework.Security.ApplicationClaimNames` so public Auth endpoints, admin APIs, token validation, and test token helpers stay aligned.
 
 Login and refresh fail when a member is disabled.
 
@@ -200,8 +200,8 @@ MemberSessionsRevokedIntegrationEvent
 
 ## Admin Commands
 
-`Auth.AdminCli` is optional and is composed by `Host.AdminCli`.
-It shares typed permission constants with `Auth.AdminApi` through `Auth.Admin.Contracts`.
+`Gma.Modules.Auth.AdminCli` is optional and is composed by `Host.AdminCli`.
+It shares typed permission constants with `Gma.Modules.Auth.AdminApi` through `Gma.Modules.Auth.Admin.Contracts`.
 
 Commands:
 
@@ -226,7 +226,7 @@ Password input supports hidden prompt, `--password-stdin`, or `--generate-passwo
 
 ## Admin API
 
-`Auth.AdminApi` is optional and is composed by `Host.AdminApi`.
+`Gma.Modules.Auth.AdminApi` is optional and is composed by `Host.AdminApi`.
 
 Routes:
 
@@ -244,7 +244,7 @@ Tenant-scoped routes require `X-Tenant-Id`. Destructive routes require an explic
 
 Relevant test groups:
 
-- `Auth.Tests` for aggregate and unit-of-work behavior.
+- `Gma.Modules.Auth.Tests` for aggregate and unit-of-work behavior.
 - `Integration.Tests` for lifecycle, tenant isolation, outbox publishing, and outbox store behavior.
 - `Architecture.Tests` for module boundaries.
 

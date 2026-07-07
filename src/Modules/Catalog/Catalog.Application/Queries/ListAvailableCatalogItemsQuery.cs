@@ -1,9 +1,9 @@
 namespace Catalog.Application.Queries;
 
 using Catalog.Contracts;
-using Shared.AccessControl;
-using Shared.Cqrs;
-using Shared.Pagination;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Pagination;
 
 public sealed record ListAvailableCatalogItemsQuery(
     AccessSubject Subject,

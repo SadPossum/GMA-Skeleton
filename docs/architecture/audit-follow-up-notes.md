@@ -7,7 +7,7 @@ These notes capture architectural and developer-experience findings from the bro
 - Standardized module application handlers to one handler class per file under `<Module>.Application/Handlers`.
 - Standardized module contracts to one public contract type per file under `<Module>.Contracts`.
 - Split grouped Catalog command/query handlers, Catalog outbox projectors, Ordering projection handlers, Auth admin outbox projectors, and Catalog integration event contracts.
-- Moved generated admin password creation from duplicated CLI/API front-door helpers into `Auth.Application.Security.AdminPasswordGenerator`.
+- Moved generated admin password creation from duplicated CLI/API front-door helpers into `Gma.Modules.Auth.Application.Security.AdminPasswordGenerator`.
 - Added architecture tests for the handler and contract file-shape rules so future example modules and generated modules do not drift quietly.
 - Added shared EF design-time helpers and removed repeated provider/connection parsing from module design-time factories.
 - Expanded `eng/add-migration.ps1` to work with any persisted module instead of only Auth and Administration.
@@ -27,8 +27,8 @@ These notes capture architectural and developer-experience findings from the bro
 - Updated `eng/new-module.ps1` and architecture tests so new application projects do not reintroduce `Microsoft.Extensions.Hosting`.
 - Moved EF design-time factories into provider-specific migration projects and removed `Microsoft.EntityFrameworkCore.Design` from runtime hosts/persistence projects.
 - Updated `eng/add-migration.ps1` to use the selected migration project as the EF startup project, avoiding design-time DLL copying into runtime persistence output.
-- Moved CLI-specific admin module contracts into `Shared.Administration.Cli` as `IAdminCliModule` and `IAdminCliCommandRegistry`, leaving `Shared.Administration` backend-agnostic.
-- Added architecture guards that keep `Shared.Administration` free of CLI/HTTP/host-builder APIs and keep the module scaffolder on the current admin CLI contract names.
+- Moved CLI-specific admin module contracts into `Gma.Framework.Administration.Cli` as `IAdminCliModule` and `IAdminCliCommandRegistry`, leaving `Gma.Framework.Administration` backend-agnostic.
+- Added architecture guards that keep `Gma.Framework.Administration` free of CLI/HTTP/host-builder APIs and keep the module scaffolder on the current admin CLI contract names.
 - Documented and tested the physical NATS durable consumer name shape as a hyphenated, NATS-safe key derived from prefix, environment, consumer module, and handler name.
 - Made NuGet audit an explicit build policy (`NuGetAudit=true`, `NuGetAuditMode=all`, low severity and above) and added a guard for the warning/audit settings.
 - Added a package hygiene guard so project files keep using central package management with unique stable versions.
@@ -59,9 +59,9 @@ These notes capture architectural and developer-experience findings from the bro
 - Added startup validation for `Auth:RefreshTokenLifetimeDays` so refresh-token sessions cannot be configured with zero or negative lifetimes.
 - Added startup validation for outbox, NATS JetStream, and NATS consumer options so impossible runtime settings fail fast instead of being silently clamped by effective-value helpers.
 - Added startup validation for tenancy and admin API claim-binding options so invalid tenant headers, missing default tenants, and blank admin actor or tenant claim settings fail during composition.
-- Added startup validation for `Administration:Bootstrap:OwnerRoleName` and introduced `Administration.Tests` as a module-specific unit-test home.
+- Added startup validation for `Administration:Bootstrap:OwnerRoleName` and introduced `Gma.Modules.Administration.Tests` as a module-specific unit-test home.
 - Added startup validation for persistence provider connection strings, Redis adapter options, and ServiceDefaults observability options, with focused unit tests and architecture guards.
-- Moved persistence option validation out of `AddSharedInfrastructure()` and into persisted module registration so non-persistence hosts can still use shared infrastructure without database configuration.
+- Moved persistence option validation out of `AddGmaInfrastructure()` and into persisted module registration so non-persistence hosts can still use shared infrastructure without database configuration.
 - Normalized CQRS unit-of-work module-name matching and added a guard that real transactional commands resolve to persisted modules with matching lowercase unit-of-work declarations.
 - Hardened integration-event envelope subject creation so module names and event names are normalized and invalid event metadata is rejected before outbox persistence.
 - Added Auth integration subject constants and an architecture guard proving published-event metadata matches the compiled `IIntegrationEvent` contract types in both directions.
@@ -90,7 +90,7 @@ These notes capture architectural and developer-experience findings from the bro
 - Added explicit `Unknown = 0` values to shared provider enums, made persistence/cache validators reject unknown providers, and stopped the Redis adapter from silently treating invalid `Caching:Provider` values as `Memory`.
 - Added `Unknown = 0` to non-persisted shared semantic enums, made cache scope formatting reject unsupported scopes explicitly, and later moved `InboxMessageStatus` to `Unknown = 0` with provider-specific compatibility migrations for old inbox rows.
 - Added shared query logging and metrics so the existing query pipeline extension point is operational, while keeping transactions, validation, and cache-aside decisions out of the default query flow.
-- Moved tenant-id normalization into `Shared.Domain` with the persisted 128-character limit, wired tenant contexts, admin tenant resolution, RBAC assignment normalization, inbox/outbox envelope/message creation, and Auth/Catalog/Ordering aggregates through it.
+- Moved tenant-id normalization into `Gma.Framework.Domain` with the persisted 128-character limit, wired tenant contexts, admin tenant resolution, RBAC assignment normalization, inbox/outbox envelope/message creation, and Auth/Catalog/Ordering aggregates through it.
 - Centralized remaining production module identity usages by replacing Auth's current DbContext schema literal, Administration's UoW module-name literal, and Ordering's duplicated Catalog subscription handler names with module metadata/identity constants.
 - Added an architecture guard that compiled Ordering subscription metadata matches its application-level integration-event registrations.
 - Centralized admin surface prefixes through module metadata, deriving Auth/Catalog/Administration admin permission and operation constants from those surfaces and wiring CLI root commands through the same constants.
@@ -124,7 +124,7 @@ These notes capture architectural and developer-experience findings from the bro
 - Tightened shared tenant id normalization so tenant ids remain case-preserving external identifiers but cannot contain whitespace or control characters that would create ambiguous headers, cache keys, audit entries, or persisted rows.
 - Tightened cache identity segments so logical keys/tags remain case-preserving external identifiers but cannot contain whitespace or control characters before URI encoding.
 - Made `AdminActor` factory-created, rejected whitespace/control characters in admin actor ids and audit error codes, and made Admin API return unauthorized for invalid actor claims instead of throwing inside executor setup.
-- Hardened `Shared.Results.Error` so only `Error.None` can carry an empty code/message; failure errors now use validated dotted codes and compact messages, with API status maps and admin audit sharing the same code rules.
+- Hardened `Gma.Framework.Results.Error` so only `Error.None` can carry an empty code/message; failure errors now use validated dotted codes and compact messages, with API status maps and admin audit sharing the same code rules.
 - Hardened `Result`/`Result<T>` so failed results reject null or `Error.None`, successful typed results reject null values at construction, and architecture tests guard production code against nullable `Result<T?>` contracts.
 - Made admin authorization and inbox processing outcomes factory-created, so allowed/processed/duplicate outcomes cannot carry failure diagnostics and denied/failed outcomes must carry bounded normalized diagnostics.
 - Hardened Auth GUID identity value objects so explicit `Guid.Empty` construction fails early, while aggregates keep default-struct defensive checks for persistence and accidental defaults.
@@ -240,19 +240,19 @@ These notes capture architectural and developer-experience findings from the bro
 - Added a project/folder naming guard so every project under `src/` and `tests/` keeps its `.csproj` file name aligned with the containing folder and namespace convention.
 - Added a guard against project-level `RootNamespace` and `AssemblyName` overrides so SDK defaults keep project names, namespaces, assemblies, and folders aligned.
 - Aligned `requests/admin-api.http` with the default admin HTTP generated-password policy by using manual password fields and guarding request examples against `generatePassword: true` while generated password responses are disabled.
-- Centralized HTTP Serilog request enrichment in the explicit `Shared.Api.Serilog` adapter with `UseSharedSerilogRequestLogging()` and a compatibility `UseGmaSerilogRequestLogging()` shim, leaving generic `Shared.Api` vendor-neutral and guarding hosts against reintroducing copied enrichment lambdas.
-- Removed the stale FluentValidation package reference from `Auth.Api` now that request-shape validation is handled by shared CQRS validators, and guarded module API projects against reintroducing a parallel validation stack by accident.
+- Centralized HTTP Serilog request enrichment in the explicit `Gma.Framework.Api.Serilog` adapter with `UseGmaSerilogRequestLogging()` and a compatibility `UseGmaSerilogRequestLogging()` shim, leaving generic `Gma.Framework.Api` vendor-neutral and guarding hosts against reintroducing copied enrichment lambdas.
+- Removed the stale FluentValidation package reference from `Gma.Modules.Auth.Api` now that request-shape validation is handled by shared CQRS validators, and guarded module API projects against reintroducing a parallel validation stack by accident.
 - Removed the stale central `Microsoft.EntityFrameworkCore.Tools` package version now that EF CLI usage is pinned through the local `dotnet-ef` tool manifest, and extended package hygiene checks to reject unused central package versions.
-- Moved duplicated HTTP-host NATS publish wiring into the explicit `Shared.Messaging.Nats.Aspire` adapter, keeping `Aspire.NATS.Net` out of host projects while preserving `NatsJetStream:Enabled` as the publishing gate.
-- Moved duplicated HTTP-host Serilog configuration wiring into the explicit `Shared.Logging.Serilog` adapter, leaving host appsettings in each composition root while keeping Serilog package references out of host projects.
-- Moved duplicated HTTP-host Swagger/OpenAPI wiring into the explicit `Shared.Api.OpenApi` adapter, keeping Swashbuckle package references out of host projects while preserving development-only Swagger UI behavior.
+- Moved duplicated HTTP-host NATS publish wiring into the explicit `Gma.Framework.Messaging.Nats.Aspire` adapter, keeping `Aspire.NATS.Net` out of host projects while preserving `NatsJetStream:Enabled` as the publishing gate.
+- Moved duplicated HTTP-host Serilog configuration wiring into the explicit `Gma.Framework.Logging.Serilog` adapter, leaving host appsettings in each composition root while keeping Serilog package references out of host projects.
+- Moved duplicated HTTP-host Swagger/OpenAPI wiring into the explicit `Gma.Framework.Api.OpenApi` adapter, keeping Swashbuckle package references out of host projects while preserving development-only Swagger UI behavior.
 - Removed the public API host's inert `AddCors()` registration and added a guard so browser cross-origin support returns later only as an explicit configured policy/adapter.
 - Moved default HTTP health endpoint mapping fully into `ServiceDefaults.MapDefaultEndpoints()`, so hosts get `/health`, `/alive`, and optional `/metrics` from one shared runtime endpoint owner.
-- Added neutral `Shared.Api` security defaults so HTTP hosts can safely run authentication/authorization middleware without making the Auth module the hidden owner of baseline ASP.NET Core security services; actual schemes remain explicit Auth or external identity adapter choices.
-- Centralized default JWT/admin claim-name strings in `Shared.Security.ApplicationClaimNames`, with `GmaClaimNames` kept as a compatibility shim, replacing raw `tenant_id`, `sid`, and `sub` literals in production code and guarding the contract against drift.
+- Added neutral `Gma.Framework.Api` security defaults so HTTP hosts can safely run authentication/authorization middleware without making the Auth module the hidden owner of baseline ASP.NET Core security services; actual schemes remain explicit Auth or external identity adapter choices.
+- Centralized default JWT/admin claim-name strings in `Gma.Framework.Security.ApplicationClaimNames`, with `GmaClaimNames` kept as a compatibility shim, replacing raw `tenant_id`, `sid`, and `sub` literals in production code and guarding the contract against drift.
 - Hardened admin API claim-name option validation so actor and configured tenant claim names reject whitespace, control characters, and overlong values while preserving URI-style external identity claim types.
-- Split Auth core infrastructure from the JWT bearer authentication adapter into separate projects, keeping CLI Auth composition free of HTTP bearer packages/scheme registration while public/admin HTTP Auth surfaces opt into `Auth.Infrastructure.JwtBearer` explicitly.
-- Decoupled core Auth infrastructure registration from host-builder APIs: `Auth.Infrastructure` now exposes an `IServiceCollection` plus configuration extension, while host-builder coupling stays in HTTP/CLI composition and the explicit JWT bearer adapter.
+- Split Auth core infrastructure from the JWT bearer authentication adapter into separate projects, keeping CLI Auth composition free of HTTP bearer packages/scheme registration while public/admin HTTP Auth surfaces opt into `Gma.Modules.Auth.Infrastructure.JwtBearer` explicitly.
+- Decoupled core Auth infrastructure registration from host-builder APIs: `Gma.Modules.Auth.Infrastructure` now exposes an `IServiceCollection` plus configuration extension, while host-builder coupling stays in HTTP/CLI composition and the explicit JWT bearer adapter.
 - Made the Redis caching adapter preflight its own options through `RedisCachingOptionsValidator` before configuring StackExchange.Redis, so invalid adapter names or connection strings fail with shaped options-validation errors at composition time.
 - Made the configured NATS publishing adapter preflight `NatsJetStream` options and require `ConnectionStrings:nats` when publishing is enabled, keeping enabled-mode transport failures in startup/composition instead of first publish.
 - Made ServiceDefaults preflight observability options before wiring OpenTelemetry and Prometheus, so invalid exporter URIs, Prometheus paths, or empty enabled OTLP signal selections fail during composition.
@@ -265,24 +265,24 @@ These notes capture architectural and developer-experience findings from the bro
 - Made Administration application registration preflight bootstrap options before registering RBAC handlers or persisted authorization services.
 - Made low-level messaging runtime registration compose shared infrastructure idempotently, so custom/test hosts using direct outbox, NATS publishing, or NATS consumer hooks get required shared dependencies without hidden module discovery.
 - Added direct Catalog application registration coverage so the compiled example module proves repeat-safe CQRS, validation, and domain-event handler registration like the first-party modules.
-- Guarded `Host.Api` composition so shared infrastructure is wired before the optional Tenancy module enables tenant-scoped endpoint behavior, keeping `Tenancy.Api` lightweight while preserving validated tenant options.
+- Guarded `Host.Api` composition so shared infrastructure is wired before the optional Tenancy module enables tenant-scoped endpoint behavior, keeping `Gma.Modules.Tenancy.Api` lightweight while preserving validated tenant options.
 - Added an enum-default architecture guard so public contract/domain/shared boundary enums keep `Unknown = 0`; the former inbox `Pending = 0` persisted-state exception has been removed through compatibility migrations.
 - Added a public contract API boundary guard so a module may consume another module's contracts internally, but its own public `.Contracts`/`.Admin.Contracts` surface does not expose another module's types.
 - Guarded the manual `ArchitectureCatalog.ModuleDescriptors` list against drift by comparing it to every `*ModuleMetadata.Descriptor` exposed from module contract projects.
 - Aligned the module template and scaffolder next-step output with the descriptor-catalog and public contract ownership guards so generated-module follow-up work points at the same invariants the tests enforce.
 - Guarded provider-specific migration projects so they reference only their owning `.Persistence` project, keeping EF design-time/migration edges thin and preventing migration projects from becoming hidden composition roots.
-- Removed a stale `Auth.Api` reference to `Shared.Infrastructure` and guarded module API/admin front-door projects against direct shared-infrastructure references; front doors compose module adapters, while persistence/messaging/cache projects own infrastructure coupling.
+- Removed a stale `Gma.Modules.Auth.Api` reference to `Gma.Framework.Infrastructure` and guarded module API/admin front-door projects against direct shared-infrastructure references; front doors compose module adapters, while persistence/messaging/cache projects own infrastructure coupling.
 - Guarded persisted modules to keep SQL Server and PostgreSQL migration project parity, preserving the current first-class provider split without running expensive migration drift checks for unrelated slices.
 - Replaced Auth-only clean-architecture checks with module-wide Domain/Application dependency guards so every current and future feature module keeps domain code free of contracts/adapters/frameworks and application code free of persistence/infrastructure/front-door dependencies.
 - Removed the stale `NetArchTest.Rules` dependency after module boundary checks moved to direct assembly-reference guards, keeping architecture tests on the repo's own explicit catalog rather than an unused external package.
 - Added a domain project-shape guard so module `.Domain` projects keep only shared domain/error project references and no package/framework references, catching unused dependency drift before it appears in compiled assembly references.
 - Added an application project-shape guard so module `.Application` projects stay adapter/front-door free at the `.csproj` level, allowing only shared abstractions, own contracts/domain, optional producer contracts, and small Microsoft extension abstraction packages.
-- Tightened application project-shape rules so `Shared.Administration` is reserved for the owning `Administration.Application` module; feature modules keep admin framework dependencies in `.AdminCli` and `.AdminApi` front doors.
-- Added public/admin contract project-shape guards so public `.Contracts` projects stay backend/admin-framework free, while `.Admin.Contracts` projects remain thin typed wrappers over `Shared.Administration` and the owning public contracts.
+- Tightened application project-shape rules so `Gma.Framework.Administration` is reserved for the owning `Gma.Modules.Administration.Application` module; feature modules keep admin framework dependencies in `.AdminCli` and `.AdminApi` front doors.
+- Added public/admin contract project-shape guards so public `.Contracts` projects stay backend/admin-framework free, while `.Admin.Contracts` projects remain thin typed wrappers over `Gma.Framework.Administration` and the owning public contracts.
 - Added a persistence project-shape guard so module `.Persistence` projects stay EF provider adapters instead of accumulating front-door, admin, framework, or unrelated package dependencies.
 - Added HTTP and admin CLI front-door project-shape guards so module `.Api`, `.AdminApi`, and `.AdminCli` projects can compose their owning module adapters without becoming catch-all dependency sinks.
 - Hardened module boundary source/project scans to ignore `bin` and `obj`, keeping architecture checks stable after local builds generate source files.
-- Added shared-core project-shape guards so dependency-free primitives stay dependency-free, `Shared.Application.Composition` remains limited to constrained registration, `Shared.Application.Events` stays event-contract-only, and `Shared.Pagination` stays dependency-free.
+- Added shared-core project-shape guards so dependency-free primitives stay dependency-free, `Gma.Framework.Application.Composition` remains limited to constrained registration, `Gma.Framework.Application.Events` stays event-contract-only, and `Gma.Framework.Pagination` stays dependency-free.
 - Added a shared-project dependency manifest guard so concrete backend packages stay in explicit shared adapter projects and new shared projects require a deliberate dependency-shape update.
 - Added a runtime host dependency manifest guard so public/admin HTTP hosts stay package-free composition roots, `Host.AdminCli` owns only CLI-hosting packages, `ServiceDefaults` owns observability packages, and `AppHost` owns Aspire hosting packages.
 - Added a test-project hygiene guard so every test project remains discoverable, non-packable, centrally versioned, and keeps the xUnit runner dependency private.
@@ -291,7 +291,7 @@ These notes capture architectural and developer-experience findings from the bro
 - Added an enum-guidance docs guard so the `Unknown = 0`, smart-enum/code-list, provider enum, and module-template rules stay visible while enum modeling evolves.
 - Centralized admin CLI message/error/prompt output through `AdminCliOutput` and guarded module `.AdminCli` front doors against raw `Console` writes, keeping output formatting replaceable without changing module command maps.
 - Isolated shared unit tests that redirect process-wide console streams with `ConsoleTestIsolation` and added a guard so future non-integration console-redirection tests cannot race under xUnit parallel execution.
-- Guarded the module scaffolder so generated admin CLI shells keep depending on `Shared.Administration.Cli` and do not introduce raw console output into generated module front doors.
+- Guarded the module scaffolder so generated admin CLI shells keep depending on `Gma.Framework.Administration.Cli` and do not introduce raw console output into generated module front doors.
 - Hardened `DockerFact` availability probing so a hung `docker info` check is bounded, hidden-window, and explicitly kills the timed-out child process before falling back to local skip behavior.
 - Removed the stale unused `Add-ProjectReference` helper from `eng/new-module.ps1` and guarded against reintroducing that misleading scaffolder extension point.
 - Added a markdown local-link guard so `README.md` and docs links to repository files, templates, requests, and architecture pages cannot rot silently.
@@ -310,7 +310,7 @@ These notes capture architectural and developer-experience findings from the bro
 - Documented ADR 0006 so this reflection rule stays bounded and does not become implicit host/module discovery or integration-event subscription scanning.
 - Evaluated FluentValidation against the current request-shape validators and documented ADR 0007 to keep shared CQRS validator contracts as the default instead of adding a parallel validation stack.
 - Started the optional tasks/daemons framework with ADR 0008, shared task payload/context/progress/control contracts, and module task metadata without adding a scheduler/runtime dependency to default hosts.
-- Added scheduler-neutral task run store contracts, lease request/value objects, shared status-transition rules, and an explicit `Shared.Tasks.Cqrs` bridge for `ITaskCommandDispatcher` while keeping EF tables, worker services, and scheduler adapters out of default host composition. The dispatcher contract and implementation live outside `Shared.Tasks.Infrastructure` so task workers can run without CQRS unless a host composes `AddTaskCqrs()`.
+- Added scheduler-neutral task run store contracts, lease request/value objects, shared status-transition rules, and an explicit `Gma.Framework.Tasks.Cqrs` bridge for `ITaskCommandDispatcher` while keeping EF tables, worker services, and scheduler adapters out of default host composition. The dispatcher contract and implementation live outside `Gma.Framework.Tasks.Infrastructure` so task workers can run without CQRS unless a host composes `AddTaskCqrs()`.
 - Added the optional `TaskRuntime` EF persistence module with SQL Server/PostgreSQL migrations, explicit `AddTaskWorkerRuntime()` hosted-worker composition, explicit task-handler registration metadata, architecture guards that task metadata matches handler registration, and a compiled `TaskSamples` module proving task execution through CQRS dispatch.
 
 ## Findings To Keep Watching
@@ -329,7 +329,7 @@ These notes capture architectural and developer-experience findings from the bro
 - Architecture tests now use a single explicit catalog for compiled module projects. New non-migration module projects are tested to appear there in the same change that adds the module.
 - Continue the admin API security pass with deeper audit export, audit retention, and external identity-provider mapping requirements.
 - Keep Administration and Tenancy contract metadata aligned with `ArchitectureCatalog`, docs, and scaffolding output as those optional modules evolve.
-- Renamed the legacy result/error primitive package to `Shared.Results` so the package name matches its actual `Error` / `Result` primitives and the existing `tests/Shared.Tests/Results` test area.
+- Renamed the legacy result/error primitive package to `Gma.Framework.Results` so the package name matches its actual `Error` / `Result` primitives and the existing `src/Framework/tests/Gma.Framework.Tests/Results` test area.
 - Continue documenting permission codes carefully so consumer modules do not treat permissions as domain model.
 - Keep using `Unknown = 0` for ordinary public contract and domain-state enums. If a future module needs richer compatibility semantics, use a deliberate smart enum or value-object/code-list type with tests and docs rather than silently mapping unknown values to a valid domain value.
 - Follow-up enum design remains open: regular enums with `Unknown = 0` are the default, but modules may introduce a documented custom enum/smart-enum/code-list pattern when versioning, parsing, or provider compatibility needs stronger behavior.
@@ -338,10 +338,10 @@ These notes capture architectural and developer-experience findings from the bro
 - Any reflection-backed enum/custom-enum registry should be explicitly called out in module docs and backed by tests proving it does not duplicate or conflict with .NET/source-generator/default package alternatives.
 - If custom enums become worth adding, make them a single documented project-wide pattern with explicit parsing, display name, persistence value, compatibility behavior, and tests; avoid per-module enum magic that new contributors have to rediscover.
 - Do not renumber persisted enum values after migrations exist unless a compatibility migration and data backfill are part of the same change; the inbox status migration is the reference pattern for retiring an old persisted enum layout.
-- If tenant ids need richer semantics later, evolve `TenantIds` into a `Shared.Domain` value object or code-list type with migrations, docs, and compatibility tests.
+- If tenant ids need richer semantics later, evolve `TenantIds` into a `Gma.Framework.Domain` value object or code-list type with migrations, docs, and compatibility tests.
 - Auth identity structs intentionally leave `default(<Id>)` as `Guid.Empty` so aggregate, event, and token guards can reject missing identities explicitly. Do not normalize empty ids into fallback ids.
 - Catalog and Ordering examples are compiled but intentionally not registered in default hosts. Keep architecture tests for that, because accidental registration would turn examples into runtime dependencies.
-- HTTP Serilog composition is split between `Shared.Logging.Serilog` for host configuration loading and `Shared.Api.Serilog` for request-log enrichment; keep hosts responsible for appsettings values, and keep generic `Shared.Api` free of logging backend packages.
+- HTTP Serilog composition is split between `Gma.Framework.Logging.Serilog` for host configuration loading and `Gma.Framework.Api.Serilog` for request-log enrichment; keep hosts responsible for appsettings values, and keep generic `Gma.Framework.Api` free of logging backend packages.
 
 ## Security And Responsibility Notes
 
@@ -350,7 +350,7 @@ These notes capture architectural and developer-experience findings from the bro
 - Admin audit data must remain operation metadata only: actor, tenant, permission, result, timestamps, and error code. Never include passwords, tokens, token hashes, refresh tokens, or raw secrets.
 - Admin audit IDs and timestamps should come from shared infrastructure primitives so audit behavior stays deterministic and replaceable.
 - NATS subjects and integration event names are public contracts. Changing them is a versioned compatibility decision, not a local refactor.
-- `IntegrationEvent` centralizes event id, occurrence time, event name, and version validation. Tenant-owned events use `TenantIntegrationEvent` from `Shared.Tenancy.Messaging`; keep payload-specific fields in the module event type, and introduce richer envelope compatibility only through a documented messaging ADR.
+- `IntegrationEvent` centralizes event id, occurrence time, event name, and version validation. Tenant-owned events use `TenantIntegrationEvent` from `Gma.Framework.Tenancy.Messaging`; keep payload-specific fields in the module event type, and introduce richer envelope compatibility only through a documented messaging ADR.
 - Cross-module decisions should continue to use local projections or duplicated read data. Do not add cross-module EF relationships or direct domain/application references.
 
 ## Small Local Notes

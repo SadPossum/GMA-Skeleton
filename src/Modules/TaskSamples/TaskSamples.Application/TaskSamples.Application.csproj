@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\TaskSamples.Contracts\TaskSamples.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Application.Composition\Shared.Application.Composition.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Results\Shared.Results.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Tasks.Cqrs\Shared.Tasks.Cqrs.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Tasks\Shared.Tasks.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Runtime\Shared.Runtime.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Cqrs\Shared.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Application.Composition\Gma.Framework.Application.Composition.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Results\Gma.Framework.Results.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tasks.Cqrs\Gma.Framework.Tasks.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tasks\Gma.Framework.Tasks.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Runtime\Gma.Framework.Runtime.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj" />
   </ItemGroup>
 </Project>

@@ -3,14 +3,31 @@
 ## Test Projects
 
 ```text
-Administration.Tests
+src/Framework/tests/Gma.Framework.Tests
+src/Modules/Administration/tests/Gma.Modules.Administration.Tests
+src/Modules/Auth/tests/Gma.Modules.Auth.Tests
+src/Modules/Notifications/tests/Gma.Modules.Notifications.Tests
+tests/Architecture.Tests
+tests/Catalog.Tests
+tests/Integration.Tests
+tests/Ordering.Tests
+tests/ServiceDefaults.Tests
+```
+
+Focused framework and reusable-module tests live under the future source repository root. Root-level `tests/` is for skeleton/composition tests, example-module tests, and cross-module integration or architecture coverage.
+
+Test project names:
+
+```text
+Gma.Modules.Administration.Tests
 Architecture.Tests
-Auth.Tests
+Gma.Modules.Auth.Tests
 Catalog.Tests
 Integration.Tests
 Ordering.Tests
 ServiceDefaults.Tests
-Shared.Tests
+Gma.Framework.Tests
+Gma.Modules.Notifications.Tests
 ```
 
 Every test project must declare:
@@ -53,7 +70,7 @@ Use these defaults:
 
 - `Support/` for fixtures, test applications, helper attributes, shared test collections, and catalogs.
 - Feature module unit tests mirror the module layer: `Application/`, `Contracts/`, `Domain/`, `Persistence/`, `Security/`, or a focused capability such as `Projections/`.
-- `Shared.Tests` groups by shared capability: `Administration/`, `Api/`, `Caching/`, `Cqrs/`, `Domain/`, `Infrastructure/`, `Messaging/`, `Modules/`, `Numerics/`, `Observability/`, `Results/`, `Security/`.
+- `Gma.Framework.Tests` groups by shared capability: `Administration/`, `Api/`, `Caching/`, `Cqrs/`, `Domain/`, `Infrastructure/`, `Messaging/`, `Modules/`, `Numerics/`, `Observability/`, `Results/`, `Security/`.
 - `Architecture.Tests` uses `Boundaries/`, `DeveloperExperience/`, `Modules/`, and `Support/`.
 - `Integration.Tests` groups by runtime surface or adapter: `AdminApi/`, `AdminCli/`, `Auth/`, `Caching/`, `Messaging/`, `Observability/`, `Persistence/`, and `Support/`.
 
@@ -78,7 +95,7 @@ Docker tests run only `Category=Docker`, set `GMA_REQUIRE_DOCKER_TESTS=true`, an
 Full local test command:
 
 ```powershell
-dotnet test GenericModularApi.sln --no-build --logger "console;verbosity=minimal"
+dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 If .NET 10 is installed outside `PATH`, set `GMA_DOTNET` and use the `eng/*.ps1` scripts so local tooling still resolves the pinned SDK intentionally.
@@ -175,4 +192,4 @@ Admin_cli_bootstraps_rbac_and_manages_auth_members_against_sql_server_and_postgr
 - Use unique database names or isolated containers.
 - Avoid relying on test order.
 - Prefer deterministic timestamps for domain tests.
-- Tests that redirect process-wide state such as `Console.Out`, `Console.Error`, or `Console.In` must use a dedicated xUnit collection so they do not race with each other. `Shared.Tests` uses `ConsoleTestIsolation` for this.
+- Tests that redirect process-wide state such as `Console.Out`, `Console.Error`, or `Console.In` must use a dedicated xUnit collection so they do not race with each other. `Gma.Framework.Tests` uses `ConsoleTestIsolation` for this.

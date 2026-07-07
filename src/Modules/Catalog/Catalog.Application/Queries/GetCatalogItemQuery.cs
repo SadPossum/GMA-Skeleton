@@ -1,6 +1,6 @@
 namespace Catalog.Application.Queries;
 
 using Catalog.Contracts;
-using Shared.Cqrs;
+using Gma.Framework.Cqrs;
 
 public sealed record GetCatalogItemQuery(Guid ItemId) : IQuery<CatalogItemDto>;

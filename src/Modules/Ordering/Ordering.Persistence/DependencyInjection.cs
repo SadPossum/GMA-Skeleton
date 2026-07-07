@@ -7,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Ordering.Application.Ports;
 using Ordering.Persistence.Repositories;
-using Shared.Messaging;
-using Shared.Cqrs.UnitOfWork;
-using Shared.Persistence.EntityFrameworkCore;
-using Shared.ProjectionRebuild;
+using Gma.Framework.Messaging;
+using Gma.Framework.Cqrs.UnitOfWork;
+using Gma.Framework.Persistence.EntityFrameworkCore;
+using Gma.Framework.ProjectionRebuild;
 
 public static class DependencyInjection
 {

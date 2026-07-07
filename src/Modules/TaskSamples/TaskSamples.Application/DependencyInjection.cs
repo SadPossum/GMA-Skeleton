@@ -2,8 +2,8 @@ namespace TaskSamples.Application;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shared.Application.Composition;
-using Shared.Tasks;
+using Gma.Framework.Application.Composition;
+using Gma.Framework.Tasks;
 using TaskSamples.Application.Tasks;
 using TaskSamples.Contracts;
 

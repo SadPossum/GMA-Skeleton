@@ -1,7 +1,7 @@
 namespace Catalog.Domain.Events;
 
 using Catalog.Domain.Aggregates;
-using Shared.Domain;
+using Gma.Framework.Domain;
 
 public sealed record CatalogItemUpdatedDomainEvent : TenantDomainEvent
 {

@@ -1,7 +1,7 @@
 namespace Ordering.Persistence;
 
-using Shared.Domain;
-using Shared.ProjectionRebuild;
+using Gma.Framework.Domain;
+using Gma.Framework.ProjectionRebuild;
 
 public sealed class OrderingProjectionRebuildCheckpoint : ProjectionRebuildCheckpointState, ITenantScoped
 {

@@ -6,7 +6,7 @@ Use notifications for best-effort UI updates such as operation completion, task 
 
 ## Boundaries
 
-Modules may depend on the contracts in `Shared.Notifications` for best-effort front-door delivery:
+Modules may depend on the contracts in `Gma.Framework.Notifications` for best-effort front-door delivery:
 
 - `IUserNotificationPayload`
 - `IUserNotificationRequestQueue`
@@ -17,18 +17,18 @@ Modules may depend on the contracts in `Shared.Notifications` for best-effort fr
 - notification metadata attributes
 - module descriptor notification metadata
 
-Modules may also reference `Notifications.Contracts` when they intentionally publish durable notification requests for the optional `Notifications` module.
+Modules may also reference `Gma.Modules.Notifications.Contracts` when they intentionally publish durable notification requests for the optional `Notifications` module.
 
 Modules must not reference:
 
-- `Shared.Notifications.Api`
-- `Shared.Notifications.Cqrs`
-- `Shared.Notifications.SignalR`
-- `Notifications.Application`
-- `Notifications.Domain`
-- `Notifications.Persistence`
-- `Notifications.Api`
-- `Notifications.AdminApi`
+- `Gma.Framework.Notifications.Api`
+- `Gma.Framework.Notifications.Cqrs`
+- `Gma.Framework.Notifications.SignalR`
+- `Gma.Modules.Notifications.Application`
+- `Gma.Modules.Notifications.Domain`
+- `Gma.Modules.Notifications.Persistence`
+- `Gma.Modules.Notifications.Api`
+- `Gma.Modules.Notifications.AdminApi`
 - SignalR packages
 - ASP.NET notification endpoint or hub internals
 
@@ -37,19 +37,19 @@ The host selects delivery adapters.
 ## Project Split
 
 ```text
-Shared.Notifications
+Gma.Framework.Notifications
   contracts and metadata
 
-Shared.Notifications.Infrastructure
+Gma.Framework.Notifications.Infrastructure
   in-process feed, bounded queues, serialization, metrics, fail-open history and sink dispatch
 
-Shared.Notifications.Cqrs
+Gma.Framework.Notifications.Cqrs
   post-commit command pipeline bridge for queued notification requests
 
-Shared.Notifications.Api
+Gma.Framework.Notifications.Api
   authenticated SSE endpoint
 
-Shared.Notifications.SignalR
+Gma.Framework.Notifications.SignalR
   authenticated SignalR hub and group delivery
 
 Notifications
@@ -92,7 +92,7 @@ Declare public notification contracts in the owning module contracts project whe
 
 ## Requesting From Commands
 
-Transactional command handlers may enqueue best-effort live notification intent through `IUserNotificationRequestQueue`. The queue is scoped to the current command execution, and `Shared.Notifications.Cqrs` flushes it only after a successful command result and unit-of-work commit:
+Transactional command handlers may enqueue best-effort live notification intent through `IUserNotificationRequestQueue`. The queue is scoped to the current command execution, and `Gma.Framework.Notifications.Cqrs` flushes it only after a successful command result and unit-of-work commit:
 
 ```csharp
 await notificationRequests.EnqueueAsync(
@@ -107,7 +107,7 @@ await notificationRequests.EnqueueAsync(
 
 This prevents a user from seeing "item updated" before the database commit succeeds. The scoped queue is not itself durable. If the optional `Notifications` module is composed, history is stored when the post-commit publish request reaches `IUserNotificationPublisher`; if a process dies after the source commit but before the queue flushes, no history row is created.
 
-For guaranteed history creation, publish `UserNotificationRequestedIntegrationEvent` from the source module's outbox. The event contract lives in `Notifications.Contracts`, while the physical subject remains producer-scoped:
+For guaranteed history creation, publish `UserNotificationRequestedIntegrationEvent` from the source module's outbox. The event contract lives in `Gma.Modules.Notifications.Contracts`, while the physical subject remains producer-scoped:
 
 ```text
 {application-namespace}.{producer-module}.user-notification-requested.v1

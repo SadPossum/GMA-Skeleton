@@ -5,10 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Ordering.Application.Handlers;
 using Ordering.Application.Tasks;
 using Ordering.Contracts;
-using Shared.Application.Composition;
-using Shared.Messaging;
-using Shared.ProjectionRebuild.Tasks;
-using Shared.Tasks;
+using Gma.Framework.Application.Composition;
+using Gma.Framework.Messaging;
+using Gma.Framework.ProjectionRebuild.Tasks;
+using Gma.Framework.Tasks;
 
 public static class DependencyInjection
 {

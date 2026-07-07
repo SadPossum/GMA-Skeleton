@@ -12,7 +12,7 @@ Cross-module reads are tempting in a modular monolith because everything is depl
 
 ## Decision
 
-Add a generic NATS JetStream consumer loop in `Shared.Messaging.Nats` and consumer contracts in `Shared.Messaging`.
+Add a generic NATS JetStream consumer loop in `Gma.Framework.Messaging.Nats` and consumer contracts in `Gma.Framework.Messaging`.
 
 Modules register subscriptions explicitly:
 

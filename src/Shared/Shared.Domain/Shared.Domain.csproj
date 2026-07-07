@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\Shared.Naming\Shared.Naming.csproj" />
-    <ProjectReference Include="..\Shared.Numerics\Shared.Numerics.csproj" />
-  </ItemGroup>
-</Project>

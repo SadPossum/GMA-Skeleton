@@ -1,5 +1,5 @@
 namespace Catalog.Contracts;
 
-using Shared.ProjectionRebuild;
+using Gma.Framework.ProjectionRebuild;
 
 public interface ICatalogItemProjectionExportSource : IProjectionRebuildSource<CatalogItemProjectionExport>;

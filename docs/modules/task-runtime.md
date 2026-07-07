@@ -5,14 +5,14 @@ The `TaskRuntime` module is an optional persisted runtime for queued tasks, long
 ## Projects
 
 ```text
-TaskRuntime.Contracts
-TaskRuntime.Application
-TaskRuntime.Persistence
-TaskRuntime.Persistence.SqlServerMigrations
-TaskRuntime.Persistence.PostgreSqlMigrations
-TaskRuntime.Admin.Contracts
-TaskRuntime.AdminCli
-TaskRuntime.AdminApi
+Gma.Modules.TaskRuntime.Contracts
+Gma.Modules.TaskRuntime.Application
+Gma.Modules.TaskRuntime.Persistence
+Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations
+Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations
+Gma.Modules.TaskRuntime.Admin.Contracts
+Gma.Modules.TaskRuntime.AdminCli
+Gma.Modules.TaskRuntime.AdminApi
 ```
 
 `TaskRuntime` is not registered in the default `Host.Api`, `Host.AdminCli`, or `Host.AdminApi`. Applications compose it explicitly when they want persisted task runs or admin task controls.
@@ -27,7 +27,7 @@ The module owns:
 - SQL Server and PostgreSQL migrations for the `tasks` schema;
 - admin CLI and admin API front doors for task operations.
 
-The shared task contracts and worker loop live outside the module in `Shared.Tasks`, `Shared.Tasks.Infrastructure`, and optional bridge packages. Task-owning modules still own their payload contracts and handlers.
+The shared task contracts and worker loop live outside the module in `Gma.Framework.Tasks`, `Gma.Framework.Tasks.Infrastructure`, and optional bridge packages. Task-owning modules still own their payload contracts and handlers.
 
 ## Composition
 
@@ -56,11 +56,11 @@ For tenant-scoped task payloads, compose the tenancy task bridge:
 builder.AddTenantTaskExecutionContext();
 ```
 
-`TaskRuntimeProfiles.Default` is selected by `TaskRuntime.AdminCli` and `TaskRuntime.AdminApi`. The profile requires the persisted run store, runtime reporter, and control channel provided by `TaskRuntime.Persistence`.
+`TaskRuntimeProfiles.Default` is selected by `Gma.Modules.TaskRuntime.AdminCli` and `Gma.Modules.TaskRuntime.AdminApi`. The profile requires the persisted run store, runtime reporter, and control channel provided by `Gma.Modules.TaskRuntime.Persistence`.
 
 ## Admin CLI
 
-`TaskRuntime.AdminCli` contributes the `tasks` command surface when explicitly registered by an admin CLI host:
+`Gma.Modules.TaskRuntime.AdminCli` contributes the `tasks` command surface when explicitly registered by an admin CLI host:
 
 ```text
 tasks runs list
@@ -75,7 +75,7 @@ tasks runs retry --run-id <id> --yes
 
 ## Admin API
 
-`TaskRuntime.AdminApi` maps admin-only endpoints under:
+`Gma.Modules.TaskRuntime.AdminApi` maps admin-only endpoints under:
 
 ```text
 /api/admin/tasks/runs

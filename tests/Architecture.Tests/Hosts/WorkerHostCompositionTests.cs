@@ -4,9 +4,9 @@ using Host.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Shared.Messaging;
-using Shared.ModuleComposition;
-using Shared.Tasks;
+using Gma.Framework.Messaging;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Tasks;
 using Xunit;
 
 [Trait("Category", "Architecture")]

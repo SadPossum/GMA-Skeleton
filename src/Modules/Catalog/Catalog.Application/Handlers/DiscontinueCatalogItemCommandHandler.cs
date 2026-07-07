@@ -4,11 +4,11 @@ using Catalog.Application.Commands;
 using Catalog.Application.Ports;
 using Catalog.Domain.Aggregates;
 using Catalog.Domain.Errors;
-using Shared.Cqrs;
-using Shared.Caching;
-using Shared.Runtime.Identity;
-using Shared.Runtime.Time;
-using Shared.Results;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Caching;
+using Gma.Framework.Runtime.Identity;
+using Gma.Framework.Runtime.Time;
+using Gma.Framework.Results;
 
 internal sealed class DiscontinueCatalogItemCommandHandler(
     ICatalogItemRepository repository,

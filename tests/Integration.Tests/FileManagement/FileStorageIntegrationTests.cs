@@ -3,26 +3,26 @@ namespace Integration.Tests;
 using System.Text;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
-using Files.Api;
-using Files.Application.Commands;
-using Files.Application.Queries;
-using Files.Application.ReadModels;
-using Files.Contracts;
+using Gma.Modules.Files.Api;
+using Gma.Modules.Files.Application.Commands;
+using Gma.Modules.Files.Application.Queries;
+using Gma.Modules.Files.Application.ReadModels;
+using Gma.Modules.Files.Contracts;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Shared.AccessControl;
-using Shared.Api.Modules;
-using Shared.Cqrs;
-using Shared.Cqrs.Infrastructure;
-using Shared.FileManagement;
-using Shared.FileManagement.LocalStorage;
-using Shared.FileManagement.Minio;
-using Shared.ModuleComposition;
-using Shared.Results;
-using Shared.Runtime.Infrastructure;
-using Shared.Tenancy.Infrastructure;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Api.Modules;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Cqrs.Infrastructure;
+using Gma.Framework.FileManagement;
+using Gma.Framework.FileManagement.LocalStorage;
+using Gma.Framework.FileManagement.Minio;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Results;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Tenancy.Infrastructure;
 using Xunit;
 
 [Trait("Category", "Integration")]
@@ -72,7 +72,7 @@ public sealed class FileStorageIntegrationTests
             Result<FileDownload> afterDelete = await dispatcher.QueryAsync(
                 new GetFileQuery(upload.Value.FileId, UserSubject("user-a")));
             Assert.True(afterDelete.IsFailure);
-            Assert.Equal(Files.Application.FilesApplicationErrors.FileNotFound, afterDelete.Error);
+            Assert.Equal(Gma.Modules.Files.Application.FilesApplicationErrors.FileNotFound, afterDelete.Error);
         }
         finally
         {
@@ -113,9 +113,9 @@ public sealed class FileStorageIntegrationTests
                 new GetFileQuery(upload.Value.FileId, UserSubject("user-a")));
 
             Assert.True(otherUserDownload.IsFailure);
-            Assert.Equal(Files.Application.FilesApplicationErrors.FileNotFound, otherUserDownload.Error);
+            Assert.Equal(Gma.Modules.Files.Application.FilesApplicationErrors.FileNotFound, otherUserDownload.Error);
             Assert.True(otherUserDelete.IsFailure);
-            Assert.Equal(Files.Application.FilesApplicationErrors.FileNotFound, otherUserDelete.Error);
+            Assert.Equal(Gma.Modules.Files.Application.FilesApplicationErrors.FileNotFound, otherUserDelete.Error);
             Assert.True(ownerDownload.IsSuccess, ownerDownload.Error.Message);
         }
         finally

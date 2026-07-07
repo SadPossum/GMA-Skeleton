@@ -1,8 +1,8 @@
 namespace Catalog.Contracts;
 
-using Shared.Messaging;
-using Shared.Tenancy;
-using Shared.Tenancy.Messaging;
+using Gma.Framework.Messaging;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Tenancy.Messaging;
 
 [IntegrationEventName(EventType)]
 [IntegrationEventVersion(EventVersion)]

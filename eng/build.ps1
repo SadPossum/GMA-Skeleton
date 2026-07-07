@@ -7,7 +7,7 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
-$arguments = @('build', (Join-GmaPath 'GenericModularApi.sln'))
+$arguments = @('build', (Join-GmaPath 'GenericModularApi.slnx'))
 
 if ($NoRestore) {
     $arguments += '--no-restore'

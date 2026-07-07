@@ -42,5 +42,5 @@ Adapter-specific physical overrides remain available when a deployment must inte
 - Module contracts keep stable logical module/event/version names and render physical subjects through shared naming helpers or module subject factory methods.
 - Runtime hosts can be cloned into a new product without editing module internals.
 - Existing code that references `gma` defaults continues to work locally.
-- Compatibility wrappers such as `AddGmaOpenApi`, `UseGmaSerilogRequestLogging`, and `GmaClaimNames` may remain temporarily, but new host composition and docs should use neutral names.
+- Compatibility wrappers such as `AddSharedOpenApi`, `UseSharedSerilogRequestLogging`, and `GmaClaimNames` may remain temporarily, but new host composition and docs should use GMA framework names.
 - Architecture and unit tests should cover both default `gma` behavior and a configured namespace such as `acme-orders`.

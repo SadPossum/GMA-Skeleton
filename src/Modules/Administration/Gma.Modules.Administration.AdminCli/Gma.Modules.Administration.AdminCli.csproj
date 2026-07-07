@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gma.Modules.Administration.Contracts\Gma.Modules.Administration.Contracts.csproj" />
+    <ProjectReference Include="..\Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj" />
+    <ProjectReference Include="..\Gma.Modules.Administration.Persistence\Gma.Modules.Administration.Persistence.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration.Cli\Gma.Framework.Administration.Cli.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration\Gma.Framework.Administration.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Runtime\Gma.Framework.Runtime.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Results\Gma.Framework.Results.csproj" />
+  </ItemGroup>
+</Project>

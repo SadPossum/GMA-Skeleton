@@ -2,7 +2,7 @@ namespace Catalog.Persistence.PostgreSqlMigrations;
 
 using Catalog.Persistence;
 using Microsoft.EntityFrameworkCore.Design;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 public sealed class CatalogPostgreSqlDesignTimeDbContextFactory : IDesignTimeDbContextFactory<CatalogDbContext>
 {

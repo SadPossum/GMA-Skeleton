@@ -2,8 +2,8 @@ namespace Catalog.Domain.Visibility;
 
 using Catalog.Domain.Errors;
 using Catalog.Domain.ValueObjects;
-using Shared.Naming;
-using Shared.Results;
+using Gma.Framework.Naming;
+using Gma.Framework.Results;
 
 public sealed record CatalogViewer
 {

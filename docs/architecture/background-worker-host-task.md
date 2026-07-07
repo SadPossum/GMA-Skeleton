@@ -32,7 +32,7 @@ The repo already has most of the runtime pieces:
 - When NATS publishing is enabled, `AddNatsJetStreamMessaging()` replaces `IEventBus` with the NATS implementation and registers `OutboxPublisherService`.
 - `OutboxPublisherService` claims pending rows from every registered module `IOutboxStore` and publishes through `IEventBus`.
 - NATS consumers are separate. They start only when a host calls `AddNatsJetStreamConsumers()` and `NatsConsumers:Enabled=true`.
-- Task processing is separate. Hosts must explicitly compose `TaskRuntime.Persistence`, task handler modules, and `AddTaskWorkerRuntime()`.
+- Task processing is separate. Hosts must explicitly compose `Gma.Modules.TaskRuntime.Persistence`, task handler modules, and `AddTaskWorkerRuntime()`.
 
 The current design is safe for small systems because API requests do not publish to NATS inline. Writes add outbox rows inside the module database transaction, and background publishing happens later.
 
@@ -111,7 +111,7 @@ Keep worker composition explicit.
 The first slice may compose module services directly in `Program.cs`:
 
 ```csharp
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddMessagingInfrastructure();
 builder.AddConfiguredNatsJetStreamMessaging();
 builder.AddNatsJetStreamConsumers();

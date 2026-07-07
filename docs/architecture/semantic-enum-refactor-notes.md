@@ -19,13 +19,13 @@ This keeps the skeleton simple:
 ## Applied In This Slice
 
 - Replaced notifications domain string-backed `NotificationSeverity`, `NotificationBroadcastAudience`, and `NotificationBroadcastRecipientKind` records with enums.
-- Replaced notification recipient-kind public constants with a `Notifications.Contracts.NotificationBroadcastRecipientKind` enum and mapped contract values to domain values in `Notifications.Application`.
-- Replaced notification DTO and create-broadcast command severity strings with `Notifications.Contracts.NotificationSeverity`.
+- Replaced notification recipient-kind public constants with a `Gma.Modules.Notifications.Contracts.NotificationBroadcastRecipientKind` enum and mapped contract values to domain values in `Gma.Modules.Notifications.Application`.
+- Replaced notification DTO and create-broadcast command severity strings with `Gma.Modules.Notifications.Contracts.NotificationSeverity`.
 - Added notification-owned parse/format helpers for stable wire values.
 - Added owner-package JSON converters for notification contract enums and shared live notification severity so HTTP, SignalR/SSE payloads, and integration events write stable lowercase/kebab-case strings and reject numeric, unknown, or undefined values.
 - Replaced the shared SSE notification item `kind` string with `NotificationSseItemKind`, keeping the external JSON as stable `notification`/`heartbeat` text.
-- Replaced Auth admin member status DTO strings with `Auth.Contracts.MemberStatus` and an Auth-owned JSON converter so admin API responses expose stable lowercase status names without coupling contracts to the Auth domain enum.
-- Added owner-package JSON converters and wire-name helpers for `Auth.Contracts.UsernameType`, `Catalog.Contracts.CatalogItemStatus`, and `Ordering.Contracts.OrderStatus`.
+- Replaced Auth admin member status DTO strings with `Gma.Modules.Auth.Contracts.MemberStatus` and an Auth-owned JSON converter so admin API responses expose stable lowercase status names without coupling contracts to the Auth domain enum.
+- Added owner-package JSON converters and wire-name helpers for `Gma.Modules.Auth.Contracts.UsernameType`, `Catalog.Contracts.CatalogItemStatus`, and `Ordering.Contracts.OrderStatus`.
 - Kept EF columns and public DTO strings stable by translating through helpers in persistence/repositories.
 - Changed notification aggregate/entity factories to accept domain enum values instead of raw strings.
 - Added tests for `Unknown = 0`, parsing, formatting, and invalid-value rejection.

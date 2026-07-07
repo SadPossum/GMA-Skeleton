@@ -1,7 +1,7 @@
 namespace Catalog.Application.Validation;
 
 using Catalog.Application.Commands;
-using Shared.Cqrs;
+using Gma.Framework.Cqrs;
 
 internal sealed class DiscontinueCatalogItemCommandValidator : ICommandValidator<DiscontinueCatalogItemCommand>
 {

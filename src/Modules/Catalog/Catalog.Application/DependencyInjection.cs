@@ -1,7 +1,7 @@
 namespace Catalog.Application;
 
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Application.Composition;
+using Gma.Framework.Application.Composition;
 
 public static class DependencyInjection
 {

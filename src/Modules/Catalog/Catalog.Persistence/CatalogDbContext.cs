@@ -2,9 +2,9 @@ namespace Catalog.Persistence;
 
 using Catalog.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
-using Shared.Persistence.EntityFrameworkCore;
-using Shared.Tenancy;
-using Shared.Messaging.Infrastructure;
+using Gma.Framework.Persistence.EntityFrameworkCore;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Messaging.Infrastructure;
 
 public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options, ITenantContext tenantContext)
     : TenantAwareDbContext<CatalogDbContext>(options, tenantContext)

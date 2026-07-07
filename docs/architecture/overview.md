@@ -24,92 +24,94 @@ src/
   Host.Worker/
   AppHost/
   ServiceDefaults/
-  Shared/
-    Shared.Administration/
-    Shared.Administration.Api/
-    Shared.Administration.Cli/
-    Shared.Api/
-    Shared.AccessControl/
-    Shared.Api.OpenApi/
-    Shared.Api.Serilog/
-    Shared.Application.Composition/
-    Shared.Application.Events/
-    Shared.Application.Events.Infrastructure/
-    Shared.Authorization/
-    Shared.Caching/
-    Shared.Caching.Cqrs/
-    Shared.Caching.Infrastructure/
-    Shared.Caching.Redis/
-    Shared.Cqrs/
-    Shared.Cqrs.Infrastructure/
-    Shared.Domain/
-    Shared.FileManagement/
-    Shared.FileManagement.LocalStorage/
-    Shared.FileManagement.Minio/
-    Shared.Results/
-    Shared.Infrastructure/
-    Shared.Logging.Serilog/
-    Shared.Messaging/
-    Shared.Messaging.Infrastructure/
-    Shared.Messaging.Nats/
-    Shared.Messaging.Nats.Aspire/
-    Shared.ModuleComposition/
-    Shared.Modules/
-    Shared.Naming/
-    Shared.Numerics/
-    Shared.Notifications/
-    Shared.Notifications.Cqrs/
-    Shared.Notifications.Infrastructure/
-    Shared.Notifications.Api/
-    Shared.Notifications.SignalR/
-    Shared.Observability/
-    Shared.Observability.Infrastructure/
-    Shared.Pagination/
-    Shared.Persistence.EntityFrameworkCore/
-    Shared.ProjectionRebuild/
-    Shared.ProjectionRebuild.EntityFrameworkCore/
-    Shared.ProjectionRebuild.Tasks/
-    Shared.Runtime/
-    Shared.Runtime.Infrastructure/
-    Shared.Security/
-    Shared.Tasks/
-    Shared.Tasks.Cqrs/
-    Shared.Tasks.Infrastructure/
-    Shared.Tenancy/
-    Shared.Tenancy.Api.Serilog/
-    Shared.Tenancy.Caching/
-    Shared.Tenancy.Cqrs/
-    Shared.Tenancy.Infrastructure/
-    Shared.Tenancy.Messaging/
-    Shared.Tenancy.Messaging.Infrastructure/
-    Shared.Tenancy.Tasks/
+  Framework/
+    Gma.Framework.Administration/
+    Gma.Framework.Administration.Api/
+    Gma.Framework.Administration.Cli/
+    Gma.Framework.Api/
+    Gma.Framework.AccessControl/
+    Gma.Framework.Api.OpenApi/
+    Gma.Framework.Api.Serilog/
+    Gma.Framework.Application.Composition/
+    Gma.Framework.Application.Events/
+    Gma.Framework.Application.Events.Infrastructure/
+    Gma.Framework.Authorization/
+    Gma.Framework.Caching/
+    Gma.Framework.Caching.Cqrs/
+    Gma.Framework.Caching.Infrastructure/
+    Gma.Framework.Caching.Redis/
+    Gma.Framework.Cqrs/
+    Gma.Framework.Cqrs.Infrastructure/
+    Gma.Framework.Domain/
+    Gma.Framework.FileManagement/
+    Gma.Framework.FileManagement.LocalStorage/
+    Gma.Framework.FileManagement.Minio/
+    Gma.Framework.Results/
+    Gma.Framework.Infrastructure/
+    Gma.Framework.Logging.Serilog/
+    Gma.Framework.Messaging/
+    Gma.Framework.Messaging.Infrastructure/
+    Gma.Framework.Messaging.Nats/
+    Gma.Framework.Messaging.Nats.Aspire/
+    Gma.Framework.ModuleComposition/
+    Gma.Framework.Modules/
+    Gma.Framework.Naming/
+    Gma.Framework.Numerics/
+    Gma.Framework.Notifications/
+    Gma.Framework.Notifications.Cqrs/
+    Gma.Framework.Notifications.Infrastructure/
+    Gma.Framework.Notifications.Api/
+    Gma.Framework.Notifications.SignalR/
+    Gma.Framework.Observability/
+    Gma.Framework.Observability.Infrastructure/
+    Gma.Framework.Pagination/
+    Gma.Framework.Persistence.EntityFrameworkCore/
+    Gma.Framework.ProjectionRebuild/
+    Gma.Framework.ProjectionRebuild.EntityFrameworkCore/
+    Gma.Framework.ProjectionRebuild.Tasks/
+    Gma.Framework.Runtime/
+    Gma.Framework.Runtime.Infrastructure/
+    Gma.Framework.Security/
+    Gma.Framework.Tasks/
+    Gma.Framework.Tasks.Cqrs/
+    Gma.Framework.Tasks.Infrastructure/
+    Gma.Framework.Tenancy/
+    Gma.Framework.Tenancy.Api.Serilog/
+    Gma.Framework.Tenancy.Caching/
+    Gma.Framework.Tenancy.Cqrs/
+    Gma.Framework.Tenancy.Infrastructure/
+    Gma.Framework.Tenancy.Messaging/
+    Gma.Framework.Tenancy.Messaging.Infrastructure/
+    Gma.Framework.Tenancy.Tasks/
+    tests/
+      Gma.Framework.Tests/
   Modules/
     Auth/
-      Auth.Contracts/
+      Gma.Modules.Auth.Contracts/
         Api/
         Admin/
         Events/
         Metadata/
         Types/
-      Auth.Domain/
-      Auth.Application/
-      Auth.Infrastructure/
-      Auth.Persistence/
-      Auth.Persistence.SqlServerMigrations/
-      Auth.Persistence.PostgreSqlMigrations/
-      Auth.Api/
-      Auth.Admin.Contracts/
+      Gma.Modules.Auth.Domain/
+      Gma.Modules.Auth.Application/
+      Gma.Modules.Auth.Infrastructure/
+      Gma.Modules.Auth.Persistence/
+      Gma.Modules.Auth.Persistence.SqlServerMigrations/
+      Gma.Modules.Auth.Persistence.PostgreSqlMigrations/
+      Gma.Modules.Auth.Api/
+      Gma.Modules.Auth.Admin.Contracts/
         Operations/
         Permissions/
-      Auth.AdminCli/
-      Auth.AdminApi/
+      Gma.Modules.Auth.AdminCli/
+      Gma.Modules.Auth.AdminApi/
     Administration/
-      Administration.Application/
-      Administration.Persistence/
-      Administration.Persistence.SqlServerMigrations/
-      Administration.Persistence.PostgreSqlMigrations/
-      Administration.AdminCli/
-      Administration.AdminApi/
+      Gma.Modules.Administration.Application/
+      Gma.Modules.Administration.Persistence/
+      Gma.Modules.Administration.Persistence.SqlServerMigrations/
+      Gma.Modules.Administration.Persistence.PostgreSqlMigrations/
+      Gma.Modules.Administration.AdminCli/
+      Gma.Modules.Administration.AdminApi/
     Catalog/
       Catalog.Contracts/
       Catalog.Domain/
@@ -122,19 +124,19 @@ src/
       Catalog.AdminCli/
       Catalog.AdminApi/
     Files/
-      Files.Contracts/
-      Files.Application/
-      Files.Api/
+      Gma.Modules.Files.Contracts/
+      Gma.Modules.Files.Application/
+      Gma.Modules.Files.Api/
     Notifications/
-      Notifications.Contracts/
-      Notifications.Domain/
-      Notifications.Application/
-      Notifications.Persistence/
-      Notifications.Persistence.SqlServerMigrations/
-      Notifications.Persistence.PostgreSqlMigrations/
-      Notifications.Api/
-      Notifications.Admin.Contracts/
-      Notifications.AdminApi/
+      Gma.Modules.Notifications.Contracts/
+      Gma.Modules.Notifications.Domain/
+      Gma.Modules.Notifications.Application/
+      Gma.Modules.Notifications.Persistence/
+      Gma.Modules.Notifications.Persistence.SqlServerMigrations/
+      Gma.Modules.Notifications.Persistence.PostgreSqlMigrations/
+      Gma.Modules.Notifications.Api/
+      Gma.Modules.Notifications.Admin.Contracts/
+      Gma.Modules.Notifications.AdminApi/
     Ordering/
       Ordering.Contracts/
       Ordering.Domain/
@@ -143,26 +145,32 @@ src/
       Ordering.Persistence.SqlServerMigrations/
       Ordering.Persistence.PostgreSqlMigrations/
     TaskRuntime/
-      TaskRuntime.Contracts/
-      TaskRuntime.Application/
-      TaskRuntime.Persistence/
-      TaskRuntime.Persistence.SqlServerMigrations/
-      TaskRuntime.Persistence.PostgreSqlMigrations/
-      TaskRuntime.Admin.Contracts/
-      TaskRuntime.AdminCli/
-      TaskRuntime.AdminApi/
+      Gma.Modules.TaskRuntime.Contracts/
+      Gma.Modules.TaskRuntime.Application/
+      Gma.Modules.TaskRuntime.Persistence/
+      Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations/
+      Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations/
+      Gma.Modules.TaskRuntime.Admin.Contracts/
+      Gma.Modules.TaskRuntime.AdminCli/
+      Gma.Modules.TaskRuntime.AdminApi/
     TaskSamples/
       TaskSamples.Contracts/
       TaskSamples.Application/
     Tenancy/
-      Tenancy.Contracts/
-      Tenancy.Api/
+      Gma.Modules.Tenancy.Contracts/
+      Gma.Modules.Tenancy.Api/
+    Auth/tests/
+      Gma.Modules.Auth.Tests/
+    Administration/tests/
+      Gma.Modules.Administration.Tests/
+    Notifications/tests/
+      Gma.Modules.Notifications.Tests/
 tests/
-  Shared.Tests/
-  Auth.Tests/
-  Notifications.Tests/
   Architecture.Tests/
+  Catalog.Tests/
   Integration.Tests/
+  Ordering.Tests/
+  ServiceDefaults.Tests/
 ```
 
 ## Runtime Composition
@@ -181,7 +189,7 @@ Current host registration:
 builder.AddUserNotificationsCqrs(); // post-commit flush for queued notification requests
 builder.AddRedisCaching(); // no-op unless Redis caching is enabled
 builder.AddCachingCqrs();
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddMessagingInfrastructure();
 builder.AddTenantAwareMessaging(); // tenant-aware event scope/context bridge
 builder.AddConfiguredNatsJetStreamMessaging(); // no-op unless NATS publishing is enabled
@@ -190,9 +198,9 @@ builder.AddUserNotificationSignalR();
 builder.Services.AddApiSecurityDefaults(); // no default scheme; Auth or another adapter supplies one
 builder.AddModule<TenancyModule>();
 builder.AddAuthModule(AuthProfile.TenantScoped());
-builder.AddSharedOpenApi();
+builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
-app.UseSharedOpenApi(); // serves Swagger only in Development
+app.UseGmaOpenApi(); // serves Swagger only in Development
 app.MapModules();
 app.MapUserNotificationServerSentEvents();
 app.MapUserNotificationSignalR();
@@ -201,10 +209,10 @@ app.MapUserNotificationSignalR();
 `Host.AdminCli` is a separate optional composition root for administrative commands:
 
 ```csharp
-builder.AddSharedAdministrationCli();
+builder.AddGmaAdministrationCli();
 builder.AddRedisCaching(); // no-op unless Redis caching is enabled
 builder.AddCachingCqrs();
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddMessagingInfrastructure(); // outbox writer registry without hosted publishers
 builder.AddTenantAwareMessaging(); // tenant-aware event scope/context bridge
 builder.AddAdminModule<AdministrationAdminCliModule>();
@@ -217,15 +225,15 @@ It does not map public API endpoints.
 `Host.AdminApi` is a separate optional composition root for administrative HTTP APIs:
 
 ```csharp
-builder.Services.AddSharedAdministrationApi(builder.Configuration);
+builder.Services.AddGmaAdministrationApi(builder.Configuration);
 builder.AddRedisCaching(); // no-op unless Redis caching is enabled
 builder.AddCachingCqrs();
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddMessagingInfrastructure();
 builder.AddTenantAwareMessaging(); // tenant-aware event scope/context bridge
 builder.AddAdminApiModule<AdministrationAdminApiModule>();
 builder.AddAuthAdminApiModule(AuthProfile.TenantScoped());
-builder.AddSharedOpenApi();
+builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
 app.MapAdminApiModules();
 ```
@@ -237,7 +245,7 @@ app.MapAdminApiModules();
 ```csharp
 builder.AddRedisCaching(); // no-op unless Redis caching is enabled
 builder.AddCachingCqrs();
-builder.AddSharedInfrastructure();
+builder.AddGmaInfrastructure();
 builder.AddTenantCaching();
 builder.AddMessagingInfrastructure();
 builder.AddTenantAwareMessaging();
@@ -271,337 +279,337 @@ Modules.*.Persistence
   -> Modules.*.Application
   -> Modules.*.Domain
 
-Shared.AccessControl
-  -> Shared.Naming
+Gma.Framework.AccessControl
+  -> Gma.Framework.Naming
 
-Shared.Administration
-  -> Shared.Naming
-  -> Shared.Results
-  -> Shared.Runtime
-  -> Shared.Tenancy
+Gma.Framework.Administration
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Results
+  -> Gma.Framework.Runtime
+  -> Gma.Framework.Tenancy
 
-Shared.Administration.Api
-  -> Shared.Administration
-  -> Shared.Api
-  -> Shared.Cqrs
-  -> Shared.Results
-  -> Shared.Naming
-  -> Shared.Security
-  -> Shared.Tenancy
+Gma.Framework.Administration.Api
+  -> Gma.Framework.Administration
+  -> Gma.Framework.Api
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.Results
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Security
+  -> Gma.Framework.Tenancy
 
-Shared.Administration.Cli
-  -> Shared.Administration
-  -> Shared.Cqrs
-  -> Shared.Results
-  -> Shared.Naming
-  -> Shared.Runtime
+Gma.Framework.Administration.Cli
+  -> Gma.Framework.Administration
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.Results
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Runtime
 
-Shared.Api
-  -> Shared.Results
-  -> Shared.Naming
-  -> Shared.Tenancy
+Gma.Framework.Api
+  -> Gma.Framework.Results
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Tenancy
 
-Shared.Api.OpenApi
+Gma.Framework.Api.OpenApi
   -> no project references
 
-Shared.Api.Serilog
-  -> Shared.Api
-  -> Shared.Observability
+Gma.Framework.Api.Serilog
+  -> Gma.Framework.Api
+  -> Gma.Framework.Observability
 
-Shared.Tenancy.Api.Serilog
-  -> Shared.Api.Serilog
-  -> Shared.ModuleComposition
-  -> Shared.Observability
-  -> Shared.Tenancy
+Gma.Framework.Tenancy.Api.Serilog
+  -> Gma.Framework.Api.Serilog
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Tenancy
 
-Shared.Application.Composition
-  -> Shared.Application.Events
-  -> Shared.Cqrs
+Gma.Framework.Application.Composition
+  -> Gma.Framework.Application.Events
+  -> Gma.Framework.Cqrs
 
-Shared.Application.Events
-  -> Shared.Domain
+Gma.Framework.Application.Events
+  -> Gma.Framework.Domain
 
-Shared.Application.Events.Infrastructure
-  -> Shared.Application.Events
-  -> Shared.Domain
+Gma.Framework.Application.Events.Infrastructure
+  -> Gma.Framework.Application.Events
+  -> Gma.Framework.Domain
 
-Shared.Authorization
-  -> Shared.Modules
-  -> Shared.Naming
+Gma.Framework.Authorization
+  -> Gma.Framework.Modules
+  -> Gma.Framework.Naming
 
-Shared.Caching
-  -> Shared.ModuleComposition
-  -> Shared.Modules
-  -> Shared.Naming
+Gma.Framework.Caching
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Modules
+  -> Gma.Framework.Naming
 
-Shared.Caching.Redis
-  -> Shared.Caching
-  -> Shared.ModuleComposition
+Gma.Framework.Caching.Redis
+  -> Gma.Framework.Caching
+  -> Gma.Framework.ModuleComposition
 
-Shared.Caching.Cqrs
-  -> Shared.Caching
-  -> Shared.Caching.Infrastructure
-  -> Shared.Cqrs
-  -> Shared.Cqrs.Infrastructure
-  -> Shared.ModuleComposition
-  -> Shared.Observability.Infrastructure
-  -> Shared.Results
+Gma.Framework.Caching.Cqrs
+  -> Gma.Framework.Caching
+  -> Gma.Framework.Caching.Infrastructure
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.Cqrs.Infrastructure
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Results
 
-Shared.Caching.Infrastructure
-  -> Shared.Caching
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Observability
-  -> Shared.Observability.Infrastructure
-  -> Shared.Runtime
-  -> Shared.Runtime.Infrastructure
+Gma.Framework.Caching.Infrastructure
+  -> Gma.Framework.Caching
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Runtime
+  -> Gma.Framework.Runtime.Infrastructure
 
-Shared.Cqrs
-  -> Shared.Results
+Gma.Framework.Cqrs
+  -> Gma.Framework.Results
 
-Shared.Cqrs.Infrastructure
-  -> Shared.Cqrs
-  -> Shared.Results
-  -> Shared.Naming
-  -> Shared.Observability
-  -> Shared.Observability.Infrastructure
-  -> Shared.Runtime.Infrastructure
+Gma.Framework.Cqrs.Infrastructure
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.Results
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Runtime.Infrastructure
 
-Shared.Domain
-  -> Shared.Naming
-  -> Shared.Numerics
+Gma.Framework.Domain
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Numerics
 
-Shared.FileManagement
+Gma.Framework.FileManagement
   -> no project references
 
-Shared.FileManagement.LocalStorage
-  -> Shared.FileManagement
-  -> Shared.ModuleComposition
+Gma.Framework.FileManagement.LocalStorage
+  -> Gma.Framework.FileManagement
+  -> Gma.Framework.ModuleComposition
 
-Shared.FileManagement.Minio
-  -> Shared.FileManagement
-  -> Shared.ModuleComposition
+Gma.Framework.FileManagement.Minio
+  -> Gma.Framework.FileManagement
+  -> Gma.Framework.ModuleComposition
 
-Shared.Infrastructure
-  -> Shared.Application.Events.Infrastructure
-  -> Shared.Cqrs.Infrastructure
-  -> Shared.Runtime.Infrastructure
-  -> Shared.Tenancy.Cqrs
-  -> Shared.Tenancy.Infrastructure
+Gma.Framework.Infrastructure
+  -> Gma.Framework.Application.Events.Infrastructure
+  -> Gma.Framework.Cqrs.Infrastructure
+  -> Gma.Framework.Runtime.Infrastructure
+  -> Gma.Framework.Tenancy.Cqrs
+  -> Gma.Framework.Tenancy.Infrastructure
 
-Shared.Logging.Serilog
+Gma.Framework.Logging.Serilog
   -> no project references
 
-Shared.Messaging
-  -> Shared.ModuleComposition
-  -> Shared.Modules
-  -> Shared.Naming
-  -> Shared.Numerics
+Gma.Framework.Messaging
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Modules
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Numerics
 
-Shared.Messaging.Infrastructure
-  -> Shared.Messaging
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Observability
-  -> Shared.Observability.Infrastructure
-  -> Shared.Runtime
-  -> Shared.Runtime.Infrastructure
+Gma.Framework.Messaging.Infrastructure
+  -> Gma.Framework.Messaging
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Runtime
+  -> Gma.Framework.Runtime.Infrastructure
 
-Shared.Messaging.Nats
-  -> Shared.Messaging
-  -> Shared.Messaging.Infrastructure
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Runtime
+Gma.Framework.Messaging.Nats
+  -> Gma.Framework.Messaging
+  -> Gma.Framework.Messaging.Infrastructure
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Runtime
 
-Shared.Messaging.Nats.Aspire
-  -> Shared.Messaging.Nats
+Gma.Framework.Messaging.Nats.Aspire
+  -> Gma.Framework.Messaging.Nats
 
-Shared.ModuleComposition
-  -> Shared.Modules
-  -> Shared.Naming
+Gma.Framework.ModuleComposition
+  -> Gma.Framework.Modules
+  -> Gma.Framework.Naming
 
-Shared.Modules
-  -> Shared.Naming
+Gma.Framework.Modules
+  -> Gma.Framework.Naming
 
-Shared.Naming
+Gma.Framework.Naming
   -> no project references
 
-Shared.Numerics
+Gma.Framework.Numerics
   -> no project references
 
-Shared.Notifications
-  -> Shared.ModuleComposition
-  -> Shared.Modules
-  -> Shared.Naming
+Gma.Framework.Notifications
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Modules
+  -> Gma.Framework.Naming
 
-Shared.Notifications.Cqrs
-  -> Shared.Cqrs
-  -> Shared.Cqrs.Infrastructure
-  -> Shared.ModuleComposition
-  -> Shared.Notifications
-  -> Shared.Notifications.Infrastructure
-  -> Shared.Observability.Infrastructure
-  -> Shared.Results
+Gma.Framework.Notifications.Cqrs
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.Cqrs.Infrastructure
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Notifications
+  -> Gma.Framework.Notifications.Infrastructure
+  -> Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Results
 
-Shared.Notifications.Api
-  -> Shared.Api
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Notifications
-  -> Shared.Security
-  -> Shared.Tenancy
+Gma.Framework.Notifications.Api
+  -> Gma.Framework.Api
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Notifications
+  -> Gma.Framework.Security
+  -> Gma.Framework.Tenancy
 
-Shared.Notifications.Infrastructure
-  -> Shared.Naming
-  -> Shared.ModuleComposition
-  -> Shared.Notifications
-  -> Shared.Observability
-  -> Shared.Observability.Infrastructure
-  -> Shared.Runtime
-  -> Shared.Runtime.Infrastructure
+Gma.Framework.Notifications.Infrastructure
+  -> Gma.Framework.Naming
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Notifications
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Runtime
+  -> Gma.Framework.Runtime.Infrastructure
 
-Shared.Notifications.SignalR
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Notifications
-  -> Shared.Runtime
-  -> Shared.Security
-  -> Shared.Tenancy
+Gma.Framework.Notifications.SignalR
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Notifications
+  -> Gma.Framework.Runtime
+  -> Gma.Framework.Security
+  -> Gma.Framework.Tenancy
 
-Shared.Observability
-  -> Shared.Naming
+Gma.Framework.Observability
+  -> Gma.Framework.Naming
 
-Shared.Observability.Infrastructure
-  -> Shared.Naming
-  -> Shared.Observability
-  -> Shared.Runtime
+Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Runtime
 
-Shared.Pagination
+Gma.Framework.Pagination
   -> no project references
 
-Shared.Persistence.EntityFrameworkCore
-  -> Shared.Application.Events
-  -> Shared.Cqrs
-  -> Shared.Domain
-  -> Shared.Naming
-  -> Shared.Tenancy
+Gma.Framework.Persistence.EntityFrameworkCore
+  -> Gma.Framework.Application.Events
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.Domain
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Tenancy
 
-Shared.ProjectionRebuild
-  -> Shared.Naming
-  -> Shared.Observability
-  -> Shared.Observability.Infrastructure
-  -> Shared.Runtime
+Gma.Framework.ProjectionRebuild
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Runtime
 
-Shared.ProjectionRebuild.Tasks
-  -> Shared.ProjectionRebuild
-  -> Shared.Tasks
+Gma.Framework.ProjectionRebuild.Tasks
+  -> Gma.Framework.ProjectionRebuild
+  -> Gma.Framework.Tasks
 
-Shared.ProjectionRebuild.EntityFrameworkCore
-  -> Shared.Naming
-  -> Shared.ProjectionRebuild
+Gma.Framework.ProjectionRebuild.EntityFrameworkCore
+  -> Gma.Framework.Naming
+  -> Gma.Framework.ProjectionRebuild
 
-Shared.Results
+Gma.Framework.Results
   -> no project references
 
-Shared.Runtime
-  -> Shared.Naming
+Gma.Framework.Runtime
+  -> Gma.Framework.Naming
 
-Shared.Runtime.Infrastructure
-  -> Shared.Naming
-  -> Shared.Runtime
+Gma.Framework.Runtime.Infrastructure
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Runtime
 
-Shared.Security
+Gma.Framework.Security
   -> no project references
 
-Shared.Tasks
-  -> Shared.ModuleComposition
-  -> Shared.Modules
-  -> Shared.Naming
+Gma.Framework.Tasks
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Modules
+  -> Gma.Framework.Naming
 
-Shared.Tasks.Cqrs
-  -> Shared.Cqrs
-  -> Shared.Cqrs.Infrastructure
-  -> Shared.ModuleComposition
-  -> Shared.Results
-  -> Shared.Tasks
+Gma.Framework.Tasks.Cqrs
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.Cqrs.Infrastructure
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Results
+  -> Gma.Framework.Tasks
 
-Shared.Tasks.Infrastructure
-  -> Shared.ModuleComposition
-  -> Shared.Observability
-  -> Shared.Observability.Infrastructure
-  -> Shared.Runtime
-  -> Shared.Runtime.Infrastructure
-  -> Shared.Tasks
+Gma.Framework.Tasks.Infrastructure
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Observability.Infrastructure
+  -> Gma.Framework.Runtime
+  -> Gma.Framework.Runtime.Infrastructure
+  -> Gma.Framework.Tasks
 
-Shared.Tenancy
-  -> Shared.ModuleComposition
-  -> Shared.Modules
-  -> Shared.Results
+Gma.Framework.Tenancy
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Modules
+  -> Gma.Framework.Results
 
-Shared.Tenancy.Infrastructure
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Tenancy
+Gma.Framework.Tenancy.Infrastructure
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Tenancy
 
-Shared.Tenancy.Caching
-  -> Shared.Caching
-  -> Shared.Caching.Infrastructure
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Tenancy
+Gma.Framework.Tenancy.Caching
+  -> Gma.Framework.Caching
+  -> Gma.Framework.Caching.Infrastructure
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Tenancy
 
-Shared.Tenancy.Cqrs
-  -> Shared.Cqrs.Infrastructure
-  -> Shared.ModuleComposition
-  -> Shared.Observability
-  -> Shared.Tenancy
+Gma.Framework.Tenancy.Cqrs
+  -> Gma.Framework.Cqrs.Infrastructure
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Observability
+  -> Gma.Framework.Tenancy
 
-Shared.Tenancy.Messaging
-  -> Shared.Messaging
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Tenancy
+Gma.Framework.Tenancy.Messaging
+  -> Gma.Framework.Messaging
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Tenancy
 
-Shared.Tenancy.Messaging.Infrastructure
-  -> Shared.Messaging
-  -> Shared.ModuleComposition
-  -> Shared.Tenancy
-  -> Shared.Tenancy.Messaging
+Gma.Framework.Tenancy.Messaging.Infrastructure
+  -> Gma.Framework.Messaging
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Tenancy
+  -> Gma.Framework.Tenancy.Messaging
 
-Shared.Tenancy.Tasks
-  -> Shared.ModuleComposition
-  -> Shared.Tasks
-  -> Shared.Tasks.Infrastructure
-  -> Shared.Tenancy
+Gma.Framework.Tenancy.Tasks
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Tasks
+  -> Gma.Framework.Tasks.Infrastructure
+  -> Gma.Framework.Tenancy
 
-Files.Contracts
-  -> Shared.FileManagement
-  -> Shared.ModuleComposition
-  -> Shared.Modules
-  -> Shared.Tenancy
+Gma.Modules.Files.Contracts
+  -> Gma.Framework.FileManagement
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Modules
+  -> Gma.Framework.Tenancy
 
-Files.Application
-  -> Files.Contracts
-  -> Shared.AccessControl
-  -> Shared.Application.Composition
-  -> Shared.Cqrs
-  -> Shared.FileManagement
-  -> Shared.Results
-  -> Shared.Runtime
-  -> Shared.Tenancy
+Gma.Modules.Files.Application
+  -> Gma.Modules.Files.Contracts
+  -> Gma.Framework.AccessControl
+  -> Gma.Framework.Application.Composition
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.FileManagement
+  -> Gma.Framework.Results
+  -> Gma.Framework.Runtime
+  -> Gma.Framework.Tenancy
 
-Files.Api
-  -> Files.Application
-  -> Files.Contracts
-  -> Shared.AccessControl
-  -> Shared.Api
-  -> Shared.Cqrs
-  -> Shared.ModuleComposition
-  -> Shared.Naming
-  -> Shared.Results
-  -> Shared.Security
-  -> Shared.Tenancy
+Gma.Modules.Files.Api
+  -> Gma.Modules.Files.Application
+  -> Gma.Modules.Files.Contracts
+  -> Gma.Framework.AccessControl
+  -> Gma.Framework.Api
+  -> Gma.Framework.Cqrs
+  -> Gma.Framework.ModuleComposition
+  -> Gma.Framework.Naming
+  -> Gma.Framework.Results
+  -> Gma.Framework.Security
+  -> Gma.Framework.Tenancy
 ```
 
 Cross-module dependencies must go through:
@@ -650,7 +658,7 @@ User notifications have two explicit paths. Best-effort live delivery follows a 
 
 ```text
 transactional command handler -> IUserNotificationRequestQueue
-  -> Shared.Notifications.Cqrs post-commit flush
+  -> Gma.Framework.Notifications.Cqrs post-commit flush
   -> IUserNotificationPublisher
   -> in-process notification feed
   -> optional SSE endpoint / optional SignalR hub
@@ -677,7 +685,7 @@ Host.AdminCli -> *.AdminCli -> *.Application -> *.Domain
 Host.AdminApi -> *.AdminApi -> *.Application -> *.Domain
                  |
                  -> *.Admin.Contracts
-                 -> Shared.Administration contracts
+                 -> Gma.Framework.Administration contracts
 ```
 
 ## Why This Shape

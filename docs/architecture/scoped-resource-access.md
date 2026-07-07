@@ -4,7 +4,7 @@
 
 Use domain-owned access policies that return typed access scopes for list, search, feed, export, and other multi-resource reads.
 
-`Shared.AccessControl` remains a small vocabulary package for front-door subjects. It must not own business rules, EF translation, grants, relationship models, policy evaluators, or external policy-engine dependencies.
+`Gma.Framework.AccessControl` remains a small vocabulary package for front-door subjects. It must not own business rules, EF translation, grants, relationship models, policy evaluators, or external policy-engine dependencies.
 
 The default pattern is:
 
@@ -34,12 +34,12 @@ Reference points:
 
 ## Package Responsibilities
 
-`Shared.AccessControl` may provide:
+`Gma.Framework.AccessControl` may provide:
 
 - `AccessSubject` and `AccessSubjectKind` for API, admin, CLI, worker, and test front doors;
 - future optional adapters, if they are separate packages.
 
-`Shared.AccessControl` must not provide:
+`Gma.Framework.AccessControl` must not provide:
 
 - Catalog, Ordering, Notifications, social graph, PMS, chat, report, or staff-management rules;
 - generic EF query generation for business visibility;

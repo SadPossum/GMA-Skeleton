@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Administration\Gma.Framework.Administration.csproj" />
+  </ItemGroup>
+</Project>

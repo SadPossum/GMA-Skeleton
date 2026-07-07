@@ -1,7 +1,7 @@
 namespace TaskSamples.Application.Tasks;
 
-using Shared.Cqrs;
-using Shared.Results;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Results;
 
 internal sealed class RecordTaskSampleReportCommandHandler(ITaskSampleReportSink sink)
     : ICommandHandler<RecordTaskSampleReportCommand, Unit>

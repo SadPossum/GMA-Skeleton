@@ -3,11 +3,11 @@ namespace Integration.Tests.Support;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Administration.Persistence;
-using Administration.Persistence.Entities;
-using Auth.Domain.Services;
-using Auth.Domain.ValueObjects;
-using Auth.Persistence;
+using Gma.Modules.Administration.Persistence;
+using Gma.Modules.Administration.Persistence.Entities;
+using Gma.Modules.Auth.Domain.Services;
+using Gma.Modules.Auth.Domain.ValueObjects;
+using Gma.Modules.Auth.Persistence;
 using Host.AdminApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -18,9 +18,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NATS.Client.Core;
-using Shared.Security;
-using Shared.Tenancy;
-using Shared.Persistence.EntityFrameworkCore;
+using Gma.Framework.Security;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 
 internal sealed class AdminApiTestApplication(
     string provider,

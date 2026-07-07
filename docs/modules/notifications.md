@@ -5,24 +5,24 @@ The `Notifications` module is an optional durable history/read-state module for 
 ## Projects
 
 ```text
-Notifications.Contracts
-Notifications.Domain
-Notifications.Application
-Notifications.Persistence
-Notifications.Persistence.SqlServerMigrations
-Notifications.Persistence.PostgreSqlMigrations
-Notifications.Api
-Notifications.Admin.Contracts
-Notifications.AdminApi
+Gma.Modules.Notifications.Contracts
+Gma.Modules.Notifications.Domain
+Gma.Modules.Notifications.Application
+Gma.Modules.Notifications.Persistence
+Gma.Modules.Notifications.Persistence.SqlServerMigrations
+Gma.Modules.Notifications.Persistence.PostgreSqlMigrations
+Gma.Modules.Notifications.Api
+Gma.Modules.Notifications.Admin.Contracts
+Gma.Modules.Notifications.AdminApi
 ```
 
 The module is not registered in the default hosts. Applications compose the user API and admin API explicitly when they need notification history.
 
-`NotificationsProfiles.Default` is selected by both `Notifications.Api` and `Notifications.AdminApi`. It provides the `notifications.history` and `notifications.broadcasts` composition features and requires tenant context. Live SSE/SignalR delivery is still host-selected through the shared notification adapters, not implied by the durable module profile.
+`NotificationsProfiles.Default` is selected by both `Gma.Modules.Notifications.Api` and `Gma.Modules.Notifications.AdminApi`. It provides the `notifications.history` and `notifications.broadcasts` composition features and requires tenant context. Live SSE/SignalR delivery is still host-selected through the shared notification adapters, not implied by the durable module profile.
 
 ## User API
 
-`Notifications.Api` maps current-user endpoints:
+`Gma.Modules.Notifications.Api` maps current-user endpoints:
 
 | Method | Route | Purpose |
 | --- | --- | --- |
@@ -41,11 +41,11 @@ The stream accepts optional `afterSequence`. When omitted, the stream starts aft
 
 All endpoints require authentication and tenant context. When tenancy is enabled, the tenant claim on the token must match the active tenant context.
 
-Current-user history endpoints use the shared access-subject foundation. The API constructs an explicit `AccessSubject` from the authenticated user and active tenant, while `Notifications.Application.Visibility.NotificationHistoryAccess` owns the simple user/tenant checks. Single-notification reads and mark-read operations check a minimal access summary and return not-found-shaped results for wrong-user or wrong-tenant access. List, stream, cursor, and read-all paths keep visibility constrained inside repository queries.
+Current-user history endpoints use the shared access-subject foundation. The API constructs an explicit `AccessSubject` from the authenticated user and active tenant, while `Gma.Modules.Notifications.Application.Visibility.NotificationHistoryAccess` owns the simple user/tenant checks. Single-notification reads and mark-read operations check a minimal access summary and return not-found-shaped results for wrong-user or wrong-tenant access. List, stream, cursor, and read-all paths keep visibility constrained inside repository queries.
 
 ## Admin API
 
-`Notifications.AdminApi` maps admin-only endpoints under `/api/admin/notifications`:
+`Gma.Modules.Notifications.AdminApi` maps admin-only endpoints under `/api/admin/notifications`:
 
 | Method | Route | Purpose |
 | --- | --- | --- |
@@ -90,7 +90,7 @@ SQL Server and PostgreSQL migrations are provider-specific and use the schema-lo
 
 ## Durable Ingestion
 
-`Notifications.Contracts` owns `UserNotificationRequestedIntegrationEvent`. Producer modules that want guaranteed history creation publish that event through their own outbox and declare it in their descriptor. The physical subject remains producer-scoped:
+`Gma.Modules.Notifications.Contracts` owns `UserNotificationRequestedIntegrationEvent`. Producer modules that want guaranteed history creation publish that event through their own outbox and declare it in their descriptor. The physical subject remains producer-scoped:
 
 ```text
 {application-namespace}.{producer-module}.user-notification-requested.v1
@@ -102,9 +102,9 @@ The compiled Ordering example publishes affected-order-owner notification reques
 gma.ordering.user-notification-requested.v1
 ```
 
-`Notifications.Application` exposes `AddUserNotificationRequestSubscription(producerModule)` for hosts or examples that want this module to consume a producer's durable notification requests. The NATS consumer loop writes the notification and inbox processed marker in the `notifications` schema transaction, giving at-least-once delivery with module-owned idempotency.
+`Gma.Modules.Notifications.Application` exposes `AddUserNotificationRequestSubscription(producerModule)` for hosts or examples that want this module to consume a producer's durable notification requests. The NATS consumer loop writes the notification and inbox processed marker in the `notifications` schema transaction, giving at-least-once delivery with module-owned idempotency.
 
-This pattern is explicit by design. The reusable Notifications descriptor does not subscribe to Catalog or any other producer by default. If a producer should feed notification history, compose a producer-specific subscription in the host/example runtime. Do not add cross-module EF links or direct writes into `Notifications.Persistence`.
+This pattern is explicit by design. The reusable Notifications descriptor does not subscribe to Catalog or any other producer by default. If a producer should feed notification history, compose a producer-specific subscription in the host/example runtime. Do not add cross-module EF links or direct writes into `Gma.Modules.Notifications.Persistence`.
 
 ## Shared Live Adapters
 
@@ -122,8 +122,8 @@ Use the durable integration-event path for notifications that must survive proce
 Reference and register only the surfaces needed by the host:
 
 ```csharp
-using Notifications.Api;
-using Notifications.AdminApi;
+using Gma.Modules.Notifications.Api;
+using Gma.Modules.Notifications.AdminApi;
 
 builder.AddModule<NotificationsModule>();
 builder.AddAdminApiModule<NotificationsAdminApiModule>();
@@ -142,8 +142,8 @@ Payload JSON is normalized and bounded to 32 KB for both direct history rows and
 
 ## Boundaries
 
-- Other modules may reference `Notifications.Contracts`.
-- Other modules must not reference `Notifications.Application`, `Notifications.Domain`, `Notifications.Persistence`, `Notifications.Api`, or `Notifications.AdminApi`.
+- Other modules may reference `Gma.Modules.Notifications.Contracts`.
+- Other modules must not reference `Gma.Modules.Notifications.Application`, `Gma.Modules.Notifications.Domain`, `Gma.Modules.Notifications.Persistence`, `Gma.Modules.Notifications.Api`, or `Gma.Modules.Notifications.AdminApi`.
 - Producing modules publish notification requests through their own outbox; they never write notification history directly.
 - Durable business decisions must use integration events and local projections, not notification history.
 

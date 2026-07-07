@@ -1,7 +1,7 @@
 using Host.Worker;
 using Microsoft.Extensions.Hosting;
-using Shared.Logging.Serilog;
-using Shared.ModuleComposition;
+using Gma.Framework.Logging.Serilog;
+using Gma.Framework.ModuleComposition;
 
 HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
 {

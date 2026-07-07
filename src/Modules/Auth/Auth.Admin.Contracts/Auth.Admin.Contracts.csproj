@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\Auth.Contracts\Auth.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Administration\Shared.Administration.csproj" />
-  </ItemGroup>
-</Project>

@@ -9,7 +9,7 @@ param(
 
 $arguments = @(
     'test',
-    (Join-GmaPath 'GenericModularApi.sln'),
+    (Join-GmaPath 'GenericModularApi.slnx'),
     '--filter',
     'Category!=Docker',
     '--logger',

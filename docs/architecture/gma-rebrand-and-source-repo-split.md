@@ -1,0 +1,606 @@
+# GMA Rebrand And Source Repo Split Plan
+
+Status: in progress; Stages 1-6 are implemented in the current repository, while local extraction, real GitHub repositories, and submodule replacement remain future work.
+
+This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
+
+The intended end state is:
+
+- Framework code is branded as `Gma.Framework.*`.
+- Reusable first-party modules are branded as `Gma.Modules.<Module>.*`.
+- Business applications can keep their own `Shared` or equivalent app-specific projects without colliding with GMA framework code.
+- Each independent framework/module repository has its own `.slnx`, tests, docs, and Git history.
+- A production application composes selected framework and module repositories as source submodules and pins exact commits.
+- NuGet packaging remains possible later, but it is not the primary development path while the framework is still learning from production applications.
+
+## Research Anchors
+
+- .NET namespace guidelines recommend stable product or technology names and PascalCasing for namespaces. This supports `Gma.Framework.*` and `Gma.Modules.*` rather than `GMA.*` or lower-case code namespaces: <https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-namespaces>
+- .NET capitalization guidelines use PascalCasing for public member, type, and namespace names, and do not treat long acronyms as all caps. This supports `Gma` over `GMA`: <https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions>
+- In .NET 10, `dotnet new sln` creates `.slnx` by default. Microsoft describes `.slnx` as stable, understandable, widely supported, and easier to maintain: <https://learn.microsoft.com/en-us/dotnet/core/compatibility/sdk/10.0/dotnet-new-sln-slnx-default>
+- `dotnet sln` can list, add, remove, and migrate `.sln`/`.slnx` files. This gives the migration a supported CLI path: <https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-sln>
+- Git submodules keep another Git repository as a subdirectory while the parent repository records a commit pointer instead of owning the nested files. That matches the source-first, independently versioned dependency model: <https://git-scm.com/book/en/v2/Git-Tools-Submodules>
+- GitHub Actions `actions/checkout` supports `submodules: true` and `submodules: recursive`, and can also check out multiple repositories into nested paths. Private secondary repositories need an explicit token or SSH key: <https://github.com/actions/checkout>
+- .NET library dependency guidance warns about dependency graph friction and recommends minimizing unnecessary dependencies. The source-first split should preserve the current small optional package seams instead of turning every module into a heavy dependency bundle: <https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/dependencies>
+
+## Naming Decision
+
+Use `Gma` for code, project, assembly, and package identity:
+
+```text
+Gma.Framework.Results
+Gma.Framework.Cqrs
+Gma.Framework.Messaging
+Gma.Framework.Messaging.Nats
+Gma.Framework.Tenancy
+Gma.Framework.FileManagement.Minio
+
+Gma.Modules.Auth.Contracts
+Gma.Modules.Auth.Domain
+Gma.Modules.Auth.Application
+Gma.Modules.Auth.Persistence
+Gma.Modules.Auth.Api
+
+Gma.Modules.Notifications.*
+Gma.Modules.Administration.*
+Gma.Modules.Files.*
+```
+
+Use lower-case `gma` only for runtime identifiers where lower-case is already natural or conventional:
+
+```text
+gma-admin
+gma:{environment}:...
+gma.<module>.<event>.v<version>
+```
+
+Do not use `GMA.*` for code namespaces. It fights the normal .NET readability convention and makes names visually loud once there are many packages.
+
+Do not use `Shared.*` for the reusable framework after the rebrand. Future business applications should be free to create their own `Shared`, `Acme.Shared`, `StayQuest.Shared`, or equivalent app-owned shared projects without confusion.
+
+## Repository Model Decision
+
+Prefer source-first Git submodules over NuGet packages for first-party production app development while GMA is still evolving.
+
+The production application should look like this:
+
+```text
+my-business-app/
+  MyBusinessApp.slnx
+  src/
+    Host.Api/
+    Host.Worker/
+    Modules/
+      MyBusinessFeature/
+    MyBusiness.Shared/
+  gma/
+    framework/              # submodule: SadPossum/gma-framework
+    modules/
+      auth/                 # submodule: SadPossum/gma-module-auth
+      administration/       # submodule: SadPossum/gma-module-administration
+      notifications/        # submodule: SadPossum/gma-module-notifications
+      files/                # submodule: SadPossum/gma-module-files
+```
+
+The business app `.slnx` references selected `.csproj` files from submodules directly. It does not nest or reference child `.slnx` files.
+
+Each independent repository still owns its own `.slnx` for standalone work:
+
+```text
+gma-framework/
+  Gma.Framework.slnx
+
+gma-module-auth/
+  Gma.Modules.Auth.slnx
+
+gma-module-notifications/
+  Gma.Modules.Notifications.slnx
+
+my-business-app/
+  MyBusinessApp.slnx
+```
+
+The source dependency lock is the parent application's submodule pointer. Updating GMA in an application is a normal app commit that moves one or more submodule commits.
+
+## Module Split Decision
+
+Split reusable modules into their own repositories only after the current repository proves the `Gma.*` rename and source layout.
+
+Recommended first reusable module repositories:
+
+```text
+gma-module-auth
+gma-module-administration
+gma-module-notifications
+gma-module-files
+```
+
+Consider later, after the first split is boring:
+
+```text
+gma-module-task-runtime
+gma-module-tenancy
+```
+
+Keep teaching/example modules in the skeleton/composition repository for now:
+
+```text
+Catalog
+Ordering
+TaskSamples
+```
+
+Those examples are valuable because they prove cross-module contracts, caching, tasks, projection rebuilds, messaging, admin surfaces, and API composition. They are not reusable product modules yet.
+
+Tenancy needs a deliberate split decision during implementation:
+
+- `Gma.Framework.Tenancy.*` should stay in the framework because many optional capabilities bridge to tenant context.
+- The optional tenant API/module front door can become `Gma.Modules.Tenancy.*` only if it grows into reusable module behavior beyond framework composition.
+- Do not let module repositories depend on a tenancy module repo just to use tenant abstractions; tenant abstractions belong in the framework.
+
+## Source Reference Strategy
+
+Module repositories need to build in two contexts:
+
+- standalone module development;
+- nested inside a production application with a separately checked-out framework submodule.
+
+Avoid hardcoding only one path shape. Introduce an explicit source-root convention before repository extraction.
+
+Recommended convention:
+
+```text
+GmaFrameworkRoot
+GmaModuleAuthRoot
+GmaModuleAdministrationRoot
+GmaModuleNotificationsRoot
+GmaModuleFilesRoot
+```
+
+Each reusable module repository should import an ignored local source-roots file from its root `Directory.Build.props` if it exists:
+
+```xml
+<Import Project="$(MSBuildThisFileDirectory)Gma.SourceRoots.props"
+        Condition="Exists('$(MSBuildThisFileDirectory)Gma.SourceRoots.props')" />
+```
+
+The checked-in fallback can point to the normal standalone development layout. Application bootstrap scripts can generate ignored `Gma.SourceRoots.props` files inside submodules so Visual Studio, Rider, the .NET CLI, and CI all resolve the same framework root.
+
+This avoids one bad tradeoff:
+
+- no duplicate nested framework submodule per module in production apps;
+- no forced NuGet dependency while framework source is still evolving;
+- no brittle assumption that every clone lives in the same parent folder.
+
+## Stage 0: Preflight And Decision Lock
+
+Goal: freeze the intended migration shape before touching thousands of names.
+
+Actions:
+
+- Confirm the current `dev` branch is clean and pushed.
+- Create a branch for the rebrand, for example `codex/gma-rebrand-source-split`.
+- Add this document and, if useful, an ADR that records `Gma.*`, source-first submodules, and `.slnx`.
+- Decide whether the current all-up repository becomes `gma-skeleton`, `gma-composition`, or remains `GenericModularApi` until extraction.
+- Decide whether public package IDs will be `Gma.*` or `SadPossum.Gma.*` later. This does not block source-first work.
+
+Validation:
+
+```powershell
+git status --short --branch
+dotnet build GenericModularApi.slnx --no-restore -m:1
+dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+```
+
+Agent goal:
+
+```text
+Inspect the current GenericModularApi repo, docs, solution, branch state, and architecture guards. Lock the GMA rebrand/source-split decisions in docs without changing code behavior yet. Preserve the modular optional architecture, keep source-first submodules as the preferred future development model, and add any ADR/planning notes needed before a broad rename.
+```
+
+## Stage 1: Rename Code Identity To Gma.*
+
+Goal: make the current repository compile with `Gma.*` project, assembly, namespace, and test identity while behavior stays unchanged.
+
+Actions:
+
+- Rename namespaces from `Shared.*` to `Gma.Framework.*`.
+- Rename reusable modules from `Auth.*`, `Administration.*`, `Notifications.*`, and `Files.*` to `Gma.Modules.<Module>.*`.
+- Rename optional module contracts and metadata consistently.
+- Rename test namespaces and `InternalsVisibleTo` values.
+- Rename project files and update project references.
+- Update all `using` directives.
+- Update scripts, docs, architecture guards, module metadata tests, dependency allow-lists, and solution entries.
+- Keep runtime logical module names stable unless there is a deliberate reason to change them. For example, the Auth module can still have a logical module name of `Auth`; the code identity becomes `Gma.Modules.Auth`.
+- Keep runtime configurable prefixes configurable. Do not hardwire `gma` back into application identity where the previous configurable identity work intentionally made it project-specific.
+
+Suggested target shape:
+
+```text
+src/Framework/Gma.Framework.Results/Gma.Framework.Results.csproj
+src/Framework/Gma.Framework.Cqrs/Gma.Framework.Cqrs.csproj
+src/Framework/Gma.Framework.Messaging/Gma.Framework.Messaging.csproj
+
+src/Modules/Auth/Gma.Modules.Auth.Contracts/Gma.Modules.Auth.Contracts.csproj
+src/Modules/Auth/Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj
+src/Modules/Auth/Gma.Modules.Auth.Api/Gma.Modules.Auth.Api.csproj
+```
+
+Validation:
+
+```powershell
+rg "namespace Shared|using Shared|Shared\." src tests docs eng
+rg "namespace Auth|using Auth|Auth\." src tests docs eng
+rg "InternalsVisibleTo\(\"Shared|InternalsVisibleTo\(\"Auth|InternalsVisibleTo\(\"Notifications|InternalsVisibleTo\(\"Files" src tests
+dotnet restore GenericModularApi.slnx
+dotnet build GenericModularApi.slnx --no-restore -m:1
+dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+```
+
+Expected rough edges:
+
+- Old names may remain in changelog-style docs or migration history names if changing them would break historical meaning.
+- EF migration class names can usually stay if they are internal history, but project/namespace names should still align.
+- Architecture tests will need a careful update because many of them intentionally encode current project names and references.
+
+Agent goal:
+
+```text
+Perform the first broad GMA identity rename in the current repo: Shared.* becomes Gma.Framework.*, reusable module projects become Gma.Modules.<Module>.*, and all project files, namespaces, usings, InternalsVisibleTo values, tests, scripts, docs, and architecture guards are aligned. Keep behavior and runtime logical module names stable unless explicitly documented. Validate with restore, build, full no-build tests, and source-wide searches for stale identity names.
+```
+
+## Stage 2: Rebrand Shared As Framework
+
+Goal: make `Framework` the conceptual and folder boundary for reusable GMA primitives.
+
+Actions:
+
+- Move `src/Shared` to `src/Framework`.
+- Move `tests/Shared.Tests` to `src/Framework/tests/Gma.Framework.Tests`.
+- Update documentation wording from "shared packages" to "framework packages" where it refers to reusable GMA code.
+- Keep "shared" as a generic concept only when talking about application-owned shared code or .NET shared concepts.
+- Update solution folders and architecture diagrams.
+- Update `eng/new-module.ps1` and other scaffolding docs/scripts to reference `src/Framework`.
+- Update dependency boundary tests from "Shared" language to "Framework" language.
+
+Validation:
+
+```powershell
+rg "src\\Shared|src/Shared|tests\\Shared.Tests|tests/Shared.Tests" .
+rg "shared package|Shared package|Shared project|shared-project" docs tests src
+dotnet build GenericModularApi.slnx --no-restore -m:1
+dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+```
+
+Agent goal:
+
+```text
+Rebrand the current Shared area into the GMA Framework area. Move folders, tests, solution folders, docs, scripts, and architecture guard language so reusable platform code is consistently described as framework code. Preserve all optional capability boundaries and keep business-application shared code conceptually separate from GMA framework code.
+```
+
+## Stage 3: Module Repository Readiness
+
+Goal: make reusable modules clean enough to be extracted without dragging skeleton-only code or other modules across boundaries.
+
+Actions:
+
+- Add a module repository readiness checklist to each reusable module doc.
+- Ensure each reusable module depends only on framework projects and its own projects.
+- Ensure cross-module communication uses contracts/events only.
+- Verify `Administration` does not depend on Auth internals.
+- Verify `Notifications` does not define business notification visibility rules beyond its own delivery/read state.
+- Verify `Files` remains storage/front-door focused and does not pretend to be a generic business document/ACL system.
+- Decide whether `TaskRuntime` is extracted now or later.
+- Decide whether `Gma.Modules.Tenancy.Api` is a module repo or stays with framework/skeleton for now.
+- Keep examples out of reusable module repositories.
+
+Validation:
+
+```powershell
+dotnet test tests\Architecture.Tests\Architecture.Tests.csproj --no-build --filter "FullyQualifiedName~ModuleBoundaryTests|FullyQualifiedName~DeveloperExperienceGuardTests" --logger "console;verbosity=minimal"
+rg "ProjectReference.*Modules" src/Modules/Auth src/Modules/Administration src/Modules/Notifications src/Modules/Files -g "*.csproj"
+```
+
+Agent goal:
+
+```text
+Audit reusable modules for repository extraction readiness. Tighten dependencies, docs, architecture tests, and module boundaries so Auth, Administration, Notifications, and Files can each become independent source repositories depending only on Gma.Framework.* and their own projects. Keep Catalog, Ordering, and TaskSamples as examples in the skeleton/composition repo.
+```
+
+## Stage 4: Switch Current Repository To SLNX
+
+Goal: make `.slnx` the normal solution format for the all-up repository before adding per-repo solutions.
+
+Actions:
+
+- Run `dotnet sln GenericModularApi.sln migrate`.
+- Rename the all-up solution to the chosen current repo identity if needed, for example `Gma.Skeleton.slnx` or `GenericModularApi.slnx`.
+- Update build/test scripts and docs to use `.slnx`.
+- Update CI references.
+- Remove the legacy `.sln` only after IDE, CLI, and scripts are verified.
+
+Validation:
+
+```powershell
+dotnet sln GenericModularApi.slnx list
+dotnet restore GenericModularApi.slnx
+dotnet build GenericModularApi.slnx --no-restore -m:1
+dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+rg "GenericModularApi\.sln([^x]|$)" docs eng .github README.md
+```
+
+Agent goal:
+
+```text
+Migrate the repository from legacy .sln to .slnx using the supported dotnet CLI flow. Update scripts, docs, validation commands, and CI references. Remove the legacy solution only after restore, build, test, and solution listing prove the .slnx is complete.
+```
+
+## Stage 5: Add Framework And Module SLNX Entrypoints In The Current Repo
+
+Goal: prove each future repository has a standalone build/test front door before physically splitting Git repositories.
+
+Add these solution files inside the current repo first:
+
+```text
+Gma.Framework.slnx
+Gma.Modules.Auth.slnx
+Gma.Modules.Administration.slnx
+Gma.Modules.Notifications.slnx
+Gma.Modules.Files.slnx
+Gma.Modules.TaskRuntime.slnx
+Gma.Modules.Tenancy.slnx
+```
+
+Each module `.slnx` should include:
+
+- that module's source projects;
+- its focused tests when the module already has a focused test project;
+- required framework projects through project references;
+- any migration projects owned by that module.
+
+Each module `.slnx` should not include:
+
+- application hosts;
+- example modules;
+- unrelated reusable modules except through contract-only references if that module truly owns such a dependency.
+
+Validation:
+
+```powershell
+dotnet restore Gma.Framework.slnx
+dotnet build Gma.Framework.slnx --no-restore -m:1
+dotnet test Gma.Framework.slnx --no-build --logger "console;verbosity=minimal"
+
+dotnet restore Gma.Modules.Auth.slnx
+dotnet build Gma.Modules.Auth.slnx --no-restore -m:1
+dotnet test Gma.Modules.Auth.slnx --no-build --logger "console;verbosity=minimal"
+```
+
+Repeat for each reusable module solution.
+
+Focused framework/module tests should live under the future source repository root, for example:
+
+```text
+src/Framework/tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj
+src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj
+```
+
+Agent goal:
+
+```text
+Add standalone .slnx entrypoints for the future framework and reusable module repositories while still inside the current monorepo. Each .slnx must include only the projects that future repo owns plus necessary framework dependencies and focused tests. Validate every new solution independently and keep the all-up solution green.
+```
+
+## Stage 6: Source Root And Submodule Development Tooling
+
+Goal: make source-first composition pleasant before creating separate repositories.
+
+Actions:
+
+- Add `Gma.SourceRoots.props.example`.
+- Add ignored `Gma.SourceRoots.props` to `.gitignore`.
+- Update project references in future module repos to resolve framework roots through `GmaFrameworkRoot`.
+- Add scripts:
+  - `eng/gma-status.ps1`
+  - `eng/gma-bootstrap.ps1`
+  - `eng/gma-update.ps1`
+  - `eng/gma-validate.ps1`
+- Document common flows:
+  - clone all submodules;
+  - edit framework from a production app checkout;
+  - push framework PR from inside a submodule;
+  - update the parent app submodule pointer;
+  - recover detached HEAD in a submodule;
+  - verify dirty nested repositories before committing an app pointer update.
+
+Validation:
+
+```powershell
+eng\gma-bootstrap.ps1 -WhatIf
+eng\gma-status.ps1
+eng\gma-validate.ps1
+```
+
+Agent goal:
+
+```text
+Add source-root and submodule development tooling for future GMA source dependencies. Make framework/module project references configurable for standalone repo development and nested production-app submodule development. Document and test bootstrap, status, update, validation, dirty-check, and PR workflows without creating external repositories yet.
+```
+
+## Stage 7: Repository Extraction Dry Run
+
+Goal: prove repository extraction from a fresh clone before creating or pushing real GitHub repositories.
+
+Actions:
+
+- Work from a fresh clone, not the active working tree.
+- Extract framework history into a local `gma-framework` repository.
+- Extract each reusable module history into local module repositories.
+- Preserve authorship and tags where practical.
+- Keep a rollback branch and do not rewrite the current source repository history.
+- Validate each extracted repository with its own `.slnx`.
+- Validate a local composition app that adds extracted repositories as submodules and builds the all-up app.
+
+Extraction options:
+
+- Prefer `git filter-repo` in a fresh clone for precise history extraction if available.
+- Use `git subtree split` only if it is enough for the desired history and produces simpler local results.
+- If history preservation is not worth the cost for some module, create a clean initial import commit and document that decision.
+
+Validation:
+
+```powershell
+git status --short --branch
+dotnet restore Gma.Framework.slnx
+dotnet build Gma.Framework.slnx --no-restore -m:1
+dotnet test Gma.Framework.slnx --no-build --logger "console;verbosity=minimal"
+```
+
+Repeat for each extracted module repository and the local composition app.
+
+Agent goal:
+
+```text
+Perform a local-only repository extraction dry run from a fresh clone. Produce local gma-framework and reusable module repositories with their own .slnx files, docs, tests, and preserved history where practical. Validate each extracted repo independently and validate a local app-style composition that consumes them as source submodules. Do not push or rewrite the main repository until the dry run is proven.
+```
+
+## Stage 8: Create GitHub Repositories And Configure Git
+
+Goal: create the real independent repositories and wire the source-first workflow.
+
+Recommended repositories:
+
+```text
+SadPossum/gma-framework
+SadPossum/gma-module-auth
+SadPossum/gma-module-administration
+SadPossum/gma-module-notifications
+SadPossum/gma-module-files
+SadPossum/gma-skeleton
+```
+
+Actions:
+
+- Create GitHub repositories.
+- Push extracted histories.
+- Configure `main` and `dev` branch model consistently.
+- Set default branch policy. If development happens on `dev`, make `dev` the default branch for work repos.
+- Add branch protection and required checks.
+- Add repository descriptions, topics, license/readme alignment, and docs links.
+- Add CODEOWNERS if useful.
+- Configure Actions:
+  - framework repo checks only framework `.slnx`;
+  - module repos check out framework source and validate their module `.slnx`;
+  - skeleton/composition repo checks submodules recursively and validates all-up composition.
+- For private submodules in GitHub Actions, configure PAT or SSH secrets with read access to the needed repositories.
+
+Validation:
+
+```powershell
+git ls-remote git@github.com-private:SadPossum/gma-framework.git
+git ls-remote git@github.com-private:SadPossum/gma-module-auth.git
+git clone --recurse-submodules git@github.com-private:SadPossum/gma-skeleton.git
+dotnet restore Gma.Skeleton.slnx
+dotnet build Gma.Skeleton.slnx --no-restore -m:1
+dotnet test Gma.Skeleton.slnx --no-build --logger "console;verbosity=minimal"
+```
+
+Agent goal:
+
+```text
+Create and configure the real GitHub repositories for GMA framework, reusable modules, and skeleton/composition. Push the proven extracted histories, configure branch model and protections, add CI for standalone and composition validation, and prove a clean clone with recursive submodules can restore, build, and test.
+```
+
+## Stage 9: Replace Current Monorepo Internals With Submodules
+
+Goal: turn the skeleton/composition repository into the app-like consumer of the independent source repositories.
+
+Actions:
+
+- Replace framework source folder with a `gma/framework` submodule.
+- Replace reusable module source folders with `gma/modules/<module>` submodules.
+- Keep skeleton hosts, examples, app-specific docs, and composition tests in the skeleton repo.
+- Update `Gma.Skeleton.slnx` to reference projects from submodule paths.
+- Update docs so new production apps can copy the skeleton pattern.
+- Ensure module repos do not accidentally include the skeleton's examples or host-specific code.
+
+Validation:
+
+```powershell
+git submodule status --recursive
+git status --short --branch
+dotnet restore Gma.Skeleton.slnx
+dotnet build Gma.Skeleton.slnx --no-restore -m:1
+dotnet test Gma.Skeleton.slnx --no-build --logger "console;verbosity=minimal"
+```
+
+Agent goal:
+
+```text
+Convert the skeleton/composition repository into a source-first consumer of independent GMA framework and module repositories. Replace internal framework and reusable module source with Git submodules, update solution/project paths, docs, scripts, and CI, and prove a clean recursive-submodule clone validates the same behavior as the monorepo did.
+```
+
+## Stage 10: Production App Template And Operating Rules
+
+Goal: make the pattern easy to reuse for the next real business application.
+
+Actions:
+
+- Add a production app template or docs page showing:
+  - app-owned shared project naming;
+  - GMA submodule layout;
+  - app `.slnx` composition;
+  - host composition;
+  - local bootstrap;
+  - update and PR workflow;
+  - CI setup for private submodules.
+- Add a "how to patch GMA from an app" guide.
+- Add a "how to update GMA in an app" guide.
+- Add a "when to upstream vs app-local override" guide.
+- Add a "do not edit detached HEAD" warning for submodules.
+
+Validation:
+
+```powershell
+eng\new-gma-app.ps1 -Name SampleApp -OutputPath .tmp\SampleApp
+cd .tmp\SampleApp
+eng\gma-bootstrap.ps1
+dotnet restore SampleApp.slnx
+dotnet build SampleApp.slnx --no-restore -m:1
+```
+
+Agent goal:
+
+```text
+Create the production-app source composition template and operating docs. The template should let a new app consume selected GMA framework and module repositories as editable submodules, keep its own app-owned shared code, compose only chosen modules, and validate with a clean bootstrap/build workflow.
+```
+
+## Verification Checklist For The Whole Migration
+
+The migration is not complete until all of these are true:
+
+- No active source projects use `Shared.*` namespaces for GMA framework code.
+- Current all-up solution is `.slnx`.
+- Framework has its own `.slnx`.
+- Each reusable module repo or repo-ready slice has its own `.slnx`.
+- Each reusable module can validate without the all-up skeleton solution.
+- Business-app style composition can reference selected framework/module source projects.
+- Submodule bootstrap/status/update scripts exist and are documented.
+- CI can clone submodules and validate from a clean checkout.
+- Architecture tests still enforce optional module boundaries.
+- Docs clearly separate:
+  - GMA framework code;
+  - reusable GMA modules;
+  - example modules;
+  - application-owned shared code.
+- The repo split has a rollback path and was first tested in a fresh local clone.
+
+## Risks And Guardrails
+
+- Broad namespace/project renames can hide real behavior changes. Keep Stage 1 mechanical and behavior-neutral.
+- `.slnx` migration can leave scripts and docs pointing at stale `.sln` commands. Search all docs and scripts.
+- Submodules are powerful but easy to leave dirty or detached. Scripts should make submodule state visible before commits.
+- Private submodules require explicit GitHub Actions credentials; the default repository token is not enough for unrelated private repos.
+- Module repos should not become miniature monoliths. They must depend on framework packages/source and their own internals only.
+- Avoid extracting examples into reusable module repositories too early.
+- Keep NuGet package metadata possible, but do not force package-first development until source-first production feedback settles the framework.

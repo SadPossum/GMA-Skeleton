@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Integration.Tests.Support;
-using Shared.Notifications;
+using Gma.Framework.Notifications;
 using Xunit;
 
 public sealed class NotificationStreamingIntegrationTests

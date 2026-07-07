@@ -1,10 +1,10 @@
 namespace Catalog.Persistence;
 
 using Microsoft.Extensions.Options;
-using Shared.Messaging;
-using Shared.Runtime;
-using Shared.Runtime.Time;
-using Shared.Messaging.Infrastructure;
+using Gma.Framework.Messaging;
+using Gma.Framework.Runtime;
+using Gma.Framework.Runtime.Time;
+using Gma.Framework.Messaging.Infrastructure;
 
 internal sealed class CatalogOutboxWriter(
     CatalogDbContext dbContext,

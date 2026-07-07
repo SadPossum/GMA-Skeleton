@@ -1,10 +1,10 @@
 namespace Ordering.Domain.Aggregates;
 
-using Shared.Naming;
+using Gma.Framework.Naming;
 using Ordering.Domain.Errors;
 using Ordering.Domain.ValueObjects;
-using Shared.Domain.Models;
-using Shared.Results;
+using Gma.Framework.Domain.Models;
+using Gma.Framework.Results;
 
 public sealed class Order : TenantAggregateRoot<Guid>
 {

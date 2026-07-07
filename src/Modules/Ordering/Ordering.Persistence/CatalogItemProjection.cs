@@ -2,8 +2,8 @@ namespace Ordering.Persistence;
 
 using Catalog.Contracts;
 using Ordering.Domain.Aggregates;
-using Shared.Domain.Models;
-using Shared.Results;
+using Gma.Framework.Domain.Models;
+using Gma.Framework.Results;
 
 public sealed class CatalogItemProjection : TenantEntity<Guid>
 {

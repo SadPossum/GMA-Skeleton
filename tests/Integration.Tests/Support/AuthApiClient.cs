@@ -2,7 +2,7 @@ namespace Integration.Tests.Support;
 
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Auth.Contracts;
+using Gma.Modules.Auth.Contracts;
 using Xunit;
 
 internal static class AuthApiClient

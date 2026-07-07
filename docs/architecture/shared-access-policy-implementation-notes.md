@@ -4,7 +4,7 @@ These notes capture the first implementation slice for `docs/architecture/shared
 
 ## Implemented Slice
 
-- Added `Shared.AccessControl` as a small backend-agnostic shared project.
+- Added `Gma.Framework.AccessControl` as a small backend-agnostic shared project.
 - Added validated access primitives for front-door subjects only.
 - Removed the generic policy/evaluator layer after the first slice showed it was wrapping simple static checks without enough payoff.
 - Notifications now performs direct current-user notification history checks in application code.
@@ -12,7 +12,7 @@ These notes capture the first implementation slice for `docs/architecture/shared
 - Adopted the foundation in the optional Ordering example for current-user order list/detail access and user-scoped order placement.
 - Added unit tests for subject validation.
 - Added Notifications persistence/application tests for wrong-user and wrong-tenant current-user history access.
-- Added architecture guards to keep `Shared.AccessControl` free of HTTP, EF, admin, hosting, NATS, and external policy-engine dependencies.
+- Added architecture guards to keep `Gma.Framework.AccessControl` free of HTTP, EF, admin, hosting, NATS, and external policy-engine dependencies.
 
 ## Design Decisions
 
@@ -25,7 +25,7 @@ These notes capture the first implementation slice for `docs/architecture/shared
 
 ## Notifications Adoption
 
-Notifications uses only the shared subject vocabulary for current-user history. `Notifications.Api` resolves the authenticated user into an `AccessSubject.User(...)` and passes that subject to application commands and queries. `Notifications.Application.Visibility.NotificationHistoryAccess` performs the simple user/tenant checks directly, while `Notifications.Persistence` keeps list/stream/mark-all visibility constrained by subject-scoped queries.
+Notifications uses only the shared subject vocabulary for current-user history. `Gma.Modules.Notifications.Api` resolves the authenticated user into an `AccessSubject.User(...)` and passes that subject to application commands and queries. `Gma.Modules.Notifications.Application.Visibility.NotificationHistoryAccess` performs the simple user/tenant checks directly, while `Gma.Modules.Notifications.Persistence` keeps list/stream/mark-all visibility constrained by subject-scoped queries.
 
 ## Catalog And Ordering Proof Of Concept
 
@@ -51,9 +51,9 @@ Ordering stores the user id and region on the order. Current-user order list/det
 
 - Keep the shared package small until a second or third module proves additional common shape.
 - Do not add generic persisted ACL/grant tables until repeated module needs justify them.
-- If an external policy engine is introduced later, add it as an optional adapter outside `Shared.AccessControl`.
+- If an external policy engine is introduced later, add it as an optional adapter outside `Gma.Framework.AccessControl`.
 - If admin/resource policy bridging is useful later, implement it as an adapter that wraps existing admin authorization; do not replace the admin operation runner.
 - Avoid caching allow decisions unless the owning module documents revocation and invalidation.
-- Repeated API subject construction is now visible in Notifications, Catalog, and Ordering. A future optional `Shared.AccessControl.Api` helper could reduce this front-door boilerplate without moving ASP.NET Core into the core package.
+- Repeated API subject construction is now visible in Notifications, Catalog, and Ordering. A future optional `Gma.Framework.AccessControl.Api` helper could reduce this front-door boilerplate without moving ASP.NET Core into the core package.
 - Repeated single-resource not-found shaping and scoped repository patterns are good template material, but the scope types and query translators should stay module-owned until more examples prove a safe abstraction.
 - Region-code rules are duplicated in Catalog contracts/domain and Ordering domain. Keep them module-local unless another module needs the exact same semantics; then consider an optional geography primitives package.

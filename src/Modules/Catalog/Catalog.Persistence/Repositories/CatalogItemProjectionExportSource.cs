@@ -3,7 +3,7 @@ namespace Catalog.Persistence.Repositories;
 using Catalog.Contracts;
 using Catalog.Domain.Aggregates;
 using Microsoft.EntityFrameworkCore;
-using Shared.ProjectionRebuild;
+using Gma.Framework.ProjectionRebuild;
 
 internal sealed class CatalogItemProjectionExportSource(CatalogDbContext dbContext) : ICatalogItemProjectionExportSource
 {

@@ -7,10 +7,10 @@ using Ordering.Application.Commands;
 using Ordering.Application.Tasks;
 using Ordering.Application.Validation;
 using Ordering.Contracts;
-using Shared.Cqrs;
-using Shared.Messaging;
-using Shared.Tasks;
-using Shared.Tenancy;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Messaging;
+using Gma.Framework.Tasks;
+using Gma.Framework.Tenancy;
 using Xunit;
 
 [Trait("Category", "Unit")]

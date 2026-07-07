@@ -12,6 +12,7 @@ This documentation is plain Markdown so it works in GitHub, Visual Studio, Rider
 ## Architecture
 
 - [Architecture Overview](architecture/overview.md)
+- [GMA Rebrand And Source Repo Split Plan](architecture/gma-rebrand-and-source-repo-split.md)
 - [Module System](architecture/module-system.md)
 - [Module Composition Features And Profiles Task](architecture/module-composition-features-task.md)
 - [CQRS and Domain Events](architecture/cqrs-and-domain-events.md)

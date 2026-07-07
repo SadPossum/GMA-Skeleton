@@ -3,7 +3,7 @@ namespace Ordering.Tests;
 using Ordering.Domain.Errors;
 using Ordering.Domain.ValueObjects;
 using Ordering.Domain.Visibility;
-using Shared.Results;
+using Gma.Framework.Results;
 using Xunit;
 
 [Trait("Category", "Unit")]

@@ -6,7 +6,7 @@ using Catalog.Domain.Visibility;
 using Catalog.Domain.Aggregates;
 using Catalog.Persistence.QueryScopes;
 using Microsoft.EntityFrameworkCore;
-using Shared.Pagination;
+using Gma.Framework.Pagination;
 
 internal sealed class CatalogItemReadRepository(CatalogDbContext dbContext) : ICatalogItemReadRepository
 {

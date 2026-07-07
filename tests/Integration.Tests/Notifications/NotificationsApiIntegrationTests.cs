@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Integration.Tests.Support;
-using Notifications.Contracts;
+using Gma.Modules.Notifications.Contracts;
 using Xunit;
-using DomainBroadcastAudience = Notifications.Domain.ValueObjects.NotificationBroadcastAudience;
+using DomainBroadcastAudience = Gma.Modules.Notifications.Domain.ValueObjects.NotificationBroadcastAudience;
 
 public sealed class NotificationsApiIntegrationTests
 {

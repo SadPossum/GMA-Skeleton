@@ -2,7 +2,7 @@ namespace Ordering.Persistence.Configurations;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Shared.Messaging.Infrastructure;
+using Gma.Framework.Messaging.Infrastructure;
 
 internal sealed class InboxMessageConfiguration : IEntityTypeConfiguration<InboxMessage>
 {

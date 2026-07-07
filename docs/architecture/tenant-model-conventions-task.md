@@ -117,7 +117,7 @@ Rules:
 
 ## Proposed EF Helpers
 
-Add helpers in `Shared.Persistence.EntityFrameworkCore`:
+Add helpers in `Gma.Framework.Persistence.EntityFrameworkCore`:
 
 ```csharp
 modelBuilder.ApplyTenantConventions(

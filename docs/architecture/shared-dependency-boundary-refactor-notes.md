@@ -11,16 +11,16 @@ Temporary working notes for tightening shared-package dependencies. Keep this fi
 
 ## Current Slice
 
-- `Shared.Caching.Redis` previously referenced `Shared.Caching.Infrastructure` only to read `CachingOptions`, `CacheProvider`, and `IDistributedCacheAdapterRegistration`.
-- Those tiny provider/adapter seam types now live in `Shared.Caching`, so Redis depends on cache contracts rather than the HybridCache runtime package.
-- `Shared.Caching.Infrastructure` still owns option validation, HybridCache registration, metrics, physical key formatting, and fail-open runtime behavior, while tenant scope value resolution lives in `Shared.Tenancy.Caching`.
-- `Shared.Caching.Cqrs` now owns the command invalidation pipeline behavior and composes cache infrastructure plus CQRS infrastructure explicitly.
-- The shared dependency manifest and architecture overview now encode `Shared.Caching.Redis -> Shared.Caching`, keep CQRS references in `Shared.Caching.Cqrs`, and keep tenancy references in `Shared.Tenancy.Caching`.
-- `ICacheInvalidationQueueFlusher` is internal again; `Shared.Caching.Infrastructure` grants `InternalsVisibleTo("Shared.Caching.Cqrs")` so the bridge can flush deferred invalidations without widening the public cache API.
-- `Shared.Tasks.Cqrs` now owns `AddTaskCqrs()` and the `ITaskCommandDispatcher` implementation; `Shared.Tasks.Infrastructure` no longer composes CQRS or registers task command dispatch.
-- `Shared.ProjectionRebuild` is task-neutral again. `Shared.ProjectionRebuild.Tasks` adapts rebuild observers to `ITaskRuntimeReporter` and `ITaskControlLoop` only for task-backed callers.
-- `Shared.Api.Serilog` is tenant-neutral again. `Shared.Tenancy.Api.Serilog` contributes tenant id request-log enrichment only when hosts explicitly compose the bridge.
+- `Gma.Framework.Caching.Redis` previously referenced `Gma.Framework.Caching.Infrastructure` only to read `CachingOptions`, `CacheProvider`, and `IDistributedCacheAdapterRegistration`.
+- Those tiny provider/adapter seam types now live in `Gma.Framework.Caching`, so Redis depends on cache contracts rather than the HybridCache runtime package.
+- `Gma.Framework.Caching.Infrastructure` still owns option validation, HybridCache registration, metrics, physical key formatting, and fail-open runtime behavior, while tenant scope value resolution lives in `Gma.Framework.Tenancy.Caching`.
+- `Gma.Framework.Caching.Cqrs` now owns the command invalidation pipeline behavior and composes cache infrastructure plus CQRS infrastructure explicitly.
+- The shared dependency manifest and architecture overview now encode `Gma.Framework.Caching.Redis -> Gma.Framework.Caching`, keep CQRS references in `Gma.Framework.Caching.Cqrs`, and keep tenancy references in `Gma.Framework.Tenancy.Caching`.
+- `ICacheInvalidationQueueFlusher` is internal again; `Gma.Framework.Caching.Infrastructure` grants `InternalsVisibleTo("Gma.Framework.Caching.Cqrs")` so the bridge can flush deferred invalidations without widening the public cache API.
+- `Gma.Framework.Tasks.Cqrs` now owns `AddTaskCqrs()` and the `ITaskCommandDispatcher` implementation; `Gma.Framework.Tasks.Infrastructure` no longer composes CQRS or registers task command dispatch.
+- `Gma.Framework.ProjectionRebuild` is task-neutral again. `Gma.Framework.ProjectionRebuild.Tasks` adapts rebuild observers to `ITaskRuntimeReporter` and `ITaskControlLoop` only for task-backed callers.
+- `Gma.Framework.Api.Serilog` is tenant-neutral again. `Gma.Framework.Tenancy.Api.Serilog` contributes tenant id request-log enrichment only when hosts explicitly compose the bridge.
 
 ## Follow-Up Audit Targets
 
-- Keep `Shared.Naming` focused on identifier syntax and avoid using it as a generic utility bucket.
+- Keep `Gma.Framework.Naming` focused on identifier syntax and avoid using it as a generic utility bucket.

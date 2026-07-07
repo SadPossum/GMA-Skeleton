@@ -6,7 +6,7 @@ using Ordering.Contracts;
 using Ordering.Domain.Aggregates;
 using Ordering.Domain.Visibility;
 using Ordering.Persistence.QueryScopes;
-using Shared.Pagination;
+using Gma.Framework.Pagination;
 
 internal sealed class OrderReadRepository(OrderingDbContext dbContext) : IOrderReadRepository
 {

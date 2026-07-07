@@ -83,7 +83,7 @@ Tags:
 
 - `catalog:items`
 
-Create/update/discontinue commands enqueue invalidation through `ICacheInvalidationQueue`. Cache data is non-authoritative and tenant-scoped, so the default Catalog profile requires the generic `caching.tenant-scope` composition feature. Hosts satisfy that through `Shared.Tenancy.Caching`.
+Create/update/discontinue commands enqueue invalidation through `ICacheInvalidationQueue`. Cache data is non-authoritative and tenant-scoped, so the default Catalog profile requires the generic `caching.tenant-scope` composition feature. Hosts satisfy that through `Gma.Framework.Tenancy.Caching`.
 
 ## Admin Permissions
 

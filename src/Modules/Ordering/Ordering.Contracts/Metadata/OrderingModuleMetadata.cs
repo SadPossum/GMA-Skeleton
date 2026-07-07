@@ -1,11 +1,11 @@
 namespace Ordering.Contracts;
 
 using Catalog.Contracts;
-using Notifications.Contracts;
-using Shared.Messaging;
-using Shared.ModuleComposition;
-using Shared.Modules;
-using Shared.Tasks;
+using Gma.Modules.Notifications.Contracts;
+using Gma.Framework.Messaging;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Modules;
+using Gma.Framework.Tasks;
 
 public static class OrderingModuleMetadata
 {

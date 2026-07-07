@@ -4,10 +4,10 @@ using Catalog.Application.Ports;
 using Catalog.Application.Queries;
 using Catalog.Contracts;
 using Catalog.Domain.Visibility;
-using Shared.Caching;
-using Shared.Cqrs;
-using Shared.Pagination;
-using Shared.Results;
+using Gma.Framework.Caching;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Pagination;
+using Gma.Framework.Results;
 
 internal sealed class ListAvailableCatalogItemsQueryHandler(
     ICatalogItemReadRepository repository,

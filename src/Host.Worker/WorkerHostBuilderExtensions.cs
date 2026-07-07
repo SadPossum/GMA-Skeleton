@@ -1,7 +1,7 @@
 namespace Host.Worker;
 
-using Auth.Contracts;
-using Auth.Persistence;
+using Gma.Modules.Auth.Contracts;
+using Gma.Modules.Auth.Persistence;
 using Catalog.Application;
 using Catalog.Contracts;
 using Catalog.Persistence;
@@ -12,20 +12,20 @@ using Ordering.Application;
 using Ordering.Contracts;
 using Ordering.Persistence;
 using ServiceDefaults;
-using Shared.Caching.Cqrs;
-using Shared.Caching.Redis;
-using Shared.Infrastructure;
-using Shared.Messaging.Infrastructure;
-using Shared.Messaging.Nats.Aspire;
-using Shared.ModuleComposition;
-using Shared.Tasks.Cqrs;
-using Shared.Tasks.Infrastructure;
-using Shared.Tenancy.Caching;
-using Shared.Tenancy.Messaging.Infrastructure;
-using Shared.Tenancy.Tasks;
-using TaskRuntime.Application;
-using TaskRuntime.Contracts;
-using TaskRuntime.Persistence;
+using Gma.Framework.Caching.Cqrs;
+using Gma.Framework.Caching.Redis;
+using Gma.Framework.Infrastructure;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Messaging.Nats.Aspire;
+using Gma.Framework.ModuleComposition;
+using Gma.Framework.Tasks.Cqrs;
+using Gma.Framework.Tasks.Infrastructure;
+using Gma.Framework.Tenancy.Caching;
+using Gma.Framework.Tenancy.Messaging.Infrastructure;
+using Gma.Framework.Tenancy.Tasks;
+using Gma.Modules.TaskRuntime.Application;
+using Gma.Modules.TaskRuntime.Contracts;
+using Gma.Modules.TaskRuntime.Persistence;
 using TaskSamples.Application;
 
 public static class WorkerHostBuilderExtensions
@@ -39,7 +39,7 @@ public static class WorkerHostBuilderExtensions
 
         builder.AddRedisCaching();
         builder.AddCachingCqrs();
-        builder.AddSharedInfrastructure();
+        builder.AddGmaInfrastructure();
         builder.AddTenantCaching();
         builder.AddMessagingInfrastructure();
         builder.AddTenantAwareMessaging();
