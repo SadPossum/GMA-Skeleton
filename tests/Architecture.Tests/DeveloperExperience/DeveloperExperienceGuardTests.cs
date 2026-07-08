@@ -1363,9 +1363,12 @@ public sealed partial class DeveloperExperienceGuardTests
             "PushCandidates",
             "ConfigureRepositories",
             "ProtectBranches",
+            "[string[]] $Repository",
             "SkipSkeleton",
             "AllowUnconvertedSkeletonPush",
             "Get-GmaSelectedStage8RepositoryPlans",
+            "Unknown Stage 8 repository name(s)",
+            "Repository filter:",
             "Get-GmaRemoteRepositoryAudit",
             "SkeletonSubmodulesReady",
             "Test-GmaCandidateOwnsGitRepository",
@@ -1403,6 +1406,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "AllowUnconvertedSkeletonPush",
             "Skeleton repository is excluded by -SkipSkeleton",
             "merge-base",
+            "$branchesToPush = @(",
             "git -C $RepositoryPlan.LocalPath push -u origin @branchesToPush"
         ];
         string[] requiredDocsTokens =
@@ -1414,6 +1418,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "-PushCandidates",
             "-ConfigureRepositories",
             "-ProtectBranches",
+            "-Repository gma-framework",
             "-SkipDivergedMain",
             "-SkipSkeleton",
             "-AllowUnconvertedSkeletonPush",

@@ -1,6 +1,6 @@
 # GMA Rebrand And Source Repo Split Plan
 
-Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8D has flattened local repository-shape proof plus guarded GitHub automation prep, Stage 9 has local submodule-conversion and recursive-clone proof, and Stage 10 has a source-first app template proof. Real GitHub repositories, branch protection, remote pushes, and permanent submodule replacement remain future work.
+Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8D has flattened local repository-shape proof plus guarded GitHub automation prep, Stage 9 has local submodule-conversion and recursive-clone proof, and Stage 10 has a source-first app template proof. The existing `gma-framework` remote has a candidate `dev` branch pushed; reusable module and skeleton repositories, branch protection, remaining remote pushes, and permanent submodule replacement remain future work.
 
 This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
 
@@ -648,6 +648,7 @@ Actions:
 - Create GitHub repositories.
 - Use `eng\gma-github-stage8.ps1` as the guarded automation entrypoint once GitHub CLI is installed and authenticated:
   - no switches prints the exact repository/local-candidate plan without external changes;
+  - `-Repository <name>` narrows any action to explicit repository names, for example `-Repository gma-framework`, so partial external states can be handled without touching missing remotes;
   - `-InitializeCandidates` converts generated Stage 8D folders into standalone local Git repositories, commits their current contents as `SadPossum <258739@bk.ru>`, ensures `main` and `dev`, writes `Gma.SourceRoots.props.example`, `eng\bootstrap-source-roots.ps1`, and `.github\workflows\validate.yml`, keeps `Gma.SourceRoots.props` as an ignored local override, synchronizes the skeleton candidate from the current skeleton-owned docs/scripts and converted submodule `.slnx`, removes root package `.slnx` files from the skeleton candidate, and ignores skeleton `gma\...` mount points so reusable source is not duplicated into the skeleton repository;
   - `-AuditRepositories` checks the planned SSH remotes without writing to GitHub and reports reachable branches plus local candidate readiness;
   - `-CreateRepositories` creates missing GitHub repositories;
@@ -677,6 +678,7 @@ Validation:
 .\eng\gma-github-stage8.ps1 -InitializeCandidates -WhatIf
 .\eng\gma-github-stage8.ps1 -InitializeCandidates
 .\eng\gma-github-stage8.ps1 -AuditRepositories
+.\eng\gma-github-stage8.ps1 -AuditRepositories -Repository gma-framework
 .\eng\gma-github-stage8.ps1 -CreateRepositories -WhatIf
 .\eng\gma-github-stage8.ps1 -PushCandidates -SkipSkeleton -WhatIf
 git ls-remote git@github.com-private:SadPossum/gma-framework.git
@@ -698,6 +700,7 @@ Stage 8 automation-prep result on 2026-07-08:
 - Added `eng\gma-github-stage8.ps1` as the guarded local entrypoint for real repository creation/configuration once GitHub CLI and authentication are available.
 - The helper includes all Stage 8D flattened candidates: framework, Administration, Auth, Files, Notifications, TaskRuntime, Tenancy, and skeleton.
 - The helper is explicit-action only. With no switches it prints the repository/local-candidate plan without changes. With `-WhatIf`, candidate initialization, repository creation, repository configuration, and branch protection can be previewed even before GitHub CLI is installed.
+- The helper accepts `-Repository <name>` for targeted audits, initialization, pushes, configuration, or branch protection when the external repository set is only partially available.
 - The helper validates that push candidates are real standalone Git repositories instead of folders accidentally resolved through the parent monorepo worktree.
 - The helper keeps `Gma.SourceRoots.props` local-only in candidate repositories. App bootstraps may generate it inside mounted framework/module repositories, but package histories should only carry checked-in defaults or examples.
 - The helper now gives each candidate repository its own source-root example and `eng\bootstrap-source-roots.ps1`. Framework candidates default to their local `src\`; reusable module candidates default to sibling `gma-framework` and `gma-module-*` checkouts; the skeleton candidate defaults to `gma\framework` and `gma\modules\<alias>` mounts plus skeleton-owned examples.
@@ -707,9 +710,10 @@ Stage 8 automation-prep result on 2026-07-08:
 - `-SkipSkeleton` allows the framework and reusable module candidates to be pushed/configured first without weakening the `gma-skeleton` gitlink guard. The intended source-first publishing order is package repositories first, Stage 9 skeleton conversion second, skeleton repository push last.
 - The Stage 8D local candidates were initialized with standalone `.git` directories, `main` and `dev` branches, clean working trees, and `SadPossum <258739@bk.ru>` local commit authorship. A local `-PushCandidates -WhatIf` pass now previews the expected push operations for all framework, module, and skeleton candidates without requiring the missing remotes to exist yet.
 - The skeleton candidate tracks only `gma\.gitkeep` and `gma\modules\.gitkeep` for the mount shape; the actual `gma\framework` and `gma\modules\<module>` source mounts remain ignored local composition paths.
-- A read-only `-AuditRepositories` pass found `SadPossum/gma-framework` reachable over SSH with only `main`, while all reusable module and skeleton remotes were still missing or inaccessible. GitHub resolves the reachable framework repository as `SadPossum/GMA-Framework`.
+- A read-only `-AuditRepositories` pass originally found `SadPossum/gma-framework` reachable over SSH with only `main`, while all reusable module and skeleton remotes were missing or inaccessible. GitHub resolves the reachable framework repository as `SadPossum/GMA-Framework`.
 - The existing framework remote `main` contains an unrelated initial LICENSE commit, so the helper now refuses to overwrite diverged remote `main`. Use `-SkipDivergedMain` to push only `dev`, or reconcile the remote `main` deliberately before pushing it.
-- The active environment still lacks `gh` and `GH_TOKEN`/`GITHUB_TOKEN`, so real repository creation, pushes, branch protection, and a real GitHub recursive-submodule clone proof remain external Stage 8 work. The local recursive-submodule proof is covered by Stage 9.
+- A targeted `-PushCandidates -Repository gma-framework -SkipDivergedMain` pass pushed the framework candidate `dev` branch to the existing `SadPossum/GMA-Framework` repository and left the unrelated remote `main` untouched.
+- The active environment still lacks `gh` and `GH_TOKEN`/`GITHUB_TOKEN`, so reusable module and skeleton repository creation, branch protection, remaining remote pushes, and a real GitHub recursive-submodule clone proof remain external Stage 8 work. The local recursive-submodule proof is covered by Stage 9.
 
 ## Stage 9: Replace Current Monorepo Internals With Submodules
 

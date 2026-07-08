@@ -17,6 +17,8 @@ param(
 
     [string[]] $RequiredStatusChecks = @(),
 
+    [string[]] $Repository = @(),
+
     [switch] $InitializeCandidates,
 
     [switch] $AuditRepositories,
@@ -118,6 +120,21 @@ function Get-GmaStage8RepositoryPlans {
 
 function Get-GmaSelectedStage8RepositoryPlans {
     $plans = @(Get-GmaStage8RepositoryPlans)
+    if ($Repository.Count -gt 0) {
+        $validNames = @($plans | ForEach-Object { $_.Name })
+        $unknownNames = @($Repository | Where-Object { $validNames -notcontains $_ })
+        if ($unknownNames.Count -gt 0) {
+            throw "Unknown Stage 8 repository name(s): $($unknownNames -join ', '). Valid values: $($validNames -join ', ')."
+        }
+
+        $selectedNames = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        foreach ($name in $Repository) {
+            [void] $selectedNames.Add($name)
+        }
+
+        $plans = @($plans | Where-Object { $selectedNames.Contains($_.Name) })
+    }
+
     if ($SkipSkeleton) {
         $plans = @($plans | Where-Object { $_.Name -ne 'gma-skeleton' })
     }
@@ -1227,7 +1244,7 @@ function Push-GmaCandidateRepository {
         }
     }
 
-    $branchesToPush = if ($pushMain) { @('main', 'dev') } else { @('dev') }
+    $branchesToPush = @(if ($pushMain) { @('main', 'dev') } else { 'dev' })
     if ($PSCmdlet.ShouldProcess($fullName, "Push $($branchesToPush -join ' and ') branch(es)")) {
         git -C $RepositoryPlan.LocalPath push -u origin @branchesToPush
         if ($LASTEXITCODE -ne 0) {
@@ -1248,6 +1265,9 @@ if (-not $hasAction) {
     Write-Host ''
     if ($SkipSkeleton) {
         Write-Host 'Skeleton repository is excluded by -SkipSkeleton.'
+    }
+    if ($Repository.Count -gt 0) {
+        Write-Host "Repository filter: $($Repository -join ', ')."
     }
 
     Write-Host 'No changes were requested. Add -InitializeCandidates, -AuditRepositories, -CreateRepositories, -PushCandidates, -ConfigureRepositories, or -ProtectBranches.'
