@@ -1,6 +1,6 @@
 # GMA Rebrand And Source Repo Split Plan
 
-Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8D has flattened local repository-shape proof plus guarded GitHub automation prep, Stage 9 has local submodule-conversion and recursive-clone proof, and Stage 10 has a source-first app template proof. The existing `gma-framework` remote has a candidate `dev` branch pushed; reusable module and skeleton repositories, branch protection, remaining remote pushes, and permanent submodule replacement remain future work.
+Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8D has flattened local repository-shape proof, Stage 8 has real framework/module repositories created, pushed, and configured, Stage 9 has local submodule-conversion and recursive-clone proof, and Stage 10 has a source-first app template proof. The skeleton repository exists but is still empty until the real submodule conversion is committed and pushed; permanent submodule replacement remains in progress.
 
 This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
 
@@ -656,6 +656,7 @@ Actions:
   - `-SkipSkeleton` excludes `gma-skeleton` from the selected repository plan, which is the normal way to publish framework/module repositories before Stage 9 converts the skeleton;
   - `-SkipDivergedMain` may be combined with `-PushCandidates` to push `dev` while leaving an already-initialized remote `main` for manual reconciliation;
   - `-AllowUnconvertedSkeletonPush` bypasses the `gma-skeleton` submodule-gitlink guard only for a deliberate placeholder skeleton push; do not use it for the normal source-first path;
+  - `-AllowBranchProtectionUnavailable` may be combined with `-ProtectBranches` when private-repository branch protection is unavailable on the current GitHub plan; it warns and leaves the repository configured but unprotected;
   - `-ConfigureRepositories` sets repository metadata, default branch, squash-merge defaults, and topics;
   - `-ProtectBranches` applies branch protection to the configured default branch.
 - Push extracted histories.
@@ -681,6 +682,7 @@ Validation:
 .\eng\gma-github-stage8.ps1 -AuditRepositories -Repository gma-framework
 .\eng\gma-github-stage8.ps1 -CreateRepositories -WhatIf
 .\eng\gma-github-stage8.ps1 -PushCandidates -SkipSkeleton -WhatIf
+.\eng\gma-github-stage8.ps1 -ConfigureRepositories -ProtectBranches -SkipSkeleton -AllowBranchProtectionUnavailable
 git ls-remote git@github.com-private:SadPossum/gma-framework.git
 git ls-remote git@github.com-private:SadPossum/gma-module-auth.git
 git clone --recurse-submodules git@github.com-private:SadPossum/gma-skeleton.git
@@ -713,7 +715,9 @@ Stage 8 automation-prep result on 2026-07-08:
 - A read-only `-AuditRepositories` pass originally found `SadPossum/gma-framework` reachable over SSH with only `main`, while all reusable module and skeleton remotes were missing or inaccessible. GitHub resolves the reachable framework repository as `SadPossum/GMA-Framework`.
 - The existing framework remote `main` contains an unrelated initial LICENSE commit, so the helper now refuses to overwrite diverged remote `main`. Use `-SkipDivergedMain` to push only `dev`, or reconcile the remote `main` deliberately before pushing it.
 - A targeted `-PushCandidates -Repository gma-framework -SkipDivergedMain` pass pushed the framework candidate `dev` branch to the existing `SadPossum/GMA-Framework` repository and left the unrelated remote `main` untouched.
-- The active environment still lacks `gh` and `GH_TOKEN`/`GITHUB_TOKEN`, so reusable module and skeleton repository creation, branch protection, remaining remote pushes, and a real GitHub recursive-submodule clone proof remain external Stage 8 work. The local recursive-submodule proof is covered by Stage 9.
+- After GitHub CLI was installed and authenticated as `SadPossum`, the helper created the reusable module repositories and `gma-skeleton`, pushed framework/module candidate `dev` branches, pushed module candidate `main` branches, and configured framework/module metadata plus default `dev` branches.
+- `SadPossum/GMA-Framework` is public and has `dev` branch protection applied. The reusable module repositories are private; GitHub rejected branch protection for them with `Upgrade to GitHub Pro or make this repository public`, so the helper now supports `-AllowBranchProtectionUnavailable` to record the limitation and continue without weakening repository configuration.
+- The remaining Stage 8/9 external work is to convert the skeleton repository to real submodule gitlinks, push `gma-skeleton`, configure its default `dev` branch, and prove a clean recursive clone from GitHub.
 
 ## Stage 9: Replace Current Monorepo Internals With Submodules
 

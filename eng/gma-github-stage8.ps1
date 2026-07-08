@@ -37,6 +37,8 @@ param(
 
     [switch] $AllowUnconvertedSkeletonPush,
 
+    [switch] $AllowBranchProtectionUnavailable,
+
     [switch] $SkipDivergedMain
 )
 
@@ -472,12 +474,31 @@ function Get-GmaCandidateValidationWorkflowLines {
     )
 }
 
-function Assert-GmaGithubCliReady {
-    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
-        throw 'GitHub CLI is required for Stage 8 repository setup. Install gh, run gh auth login, then rerun this script.'
+function Resolve-GmaGithubCliPath {
+    $command = Get-Command gh -ErrorAction SilentlyContinue
+    if ($command) {
+        return $command.Source
     }
 
-    & gh auth status
+    $candidatePaths = @(
+        'C:\Program Files\GitHub CLI\gh.exe',
+        'C:\Program Files (x86)\GitHub CLI\gh.exe',
+        (Join-Path $env:LOCALAPPDATA 'Programs\GitHub CLI\gh.exe')
+    )
+
+    foreach ($candidatePath in $candidatePaths) {
+        if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
+            return $candidatePath
+        }
+    }
+
+    throw 'GitHub CLI is required for Stage 8 repository setup. Install gh, run gh auth login, then rerun this script.'
+}
+
+function Assert-GmaGithubCliReady {
+    $ghPath = Resolve-GmaGithubCliPath
+
+    & $ghPath auth status
     if ($LASTEXITCODE -ne 0) {
         throw 'GitHub CLI is installed but not authenticated. Run gh auth login or set GH_TOKEN/GITHUB_TOKEN.'
     }
@@ -496,9 +517,14 @@ function Invoke-GmaGithubCli {
     )
 
     if ($PSCmdlet.ShouldProcess($Target, $Action)) {
-        & gh @Arguments
+        $ghPath = Resolve-GmaGithubCliPath
+        $output = @(& $ghPath @Arguments 2>&1)
         if ($LASTEXITCODE -ne 0) {
-            throw "GitHub CLI command failed while running '$Action' for '$Target'."
+            throw "GitHub CLI command failed while running '$Action' for '$Target'. Output: $($output -join "`n")"
+        }
+
+        if ($output.Count -gt 0) {
+            Write-Output $output
         }
     }
 }
@@ -1041,7 +1067,7 @@ function Test-GmaGithubRepositoryExists {
     )
 
     return (Invoke-GmaQuietNativeCommand `
-        -FilePath 'gh' `
+        -FilePath (Resolve-GmaGithubCliPath) `
         -Arguments @('repo', 'view', $Repository, '--json', 'name', '--jq', '.name')) -eq 0
 }
 
@@ -1158,18 +1184,32 @@ function Protect-GmaGithubBranch {
 
     $payloadPath = New-TemporaryFile
     try {
-        $payload | ConvertTo-Json -Depth 10 -Compress | Set-Content -LiteralPath $payloadPath.FullName -NoNewline -Encoding utf8
-        Invoke-GmaGithubCli `
-            -Arguments @(
-                'api',
-                '--method',
-                'PUT',
-                "repos/$fullName/branches/$DefaultBranch/protection",
-                '--input',
-                $payloadPath.FullName
-            ) `
-            -Target "$fullName/$DefaultBranch" `
-            -Action 'Configure branch protection'
+        [System.IO.File]::WriteAllText(
+            $payloadPath.FullName,
+            ($payload | ConvertTo-Json -Depth 10 -Compress),
+            [System.Text.UTF8Encoding]::new($false))
+        try {
+            Invoke-GmaGithubCli `
+                -Arguments @(
+                    'api',
+                    '--method',
+                    'PUT',
+                    "repos/$fullName/branches/$DefaultBranch/protection",
+                    '--input',
+                    $payloadPath.FullName
+                ) `
+                -Target "$fullName/$DefaultBranch" `
+                -Action 'Configure branch protection'
+        }
+        catch {
+            $message = $_.Exception.Message
+            if ($AllowBranchProtectionUnavailable -and $message -like '*Upgrade to GitHub Pro or make this repository public*') {
+                Write-Warning "Branch protection is unavailable for '$fullName/$DefaultBranch' with the current GitHub plan or visibility. Repository configuration was kept, but branch protection was skipped."
+                return
+            }
+
+            throw
+        }
     }
     finally {
         Remove-Item -LiteralPath $payloadPath.FullName -Force -ErrorAction SilentlyContinue
