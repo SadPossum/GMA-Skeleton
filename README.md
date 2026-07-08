@@ -68,9 +68,9 @@ Docker-backed tests are skippable by default. To require them:
 Standalone source-repo entrypoints are available for focused framework/module work:
 
 ```powershell
-dotnet build Gma.Framework.slnx --no-restore
-dotnet build Gma.Modules.Auth.slnx --no-restore
-dotnet build Gma.Modules.Notifications.slnx --no-restore
+dotnet build gma\framework\Gma.Framework.slnx --no-restore
+dotnet build gma\modules\auth\Gma.Modules.Auth.slnx --no-restore
+dotnet build gma\modules\notifications\Gma.Modules.Notifications.slnx --no-restore
 ```
 
 For future source-submodule layouts, create a local source-root override with:
@@ -90,17 +90,17 @@ Useful entry points:
 - [Setup](docs/getting-started/setup.md)
 - [Source-First Apps](docs/getting-started/source-first-apps.md)
 - [Architecture Overview](docs/architecture/overview.md)
-- [GMA Framework Docs](src/Framework/docs/README.md)
-- [Module System](src/Framework/docs/architecture/module-system.md)
-- [Administration Architecture](src/Framework/docs/architecture/administration.md)
-- [Messaging and Outbox](src/Framework/docs/architecture/messaging-and-outbox.md)
-- [Tasks and Daemons](src/Framework/docs/architecture/tasks-and-daemons.md)
-- [Auth Module](src/Modules/Auth/docs/README.md)
-- [Administration Module](src/Modules/Administration/docs/README.md)
-- [Tenancy Module](src/Modules/Tenancy/docs/README.md)
-- [Naming Conventions](src/Framework/docs/guidelines/naming-conventions.md)
-- [Development Guidelines](src/Framework/docs/guidelines/development-guidelines.md)
-- [Documentation Guidelines](src/Framework/docs/guidelines/documentation-guidelines.md)
+- [GMA Framework Docs](gma/framework/docs/README.md)
+- [Module System](gma/framework/docs/architecture/module-system.md)
+- [Administration Architecture](gma/framework/docs/architecture/administration.md)
+- [Messaging and Outbox](gma/framework/docs/architecture/messaging-and-outbox.md)
+- [Tasks and Daemons](gma/framework/docs/architecture/tasks-and-daemons.md)
+- [Auth Module](gma/modules/auth/docs/README.md)
+- [Administration Module](gma/modules/administration/docs/README.md)
+- [Tenancy Module](gma/modules/tenancy/docs/README.md)
+- [Naming Conventions](gma/framework/docs/guidelines/naming-conventions.md)
+- [Development Guidelines](gma/framework/docs/guidelines/development-guidelines.md)
+- [Documentation Guidelines](gma/framework/docs/guidelines/documentation-guidelines.md)
 
 ## Request Examples
 

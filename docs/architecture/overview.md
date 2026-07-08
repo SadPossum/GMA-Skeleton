@@ -12,8 +12,8 @@ The skeleton owns:
 
 Reusable docs live beside reusable source. While this repository is still the monorepo staging area, those links point into the staged framework/module source roots:
 
-- [GMA Framework architecture](../../src/Framework/docs/architecture/overview.md)
-- [GMA Framework documentation index](../../src/Framework/docs/README.md)
+- [GMA Framework architecture](../../gma/framework/docs/architecture/overview.md)
+- [GMA Framework documentation index](../../gma/framework/docs/README.md)
 - [Reusable module docs](../README.md#reusable-framework-and-module-documentation-lives-with-the-source-that-owns-it)
 
 The skeleton should not become the canonical home for framework or reusable-module behavior. It can link to those docs, compose those projects, and prove that selected modules work together.

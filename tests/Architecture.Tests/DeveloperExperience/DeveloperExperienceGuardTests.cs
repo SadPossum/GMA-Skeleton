@@ -192,16 +192,11 @@ public sealed partial class DeveloperExperienceGuardTests
             ".editorconfig",
             ".gitattributes",
             ".gitignore",
+            ".github/workflows/validate.yml",
+            ".gitmodules",
             "Directory.Build.props",
             "Directory.Packages.props",
             "Gma.SourceRoots.props.example",
-            "Gma.Framework.slnx",
-            "Gma.Modules.Administration.slnx",
-            "Gma.Modules.Auth.slnx",
-            "Gma.Modules.Files.slnx",
-            "Gma.Modules.Notifications.slnx",
-            "Gma.Modules.TaskRuntime.slnx",
-            "Gma.Modules.Tenancy.slnx",
             "global.json",
             "LICENSE",
             "nuget.config",
@@ -1618,11 +1613,14 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] requiredRootWorkflowTokens =
         [
             "actions/checkout@v4",
+            "submodules: recursive",
+            "secrets.GMA_CI_TOKEN",
             "actions/setup-dotnet@v4",
             "dotnet-version: 10.0.x",
-            "./eng/restore.ps1",
+            "./eng/bootstrap-source-roots.ps1 -Force",
+            "dotnet restore GenericModularApi.slnx",
             "dotnet build GenericModularApi.slnx --no-restore -m:1",
-            "./eng/test-fast.ps1 -NoBuild"
+            "dotnet test GenericModularApi.slnx --no-build"
         ];
         string[] requiredDocsTokens =
         [
@@ -1822,100 +1820,78 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Reusable_package_solutions_are_present_and_include_colocated_tests_and_docs()
     {
         string repositoryRoot = FindRepositoryRoot();
-        Dictionary<string, string[]> requiredProjectsBySolution = new(StringComparer.OrdinalIgnoreCase)
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
+        Dictionary<string, (string SolutionPath, string[] RequiredProjects, string[] RequiredFiles)> packages = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Gma.Framework.slnx"] =
-            [
-                "src/Framework/Gma.Framework.Results/Gma.Framework.Results.csproj",
-                "src/Framework/tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj"
-            ],
-            ["Gma.Modules.Administration.slnx"] =
-            [
-                "src/Modules/Administration/Gma.Modules.Administration.Application/Gma.Modules.Administration.Application.csproj",
-                "src/Modules/Administration/tests/Gma.Modules.Administration.Tests/Gma.Modules.Administration.Tests.csproj"
-            ],
-            ["Gma.Modules.Auth.slnx"] =
-            [
-                "src/Modules/Auth/Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj",
-                "src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj"
-            ],
-            ["Gma.Modules.Files.slnx"] =
-            [
-                "src/Modules/Files/Gma.Modules.Files.Api/Gma.Modules.Files.Api.csproj"
-            ],
-            ["Gma.Modules.Notifications.slnx"] =
-            [
-                "src/Modules/Notifications/Gma.Modules.Notifications.Application/Gma.Modules.Notifications.Application.csproj",
-                "src/Modules/Notifications/tests/Gma.Modules.Notifications.Tests/Gma.Modules.Notifications.Tests.csproj"
-            ],
-            ["Gma.Modules.TaskRuntime.slnx"] =
-            [
-                "src/Modules/TaskRuntime/Gma.Modules.TaskRuntime.Application/Gma.Modules.TaskRuntime.Application.csproj"
-            ],
-            ["Gma.Modules.Tenancy.slnx"] =
-            [
-                "src/Modules/Tenancy/Gma.Modules.Tenancy.Api/Gma.Modules.Tenancy.Api.csproj"
-            ]
-        };
-        Dictionary<string, string[]> requiredFilesBySolution = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["Gma.Framework.slnx"] =
-            [
-                "src/Framework/docs/README.md",
-                "src/Framework/eng/new-module.ps1"
-            ],
-            ["Gma.Modules.Administration.slnx"] =
-            [
-                "src/Modules/Administration/docs/README.md"
-            ],
-            ["Gma.Modules.Auth.slnx"] =
-            [
-                "src/Modules/Auth/docs/README.md"
-            ],
-            ["Gma.Modules.Files.slnx"] =
-            [
-                "src/Modules/Files/docs/README.md"
-            ],
-            ["Gma.Modules.Notifications.slnx"] =
-            [
-                "src/Modules/Notifications/docs/README.md"
-            ],
-            ["Gma.Modules.TaskRuntime.slnx"] =
-            [
-                "src/Modules/TaskRuntime/docs/README.md"
-            ],
-            ["Gma.Modules.Tenancy.slnx"] =
-            [
-                "src/Modules/Tenancy/docs/README.md"
-            ]
+            ["Gma.Framework.slnx"] = (
+                Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"),
+                [
+                    "src/Gma.Framework.Results/Gma.Framework.Results.csproj",
+                    "tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj"
+                ],
+                [
+                    "docs/README.md",
+                    "eng/new-module.ps1"
+                ]),
+            ["Gma.Modules.Administration.slnx"] = (
+                Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"),
+                [
+                    "src/Gma.Modules.Administration.Application/Gma.Modules.Administration.Application.csproj",
+                    "tests/Gma.Modules.Administration.Tests/Gma.Modules.Administration.Tests.csproj"
+                ],
+                ["docs/README.md"]),
+            ["Gma.Modules.Auth.slnx"] = (
+                Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"),
+                [
+                    "src/Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj",
+                    "tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj"
+                ],
+                ["docs/README.md"]),
+            ["Gma.Modules.Files.slnx"] = (
+                Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"),
+                ["src/Gma.Modules.Files.Api/Gma.Modules.Files.Api.csproj"],
+                ["docs/README.md"]),
+            ["Gma.Modules.Notifications.slnx"] = (
+                Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"),
+                [
+                    "src/Gma.Modules.Notifications.Application/Gma.Modules.Notifications.Application.csproj",
+                    "tests/Gma.Modules.Notifications.Tests/Gma.Modules.Notifications.Tests.csproj"
+                ],
+                ["docs/README.md"]),
+            ["Gma.Modules.TaskRuntime.slnx"] = (
+                Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"),
+                ["src/Gma.Modules.TaskRuntime.Application/Gma.Modules.TaskRuntime.Application.csproj"],
+                ["docs/README.md"]),
+            ["Gma.Modules.Tenancy.slnx"] = (
+                Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx"),
+                ["src/Gma.Modules.Tenancy.Api/Gma.Modules.Tenancy.Api.csproj"],
+                ["docs/README.md"])
         };
 
-        string[] projectOffenders = requiredProjectsBySolution
+        string[] projectOffenders = packages
             .SelectMany(item =>
             {
-                string solutionPath = Path.Combine(repositoryRoot, item.Key);
-                if (!File.Exists(solutionPath))
+                if (!File.Exists(item.Value.SolutionPath))
                 {
-                    return [$"{item.Key} is missing"];
+                    return [$"{CanonicalRelativePath(repositoryRoot, item.Value.SolutionPath)} is missing"];
                 }
 
-                string solution = File.ReadAllText(solutionPath);
-                return item.Value
+                string solution = File.ReadAllText(item.Value.SolutionPath);
+                return item.Value.RequiredProjects
                     .Where(projectPath => !solution.Contains(projectPath, StringComparison.OrdinalIgnoreCase))
                     .Select(projectPath => $"{item.Key} missing {projectPath}");
             })
             .ToArray();
-        string[] fileOffenders = requiredFilesBySolution
+        string[] fileOffenders = packages
             .SelectMany(item =>
             {
-                string solutionPath = Path.Combine(repositoryRoot, item.Key);
-                if (!File.Exists(solutionPath))
+                if (!File.Exists(item.Value.SolutionPath))
                 {
-                    return [$"{item.Key} is missing"];
+                    return [$"{CanonicalRelativePath(repositoryRoot, item.Value.SolutionPath)} is missing"];
                 }
 
-                string solution = File.ReadAllText(solutionPath);
-                return item.Value
+                string solution = File.ReadAllText(item.Value.SolutionPath);
+                return item.Value.RequiredFiles
                     .Where(filePath => !solution.Contains(filePath, StringComparison.OrdinalIgnoreCase))
                     .Select(filePath => $"{item.Key} missing {filePath}");
             })
@@ -1932,22 +1908,22 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Focused_source_package_solutions_use_package_local_folders()
     {
         string repositoryRoot = FindRepositoryRoot();
-        Dictionary<string, (string SourcePrefix, string[] AllowedFolders)> packages = new(StringComparer.OrdinalIgnoreCase)
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
+        Dictionary<string, (string SolutionPath, string[] AllowedFolders)> packages = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Gma.Framework.slnx"] = ("src/Framework/", ["/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Modules.Administration.slnx"] = ("src/Modules/Administration/", ["/docs/", "/src/", "/tests/"]),
-            ["Gma.Modules.Auth.slnx"] = ("src/Modules/Auth/", ["/docs/", "/src/", "/tests/"]),
-            ["Gma.Modules.Files.slnx"] = ("src/Modules/Files/", ["/docs/", "/src/", "/tests/"]),
-            ["Gma.Modules.Notifications.slnx"] = ("src/Modules/Notifications/", ["/docs/", "/src/", "/tests/"]),
-            ["Gma.Modules.TaskRuntime.slnx"] = ("src/Modules/TaskRuntime/", ["/docs/", "/src/", "/tests/"]),
-            ["Gma.Modules.Tenancy.slnx"] = ("src/Modules/Tenancy/", ["/docs/", "/src/", "/tests/"])
+            ["Gma.Framework.slnx"] = (Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"), ["/docs/", "/eng/", "/src/", "/tests/"]),
+            ["Gma.Modules.Administration.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"), ["/docs/", "/src/", "/tests/"]),
+            ["Gma.Modules.Auth.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"), ["/docs/", "/src/", "/tests/"]),
+            ["Gma.Modules.Files.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"), ["/docs/", "/src/", "/tests/"]),
+            ["Gma.Modules.Notifications.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"), ["/docs/", "/src/", "/tests/"]),
+            ["Gma.Modules.TaskRuntime.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"), ["/docs/", "/src/", "/tests/"]),
+            ["Gma.Modules.Tenancy.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx"), ["/docs/", "/src/", "/tests/"])
         };
 
         string[] offenders = packages
             .SelectMany(item =>
             {
-                string solutionPath = Path.Combine(repositoryRoot, item.Key);
-                XDocument solution = XDocument.Load(solutionPath);
+                XDocument solution = XDocument.Load(item.Value.SolutionPath);
                 string[] folderOffenders = solution
                     .Descendants("Folder")
                     .Select(folder => folder.Attribute("Name")?.Value ?? string.Empty)
@@ -1958,8 +1934,8 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Descendants()
                     .Attributes("Path")
                     .Select(attribute => attribute.Value.Replace('\\', '/'))
-                    .Where(path => !path.StartsWith(item.Value.SourcePrefix, StringComparison.OrdinalIgnoreCase))
-                    .Select(path => $"{item.Key} lists {path} outside {item.Value.SourcePrefix}")
+                    .Where(path => !item.Value.AllowedFolders.Any(folder => path.StartsWith(folder.Trim('/'), StringComparison.OrdinalIgnoreCase)))
+                    .Select(path => $"{item.Key} lists {path} outside package-local folders")
                     .ToArray();
 
                 return folderOffenders.Concat(pathOffenders);
@@ -1975,58 +1951,41 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string repositoryRoot = FindRepositoryRoot();
         GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
-        Dictionary<string, (string SourcePrefix, string LocalSolution)> packages = new(StringComparer.OrdinalIgnoreCase)
+        Dictionary<string, string> packages = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Gma.Framework.slnx"] = ("src/Framework/", Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx")),
-            ["Gma.Modules.Administration.slnx"] = ("src/Modules/Administration/", Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx")),
-            ["Gma.Modules.Auth.slnx"] = ("src/Modules/Auth/", Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx")),
-            ["Gma.Modules.Files.slnx"] = ("src/Modules/Files/", Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx")),
-            ["Gma.Modules.Notifications.slnx"] = ("src/Modules/Notifications/", Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx")),
-            ["Gma.Modules.TaskRuntime.slnx"] = ("src/Modules/TaskRuntime/", Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx")),
-            ["Gma.Modules.Tenancy.slnx"] = ("src/Modules/Tenancy/", Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx"))
+            ["Gma.Framework.slnx"] = Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"),
+            ["Gma.Modules.Administration.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"),
+            ["Gma.Modules.Auth.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"),
+            ["Gma.Modules.Files.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"),
+            ["Gma.Modules.Notifications.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"),
+            ["Gma.Modules.TaskRuntime.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"),
+            ["Gma.Modules.Tenancy.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx")
         };
 
         string[] offenders = packages
             .SelectMany(item =>
             {
-                string rootSolutionPath = Path.Combine(repositoryRoot, item.Key);
-                string localSolutionPath = item.Value.LocalSolution;
-                string localSolutionDisplayPath = CanonicalRelativePath(repositoryRoot, localSolutionPath);
-                if (!File.Exists(localSolutionPath))
+                string solutionDisplayPath = CanonicalRelativePath(repositoryRoot, item.Value);
+                if (!File.Exists(item.Value))
                 {
-                    return [$"{localSolutionDisplayPath} is missing"];
+                    return [$"{solutionDisplayPath} is missing"];
                 }
 
-                string[] rootEntries = GetSolutionEntryPaths(XDocument.Load(rootSolutionPath));
-                string[] localEntries = GetSolutionEntryPaths(XDocument.Load(localSolutionPath));
-                string[] outsideRootEntries = rootEntries
-                    .Where(path => !path.StartsWith(item.Value.SourcePrefix, StringComparison.OrdinalIgnoreCase))
-                    .Select(path => $"{item.Key} lists {path} outside {item.Value.SourcePrefix}")
-                    .ToArray();
-                string[] expectedLocalEntries = rootEntries
-                    .Where(path => path.StartsWith(item.Value.SourcePrefix, StringComparison.OrdinalIgnoreCase))
-                    .Select(path => path[item.Value.SourcePrefix.Length..])
-                    .Select(path => ToExpectedPackageLocalSolutionEntry(path, sourceLayout.UsesExternalSourceRoots))
-                    .Order(StringComparer.OrdinalIgnoreCase)
-                    .ToArray();
+                string[] localEntries = GetSolutionEntryPaths(XDocument.Load(item.Value));
                 string[] staleLocalPrefixes = localEntries
                     .Where(path => path.StartsWith("src/Framework/", StringComparison.OrdinalIgnoreCase) ||
                                    path.StartsWith("src/Modules/", StringComparison.OrdinalIgnoreCase))
-                    .Select(path => $"{localSolutionDisplayPath} keeps monorepo-staged path {path}")
+                    .Select(path => $"{solutionDisplayPath} keeps monorepo-staged path {path}")
                     .ToArray();
-                string[] missingLocalEntries = expectedLocalEntries
-                    .Except(localEntries, StringComparer.OrdinalIgnoreCase)
-                    .Select(path => $"{localSolutionDisplayPath} missing {path}")
-                    .ToArray();
-                string[] staleLocalEntries = localEntries
-                    .Except(expectedLocalEntries, StringComparer.OrdinalIgnoreCase)
-                    .Select(path => $"{localSolutionDisplayPath} has stale entry {path}")
+                string[] nonLocalEntries = localEntries
+                    .Where(path => !path.StartsWith("docs/", StringComparison.OrdinalIgnoreCase) &&
+                                   !path.StartsWith("eng/", StringComparison.OrdinalIgnoreCase) &&
+                                   !path.StartsWith("src/", StringComparison.OrdinalIgnoreCase) &&
+                                   !path.StartsWith("tests/", StringComparison.OrdinalIgnoreCase))
+                    .Select(path => $"{solutionDisplayPath} lists non-package-local entry {path}")
                     .ToArray();
 
-                return outsideRootEntries
-                    .Concat(staleLocalPrefixes)
-                    .Concat(missingLocalEntries)
-                    .Concat(staleLocalEntries);
+                return staleLocalPrefixes.Concat(nonLocalEntries);
             })
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -2049,7 +2008,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string wrapper = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-module.ps1"));
         string implementation = File.ReadAllText(ModuleScaffolderPath(repositoryRoot));
 
-        Assert.Contains("src\\Framework\\eng\\new-module.ps1", wrapper, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("gma\\framework\\eng\\new-module.ps1", wrapper, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("-RepositoryRoot $repositoryRoot", wrapper, StringComparison.Ordinal);
         Assert.Contains("-CompositionSolution 'GenericModularApi.slnx'", wrapper, StringComparison.Ordinal);
         Assert.DoesNotContain("function Add-Project", wrapper, StringComparison.OrdinalIgnoreCase);
@@ -2117,6 +2076,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Reusable_module_solutions_only_list_owned_module_projects()
     {
         string repositoryRoot = FindRepositoryRoot();
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
         Dictionary<string, string> moduleBySolution = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Gma.Modules.Administration.slnx"] = "Administration",
@@ -2130,16 +2090,18 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] offenders = moduleBySolution
             .SelectMany(item =>
             {
-                string solutionPath = Path.Combine(repositoryRoot, item.Key);
+                string solutionPath = Path.Combine(sourceLayout.GetModulePackageRoot(item.Value), item.Key);
                 string solution = File.ReadAllText(solutionPath);
-                string ownedModulePrefix = $"src/Modules/{item.Value}/";
+                string ownedModulePrefix = $"src/Gma.Modules.{item.Value}";
 
                 return SolutionProjectPathPattern()
                     .Matches(solution)
                     .Select(match => match.Groups["path"].Value.Replace('\\', '/'))
                     .Where(projectPath =>
+                        projectPath.StartsWith("../", StringComparison.OrdinalIgnoreCase) ||
                         projectPath.StartsWith("src/Framework/", StringComparison.OrdinalIgnoreCase) ||
-                        (projectPath.StartsWith("src/Modules/", StringComparison.OrdinalIgnoreCase) &&
+                        projectPath.StartsWith("src/Modules/", StringComparison.OrdinalIgnoreCase) ||
+                        (projectPath.StartsWith("src/Gma.Modules.", StringComparison.OrdinalIgnoreCase) &&
                          !projectPath.StartsWith(ownedModulePrefix, StringComparison.OrdinalIgnoreCase)))
                     .Select(projectPath => $"{item.Key} should not list {projectPath}; module solutions build framework dependencies through GmaFrameworkRoot project references.");
             })
@@ -8694,20 +8656,6 @@ public sealed partial class DeveloperExperienceGuardTests
         target.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
         target.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
         target.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase);
-
-    private static string ToExpectedPackageLocalSolutionEntry(string path, bool packageRootLayout)
-    {
-        if (!packageRootLayout)
-        {
-            return path;
-        }
-
-        return path.StartsWith("docs/", StringComparison.OrdinalIgnoreCase) ||
-               path.StartsWith("eng/", StringComparison.OrdinalIgnoreCase) ||
-               path.StartsWith("tests/", StringComparison.OrdinalIgnoreCase)
-            ? path
-            : $"src/{path}";
-    }
 
     private static string FindRepositoryRoot()
     {

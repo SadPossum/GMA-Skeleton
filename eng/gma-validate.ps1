@@ -11,13 +11,13 @@ $solutions = @('GenericModularApi.slnx')
 
 if ($FocusedSolutions) {
     $solutions += @(
-        'Gma.Framework.slnx',
-        'Gma.Modules.Administration.slnx',
-        'Gma.Modules.Auth.slnx',
-        'Gma.Modules.Files.slnx',
-        'Gma.Modules.Notifications.slnx',
-        'Gma.Modules.TaskRuntime.slnx',
-        'Gma.Modules.Tenancy.slnx'
+        'gma\framework\Gma.Framework.slnx',
+        'gma\modules\administration\Gma.Modules.Administration.slnx',
+        'gma\modules\auth\Gma.Modules.Auth.slnx',
+        'gma\modules\files\Gma.Modules.Files.slnx',
+        'gma\modules\notifications\Gma.Modules.Notifications.slnx',
+        'gma\modules\task-runtime\Gma.Modules.TaskRuntime.slnx',
+        'gma\modules\tenancy\Gma.Modules.Tenancy.slnx'
     )
 }
 

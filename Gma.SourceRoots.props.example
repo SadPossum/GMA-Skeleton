@@ -1,17 +1,15 @@
 <Project>
   <PropertyGroup>
-    <!-- Copy this file to Gma.SourceRoots.props and keep the copy untracked. -->
-    <!-- In split source repos, anchor relative paths with $(MSBuildThisFileDirectory). -->
-    <GmaFrameworkRoot>$(GmaRepositoryRoot)src\Framework\</GmaFrameworkRoot>
-    <GmaModulesRoot>$(GmaRepositoryRoot)src\Modules\</GmaModulesRoot>
-    <GmaModuleAdministrationRoot>$(GmaModulesRoot)Administration\</GmaModuleAdministrationRoot>
-    <GmaModuleAuthRoot>$(GmaModulesRoot)Auth\</GmaModuleAuthRoot>
-    <GmaModuleCatalogRoot>$(GmaModulesRoot)Catalog\</GmaModuleCatalogRoot>
-    <GmaModuleFilesRoot>$(GmaModulesRoot)Files\</GmaModuleFilesRoot>
-    <GmaModuleNotificationsRoot>$(GmaModulesRoot)Notifications\</GmaModuleNotificationsRoot>
-    <GmaModuleOrderingRoot>$(GmaModulesRoot)Ordering\</GmaModuleOrderingRoot>
-    <GmaModuleTaskRuntimeRoot>$(GmaModulesRoot)TaskRuntime\</GmaModuleTaskRuntimeRoot>
-    <GmaModuleTaskSamplesRoot>$(GmaModulesRoot)TaskSamples\</GmaModuleTaskSamplesRoot>
-    <GmaModuleTenancyRoot>$(GmaModulesRoot)Tenancy\</GmaModuleTenancyRoot>
+    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)gma\framework\src\</GmaFrameworkRoot>
+    <GmaModulesRoot>$(MSBuildThisFileDirectory)gma\modules\</GmaModulesRoot>
+    <GmaModuleAdministrationRoot>$(GmaModulesRoot)administration\src\</GmaModuleAdministrationRoot>
+    <GmaModuleAuthRoot>$(GmaModulesRoot)auth\src\</GmaModuleAuthRoot>
+    <GmaModuleFilesRoot>$(GmaModulesRoot)files\src\</GmaModuleFilesRoot>
+    <GmaModuleNotificationsRoot>$(GmaModulesRoot)notifications\src\</GmaModuleNotificationsRoot>
+    <GmaModuleTaskRuntimeRoot>$(GmaModulesRoot)task-runtime\src\</GmaModuleTaskRuntimeRoot>
+    <GmaModuleTenancyRoot>$(GmaModulesRoot)tenancy\src\</GmaModuleTenancyRoot>
+    <GmaModuleCatalogRoot>$(GmaRepositoryRoot)src\Modules\Catalog\</GmaModuleCatalogRoot>
+    <GmaModuleOrderingRoot>$(GmaRepositoryRoot)src\Modules\Ordering\</GmaModuleOrderingRoot>
+    <GmaModuleTaskSamplesRoot>$(GmaRepositoryRoot)src\Modules\TaskSamples\</GmaModuleTaskSamplesRoot>
   </PropertyGroup>
 </Project>

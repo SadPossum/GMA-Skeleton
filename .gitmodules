@@ -1,0 +1,28 @@
+[submodule "gma/framework"]
+	path = gma/framework
+	url = git@github.com-private:SadPossum/gma-framework.git
+	branch = dev
+[submodule "gma/modules/administration"]
+	path = gma/modules/administration
+	url = git@github.com-private:SadPossum/gma-module-administration.git
+	branch = dev
+[submodule "gma/modules/auth"]
+	path = gma/modules/auth
+	url = git@github.com-private:SadPossum/gma-module-auth.git
+	branch = dev
+[submodule "gma/modules/files"]
+	path = gma/modules/files
+	url = git@github.com-private:SadPossum/gma-module-files.git
+	branch = dev
+[submodule "gma/modules/notifications"]
+	path = gma/modules/notifications
+	url = git@github.com-private:SadPossum/gma-module-notifications.git
+	branch = dev
+[submodule "gma/modules/task-runtime"]
+	path = gma/modules/task-runtime
+	url = git@github.com-private:SadPossum/gma-module-task-runtime.git
+	branch = dev
+[submodule "gma/modules/tenancy"]
+	path = gma/modules/tenancy
+	url = git@github.com-private:SadPossum/gma-module-tenancy.git
+	branch = dev

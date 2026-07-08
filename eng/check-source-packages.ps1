@@ -5,20 +5,14 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
-# This script validates the current monorepo staging layout. It keeps focused
-# source-package solutions honest before extraction, but standalone package
-# repositories are expected to flatten these roots to repo-level src/docs/tests/eng.
+# Validates the source-first skeleton layout. Framework and reusable-module
+# packages are mounted as submodules, so their focused solutions must be
+# package-local and use local docs/eng/src/tests paths.
 
 function New-GmaSourcePackage {
     param(
         [Parameter(Mandatory = $true)]
         [string] $Solution,
-
-        [Parameter(Mandatory = $true)]
-        [string] $LocalSolution,
-
-        [Parameter(Mandatory = $true)]
-        [string] $SourcePrefix,
 
         [Parameter(Mandatory = $true)]
         [string[]] $AllowedFolders,
@@ -29,8 +23,6 @@ function New-GmaSourcePackage {
 
     [pscustomobject] @{
         Solution = $Solution
-        LocalSolution = $LocalSolution
-        SourcePrefix = $SourcePrefix
         AllowedFolders = $AllowedFolders
         RequiredPaths = $RequiredPaths
     }
@@ -45,19 +37,6 @@ function ConvertTo-GmaSolutionPath {
     return $Path.Replace('\', '/')
 }
 
-function Test-GmaSolutionContainsPath {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $SolutionText,
-
-        [Parameter(Mandatory = $true)]
-        [string] $Path
-    )
-
-    $normalizedPath = ConvertTo-GmaSolutionPath -Path $Path
-    return $SolutionText.Contains("Path=`"$normalizedPath`"")
-}
-
 function Get-GmaSolutionEntryPaths {
     param(
         [Parameter(Mandatory = $true)]
@@ -69,73 +48,93 @@ function Get-GmaSolutionEntryPaths {
     } | Sort-Object)
 }
 
+function Test-GmaSolutionContainsPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]] $EntryPaths,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Path
+    )
+
+    $normalizedPath = ConvertTo-GmaSolutionPath -Path $Path
+    return $EntryPaths -contains $normalizedPath
+}
+
+function Get-GmaRelativePath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $BasePath,
+
+        [Parameter(Mandatory = $true)]
+        [string] $TargetPath
+    )
+
+    $baseFullPath = [System.IO.Path]::GetFullPath($BasePath)
+    if (-not ($baseFullPath.EndsWith('\', [System.StringComparison]::Ordinal) -or
+            $baseFullPath.EndsWith('/', [System.StringComparison]::Ordinal))) {
+        $baseFullPath += [System.IO.Path]::DirectorySeparatorChar
+    }
+
+    $targetFullPath = [System.IO.Path]::GetFullPath($TargetPath)
+    $baseUri = [System.Uri]::new($baseFullPath)
+    $targetUri = [System.Uri]::new($targetFullPath)
+    return [System.Uri]::UnescapeDataString($baseUri.MakeRelativeUri($targetUri).ToString()).Replace('/', [System.IO.Path]::DirectorySeparatorChar)
+}
+
 $packages = @(
     New-GmaSourcePackage `
-        -Solution 'Gma.Framework.slnx' `
-        -LocalSolution 'src/Framework/Gma.Framework.slnx' `
-        -SourcePrefix 'src/Framework/' `
+        -Solution 'gma\framework\Gma.Framework.slnx' `
         -AllowedFolders @('/docs/', '/eng/', '/src/', '/tests/') `
         -RequiredPaths @(
-            'src/Framework/docs/README.md',
-            'src/Framework/eng/new-module.ps1',
-            'src/Framework/tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj'
+            'gma\framework\docs\README.md',
+            'gma\framework\eng\new-module.ps1',
+            'gma\framework\tests\Gma.Framework.Tests\Gma.Framework.Tests.csproj'
         )
     New-GmaSourcePackage `
-        -Solution 'Gma.Modules.Administration.slnx' `
-        -LocalSolution 'src/Modules/Administration/Gma.Modules.Administration.slnx' `
-        -SourcePrefix 'src/Modules/Administration/' `
+        -Solution 'gma\modules\administration\Gma.Modules.Administration.slnx' `
         -AllowedFolders @('/docs/', '/src/', '/tests/') `
         -RequiredPaths @(
-            'src/Modules/Administration/docs/README.md',
-            'src/Modules/Administration/Gma.Modules.Administration.Application/Gma.Modules.Administration.Application.csproj',
-            'src/Modules/Administration/tests/Gma.Modules.Administration.Tests/Gma.Modules.Administration.Tests.csproj'
+            'gma\modules\administration\docs\README.md',
+            'gma\modules\administration\src\Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj',
+            'gma\modules\administration\tests\Gma.Modules.Administration.Tests\Gma.Modules.Administration.Tests.csproj'
         )
     New-GmaSourcePackage `
-        -Solution 'Gma.Modules.Auth.slnx' `
-        -LocalSolution 'src/Modules/Auth/Gma.Modules.Auth.slnx' `
-        -SourcePrefix 'src/Modules/Auth/' `
+        -Solution 'gma\modules\auth\Gma.Modules.Auth.slnx' `
         -AllowedFolders @('/docs/', '/src/', '/tests/') `
         -RequiredPaths @(
-            'src/Modules/Auth/docs/README.md',
-            'src/Modules/Auth/Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj',
-            'src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj'
+            'gma\modules\auth\docs\README.md',
+            'gma\modules\auth\src\Gma.Modules.Auth.Application\Gma.Modules.Auth.Application.csproj',
+            'gma\modules\auth\tests\Gma.Modules.Auth.Tests\Gma.Modules.Auth.Tests.csproj'
         )
     New-GmaSourcePackage `
-        -Solution 'Gma.Modules.Files.slnx' `
-        -LocalSolution 'src/Modules/Files/Gma.Modules.Files.slnx' `
-        -SourcePrefix 'src/Modules/Files/' `
-        -AllowedFolders @('/docs/', '/src/', '/tests/') `
+        -Solution 'gma\modules\files\Gma.Modules.Files.slnx' `
+        -AllowedFolders @('/docs/', '/src/') `
         -RequiredPaths @(
-            'src/Modules/Files/docs/README.md',
-            'src/Modules/Files/Gma.Modules.Files.Api/Gma.Modules.Files.Api.csproj'
+            'gma\modules\files\docs\README.md',
+            'gma\modules\files\src\Gma.Modules.Files.Api\Gma.Modules.Files.Api.csproj'
         )
     New-GmaSourcePackage `
-        -Solution 'Gma.Modules.Notifications.slnx' `
-        -LocalSolution 'src/Modules/Notifications/Gma.Modules.Notifications.slnx' `
-        -SourcePrefix 'src/Modules/Notifications/' `
+        -Solution 'gma\modules\notifications\Gma.Modules.Notifications.slnx' `
         -AllowedFolders @('/docs/', '/src/', '/tests/') `
         -RequiredPaths @(
-            'src/Modules/Notifications/docs/README.md',
-            'src/Modules/Notifications/Gma.Modules.Notifications.Application/Gma.Modules.Notifications.Application.csproj',
-            'src/Modules/Notifications/tests/Gma.Modules.Notifications.Tests/Gma.Modules.Notifications.Tests.csproj'
+            'gma\modules\notifications\docs\README.md',
+            'gma\modules\notifications\src\Gma.Modules.Notifications.Application\Gma.Modules.Notifications.Application.csproj',
+            'gma\modules\notifications\tests\Gma.Modules.Notifications.Tests\Gma.Modules.Notifications.Tests.csproj'
         )
     New-GmaSourcePackage `
-        -Solution 'Gma.Modules.TaskRuntime.slnx' `
-        -LocalSolution 'src/Modules/TaskRuntime/Gma.Modules.TaskRuntime.slnx' `
-        -SourcePrefix 'src/Modules/TaskRuntime/' `
-        -AllowedFolders @('/docs/', '/src/', '/tests/') `
+        -Solution 'gma\modules\task-runtime\Gma.Modules.TaskRuntime.slnx' `
+        -AllowedFolders @('/docs/', '/src/') `
         -RequiredPaths @(
-            'src/Modules/TaskRuntime/docs/README.md',
-            'src/Modules/TaskRuntime/Gma.Modules.TaskRuntime.Application/Gma.Modules.TaskRuntime.Application.csproj'
+            'gma\modules\task-runtime\docs\README.md',
+            'gma\modules\task-runtime\src\Gma.Modules.TaskRuntime.Application\Gma.Modules.TaskRuntime.Application.csproj'
         )
     New-GmaSourcePackage `
-        -Solution 'Gma.Modules.Tenancy.slnx' `
-        -LocalSolution 'src/Modules/Tenancy/Gma.Modules.Tenancy.slnx' `
-        -SourcePrefix 'src/Modules/Tenancy/' `
-        -AllowedFolders @('/docs/', '/src/', '/tests/') `
+        -Solution 'gma\modules\tenancy\Gma.Modules.Tenancy.slnx' `
+        -AllowedFolders @('/docs/', '/src/') `
         -RequiredPaths @(
-            'src/Modules/Tenancy/docs/README.md',
-            'src/Modules/Tenancy/Gma.Modules.Tenancy.Api/Gma.Modules.Tenancy.Api.csproj'
+            'gma\modules\tenancy\docs\README.md',
+            'gma\modules\tenancy\src\Gma.Modules.Tenancy.Api\Gma.Modules.Tenancy.Api.csproj'
         )
 )
 
@@ -148,8 +147,8 @@ foreach ($package in $packages) {
         continue
     }
 
-    $solutionText = Get-Content -LiteralPath $solutionPath -Raw
     try {
+        $solutionText = Get-Content -LiteralPath $solutionPath -Raw
         [xml] $solutionXml = $solutionText
     }
     catch {
@@ -157,43 +156,7 @@ foreach ($package in $packages) {
         continue
     }
 
-    $localSolutionPath = Join-GmaPath $package.LocalSolution
-    if (-not (Test-Path -LiteralPath $localSolutionPath -PathType Leaf)) {
-        $errors.Add("$($package.LocalSolution) is missing.")
-    }
-    else {
-        try {
-            [xml] $localSolutionXml = Get-Content -LiteralPath $localSolutionPath -Raw
-            $rootEntryPaths = Get-GmaSolutionEntryPaths -SolutionXml $solutionXml
-            $localEntryPaths = Get-GmaSolutionEntryPaths -SolutionXml $localSolutionXml
-            $expectedLocalEntryPaths = [System.Collections.Generic.List[string]]::new()
-            foreach ($rootEntryPath in $rootEntryPaths) {
-                if (-not $rootEntryPath.StartsWith($package.SourcePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
-                    $errors.Add("$($package.Solution) lists '$rootEntryPath' outside '$($package.SourcePrefix)'.")
-                    continue
-                }
-
-                $expectedLocalEntryPaths.Add($rootEntryPath.Substring($package.SourcePrefix.Length))
-            }
-
-            $expectedLocalEntryPaths = @($expectedLocalEntryPaths | Sort-Object)
-
-            foreach ($expectedPath in $expectedLocalEntryPaths) {
-                if ($localEntryPaths -notcontains $expectedPath) {
-                    $errors.Add("$($package.LocalSolution) missing local entry '$expectedPath'.")
-                }
-            }
-
-            foreach ($actualPath in $localEntryPaths) {
-                if ($expectedLocalEntryPaths -notcontains $actualPath) {
-                    $errors.Add("$($package.LocalSolution) has stale local entry '$actualPath'.")
-                }
-            }
-        }
-        catch {
-            $errors.Add("$($package.LocalSolution) is not valid XML: $($_.Exception.Message)")
-        }
-    }
+    $entryPaths = Get-GmaSolutionEntryPaths -SolutionXml $solutionXml
 
     foreach ($folder in $solutionXml.SelectNodes('//Folder')) {
         $folderName = $folder.GetAttribute('Name')
@@ -202,20 +165,36 @@ foreach ($package in $packages) {
         }
     }
 
-    foreach ($node in $solutionXml.SelectNodes('//*[@Path]')) {
-        $entryPath = ConvertTo-GmaSolutionPath -Path $node.GetAttribute('Path')
-        if (-not $entryPath.StartsWith($package.SourcePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
-            $errors.Add("$($package.Solution) lists '$entryPath' outside '$($package.SourcePrefix)'.")
+    foreach ($entryPath in $entryPaths) {
+        if ($entryPath.StartsWith('../', [System.StringComparison]::Ordinal) -or
+            $entryPath.StartsWith('/', [System.StringComparison]::Ordinal)) {
+            $errors.Add("$($package.Solution) lists non-local entry '$entryPath'.")
+            continue
+        }
+
+        $firstSegment = ($entryPath -split '/', 2)[0]
+        if ($package.AllowedFolders -notcontains "/$firstSegment/") {
+            $errors.Add("$($package.Solution) lists '$entryPath' outside allowed package folders.")
         }
     }
 
     foreach ($requiredPath in $package.RequiredPaths) {
-        if (-not (Test-Path -LiteralPath (Join-GmaPath $requiredPath))) {
+        $absoluteRequiredPath = Join-GmaPath $requiredPath
+        if (-not (Test-Path -LiteralPath $absoluteRequiredPath)) {
             $errors.Add("$($package.Solution) required path '$requiredPath' does not exist.")
+            continue
         }
 
-        if (-not (Test-GmaSolutionContainsPath -SolutionText $solutionText -Path $requiredPath)) {
-            $errors.Add("$($package.Solution) does not list required path '$requiredPath'.")
+        $solutionDirectory = [System.IO.Path]::GetDirectoryName($solutionPath)
+        if ([string]::IsNullOrWhiteSpace($solutionDirectory)) {
+            $errors.Add("$($package.Solution) has no solution directory.")
+            continue
+        }
+
+        $expectedEntry = Get-GmaRelativePath -BasePath $solutionDirectory -TargetPath $absoluteRequiredPath
+
+        if (-not (Test-GmaSolutionContainsPath -EntryPaths $entryPaths -Path $expectedEntry)) {
+            $errors.Add("$($package.Solution) does not list required path '$expectedEntry'.")
         }
     }
 }
@@ -227,7 +206,14 @@ $staleRootPaths = @(
     'docs/templates',
     'docs/examples/catalog-module.md',
     'docs/examples/ordering-module.md',
-    'docs/examples/task-samples-module.md'
+    'docs/examples/task-samples-module.md',
+    'src/Framework',
+    'src/Modules/Administration',
+    'src/Modules/Auth',
+    'src/Modules/Files',
+    'src/Modules/Notifications',
+    'src/Modules/TaskRuntime',
+    'src/Modules/Tenancy'
 )
 
 foreach ($staleRootPath in $staleRootPaths) {
@@ -274,4 +260,4 @@ foreach ($package in $packages) {
     }
 }
 
-Write-Host 'Monorepo source-package staging checks passed.'
+Write-Host 'Source-package checks passed.'

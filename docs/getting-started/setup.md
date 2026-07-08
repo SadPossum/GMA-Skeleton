@@ -195,29 +195,29 @@ dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minima
 
 ## Focused Solution Entrypoints
 
-Use `GenericModularApi.slnx` for the full skeleton/composition repository. Use the focused `.slnx` files when working inside a future source repository boundary:
+Use `GenericModularApi.slnx` for the full skeleton/composition repository. Use the focused package-local `.slnx` files when working inside a framework or reusable-module source boundary:
 
 ```text
-Gma.Framework.slnx
-Gma.Modules.Administration.slnx
-Gma.Modules.Auth.slnx
-Gma.Modules.Files.slnx
-Gma.Modules.Notifications.slnx
-Gma.Modules.TaskRuntime.slnx
-Gma.Modules.Tenancy.slnx
+gma/framework/Gma.Framework.slnx
+gma/modules/administration/Gma.Modules.Administration.slnx
+gma/modules/auth/Gma.Modules.Auth.slnx
+gma/modules/files/Gma.Modules.Files.slnx
+gma/modules/notifications/Gma.Modules.Notifications.slnx
+gma/modules/task-runtime/Gma.Modules.TaskRuntime.slnx
+gma/modules/tenancy/Gma.Modules.Tenancy.slnx
 ```
 
-Those root focused solutions are monorepo staging entrypoints: their paths start at `src/Framework` or `src/Modules/<Module>` so the skeleton can validate every package from one checkout. Each package root also has a package-local solution with the same contents but local paths:
+Those focused solutions live inside the mounted source repositories. Their paths are local to each package root, so a module can be opened either from this skeleton checkout or from its own repository:
 
 ```text
-src/Framework/Gma.Framework.slnx
-src/Modules/Auth/Gma.Modules.Auth.slnx
-src/Modules/Notifications/Gma.Modules.Notifications.slnx
+gma/framework/Gma.Framework.slnx
+gma/modules/auth/Gma.Modules.Auth.slnx
+gma/modules/notifications/Gma.Modules.Notifications.slnx
 ```
 
-Open the package-local solution when you want to work as if the framework or module were already its own repository. The source-package checker compares each root focused solution with its package-local mirror so they stay aligned instead of becoming another manual list to maintain.
+Open the package-local solution when you want to work as if the framework or module were already its own repository. The source-package checker verifies each focused solution stays local to `docs/`, `eng/`, `src/`, and `tests/`, and rejects stale root-owned reusable package folders.
 
-Focused framework and reusable-module tests are colocated with their current monorepo staging roots, for example `src/Framework/tests/Gma.Framework.Tests` and `src/Modules/Auth/tests/Gma.Modules.Auth.Tests`. After extraction, package-owned tests should move to the independent repository root `tests/` folder. Cross-module architecture and integration tests stay under the skeleton repository-level `tests/` folder.
+Focused framework and reusable-module tests are colocated with their package repositories, for example `gma/framework/tests/Gma.Framework.Tests` and `gma/modules/auth/tests/Gma.Modules.Auth.Tests`. Cross-module architecture and integration tests stay under the skeleton repository-level `tests/` folder.
 
 Catalog, Ordering, and TaskSamples are skeleton-owned examples, not reusable GMA source packages. They do not have standalone `.slnx` entrypoints; validate them through `GenericModularApi.slnx` and the skeleton-level test suites.
 
@@ -241,7 +241,7 @@ To create a local override file:
 .\eng\gma-bootstrap.ps1
 ```
 
-This copies `Gma.SourceRoots.props.example` to ignored `Gma.SourceRoots.props`. Edit that local file when a production app stores the framework or reusable modules outside the default `src/Framework` and `src/Modules` layout.
+This copies `Gma.SourceRoots.props.example` to ignored `Gma.SourceRoots.props`. Edit that local file when a production app stores the framework or reusable modules outside the default `gma/framework` and `gma/modules` layout.
 
 For an app-style checkout that already has flattened GMA source repositories mounted under `gma/framework` and `gma/modules/<alias>`, bootstrap the root, framework, and module-local source-root files with:
 
@@ -272,7 +272,7 @@ Before replacing the skeleton/composition repository with real submodules, use t
 .\eng\gma-stage9.ps1 -ProveLocalRecursiveClone -Force
 ```
 
-The helper is non-destructive unless you run the generated command plan yourself, explicitly request a local rehearsal under `.agents`, or pass `-Force` to a working-tree rewrite helper. It verifies the Stage 8D skeleton candidate, local candidate repositories, current mount paths, and remote reachability; then it can write `.tmp\gma-stage9-submodule-plan.ps1` with the reviewed conversion sequence. `-WriteConvertedSolution` writes a converted submodule-backed solution to `.tmp\gma-stage9-converted-solution.slnx` by default, so the `.slnx` path conversion can be reviewed without touching the root solution. The command plan updates the `.slnx`, source-root shape, recursive-submodule CI workflow, and skeleton docs before adding submodules; then it validates the submodule-backed composition, removes old reusable source and root package `.slnx` entrypoints only after validation is green, and builds again after cleanup.
+The helper is non-destructive unless you run the generated command plan yourself, explicitly request a local rehearsal under `.agents`, or pass `-Force` to a working-tree rewrite helper. It verifies the Stage 8D skeleton candidate, local candidate repositories, current mount paths, and remote reachability; then it can write `.tmp\gma-stage9-submodule-plan.ps1` with the reviewed conversion sequence. `-WriteConvertedSolution` writes a converted submodule-backed solution to `.tmp\gma-stage9-converted-solution.slnx` by default, so the `.slnx` path conversion can be reviewed without touching the root solution. The command plan updates the `.slnx`, source-root shape, recursive-submodule CI workflow, and skeleton docs before adding submodules; then it restores and builds the submodule-backed composition, removes old reusable source and root package `.slnx` entrypoints, and runs the full test pass after the final skeleton shape exists.
 
 Use `-CreateLocalRehearsal -Force` to clone the prepared skeleton into `.agents\stage9\local-submodule-rehearsal`, overlay current skeleton-owned docs/scripts, generate the converted solution, add real local submodules with `protocol.file.allow=always`, bootstrap source roots, and prove the submodule-backed composition before touching the real worktree.
 

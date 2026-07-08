@@ -1,9 +1,0 @@
-<Solution>
-  <Folder Name="/docs/">
-    <File Path="src/Modules/Tenancy/docs/README.md" />
-  </Folder>
-  <Folder Name="/src/">
-    <Project Path="src/Modules/Tenancy/Gma.Modules.Tenancy.Api/Gma.Modules.Tenancy.Api.csproj" />
-    <Project Path="src/Modules/Tenancy/Gma.Modules.Tenancy.Contracts/Gma.Modules.Tenancy.Contracts.csproj" />
-  </Folder>
-</Solution>

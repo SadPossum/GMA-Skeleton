@@ -266,12 +266,10 @@ function Get-GmaStage9CommandPlanLines {
     $lines.Add('git submodule status --recursive')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add('')
-    $lines.Add('# Validate the submodule-backed composition before deleting the old reusable source folders.')
+    $lines.Add('# Restore and build the submodule-backed composition before deleting the old reusable source folders.')
     $lines.Add('dotnet restore GenericModularApi.slnx')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add('dotnet build GenericModularApi.slnx --no-restore -m:1')
-    $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
-    $lines.Add('dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add('')
     $lines.Add('# After validation is green, remove reusable source that is now owned by submodules.')
@@ -283,6 +281,8 @@ function Get-GmaStage9CommandPlanLines {
     $lines.Add('dotnet restore GenericModularApi.slnx')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add('dotnet build GenericModularApi.slnx --no-restore -m:1')
+    $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
+    $lines.Add('dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add('')
     $lines.Add('# Keep skeleton-owned hosts, examples, docs, requests, and composition tests in this repository.')
@@ -454,7 +454,7 @@ function Convert-GmaStage9DocumentationText {
         'Reusable framework and module documentation lives with the source that owns it. In this monorepo staging layout those docs are still under staged source-package roots:',
         'Reusable framework and module documentation lives with the source that owns it. In the source-first skeleton layout those docs live under mounted GMA repositories:')
     $converted = $converted.Replace(
-        'Keep reusable framework docs in `src/Framework/docs/` while framework source is staged in this monorepo.',
+        'Keep reusable framework docs in `gma/framework/docs/` with the framework source repository.',
         'Keep reusable framework docs in `gma/framework/docs/` once framework source is mounted as a submodule.')
     $converted = $converted.Replace(
         'Keep reusable module docs in `src/Modules/<Module>/docs/` while modules are staged in this monorepo.',

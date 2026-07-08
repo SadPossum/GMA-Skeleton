@@ -211,7 +211,7 @@ Register the module in `Host.Api` during scaffolding:
 `-RegisterInHost` inserts the module at the explicit `// module-scaffold:public-api-modules` marker in `src/Host.Api/Program.cs`.
 Manual registration is usually better until the module is real. Optional modules should remain explicit host choices.
 
-The root script is a skeleton convenience wrapper. The canonical framework-owned scaffolder implementation lives at `src/Framework/eng/new-module.ps1`, and the wrapper passes the composition repository root to it.
+The root script is a skeleton convenience wrapper. The canonical framework-owned scaffolder implementation lives at `gma/framework/eng/new-module.ps1`, and the wrapper passes the composition repository root to it.
 
 ## Build Discipline
 

@@ -2,15 +2,15 @@
 
 This folder documents the skeleton/composition repository: how to run it, how it composes selected GMA source dependencies, and how the included example modules demonstrate application-level patterns.
 
-Reusable framework and module documentation lives with the source that owns it. In this monorepo staging layout those docs are still under staged source-package roots:
+Reusable framework and module documentation lives with the source that owns it. In the source-first skeleton layout those docs live under mounted GMA repositories:
 
-- [GMA Framework Docs](../src/Framework/docs/README.md)
-- [Administration Module](../src/Modules/Administration/docs/README.md)
-- [Auth Module](../src/Modules/Auth/docs/README.md)
-- [Files Module](../src/Modules/Files/docs/README.md)
-- [Notifications Module](../src/Modules/Notifications/docs/README.md)
-- [TaskRuntime Module](../src/Modules/TaskRuntime/docs/README.md)
-- [Tenancy Module](../src/Modules/Tenancy/docs/README.md)
+- [GMA Framework Docs](../gma/framework/docs/README.md)
+- [Administration Module](../gma/modules/administration/docs/README.md)
+- [Auth Module](../gma/modules/auth/docs/README.md)
+- [Files Module](../gma/modules/files/docs/README.md)
+- [Notifications Module](../gma/modules/notifications/docs/README.md)
+- [TaskRuntime Module](../gma/modules/task-runtime/docs/README.md)
+- [Tenancy Module](../gma/modules/tenancy/docs/README.md)
 
 ## Start Here
 
@@ -30,8 +30,8 @@ Reusable framework and module documentation lives with the source that owns it. 
 ## Ownership
 
 - Keep skeleton docs in `docs/`.
-- Keep reusable framework docs in `src/Framework/docs/` while framework source is staged in this monorepo.
-- Keep reusable module docs in `src/Modules/<Module>/docs/` while modules are staged in this monorepo.
+- Keep reusable framework docs in `gma/framework/docs/` once framework source is mounted as a submodule.
+- Keep reusable module docs in `gma/modules/<alias>/docs/` once modules are mounted as submodules.
 - After extraction, move each framework/module docs tree to that repository's root `docs/` folder.
 - Keep example-module docs in the example module folder; examples are skeleton-owned and do not get reusable package `.slnx` entrypoints.
 - Keep focused framework/module tests beside the owning source root.
