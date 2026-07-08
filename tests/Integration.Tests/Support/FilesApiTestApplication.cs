@@ -23,8 +23,8 @@ using Gma.Modules.Tenancy.Api;
 
 internal sealed class FilesApiTestApplication : IAsyncDisposable
 {
-    private const string JwtIssuer = "GenericModularApi";
-    private const string JwtAudience = "GenericModularApi";
+    private const string JwtIssuer = "GMA-Skeleton";
+    private const string JwtAudience = "GMA-Skeleton";
     private const string JwtSigningKey = "files-api-test-signing-key-change-me-000000000000000000";
 
     private readonly WebApplication app;

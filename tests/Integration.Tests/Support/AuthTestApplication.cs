@@ -22,8 +22,8 @@ internal sealed class AuthTestApplication(
     bool enablePrometheus = false)
     : WebApplicationFactory<ApiAssemblyReference>
 {
-    private const string JwtIssuer = "GenericModularApi";
-    private const string JwtAudience = "GenericModularApi";
+    private const string JwtIssuer = "GMA-Skeleton";
+    private const string JwtAudience = "GMA-Skeleton";
     private const string JwtSigningKey = "integration-test-signing-key-change-me-000000000000000000";
     private const string RefreshTokenPepper = "integration-test-refresh-token-pepper-change-me-000000000000000000";
 

@@ -234,21 +234,21 @@ Actions:
 - Confirm the current `dev` branch is clean and pushed.
 - Create a branch for the rebrand, for example `codex/gma-rebrand-source-split`.
 - Add this document and, if useful, an ADR that records `Gma.*`, source-first submodules, and `.slnx`.
-- Decide whether the current all-up repository becomes `GMA-Skeleton`, `gma-composition`, or remains `GenericModularApi` until extraction.
+- Decide whether the current all-up repository becomes `GMA-Skeleton`, `gma-composition`, or keeps its pre-split name until extraction.
 - Decide whether public package IDs will be `Gma.*` or `SadPossum.Gma.*` later. This does not block source-first work.
 
 Validation:
 
 ```powershell
 git status --short --branch
-dotnet build GenericModularApi.slnx --no-restore -m:1
-dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+dotnet build GMA-Skeleton.slnx --no-restore -m:1
+dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 Agent goal:
 
 ```text
-Inspect the current GenericModularApi repo, docs, solution, branch state, and architecture guards. Lock the GMA rebrand/source-split decisions in docs without changing code behavior yet. Preserve the modular optional architecture, keep source-first submodules as the preferred future development model, and add any ADR/planning notes needed before a broad rename.
+Inspect the current GMA-Skeleton repo, docs, solution, branch state, and architecture guards. Lock the GMA rebrand/source-split decisions in docs without changing code behavior yet. Preserve the modular optional architecture, keep source-first submodules as the preferred future development model, and add any ADR/planning notes needed before a broad rename.
 ```
 
 ## Stage 1: Rename Code Identity To Gma.*
@@ -285,9 +285,9 @@ Validation:
 rg "namespace Shared|using Shared|Shared\." src tests docs eng
 rg "namespace Auth|using Auth|Auth\." src tests docs eng
 rg "InternalsVisibleTo\(\"Shared|InternalsVisibleTo\(\"Auth|InternalsVisibleTo\(\"Notifications|InternalsVisibleTo\(\"Files" src tests
-dotnet restore GenericModularApi.slnx
-dotnet build GenericModularApi.slnx --no-restore -m:1
-dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+dotnet restore GMA-Skeleton.slnx
+dotnet build GMA-Skeleton.slnx --no-restore -m:1
+dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 Expected rough edges:
@@ -321,8 +321,8 @@ Validation:
 ```powershell
 rg "src\\Shared|src/Shared|tests\\Shared.Tests|tests/Shared.Tests" .
 rg "shared package|Shared package|Shared project|shared-project" docs tests src
-dotnet build GenericModularApi.slnx --no-restore -m:1
-dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+dotnet build GMA-Skeleton.slnx --no-restore -m:1
+dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 Agent goal:
@@ -366,20 +366,20 @@ Goal: make `.slnx` the normal solution format for the all-up repository before a
 
 Actions:
 
-- Run `dotnet sln GenericModularApi.sln migrate`.
-- Rename the all-up solution to the chosen current repo identity if needed, for example `Gma.Skeleton.slnx` or `GenericModularApi.slnx`.
+- Run `dotnet sln GMA-Skeleton.sln migrate`.
+- Rename the all-up solution to the chosen current repo identity if needed, for example `Gma.Skeleton.slnx` or `GMA-Skeleton.slnx`.
 - Update build/test scripts and docs to use `.slnx`.
 - Update CI references.
-- Remove the legacy `.sln` only after IDE, CLI, and scripts are verified. Done in the current repo after `GenericModularApi.slnx`, focused package `.slnx` files, and architecture checks passed.
+- Remove the legacy `.sln` only after IDE, CLI, and scripts are verified. Done in the current repo after `GMA-Skeleton.slnx`, focused package `.slnx` files, and architecture checks passed.
 
 Validation:
 
 ```powershell
-dotnet sln GenericModularApi.slnx list
-dotnet restore GenericModularApi.slnx
-dotnet build GenericModularApi.slnx --no-restore -m:1
-dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
-rg "GenericModularApi\.sln([^x]|$)" docs eng .github README.md
+dotnet sln GMA-Skeleton.slnx list
+dotnet restore GMA-Skeleton.slnx
+dotnet build GMA-Skeleton.slnx --no-restore -m:1
+dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
+rg "GMA-Skeleton\.sln([^x]|$)" docs eng .github README.md
 ```
 
 Agent goal:
@@ -411,7 +411,7 @@ The pre-split monorepo kept two entrypoints per package:
 - root focused solutions such as `Gma.Modules.Auth.slnx`, with paths rooted at the skeleton checkout;
 - package-local mirrors such as `src/Modules/Auth/Gma.Modules.Auth.slnx`, with paths local to the future module repository root.
 
-Those root focused solutions were convenient for all-up validation before real submodules. They are no longer part of the skeleton. Use `GenericModularApi.slnx` for all-up composition and the package-local `.slnx` files inside `gma/framework` or `gma/modules/<alias>` for focused package work.
+Those root focused solutions were convenient for all-up validation before real submodules. They are no longer part of the skeleton. Use `GMA-Skeleton.slnx` for all-up composition and the package-local `.slnx` files inside `gma/framework` or `gma/modules/<alias>` for focused package work.
 
 Each module `.slnx` should include:
 
@@ -538,7 +538,7 @@ Local dry-run result:
 - The successful history extraction used `git clone -c core.longpaths=true` and the short `.agents\sr\1` root.
 - `GMA-Framework` restored, built, and passed its focused tests from the extracted repository.
 - Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy restored and built from focused package entrypoints against the extracted framework root; package-local focused tests passed where present. Compiled example modules remained skeleton-owned and were validated through the all-up composition.
-- A local composition clone restored and built the all-up `GenericModularApi.slnx` while `src\Framework` and reusable module folders were directory junctions to the extracted source repositories.
+- A local composition clone restored and built the all-up `GMA-Skeleton.slnx` while `src\Framework` and reusable module folders were directory junctions to the extracted source repositories.
 
 Current source-shape rehearsal result on 2026-07-07:
 
@@ -547,7 +547,7 @@ Current source-shape rehearsal result on 2026-07-07:
 - Snapshot local source-package directories were created for `GMA-Framework` plus Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy.
 - Each source package restored and built from its own focused `.slnx`.
 - The local composition clone then replaced `src\Framework` and `src\Modules\<Module>` with directory junctions to those source-package directories.
-- After restoring the composition clone to refresh `obj` assets for the junction-backed paths, `.\eng\check-source-packages.ps1 -SkipRestore` and `dotnet build GenericModularApi.slnx --no-restore -m:1` both passed.
+- After restoring the composition clone to refresh `obj` assets for the junction-backed paths, `.\eng\check-source-packages.ps1 -SkipRestore` and `dotnet build GMA-Skeleton.slnx --no-restore -m:1` both passed.
 - The rehearsal produced one real repo hardening fix: all modules now have explicit source-root properties, Ordering cross-module project references use `$(GmaModuleCatalogRoot)` and `$(GmaModuleNotificationsRoot)`, and architecture tests reject physical cross-module project references.
 
 Stage 8A local candidate result on 2026-07-07:
@@ -559,7 +559,7 @@ Stage 8A local candidate result on 2026-07-07:
 - Module repositories also include `eng\bootstrap-source-roots.ps1` so CI or a local consumer can point them at a sibling framework checkout and optional sibling module checkout root.
 - Each candidate repository restored, built, and ran its focused tests through `.\eng\validate.ps1`.
 - The sandbox composition under `.agents\stage8a\1\composition` replaced `src\Framework` plus the reusable module folders with directory junctions to those candidate repositories.
-- The sandbox composition passed `dotnet restore GenericModularApi.slnx`, `.\eng\check-source-packages.ps1 -SkipRestore -SkipBuild`, `dotnet build GenericModularApi.slnx --no-restore -m:1`, and `dotnet test tests\Architecture.Tests\Architecture.Tests.csproj --no-build --logger "console;verbosity=minimal"`.
+- The sandbox composition passed `dotnet restore GMA-Skeleton.slnx`, `.\eng\check-source-packages.ps1 -SkipRestore -SkipBuild`, `dotnet build GMA-Skeleton.slnx --no-restore -m:1`, and `dotnet test tests\Architecture.Tests\Architecture.Tests.csproj --no-build --logger "console;verbosity=minimal"`.
 - The candidate CI workflow is a draft. It checks out framework source for module builds; if a reusable module later depends on another reusable module's contracts, that module CI should also check out the needed sibling module repository and pass `-ModuleReposRoot` to `eng\bootstrap-source-roots.ps1`.
 - Stage 8B should repeat this with real GitHub repositories and either `git filter-repo`/`git subtree split` history extraction or an explicit initial-import decision per repository.
 
@@ -578,14 +578,14 @@ Stage 8C source-root composition proof on 2026-07-07:
 - Repo-named module folders worked with the generated module-local `eng\bootstrap-source-roots.ps1`, but this is not the desired final developer experience. Real application checkouts should prefer short aliases such as `gma\modules\auth`; bootstrap scripts must support those aliases explicitly.
 - Each module repository keeps its own `Directory.Build.props`, so a root-level `Gma.SourceRoots.props` in the skeleton does not flow into module-local builds. Run each module repository's `eng\bootstrap-source-roots.ps1` when validating a module checkout outside the monorepo.
 - Host and root test projects now use per-module source-root properties such as `$(GmaModuleAuthRoot)` instead of physical `..\Modules\Auth\...` references.
-- `dotnet restore GenericModularApi.slnx` and `dotnet build GenericModularApi.slnx --no-restore -m:1` passed in the local skeleton rehearsal after `src\Framework` and reusable module folders were removed and replaced by `gma\...` source repositories.
+- `dotnet restore GMA-Skeleton.slnx` and `dotnet build GMA-Skeleton.slnx --no-restore -m:1` passed in the local skeleton rehearsal after `src\Framework` and reusable module folders were removed and replaced by `gma\...` source repositories.
 - `tests\Architecture.Tests` still contains many monorepo file-path probes such as `src\Framework` and `src\Modules\Auth`. In the split skeleton rehearsal the architecture test assembly built, but the tests failed because those probes could not find files that had moved under source repositories.
 - Before Stage 9 can require `dotnet test Gma.Skeleton.slnx`, either move framework/module-specific architecture tests into their owning repositories or make the all-up architecture test helpers resolve `GmaFrameworkRoot` and `GmaModule*Root` source roots.
 
 Stage 8D target: flatten source repositories before real submodules:
 
 - Rebuild local candidate repositories so package roots look like normal repositories:
-  - `GMA-Framework\src\Gma.Framework.Results\...`
+  - `GMA-Framework\src\Results\Gma.Framework.Results\...`
   - `GMA-Framework\docs\...`
   - `GMA-Framework\tests\Gma.Framework.Tests\...`
   - `GMA-Module-Auth\src\Gma.Modules.Auth.Application\...`
@@ -605,7 +605,7 @@ Stage 8D flattened local rehearsal result on 2026-07-08:
 
 - The run used `.agents\stage8d\2`; all generated repositories and skeleton composition folders are ignored local artifacts.
 - Local candidate repositories were generated with normal standalone roots:
-  - `GMA-Framework\src\Gma.Framework.*`, `GMA-Framework\docs`, `GMA-Framework\tests`, and `GMA-Framework\eng`;
+  - `GMA-Framework\src\<Feature>\Gma.Framework.*`, `GMA-Framework\docs`, `GMA-Framework\tests`, and `GMA-Framework\eng`;
   - `GMA-Module-<Module>\src\Gma.Modules.<Module>.*`, plus module-owned `docs` and `tests` where present.
 - Package-local test projects were hardened so package-owned references use source-root properties such as `$(GmaFrameworkRoot)`, `$(GmaModuleAuthRoot)`, and `$(GmaModuleNotificationsRoot)` instead of monorepo-relative `..\..\Gma.*` paths.
 - The flattened `GMA-Framework`, Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy candidates each passed restore, build, and package-local tests where present.
@@ -617,9 +617,9 @@ Stage 8D flattened local rehearsal result on 2026-07-08:
   - `gma\modules\notifications`;
   - `gma\modules\task-runtime`;
   - `gma\modules\tenancy`.
-- The skeleton rehearsal removed the old reusable package folders from `src\Framework` and `src\Modules\<ReusableModule>`, rewrote `GenericModularApi.slnx` project/file paths to the `gma\...` mount points, and generated a root `Gma.SourceRoots.props` for hosts, examples, and root tests.
+- The skeleton rehearsal removed the old reusable package folders from `src\Framework` and `src\Modules\<ReusableModule>`, rewrote `GMA-Skeleton.slnx` project/file paths to the `gma\...` mount points, and generated a root `Gma.SourceRoots.props` for hosts, examples, and root tests.
 - Module projects use their own repository-local `Directory.Build.props`, so the skeleton root `Gma.SourceRoots.props` does not flow into mounted module projects. The rehearsal therefore generated app-context `Gma.SourceRoots.props` files inside each mounted module root, pointing back to `gma\framework\src` and the short module aliases. This is now automated by `eng\gma-bootstrap.ps1 -SourceLayout GmaSubmodules`.
-- The app-style skeleton rehearsal passed `dotnet restore GenericModularApi.slnx` and `dotnet build GenericModularApi.slnx --no-restore -m:1`.
+- The app-style skeleton rehearsal passed `dotnet restore GMA-Skeleton.slnx` and `dotnet build GMA-Skeleton.slnx --no-restore -m:1`.
 - The split-skeleton architecture test project now resolves `Gma.SourceRoots.props` and passed in the flattened rehearsal. Package-owned architecture tests should still eventually move or be copied to their owning repositories so the skeleton keeps only composition-focused guards.
 
 Agent goal:
@@ -688,9 +688,9 @@ Validation:
 git ls-remote git@github.com-private:SadPossum/GMA-Framework.git
 git ls-remote git@github.com-private:SadPossum/GMA-Module-Auth.git
 git clone --recurse-submodules git@github.com-private:SadPossum/GMA-Skeleton.git
-dotnet restore GenericModularApi.slnx
-dotnet build GenericModularApi.slnx --no-restore -m:1
-dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+dotnet restore GMA-Skeleton.slnx
+dotnet build GMA-Skeleton.slnx --no-restore -m:1
+dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 Agent goal:
@@ -732,7 +732,7 @@ Actions:
 - Replace framework source folder with a `gma/framework` submodule whose package projects live under `gma/framework/src/`.
 - Replace reusable module source folders with short alias submodules such as `gma/modules/auth`, `gma/modules/administration`, `gma/modules/notifications`, and `gma/modules/files`.
 - Keep skeleton hosts, examples, app-specific docs, and composition tests in the skeleton repo.
-- Update the skeleton `.slnx` file, currently `GenericModularApi.slnx`, to reference projects from submodule paths.
+- Update the skeleton `.slnx` file, currently `GMA-Skeleton.slnx`, to reference projects from submodule paths.
 - Generate source-root values that point to flattened package roots, for example `$(MSBuildThisFileDirectory)gma\modules\auth\src\`.
 - Use `eng\gma-stage9.ps1` as the guarded Stage 9 preflight and command-plan helper:
   - no switches prints the planned submodule mount table without changes;
@@ -761,9 +761,9 @@ Validation:
 .\eng\gma-stage9.ps1 -ProveLocalRecursiveClone -Force
 git submodule status --recursive
 git status --short --branch
-dotnet restore GenericModularApi.slnx
-dotnet build GenericModularApi.slnx --no-restore -m:1
-dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+dotnet restore GMA-Skeleton.slnx
+dotnet build GMA-Skeleton.slnx --no-restore -m:1
+dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 Agent goal:
@@ -779,15 +779,15 @@ Stage 9 local preflight result on 2026-07-08:
 - The generated submodule commands use `git submodule add -f` so the local Stage 8D skeleton rehearsal can replace ignored `gma\...` junction mount paths with tracked submodule gitlinks; this is harmless in a root checkout that does not ignore those paths.
 - `-Audit` proves the Stage 8D skeleton candidate, skeleton source-root example, local reusable candidate repositories, and GitHub remotes are ready.
 - `-WriteCommandPlan` writes `.tmp\gma-stage9-submodule-plan.ps1`; the file is ignored local review output and should not be committed.
-- `-CreateLocalRehearsal -Force` passed against local Stage 8D candidates. It produced a real submodule-backed skeleton at `.agents\stage9\local-submodule-rehearsal`, overlaid the current skeleton-owned docs/scripts into that rehearsal, generated a converted `GenericModularApi.slnx` containing current solution items and `gma\...` package paths, removed root package `.slnx` files that now belong to package repositories, added `.gitmodules` entries for `gma\framework` and every reusable module on `dev`, and bootstrapped source roots inside the app/framework/module checkouts.
-- `-ProveLocalRecursiveClone -Force` passed after the local rehearsal. It committed the ignored rehearsal repository, cloned it into `.agents\stage9\local-recursive-clone-proof` with recursive submodules, bootstrapped source roots inside the clean clone and mounted package roots, verified the skeleton proof no longer contains root package `.slnx` files, restored `GenericModularApi.slnx`, and built it with zero warnings/errors.
+- `-CreateLocalRehearsal -Force` passed against local Stage 8D candidates. It produced a real submodule-backed skeleton at `.agents\stage9\local-submodule-rehearsal`, overlaid the current skeleton-owned docs/scripts into that rehearsal, generated a converted `GMA-Skeleton.slnx` containing current solution items and `gma\...` package paths, removed root package `.slnx` files that now belong to package repositories, added `.gitmodules` entries for `gma\framework` and every reusable module on `dev`, and bootstrapped source roots inside the app/framework/module checkouts.
+- `-ProveLocalRecursiveClone -Force` passed after the local rehearsal. It committed the ignored rehearsal repository, cloned it into `.agents\stage9\local-recursive-clone-proof` with recursive submodules, bootstrapped source roots inside the clean clone and mounted package roots, verified the skeleton proof no longer contains root package `.slnx` files, restored `GMA-Skeleton.slnx`, and built it with zero warnings/errors.
 
 Stage 9 GitHub conversion result on 2026-07-08:
 
 - The root `dev` branch now contains real `.gitmodules` entries and gitlinks for `gma\framework` plus Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy modules.
 - `SadPossum/GMA-Skeleton` has `dev` as its default branch, with initial `dev` and `main` branches pointing at the converted skeleton commit.
 - Private branch protection was unavailable on the current GitHub plan for `GMA-Skeleton`; the helper configured the repository and skipped protection with `-AllowBranchProtectionUnavailable`.
-- A clean GitHub recursive clone into `.agents\stage9\github-recursive-clone-proof` bootstrapped source roots, restored `GenericModularApi.slnx`, built with zero warnings/errors, and passed the full no-build test suite.
+- A clean GitHub recursive clone into `.agents\stage9\github-recursive-clone-proof` bootstrapped source roots, restored `GMA-Skeleton.slnx`, built with zero warnings/errors, and passed the full no-build test suite.
 
 ## Stage 10: Production App Template And Operating Rules
 

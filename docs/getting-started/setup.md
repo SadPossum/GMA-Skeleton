@@ -190,12 +190,12 @@ Docker tests require Docker and set `GMA_REQUIRE_DOCKER_TESTS=true`:
 The normal full test command may skip Docker tests locally when Docker is unavailable:
 
 ```powershell
-dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 ## Focused Solution Entrypoints
 
-Use `GenericModularApi.slnx` for the full skeleton/composition repository. Use the focused package-local `.slnx` files when working inside a framework or reusable-module source boundary:
+Use `GMA-Skeleton.slnx` for the full skeleton/composition repository. Use the focused package-local `.slnx` files when working inside a framework or reusable-module source boundary:
 
 ```text
 gma/framework/Gma.Framework.slnx
@@ -219,7 +219,7 @@ Open the package-local solution when you want to work as if the framework or mod
 
 Focused framework and reusable-module tests are colocated with their package repositories, for example `gma/framework/tests/Gma.Framework.Tests` and `gma/modules/auth/tests/Gma.Modules.Auth.Tests`. Cross-module architecture and integration tests stay under the skeleton repository-level `tests/` folder.
 
-Catalog, Ordering, and TaskSamples are skeleton-owned examples, not reusable GMA source packages. They do not have standalone `.slnx` entrypoints; validate them through `GenericModularApi.slnx` and the skeleton-level test suites.
+Catalog, Ordering, and TaskSamples are skeleton-owned examples, not reusable GMA source packages. They do not have standalone `.slnx` entrypoints; validate them through `GMA-Skeleton.slnx` and the skeleton-level test suites.
 
 Focused module `.slnx` files list only module-owned projects, focused module tests, and the module-owned docs index. They do not list framework projects as solution entries; framework dependencies resolve through `GmaFrameworkRoot` project references so the same module solution can build in the monorepo, an extracted module repo, or a source-submodule application checkout. In an extracted repository, the `.slnx`, `docs/`, `tests/`, `eng/`, and `src/` folders should live at the repository root rather than under preserved monorepo parent folders.
 

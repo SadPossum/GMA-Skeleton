@@ -609,9 +609,9 @@ $hostApiProjectLines = @(
     '<Project Sdk="Microsoft.NET.Sdk.Web">',
     '  <ItemGroup>',
     "    <ProjectReference Include=`"..\$Name.SharedKernel\$Name.SharedKernel.csproj`" />",
-    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Api\Gma.Framework.Api.csproj" />',
-    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />',
-    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />'
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api\Gma.Framework.Api.csproj" />',
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Infrastructure\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />',
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />'
 )
 
 foreach ($moduleSpec in $publicApiModuleSpecs) {

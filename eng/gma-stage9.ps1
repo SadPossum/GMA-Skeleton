@@ -238,7 +238,7 @@ function Get-GmaStage9CommandPlanLines {
     $lines.Add('if ($dirty.Count -gt 0) { throw "Stage 9 conversion requires a clean working tree before submodules are added." }')
     $lines.Add('')
     $lines.Add('# Bring in the already-proven skeleton source-root and CI shape before removing old source folders.')
-    $lines.Add('powershell -NoProfile -ExecutionPolicy Bypass -File eng\gma-stage9.ps1 -WriteConvertedSolution -ConvertedSolutionPath GenericModularApi.slnx -Force')
+    $lines.Add('powershell -NoProfile -ExecutionPolicy Bypass -File eng\gma-stage9.ps1 -WriteConvertedSolution -ConvertedSolutionPath GMA-Skeleton.slnx -Force')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add("Copy-Item -LiteralPath '$skeletonPath\Gma.SourceRoots.props.example' -Destination 'Gma.SourceRoots.props.example' -Force")
     $lines.Add('New-Item -ItemType Directory -Force -Path ''.github\workflows'' | Out-Null')
@@ -267,9 +267,9 @@ function Get-GmaStage9CommandPlanLines {
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add('')
     $lines.Add('# Restore and build the submodule-backed composition before deleting the old reusable source folders.')
-    $lines.Add('dotnet restore GenericModularApi.slnx')
+    $lines.Add('dotnet restore GMA-Skeleton.slnx')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
-    $lines.Add('dotnet build GenericModularApi.slnx --no-restore -m:1')
+    $lines.Add('dotnet build GMA-Skeleton.slnx --no-restore -m:1')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add('')
     $lines.Add('# After validation is green, remove reusable source that is now owned by submodules.')
@@ -278,11 +278,11 @@ function Get-GmaStage9CommandPlanLines {
     $lines.Add('git rm Gma.Framework.slnx Gma.Modules.Administration.slnx Gma.Modules.Auth.slnx Gma.Modules.Files.slnx Gma.Modules.Notifications.slnx Gma.Modules.TaskRuntime.slnx Gma.Modules.Tenancy.slnx')
     $lines.Add('')
     $lines.Add('# Prove the final skeleton shape after old source and root package entrypoints are gone.')
-    $lines.Add('dotnet restore GenericModularApi.slnx')
+    $lines.Add('dotnet restore GMA-Skeleton.slnx')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
-    $lines.Add('dotnet build GenericModularApi.slnx --no-restore -m:1')
+    $lines.Add('dotnet build GMA-Skeleton.slnx --no-restore -m:1')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
-    $lines.Add('dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"')
+    $lines.Add('dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"')
     $lines.Add('if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }')
     $lines.Add('')
     $lines.Add('# Keep skeleton-owned hosts, examples, docs, requests, and composition tests in this repository.')
@@ -387,7 +387,7 @@ function Convert-GmaStage9SolutionPath {
 function Write-GmaStage9ConvertedSolution {
     param([Parameter(Mandatory = $true)][string] $DestinationPath)
 
-    $sourceSolutionPath = Join-GmaPath 'GenericModularApi.slnx'
+    $sourceSolutionPath = Join-GmaPath 'GMA-Skeleton.slnx'
     $destinationSolutionPath = Resolve-GmaStage9Path $DestinationPath
     $rootSolutionPath = [System.IO.Path]::GetFullPath($sourceSolutionPath)
     if ([System.String]::Equals($destinationSolutionPath, $rootSolutionPath, [System.StringComparison]::OrdinalIgnoreCase) -and
@@ -514,7 +514,7 @@ function Sync-GmaStage9SkeletonOwnedArtifacts {
         }
     }
 
-    Write-GmaStage9ConvertedSolution (Join-Path $DestinationRoot 'GenericModularApi.slnx')
+    Write-GmaStage9ConvertedSolution (Join-Path $DestinationRoot 'GMA-Skeleton.slnx')
     Rewrite-GmaStage9SkeletonDocsForSubmoduleLayout $DestinationRoot
 
     foreach ($solutionFile in Get-GmaStage9RootPackageSolutionFiles) {
@@ -589,7 +589,7 @@ function New-GmaStage9LocalRehearsal {
     Invoke-GmaStage9Command -WorkingDirectory $rehearsalPath -Arguments @('submodule', 'status', '--recursive')
 
     if (-not $SkipLocalValidation) {
-        $solutionPath = Join-Path $rehearsalPath 'GenericModularApi.slnx'
+        $solutionPath = Join-Path $rehearsalPath 'GMA-Skeleton.slnx'
         Invoke-GmaDotNet -WorkingDirectory $rehearsalPath -Arguments @('restore', $solutionPath)
         Invoke-GmaDotNet -WorkingDirectory $rehearsalPath -Arguments @('build', $solutionPath, '--no-restore', '-m:1')
     }
@@ -674,7 +674,7 @@ function New-GmaStage9LocalRecursiveCloneProof {
     Invoke-GmaStage9Command -WorkingDirectory $cloneProofPath -Arguments @('submodule', 'status', '--recursive')
 
     if (-not $SkipLocalValidation) {
-        $solutionPath = Join-Path $cloneProofPath 'GenericModularApi.slnx'
+        $solutionPath = Join-Path $cloneProofPath 'GMA-Skeleton.slnx'
         Invoke-GmaDotNet -WorkingDirectory $cloneProofPath -Arguments @('restore', $solutionPath)
         Invoke-GmaDotNet -WorkingDirectory $cloneProofPath -Arguments @('build', $solutionPath, '--no-restore', '-m:1')
     }
@@ -685,7 +685,7 @@ function New-GmaStage9LocalRecursiveCloneProof {
 function Invoke-GmaStage9Audit {
     $stageRootPath = Resolve-GmaStage9Path $StageRoot
     $skeletonPath = Join-Path $stageRootPath 'skeleton'
-    $skeletonSolutionPath = Join-Path $skeletonPath 'GenericModularApi.slnx'
+    $skeletonSolutionPath = Join-Path $skeletonPath 'GMA-Skeleton.slnx'
     $skeletonSourceRootExamplePath = Join-Path $skeletonPath 'Gma.SourceRoots.props.example'
 
     Write-Host 'Stage 9 submodule conversion audit:'

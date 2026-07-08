@@ -113,7 +113,7 @@ function Get-GmaStage8RepositoryPlans {
         [pscustomobject] @{
             Name = 'GMA-Skeleton'
             LocalPath = Join-Path $stageRootPath 'skeleton'
-            Solution = 'GenericModularApi.slnx'
+            Solution = 'GMA-Skeleton.slnx'
             Description = 'GMA skeleton and composition repository for source-first modular monolith applications.'
             Topics = @('gma', 'dotnet', 'template', 'modular-monolith')
         }
@@ -926,7 +926,7 @@ function Sync-GmaSkeletonCandidateFromCurrentWorkspace {
 
     & powershell -NoProfile -ExecutionPolicy Bypass -File $stage9Script `
         -WriteConvertedSolution `
-        -ConvertedSolutionPath (Join-Path $RepositoryPlan.LocalPath 'GenericModularApi.slnx') `
+        -ConvertedSolutionPath (Join-Path $RepositoryPlan.LocalPath 'GMA-Skeleton.slnx') `
         -Force
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to write converted skeleton candidate solution."

@@ -1,6 +1,6 @@
 # Skeleton Overview
 
-GenericModularApi is the composition/template repository for building applications on top of the GMA framework and reusable modules.
+GMA-Skeleton is the composition/template repository for building applications on top of the GMA framework and reusable modules.
 
 The skeleton owns:
 

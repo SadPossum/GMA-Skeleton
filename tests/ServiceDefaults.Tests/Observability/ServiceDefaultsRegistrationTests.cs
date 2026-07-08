@@ -81,7 +81,7 @@ public sealed class ServiceDefaultsRegistrationTests
 
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "GenericModularApi.slnx")))
+            if (File.Exists(Path.Combine(directory.FullName, "GMA-Skeleton.slnx")))
             {
                 return directory.FullName;
             }

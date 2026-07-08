@@ -1,4 +1,4 @@
-# GenericModularApi Skeleton Documentation
+# GMA Skeleton Documentation
 
 This folder documents the skeleton/composition repository: how to run it, how it composes selected GMA source dependencies, and how the included example modules demonstrate application-level patterns.
 

@@ -1,6 +1,6 @@
-# GenericModularApi
+# GMA-Skeleton
 
-GenericModularApi is a .NET 10 modular monolith skeleton for building projects from optional, replaceable modules.
+GMA-Skeleton is a .NET 10 modular monolith skeleton for building projects from optional, replaceable modules.
 
 The repo is intentionally small and explicit:
 

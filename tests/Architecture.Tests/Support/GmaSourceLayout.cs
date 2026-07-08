@@ -4,6 +4,69 @@ using System.Xml.Linq;
 
 internal sealed class GmaSourceLayout
 {
+    private static readonly Dictionary<string, string> FrameworkFeatureFolders =
+        new(StringComparer.Ordinal)
+        {
+            ["Gma.Framework.AccessControl"] = "Security",
+            ["Gma.Framework.Administration"] = "Administration",
+            ["Gma.Framework.Administration.Api"] = "Administration",
+            ["Gma.Framework.Administration.Cli"] = "Administration",
+            ["Gma.Framework.Api"] = "Api",
+            ["Gma.Framework.Api.OpenApi"] = "Api",
+            ["Gma.Framework.Api.Serilog"] = "Api",
+            ["Gma.Framework.Application.Composition"] = "Application",
+            ["Gma.Framework.Application.Events"] = "Application",
+            ["Gma.Framework.Application.Events.Infrastructure"] = "Application",
+            ["Gma.Framework.Authorization"] = "Security",
+            ["Gma.Framework.Caching"] = "Caching",
+            ["Gma.Framework.Caching.Cqrs"] = "Caching",
+            ["Gma.Framework.Caching.Infrastructure"] = "Caching",
+            ["Gma.Framework.Caching.Redis"] = "Caching",
+            ["Gma.Framework.Cqrs"] = "Cqrs",
+            ["Gma.Framework.Cqrs.Infrastructure"] = "Cqrs",
+            ["Gma.Framework.Domain"] = "Domain",
+            ["Gma.Framework.FileManagement"] = "FileManagement",
+            ["Gma.Framework.FileManagement.LocalStorage"] = "FileManagement",
+            ["Gma.Framework.FileManagement.Minio"] = "FileManagement",
+            ["Gma.Framework.Infrastructure"] = "Infrastructure",
+            ["Gma.Framework.Logging.Serilog"] = "Logging",
+            ["Gma.Framework.Messaging"] = "Messaging",
+            ["Gma.Framework.Messaging.Infrastructure"] = "Messaging",
+            ["Gma.Framework.Messaging.Nats"] = "Messaging",
+            ["Gma.Framework.Messaging.Nats.Aspire"] = "Messaging",
+            ["Gma.Framework.ModuleComposition"] = "Modules",
+            ["Gma.Framework.Modules"] = "Modules",
+            ["Gma.Framework.Naming"] = "Naming",
+            ["Gma.Framework.Notifications"] = "Notifications",
+            ["Gma.Framework.Notifications.Api"] = "Notifications",
+            ["Gma.Framework.Notifications.Cqrs"] = "Notifications",
+            ["Gma.Framework.Notifications.Infrastructure"] = "Notifications",
+            ["Gma.Framework.Notifications.SignalR"] = "Notifications",
+            ["Gma.Framework.Numerics"] = "Numerics",
+            ["Gma.Framework.Observability"] = "Observability",
+            ["Gma.Framework.Observability.Infrastructure"] = "Observability",
+            ["Gma.Framework.Pagination"] = "Pagination",
+            ["Gma.Framework.Persistence.EntityFrameworkCore"] = "Persistence",
+            ["Gma.Framework.ProjectionRebuild"] = "ProjectionRebuild",
+            ["Gma.Framework.ProjectionRebuild.EntityFrameworkCore"] = "ProjectionRebuild",
+            ["Gma.Framework.ProjectionRebuild.Tasks"] = "ProjectionRebuild",
+            ["Gma.Framework.Results"] = "Results",
+            ["Gma.Framework.Runtime"] = "Runtime",
+            ["Gma.Framework.Runtime.Infrastructure"] = "Runtime",
+            ["Gma.Framework.Security"] = "Security",
+            ["Gma.Framework.Tasks"] = "Tasks",
+            ["Gma.Framework.Tasks.Cqrs"] = "Tasks",
+            ["Gma.Framework.Tasks.Infrastructure"] = "Tasks",
+            ["Gma.Framework.Tenancy"] = "Tenancy",
+            ["Gma.Framework.Tenancy.Api.Serilog"] = "Tenancy",
+            ["Gma.Framework.Tenancy.Caching"] = "Tenancy",
+            ["Gma.Framework.Tenancy.Cqrs"] = "Tenancy",
+            ["Gma.Framework.Tenancy.Infrastructure"] = "Tenancy",
+            ["Gma.Framework.Tenancy.Messaging"] = "Tenancy",
+            ["Gma.Framework.Tenancy.Messaging.Infrastructure"] = "Tenancy",
+            ["Gma.Framework.Tenancy.Tasks"] = "Tenancy",
+        };
+
     private static readonly IReadOnlyDictionary<string, string> ModulePropertyNames =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
@@ -92,7 +155,7 @@ internal sealed class GmaSourceLayout
     }
 
     public static string FrameworkPath(string repositoryRoot, params string[] segments) =>
-        Combine(FromRepositoryRoot(repositoryRoot).FrameworkRoot, segments);
+        FromRepositoryRoot(repositoryRoot).GetFrameworkPath(segments);
 
     public static string ModulePath(string repositoryRoot, string moduleName, params string[] segments) =>
         Combine(FromRepositoryRoot(repositoryRoot).GetModuleRoot(moduleName), segments);
@@ -222,6 +285,17 @@ internal sealed class GmaSourceLayout
     public string GetModulePackageRoot(string moduleName) =>
         GetPackageRoot(this.GetModuleRoot(moduleName));
 
+    public string GetFrameworkPath(params string[] segments)
+    {
+        if (segments.Length > 0 &&
+            FrameworkFeatureFolders.TryGetValue(segments[0], out string? featureFolder))
+        {
+            return Combine(this.FrameworkRoot, [featureFolder, .. segments]);
+        }
+
+        return Combine(this.FrameworkRoot, segments);
+    }
+
     public string ToCanonicalRelativePath(string path)
     {
         string fullPath = Path.GetFullPath(path);
@@ -268,7 +342,7 @@ internal sealed class GmaSourceLayout
         if (normalizedCanonicalPath.StartsWith(repositoryFrameworkPrefix, StringComparison.OrdinalIgnoreCase))
         {
             string relativePath = normalizedCanonicalPath[repositoryFrameworkPrefix.Length..];
-            resolvedPath = Path.Combine(this.GetFrameworkPathRoot(relativePath), relativePath);
+            resolvedPath = this.ResolveFrameworkRelativePath(relativePath);
             return true;
         }
 
@@ -333,6 +407,22 @@ internal sealed class GmaSourceLayout
         StartsWithSourcePackageFolder(relativePath)
             ? this.FrameworkRepositoryRoot
             : this.FrameworkRoot;
+
+    private string ResolveFrameworkRelativePath(string relativePath)
+    {
+        string[] segments = relativePath.Split(
+            Path.DirectorySeparatorChar,
+            Path.AltDirectorySeparatorChar,
+            StringSplitOptions.RemoveEmptyEntries);
+
+        if (segments.Length > 0 &&
+            FrameworkFeatureFolders.TryGetValue(segments[0], out string? featureFolder))
+        {
+            return Path.Combine(this.FrameworkRoot, featureFolder, relativePath);
+        }
+
+        return Path.Combine(this.GetFrameworkPathRoot(relativePath), relativePath);
+    }
 
     private static string GetModulePathRoot(string moduleRoot, string relativePath) =>
         StartsWithSourcePackageFolder(relativePath)
