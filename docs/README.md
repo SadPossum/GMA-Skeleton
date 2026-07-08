@@ -7,12 +7,12 @@ Reusable framework and module documentation lives with the source that owns it. 
 | Package | Source repository docs | Local checkout path |
 | --- | --- | --- |
 | GMA Framework | [Docs](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/README.md) | `gma/framework/docs/README.md` |
-| Administration | [Docs](https://github.com/SadPossum/gma-module-administration/blob/dev/docs/README.md) | `gma/modules/administration/docs/README.md` |
-| Auth | [Docs](https://github.com/SadPossum/gma-module-auth/blob/dev/docs/README.md) | `gma/modules/auth/docs/README.md` |
-| Files | [Docs](https://github.com/SadPossum/gma-module-files/blob/dev/docs/README.md) | `gma/modules/files/docs/README.md` |
-| Notifications | [Docs](https://github.com/SadPossum/gma-module-notifications/blob/dev/docs/README.md) | `gma/modules/notifications/docs/README.md` |
-| TaskRuntime | [Docs](https://github.com/SadPossum/gma-module-task-runtime/blob/dev/docs/README.md) | `gma/modules/task-runtime/docs/README.md` |
-| Tenancy | [Docs](https://github.com/SadPossum/gma-module-tenancy/blob/dev/docs/README.md) | `gma/modules/tenancy/docs/README.md` |
+| Administration | [Docs](https://github.com/SadPossum/GMA-Module-Administration/blob/dev/docs/README.md) | `gma/modules/administration/docs/README.md` |
+| Auth | [Docs](https://github.com/SadPossum/GMA-Module-Auth/blob/dev/docs/README.md) | `gma/modules/auth/docs/README.md` |
+| Files | [Docs](https://github.com/SadPossum/GMA-Module-Files/blob/dev/docs/README.md) | `gma/modules/files/docs/README.md` |
+| Notifications | [Docs](https://github.com/SadPossum/GMA-Module-Notifications/blob/dev/docs/README.md) | `gma/modules/notifications/docs/README.md` |
+| TaskRuntime | [Docs](https://github.com/SadPossum/GMA-Module-Task-Runtime/blob/dev/docs/README.md) | `gma/modules/task-runtime/docs/README.md` |
+| Tenancy | [Docs](https://github.com/SadPossum/GMA-Module-Tenancy/blob/dev/docs/README.md) | `gma/modules/tenancy/docs/README.md` |
 
 ## Start Here
 

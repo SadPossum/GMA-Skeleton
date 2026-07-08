@@ -193,7 +193,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "0001-documentation-structure.md"));
         string[] requiredSplitPlanTokens =
         [
-            @"gma-module-auth\src\Gma.Modules.Auth.Application",
+            @"GMA-Module-Auth\src\Gma.Modules.Auth.Application",
             @"gma\modules\auth",
             @"gma\modules\auth\src\",
             @"Do not preserve `src\Framework\...` or `src\Modules\<Module>\...` inside the independent repositories.",
@@ -1383,14 +1383,14 @@ public sealed partial class DeveloperExperienceGuardTests
             "gma-rebrand-and-source-repo-split.md"));
         string[] requiredRepositories =
         [
-            "gma-framework",
-            "gma-module-administration",
-            "gma-module-auth",
-            "gma-module-files",
-            "gma-module-notifications",
-            "gma-module-task-runtime",
-            "gma-module-tenancy",
-            "gma-skeleton"
+            "GMA-Framework",
+            "GMA-Module-Administration",
+            "GMA-Module-Auth",
+            "GMA-Module-Files",
+            "GMA-Module-Notifications",
+            "GMA-Module-Task-Runtime",
+            "GMA-Module-Tenancy",
+            "GMA-Skeleton"
         ];
         string[] requiredScriptTokens =
         [
@@ -1461,13 +1461,13 @@ public sealed partial class DeveloperExperienceGuardTests
             "-PushCandidates",
             "-ConfigureRepositories",
             "-ProtectBranches",
-            "-Repository gma-framework",
+            "-Repository GMA-Framework",
             "-SkipDivergedMain",
             "-SkipSkeleton",
             "-AllowUnconvertedSkeletonPush",
             "-AllowBranchProtectionUnavailable",
             "publish framework/module repositories before Stage 9 converts the skeleton",
-            "refuses to push `gma-skeleton` until Stage 9 has produced real `.gitmodules` entries and submodule gitlinks",
+            "refuses to push `GMA-Skeleton` until Stage 9 has produced real `.gitmodules` entries and submodule gitlinks",
             "-WhatIf"
         ];
 
@@ -1532,9 +1532,9 @@ public sealed partial class DeveloperExperienceGuardTests
             "git clone",
             "clone --recurse-submodules",
             "Invoke-GmaDotNet",
-            "gma-framework",
-            "gma-module-auth",
-            "gma-module-notifications",
+            "GMA-Framework",
+            "GMA-Module-Auth",
+            "GMA-Module-Notifications",
             "gma\\framework",
             "gma\\modules\\auth",
             "GenericModularApi.slnx",

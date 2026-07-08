@@ -61,52 +61,52 @@ function Get-GmaStage9SubmodulePlans {
     return @(
         [pscustomobject] @{
             Name = 'framework'
-            Repository = 'gma-framework'
+            Repository = 'GMA-Framework'
             MountPath = 'gma\framework'
             SourceFolder = 'Framework'
-            LocalCandidatePath = Join-Path $stageRootPath 'repos\gma-framework'
+            LocalCandidatePath = Join-Path $stageRootPath 'repos\GMA-Framework'
         },
         [pscustomobject] @{
             Name = 'administration'
-            Repository = 'gma-module-administration'
+            Repository = 'GMA-Module-Administration'
             MountPath = 'gma\modules\administration'
             SourceFolder = 'Administration'
-            LocalCandidatePath = Join-Path $stageRootPath 'repos\gma-module-administration'
+            LocalCandidatePath = Join-Path $stageRootPath 'repos\GMA-Module-Administration'
         },
         [pscustomobject] @{
             Name = 'auth'
-            Repository = 'gma-module-auth'
+            Repository = 'GMA-Module-Auth'
             MountPath = 'gma\modules\auth'
             SourceFolder = 'Auth'
-            LocalCandidatePath = Join-Path $stageRootPath 'repos\gma-module-auth'
+            LocalCandidatePath = Join-Path $stageRootPath 'repos\GMA-Module-Auth'
         },
         [pscustomobject] @{
             Name = 'files'
-            Repository = 'gma-module-files'
+            Repository = 'GMA-Module-Files'
             MountPath = 'gma\modules\files'
             SourceFolder = 'Files'
-            LocalCandidatePath = Join-Path $stageRootPath 'repos\gma-module-files'
+            LocalCandidatePath = Join-Path $stageRootPath 'repos\GMA-Module-Files'
         },
         [pscustomobject] @{
             Name = 'notifications'
-            Repository = 'gma-module-notifications'
+            Repository = 'GMA-Module-Notifications'
             MountPath = 'gma\modules\notifications'
             SourceFolder = 'Notifications'
-            LocalCandidatePath = Join-Path $stageRootPath 'repos\gma-module-notifications'
+            LocalCandidatePath = Join-Path $stageRootPath 'repos\GMA-Module-Notifications'
         },
         [pscustomobject] @{
             Name = 'task-runtime'
-            Repository = 'gma-module-task-runtime'
+            Repository = 'GMA-Module-Task-Runtime'
             MountPath = 'gma\modules\task-runtime'
             SourceFolder = 'TaskRuntime'
-            LocalCandidatePath = Join-Path $stageRootPath 'repos\gma-module-task-runtime'
+            LocalCandidatePath = Join-Path $stageRootPath 'repos\GMA-Module-Task-Runtime'
         },
         [pscustomobject] @{
             Name = 'tenancy'
-            Repository = 'gma-module-tenancy'
+            Repository = 'GMA-Module-Tenancy'
             MountPath = 'gma\modules\tenancy'
             SourceFolder = 'Tenancy'
-            LocalCandidatePath = Join-Path $stageRootPath 'repos\gma-module-tenancy'
+            LocalCandidatePath = Join-Path $stageRootPath 'repos\GMA-Module-Tenancy'
         }
     )
 }

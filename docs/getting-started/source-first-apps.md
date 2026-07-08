@@ -14,11 +14,11 @@ MyProduct/
       Billing/
       Reservations/
   gma/
-    framework/              # submodule: SadPossum/gma-framework
+    framework/              # submodule: SadPossum/GMA-Framework
     modules/
-      auth/                 # submodule: SadPossum/gma-module-auth
-      administration/       # submodule: SadPossum/gma-module-administration
-      notifications/        # submodule: SadPossum/gma-module-notifications
+      auth/                 # submodule: SadPossum/GMA-Module-Auth
+      administration/       # submodule: SadPossum/GMA-Module-Administration
+      notifications/        # submodule: SadPossum/GMA-Module-Notifications
 ```
 
 `SharedKernel` is app-owned. GMA framework code remains under `gma/framework`, and reusable GMA modules remain under `gma/modules/<alias>`. Do not put app-specific shared code inside GMA repositories just because the code is convenient today.
@@ -54,8 +54,8 @@ Use `.\eng\gma-bootstrap.ps1 -Force` after moving source mounts, switching a reu
 For a real app, add source repositories at the same mount paths as Git submodules, then bootstrap:
 
 ```powershell
-git submodule add git@github.com-private:SadPossum/gma-framework.git gma/framework
-git submodule add git@github.com-private:SadPossum/gma-module-auth.git gma/modules/auth
+git submodule add git@github.com-private:SadPossum/GMA-Framework.git gma/framework
+git submodule add git@github.com-private:SadPossum/GMA-Module-Auth.git gma/modules/auth
 .\eng\gma-update.ps1 -Init
 .\eng\gma-bootstrap.ps1
 .\eng\gma-validate.ps1
