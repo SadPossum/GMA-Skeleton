@@ -1,6 +1,6 @@
 # GMA Rebrand And Source Repo Split Plan
 
-Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8D has flattened local repository-shape proof, Stage 8 has real framework/module repositories created, pushed, and configured, Stage 9 has local submodule-conversion and recursive-clone proof, and Stage 10 has a source-first app template proof. The skeleton repository exists but is still empty until the real submodule conversion is committed and pushed; permanent submodule replacement remains in progress.
+Status: implemented in the current source-first skeleton. Stages 1-10 are kept below as the migration history and operating rationale. The reusable framework and modules now live in independent repositories mounted under `gma/` as submodules, and `SadPossum/gma-skeleton` composes those source repositories on the `dev` branch.
 
 This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
 
@@ -313,7 +313,7 @@ Actions:
 - Update documentation wording from "shared packages" to "framework packages" where it refers to reusable GMA code.
 - Keep "shared" as a generic concept only when talking about application-owned shared code or .NET shared concepts.
 - Update solution folders and architecture diagrams.
-- Keep `src/Framework/eng/new-module.ps1` as the framework-owned scaffolder implementation, with skeleton repositories exposing a thin `eng/new-module.ps1` wrapper that passes their composition root and composition solution filename.
+- Keep `eng/new-module.ps1` as the framework-owned scaffolder implementation inside the framework repository. Skeleton repositories expose a thin `eng/new-module.ps1` wrapper that delegates to the mounted framework implementation and passes their composition root plus composition solution filename.
 - Update dependency boundary tests from "Shared" language to "Framework" language.
 
 Validation:
@@ -392,7 +392,9 @@ Migrate the repository from legacy .sln to .slnx using the supported dotnet CLI 
 
 Goal: prove each future repository has a standalone build/test front door before physically splitting Git repositories.
 
-Add these solution files inside the current repo first:
+This stage is historical. Stage 9 removed the temporary root-focused solution files from the skeleton; the current focused solution files live inside the source repositories mounted under `gma/`.
+
+During the pre-split stage, these temporary solution files existed inside the current repo first:
 
 ```text
 Gma.Framework.slnx
@@ -404,12 +406,12 @@ Gma.Modules.TaskRuntime.slnx
 Gma.Modules.Tenancy.slnx
 ```
 
-Keep two entrypoints per package while the monorepo is still the staging area:
+The pre-split monorepo kept two entrypoints per package:
 
 - root focused solutions such as `Gma.Modules.Auth.slnx`, with paths rooted at the skeleton checkout;
 - package-local mirrors such as `src/Modules/Auth/Gma.Modules.Auth.slnx`, with paths local to the future module repository root.
 
-The root focused solutions are convenient for all-up validation from the skeleton. The package-local mirrors are convenient for editing a framework or module in isolation and should move with the package when it becomes its own repository.
+Those root focused solutions were convenient for all-up validation before real submodules. They are no longer part of the skeleton. Use `GenericModularApi.slnx` for all-up composition and the package-local `.slnx` files inside `gma/framework` or `gma/modules/<alias>` for focused package work.
 
 Each module `.slnx` should include:
 
@@ -430,13 +432,13 @@ Catalog, Ordering, and TaskSamples are compiled skeleton examples, not reusable 
 Validation:
 
 ```powershell
-dotnet restore Gma.Framework.slnx
-dotnet build Gma.Framework.slnx --no-restore -m:1
-dotnet test Gma.Framework.slnx --no-build --logger "console;verbosity=minimal"
+dotnet restore gma\framework\Gma.Framework.slnx
+dotnet build gma\framework\Gma.Framework.slnx --no-restore -m:1
+dotnet test gma\framework\Gma.Framework.slnx --no-build --logger "console;verbosity=minimal"
 
-dotnet restore Gma.Modules.Auth.slnx
-dotnet build Gma.Modules.Auth.slnx --no-restore -m:1
-dotnet test Gma.Modules.Auth.slnx --no-build --logger "console;verbosity=minimal"
+dotnet restore gma\modules\auth\Gma.Modules.Auth.slnx
+dotnet build gma\modules\auth\Gma.Modules.Auth.slnx --no-restore -m:1
+dotnet test gma\modules\auth\Gma.Modules.Auth.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 Repeat for each reusable module solution.
@@ -444,8 +446,8 @@ Repeat for each reusable module solution.
 Focused framework/module tests should live under the future source repository root, for example:
 
 ```text
-src/Framework/tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj
-src/Modules/Auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj
+gma/framework/tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj
+gma/modules/auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj
 ```
 
 Agent goal:
@@ -523,7 +525,7 @@ dotnet build Gma.Framework.slnx --no-restore -m:1
 dotnet test Gma.Framework.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
-Repeat for each extracted module repository and the local composition app. In the source monorepo, use this shortcut before a full extraction run:
+Run those commands from inside each extracted package repository. For the skeleton composition checkout, use the mounted package paths or this shortcut:
 
 ```powershell
 .\eng\check-source-packages.ps1 -SkipRestore
@@ -717,7 +719,7 @@ Stage 8 automation-prep result on 2026-07-08:
 - A targeted `-PushCandidates -Repository gma-framework -SkipDivergedMain` pass pushed the framework candidate `dev` branch to the existing `SadPossum/GMA-Framework` repository and left the unrelated remote `main` untouched.
 - After GitHub CLI was installed and authenticated as `SadPossum`, the helper created the reusable module repositories and `gma-skeleton`, pushed framework/module candidate `dev` branches, pushed module candidate `main` branches, and configured framework/module metadata plus default `dev` branches.
 - `SadPossum/GMA-Framework` is public and has `dev` branch protection applied. The reusable module repositories are private; GitHub rejected branch protection for them with `Upgrade to GitHub Pro or make this repository public`, so the helper now supports `-AllowBranchProtectionUnavailable` to record the limitation and continue without weakening repository configuration.
-- The remaining Stage 8/9 external work is to convert the skeleton repository to real submodule gitlinks, push `gma-skeleton`, configure its default `dev` branch, and prove a clean recursive clone from GitHub.
+- Stage 9 completed the external handoff: the skeleton repository was converted to real submodule gitlinks, `gma-skeleton` was pushed, `dev` was configured as the default branch, and a clean recursive clone from GitHub was proven.
 
 ## Stage 9: Replace Current Monorepo Internals With Submodules
 
@@ -828,18 +830,18 @@ Stage 10 local template result on 2026-07-08:
 - The generated app uses an app-owned `SharedKernel` project instead of a literal `Shared` namespace, avoiding analyzer conflicts while keeping app-specific shared code separate from GMA framework code.
 - The template creates an app `.slnx`, minimal API host, root `Directory.Build.props`, source-root example, local bootstrap/status/validate scripts, and `gma\framework` plus `gma\modules\<alias>` mount shape.
 - `-Modules` selects which reusable modules are mounted and written into source-root config. Public API modules are also referenced and registered by the generated API host; admin CLI/API and worker-only surfaces remain explicit app-owned host work. The default is framework-only, while `-Modules all` exists for deliberate full local proof.
-- `-UseLocalStage8Candidates` mounts the ignored Stage 8D candidate repositories as local junctions so the template can be validated before real GitHub submodules exist.
+- `-UseLocalStage8Candidates` mounts the ignored Stage 8D candidate repositories as local junctions for historical/offline template proof.
 - Validation passed with `.tmp\SampleApp`: generated app, ran `eng\gma-bootstrap.ps1`, restored `SampleApp.slnx`, and built `SampleApp.slnx --no-restore -m:1` with zero warnings/errors.
 - Follow-up composition proof passed with selected Auth and Notifications without Tenancy, using `AuthProfile.Global()`, and with `-Modules all`, where the API host registered Tenancy, Auth, Files, and Notifications while keeping Administration and TaskRuntime as mounted but host-specific surfaces. Both generated apps restored and built with zero warnings/errors.
 
 ## Verification Checklist For The Whole Migration
 
-The migration is not complete until all of these are true:
+Use this checklist when auditing or replaying the migration:
 
 - No active source projects use `Shared.*` namespaces for GMA framework code.
 - Current all-up solution is `.slnx`.
 - Framework has its own `.slnx`.
-- Each reusable module repo or repo-ready slice has its own `.slnx`.
+- Each reusable module repository has its own `.slnx`.
 - Each reusable module can validate without the all-up skeleton solution.
 - Business-app style composition can reference selected framework/module source projects.
 - Submodule bootstrap/status/update scripts exist and are documented.

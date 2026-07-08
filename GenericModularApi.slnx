@@ -32,6 +32,10 @@
     <File Path="eng/test-fast.ps1" />
     <File Path="eng/verify.ps1" />
   </Folder>
+  <Folder Name="/gma/">
+    <File Path="gma/README.md" />
+    <File Path="gma/modules/README.md" />
+  </Folder>
   <Folder Name="/.github/workflows/">
     <File Path=".github/workflows/validate.yml" />
   </Folder>

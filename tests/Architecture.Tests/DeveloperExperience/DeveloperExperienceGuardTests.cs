@@ -136,6 +136,39 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
+    public void Skeleton_docs_do_not_link_to_deep_submodule_files()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        Regex markdownLinkPattern = new(@"\[[^\]]+\]\((?<target>[^)\s]+)(?:\s+""[^""]*"")?\)");
+        string[] skeletonDocs = Directory
+            .EnumerateFiles(Path.Combine(repositoryRoot, "docs"), "*.md", SearchOption.AllDirectories)
+            .Prepend(Path.Combine(repositoryRoot, "README.md"))
+            .Where(path => !HasIgnoredPathSegment(path))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        string[] offenders = skeletonDocs
+            .SelectMany(path =>
+            {
+                string source = File.ReadAllText(path);
+                string relativePath = NormalizePath(Path.GetRelativePath(repositoryRoot, path));
+                return markdownLinkPattern
+                    .Matches(source)
+                    .Select(match => match.Groups["target"].Value.Trim())
+                    .Where(target => !target.Contains("://", StringComparison.Ordinal) &&
+                                     !target.StartsWith('#'))
+                    .Select(target => target.Replace('\\', '/'))
+                    .Where(target => target.StartsWith("gma/", StringComparison.OrdinalIgnoreCase) ||
+                                     target.StartsWith("../gma/", StringComparison.OrdinalIgnoreCase) ||
+                                     target.StartsWith("../../gma/", StringComparison.OrdinalIgnoreCase))
+                    .Select(target => $"{relativePath} links to submodule file '{target}'. Use the owning source repository URL instead.");
+            })
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
     public void Source_repo_split_docs_prefer_flat_package_roots()
     {
         string repositoryRoot = FindRepositoryRoot();
@@ -144,6 +177,12 @@ public sealed partial class DeveloperExperienceGuardTests
             "docs",
             "architecture",
             "gma-rebrand-and-source-repo-split.md"));
+        string skeletonDocsIndex = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "README.md"));
+        string skeletonArchitectureOverview = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "docs",
+            "architecture",
+            "overview.md"));
         string documentationGuidelines = File.ReadAllText(FrameworkDocsPath(
             repositoryRoot,
             "guidelines",
@@ -163,8 +202,8 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         string[] requiredDocsTokens =
         [
-            "move its docs to that repository's root-level `docs/` folder",
-            "standalone module repository, the same content should live at `docs/README.md`"
+            "links to reusable docs should point at the owning source repository on GitHub",
+            "GitHub cannot reliably render deep file links through a skeleton submodule path"
         ];
 
         string[] offenders = requiredSplitPlanTokens
@@ -172,6 +211,8 @@ public sealed partial class DeveloperExperienceGuardTests
             .Select(token => $"docs/architecture/gma-rebrand-and-source-repo-split.md missing {token}")
             .Concat(requiredDocsTokens
                 .Where(token =>
+                    !skeletonDocsIndex.Contains(token, StringComparison.Ordinal) &&
+                    !skeletonArchitectureOverview.Contains(token, StringComparison.Ordinal) &&
                     !documentationGuidelines.Contains(token, StringComparison.Ordinal) &&
                     !documentationAdr.Contains(token, StringComparison.Ordinal))
                 .Select(token => $"documentation ownership docs missing {token}"))
@@ -198,6 +239,8 @@ public sealed partial class DeveloperExperienceGuardTests
             "Directory.Packages.props",
             "Gma.SourceRoots.props.example",
             "global.json",
+            "gma/README.md",
+            "gma/modules/README.md",
             "LICENSE",
             "nuget.config",
             "README.md"
