@@ -251,21 +251,7 @@ For an app-style checkout that already has flattened GMA source repositories mou
 
 That command writes ignored `Gma.SourceRoots.props` files at the skeleton root, `gma/framework`, and each mounted reusable module root. The module-local files are required because each source repository imports its own `Directory.Build.props`; the skeleton root props file does not flow into projects inside a mounted source repository. Use `-WhatIf` to preview writes and `-Force` to refresh existing local files.
 
-The Stage 8 and Stage 9 helpers remain in `eng/` as migration/recovery tooling for the source-repo split. They are not part of the normal day-to-day app workflow. Use them only when auditing or replaying the repository extraction/submodule-conversion process:
-
-```powershell
-.\eng\gma-github-stage8.ps1
-.\eng\gma-stage9.ps1
-.\eng\gma-stage9.ps1 -Audit
-.\eng\gma-stage9.ps1 -WriteCommandPlan
-.\eng\gma-stage9.ps1 -WriteConvertedSolution
-.\eng\gma-stage9.ps1 -CreateLocalRehearsal -Force
-.\eng\gma-stage9.ps1 -ProveLocalRecursiveClone -Force
-```
-
-Keep `-WhatIf` on the first external pass. These helpers are deliberately guarded because they can create repositories, push branches, or rewrite the skeleton checkout when action switches are supplied. For source-split dry runs on Windows, keep sandbox paths short and clone with `core.longpaths=true`.
-
-Stage 9 remains non-destructive unless you run the generated command plan, request a local rehearsal under `.agents`, or pass `-Force` to a working-tree rewrite helper. Its review artifacts include `.tmp\gma-stage9-submodule-plan.ps1` and `.tmp\gma-stage9-converted-solution.slnx`. The rehearsal path `.agents\stage9\local-submodule-rehearsal` uses `protocol.file.allow=always` for local submodules; the recursive proof path `.agents\stage9\local-recursive-clone-proof` catches broken `.gitmodules`, stale solution items, root package `.slnx` leakage, source-root, documentation-link, and recursive-submodule CI workflow assumptions. The reviewed command plan adds real submodule gitlinks, bootstraps source roots, removes old reusable source, and removes root package `.slnx` entrypoints from the skeleton.
+The one-off Stage 8/Stage 9 source-split automation is no longer part of the live `eng/` workflow. The decisions and command history remain in [the rebrand/source-split architecture note](../architecture/gma-rebrand-and-source-repo-split.md), but day-to-day work should use the source-first scripts listed below.
 
 To create a new source-first production app shell:
 
@@ -276,7 +262,7 @@ cd .tmp\SampleApp
 .\eng\gma-validate.ps1
 ```
 
-The generated app keeps app-owned common code in `SampleApp.SharedKernel`, mounts GMA framework and explicitly selected reusable modules under `gma\...`, composes selected public API modules in the generated API host, and validates through its own `.slnx`. Use `-Modules auth,notifications` or another explicit list for the reusable modules the app wants; omit `-Modules` for a framework-only shell, or use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. Admin CLI/API and worker-only module surfaces stay explicit app-owned host work. The template also includes `.github\workflows\validate.yml`; set `GMA_CI_TOKEN` when private GMA submodules need cross-repository read access in GitHub Actions.
+The generated app keeps process entrypoints under `src\Hosts`, app-owned modules under `src\Modules`, and app-owned shared code in `src\Shared\SampleApp.SharedKernel`. It mounts GMA framework and explicitly selected reusable modules under `gma\...`, composes selected public API modules in the generated API host, and validates through its own `.slnx`. Use `-Modules auth,notifications` or another explicit list for the reusable modules the app wants; omit `-Modules` for a framework-only shell, or use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. The root README stays app-facing, while generated GMA operating notes live in `docs\gma-source.md`. Admin CLI/API and worker-only module surfaces stay explicit app-owned host work. The template also includes `.github\workflows\validate.yml`; set `GMA_CI_TOKEN` only when private GMA submodules need cross-repository read access in GitHub Actions.
 
 See [Source-first apps](source-first-apps.md) for the app layout, patch/update workflow, upstream-vs-app-local guidance, and submodule detached-HEAD warning.
 

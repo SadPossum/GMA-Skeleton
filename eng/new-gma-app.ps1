@@ -9,11 +9,7 @@ param(
 
     [switch] $Force,
 
-    [switch] $UseLocalStage8Candidates,
-
-    [string[]] $Modules = @(),
-
-    [string] $StageRoot = '.agents\stage8d\2'
+    [string[]] $Modules = @()
 )
 
 . (Join-Path $PSScriptRoot 'common.ps1')
@@ -129,44 +125,6 @@ function Write-GmaTemplateFile {
     $action = if (Test-Path -LiteralPath $Path) { 'Overwrite' } else { 'Create' }
     if ($PSCmdlet.ShouldProcess($Path, "$action generated app file")) {
         [System.IO.File]::WriteAllLines($Path, $Lines, [System.Text.UTF8Encoding]::new($false))
-    }
-}
-
-function Add-GmaTemplateJunction {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $Path,
-
-        [Parameter(Mandatory = $true)]
-        [string] $Target
-    )
-
-    if (-not (Test-Path -LiteralPath $Target -PathType Container)) {
-        throw "Cannot mount local Stage 8 candidate because target does not exist: $Target"
-    }
-
-    if (Test-Path -LiteralPath $Path) {
-        if (-not $Force) {
-            throw "Refusing to replace existing source mount '$Path'. Rerun with -Force after checking the path."
-        }
-
-        $item = Get-Item -LiteralPath $Path -Force
-        if (-not ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
-            throw "Refusing to replace non-link path '$Path'. Remove it manually if it should become a local source mount."
-        }
-
-        if ($PSCmdlet.ShouldProcess($Path, 'Remove existing source mount')) {
-            Remove-Item -LiteralPath $Path -Force
-        }
-    }
-
-    $parent = Split-Path -Parent $Path
-    if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
-        New-Item -ItemType Directory -Force -Path $parent | Out-Null
-    }
-
-    if ($PSCmdlet.ShouldProcess($Path, "Create junction to $Target")) {
-        New-Item -ItemType Junction -Path $Path -Target $Target | Out-Null
     }
 }
 
@@ -476,11 +434,8 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'global.json') @(
     '}'
 )
 
-Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'Directory.Packages.props') @(
-    '<Project>',
-    '  <ItemGroup />',
-    '</Project>'
-)
+$packageVersionTemplate = Get-Content -LiteralPath (Join-GmaPath 'Directory.Packages.props')
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'Directory.Packages.props') $packageVersionTemplate
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'Directory.Build.props') @(
     '<Project>',
@@ -527,6 +482,14 @@ else {
     ($publicApiModuleSpecs | ForEach-Object { $_.Alias }) -join ', '
 }
 
+$submoduleCommandLines = @(
+    'git submodule add https://github.com/SadPossum/GMA-Framework.git gma/framework'
+)
+
+foreach ($moduleSpec in $selectedModuleSpecArray) {
+    $submoduleCommandLines += "git submodule add https://github.com/SadPossum/$($moduleSpec.Repository).git gma/modules/$($moduleSpec.Alias)"
+}
+
 $sourceRootExampleLines = @(
     '<Project>',
     '  <PropertyGroup>',
@@ -558,6 +521,9 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '  <Folder Name="/.github/workflows/">',
     '    <File Path=".github/workflows/validate.yml" />',
     '  </Folder>',
+    '  <Folder Name="/docs/">',
+    '    <File Path="docs/gma-source.md" />',
+    '  </Folder>',
     '  <Folder Name="/Solution Items/">',
     '    <File Path=".gitignore" />',
     '    <File Path="Directory.Build.props" />',
@@ -566,9 +532,16 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '    <File Path="Gma.SourceRoots.props.example" />',
     '    <File Path="README.md" />',
     '  </Folder>',
-    '  <Folder Name="/src/">',
-    "    <Project Path=`"src/$Name.Host.Api/$Name.Host.Api.csproj`" />",
-    "    <Project Path=`"src/$Name.SharedKernel/$Name.SharedKernel.csproj`" />",
+    '  <Folder Name="/src/Hosts/">',
+    '    <File Path="src/Hosts/README.md" />',
+    "    <Project Path=`"src/Hosts/$Name.Host.Api/$Name.Host.Api.csproj`" />",
+    '  </Folder>',
+    '  <Folder Name="/src/Modules/">',
+    '    <File Path="src/Modules/README.md" />',
+    '  </Folder>',
+    '  <Folder Name="/src/Shared/">',
+    '    <File Path="src/Shared/README.md" />',
+    "    <Project Path=`"src/Shared/$Name.SharedKernel/$Name.SharedKernel.csproj`" />",
     '  </Folder>',
     '</Solution>'
 )
@@ -576,28 +549,130 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'README.md') @(
     "# $Name",
     '',
-    'This app is generated as a source-first GMA composition shell.',
+    "$Name is an application shell built with GMA source packages.",
     '',
-    "- Keep app-owned shared code under ``src/$Name.SharedKernel`` or a similar app namespace.",
-    '- Mount GMA framework at `gma/framework` and reusable GMA modules under `gma/modules/<alias>`.',
+    '## Quick Start',
+    '',
+    'After adding or mounting the GMA source packages described in [docs/gma-source.md](docs/gma-source.md):',
+    '',
+    '```powershell',
+    '.\eng\gma-update.ps1 -Init',
+    '.\eng\gma-bootstrap.ps1 -Force',
+    '.\eng\gma-validate.ps1',
+    "dotnet run --project .\src\Hosts\$Name.Host.Api\$Name.Host.Api.csproj",
+    '```',
+    '',
+    '## Layout',
+    '',
+    '- Runtime hosts live under `src/Hosts/`.',
+    '- App-owned modules live under `src/Modules/`.',
+    '- App-owned shared code lives under `src/Shared/`.',
+    '- Reusable GMA source packages are mounted under `gma/`.',
+    '- GMA source-package workflow notes live in [docs/gma-source.md](docs/gma-source.md).'
+)
+
+$gmaSourceDocsLines = @(
+    '# GMA Source Packages',
+    '',
+    'This app consumes GMA as editable source so product work can improve the framework and reusable modules without waiting on package publishing.',
+    '',
+    '## Selected Sources',
+    '',
+    '- GMA framework mount: `gma/framework`.',
+    '- Reusable GMA module mounts: `gma/modules/<alias>`.',
     "- Selected reusable GMA modules for this shell: $selectedModuleText.",
-    "- Public API modules composed by `src/$Name.Host.Api`: $publicApiModuleText.",
+    "- Public API modules composed by ``src/Hosts/$Name.Host.Api``: $publicApiModuleText.",
     '- Admin CLI/API and worker-only module surfaces stay app-specific; add those hosts explicitly when the app needs them.',
     '- Runtime provider choices such as authentication schemes, storage adapters, messaging, and production connection strings remain app-owned composition work.',
-    '- Run `eng/gma-bootstrap.ps1` after cloning submodules or mounting local source checkouts.',
-    '- Run `eng/gma-update.ps1 -Init` after adding real GMA submodules.',
-    '- Work on GMA fixes in the source checkout, push a GMA branch/PR, then update the app submodule pointer deliberately.',
-    '- Set `GMA_CI_TOKEN` in GitHub Actions when private GMA submodules need cross-repository read access.'
+    '- `Directory.Packages.props` is seeded from the skeleton catalog so app-owned generated modules can restore immediately; prune or add versions as the product evolves.',
+    '',
+    '## Add Source Repositories',
+    '',
+    'If the app does not already have GMA source packages mounted, add them as submodules:',
+    '',
+    '```powershell'
 )
+
+$gmaSourceDocsLines += $submoduleCommandLines
+$gmaSourceDocsLines += @(
+    '```',
+    '',
+    'Use equivalent SSH or fork URLs when the app should track private forks instead of the public GMA repositories.',
+    '',
+    '## Local Bootstrap',
+    '',
+    'Run these commands after cloning the app, adding submodules, or mounting local source checkouts:',
+    '',
+    '```powershell',
+    '.\eng\gma-update.ps1 -Init',
+    '.\eng\gma-bootstrap.ps1 -Force',
+    '.\eng\gma-status.ps1',
+    '.\eng\gma-validate.ps1',
+    '```',
+    '',
+    '`eng/gma-bootstrap.ps1` writes ignored `Gma.SourceRoots.props` files for the app and mounted GMA repositories. Use `-Force` after moving source mounts or changing the selected module set.',
+    '',
+    '## Updating GMA',
+    '',
+    'GMA source packages are app dependencies. Update them deliberately, validate the app, and commit changed submodule pointers only when the new dependency state is intended.',
+    '',
+    '```powershell',
+    'git -C gma/framework fetch origin',
+    'git -C gma/framework switch dev',
+    'git -C gma/framework pull --ff-only origin dev',
+    '.\eng\gma-bootstrap.ps1 -Force',
+    '.\eng\gma-validate.ps1',
+    'git status --short',
+    '```',
+    '',
+    '## Fixing GMA From This App',
+    '',
+    '- Work on GMA fixes in the source checkout, push a GMA branch/PR, then update the app submodule pointer deliberately.',
+    '- Avoid editing a submodule while it is in detached `HEAD`; switch to a branch inside that source checkout first.',
+    '- Upstream fixes when they improve reusable framework or module behavior; keep product-specific policies and workflows in the app.',
+    '',
+    '## CI',
+    '',
+    'Generated app shells include `.github/workflows/validate.yml` with recursive submodule checkout, source-root bootstrap, restore, and build steps.',
+    '',
+    'Set `GMA_CI_TOKEN` in GitHub Actions only when private GMA submodules need cross-repository read access. Public GMA repositories can use the default GitHub token.'
+)
+
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'docs\gma-source.md') $gmaSourceDocsLines
 
 Write-GmaGeneratedBootstrap -Root $resolvedOutputPath -ModuleSpecs $selectedModuleSpecArray
 Write-GmaGeneratedWorkflow $resolvedOutputPath
 
-Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\$Name.SharedKernel\$Name.SharedKernel.csproj") @(
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'src\Hosts\README.md') @(
+    '# Hosts',
+    '',
+    'Hosts are process entrypoints. Keep composition here and keep domain behavior in modules.',
+    '',
+    '- `*.Host.Api` composes public HTTP modules.',
+    '- Add admin API, admin CLI, worker, or migration hosts only when the product needs them.'
+)
+
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'src\Modules\README.md') @(
+    '# Modules',
+    '',
+    'Place app-owned domain modules here.',
+    '',
+    'A module should own its domain model, application use cases, persistence, front doors, tests, and docs. Reusable GMA modules stay mounted under `gma/modules/<alias>` instead of this folder.'
+)
+
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'src\Shared\README.md') @(
+    '# Shared',
+    '',
+    'Place app-owned shared contracts and small cross-module primitives here.',
+    '',
+    'Keep this layer small. Prefer module-owned behavior unless a concept is genuinely shared across app modules.'
+)
+
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Shared\$Name.SharedKernel\$Name.SharedKernel.csproj") @(
     '<Project Sdk="Microsoft.NET.Sdk" />'
 )
 
-Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\$Name.SharedKernel\ApplicationAssemblyMarker.cs") @(
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Shared\$Name.SharedKernel\ApplicationAssemblyMarker.cs") @(
     "namespace $Name.SharedKernel;",
     '',
     'public static class ApplicationAssemblyMarker',
@@ -608,7 +683,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\$Name.SharedKernel\App
 $hostApiProjectLines = @(
     '<Project Sdk="Microsoft.NET.Sdk.Web">',
     '  <ItemGroup>',
-    "    <ProjectReference Include=`"..\$Name.SharedKernel\$Name.SharedKernel.csproj`" />",
+    "    <ProjectReference Include=`"..\..\Shared\$Name.SharedKernel\$Name.SharedKernel.csproj`" />",
     '    <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api\Gma.Framework.Api.csproj" />',
     '    <ProjectReference Include="$(GmaFrameworkRoot)Infrastructure\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />',
     '    <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />'
@@ -624,7 +699,7 @@ $hostApiProjectLines += @(
     '</Project>'
 )
 
-Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\$Name.Host.Api\$Name.Host.Api.csproj") $hostApiProjectLines
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\$Name.Host.Api.csproj") $hostApiProjectLines
 
 $programUsingLines = @(
     'using Gma.Framework.Api.Modules;',
@@ -694,28 +769,12 @@ $programLines += @(
     'app.Run();'
 )
 
-Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\$Name.Host.Api\Program.cs") $programLines
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\Program.cs") $programLines
 
 New-Item -ItemType Directory -Force -Path (Join-Path $resolvedOutputPath 'gma\modules') | Out-Null
 New-Item -ItemType File -Force -Path (Join-Path $resolvedOutputPath 'gma\.gitkeep') | Out-Null
 New-Item -ItemType File -Force -Path (Join-Path $resolvedOutputPath 'gma\modules\.gitkeep') | Out-Null
-
-if (-not $UseLocalStage8Candidates) {
-    New-Item -ItemType Directory -Force -Path (Join-Path $resolvedOutputPath 'gma\framework') | Out-Null
-}
-
-if ($UseLocalStage8Candidates) {
-    $resolvedStageRoot = Resolve-GmaTemplatePath $StageRoot
-    Add-GmaTemplateJunction `
-        -Path (Join-Path $resolvedOutputPath 'gma\framework') `
-        -Target (Join-Path $resolvedStageRoot 'repos\GMA-Framework')
-
-    foreach ($moduleSpec in $selectedModuleSpecArray) {
-        Add-GmaTemplateJunction `
-            -Path (Join-Path $resolvedOutputPath "gma\modules\$($moduleSpec.Alias)") `
-            -Target (Join-Path $resolvedStageRoot "repos\$($moduleSpec.Repository)")
-    }
-}
+New-Item -ItemType Directory -Force -Path (Join-Path $resolvedOutputPath 'gma\framework') | Out-Null
 
 Write-Host "Created GMA app shell: $resolvedOutputPath"
-Write-Host 'Next: run eng/gma-bootstrap.ps1, then eng/gma-validate.ps1.'
+Write-Host 'Next: add or mount GMA source packages, run eng/gma-update.ps1 -Init, then eng/gma-bootstrap.ps1 -Force and eng/gma-validate.ps1.'

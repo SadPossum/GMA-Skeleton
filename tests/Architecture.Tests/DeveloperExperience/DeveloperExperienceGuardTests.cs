@@ -1372,232 +1372,35 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Stage8_github_repository_helper_is_guarded_and_complete()
+    public void Completed_source_split_migration_scripts_are_not_live_workflow()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string script = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "gma-github-stage8.ps1"));
+        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
         string setupDocs = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "getting-started", "setup.md"));
-        string splitPlan = File.ReadAllText(Path.Combine(
-            repositoryRoot,
-            "docs",
-            "architecture",
-            "gma-rebrand-and-source-repo-split.md"));
-        string[] requiredRepositories =
-        [
-            "GMA-Framework",
-            "GMA-Module-Administration",
-            "GMA-Module-Auth",
-            "GMA-Module-Files",
-            "GMA-Module-Notifications",
-            "GMA-Module-Task-Runtime",
-            "GMA-Module-Tenancy",
-            "GMA-Skeleton"
-        ];
-        string[] requiredScriptTokens =
-        [
-            "SupportsShouldProcess",
-            "InitializeCandidates",
-            "AuditRepositories",
-            "CreateRepositories",
-            "PushCandidates",
-            "ConfigureRepositories",
-            "ProtectBranches",
-            "[string[]] $Repository",
-            "SkipSkeleton",
-            "AllowUnconvertedSkeletonPush",
-            "AllowBranchProtectionUnavailable",
-            "Get-GmaSelectedStage8RepositoryPlans",
-            "Unknown Stage 8 repository name(s)",
-            "Repository filter:",
-            "Get-GmaRemoteRepositoryAudit",
-            "SkeletonSubmodulesReady",
-            "Test-GmaCandidateOwnsGitRepository",
-            "Test-GmaSkeletonCandidateHasSubmoduleGitlinks",
-            "Assert-GmaSkeletonCandidateCanBePushed",
-            "Assert-GmaCandidatePushPreconditions",
-            "Get-GmaStage8RootPackageSolutionFiles",
-            "Get-GmaStage8SkeletonSubmoduleMountPaths",
-            "Ensure-GmaSkeletonCandidateMountIgnores",
-            "Sync-GmaSkeletonCandidateFromCurrentWorkspace",
-            "Ensure-GmaCandidateSourceRootOverridesAreLocalOnly",
-            "Ensure-GmaCandidateSourceRootBootstrap",
-            "Ensure-GmaCandidateValidationWorkflow",
-            "Get-GmaCandidateValidationWorkflowLines",
-            "Gma.SourceRoots.props.example",
-            "eng\\bootstrap-source-roots.ps1",
-            ".github\\workflows\\validate.yml",
-            "actions/checkout@v4",
-            "actions/setup-dotnet@v4",
-            "GMA_CI_TOKEN",
-            "submodules: recursive",
-            "$($moduleSpec.Repository)\\src\\",
-            "-WriteConvertedSolution",
-            "-RewriteSkeletonDocsForSubmoduleLayout",
-            "Refusing to push '$Owner/$($RepositoryPlan.Name)' before Stage 9 has added real .gitmodules entries and submodule gitlinks",
-            "Resolve-GmaGithubCliPath",
-            "C:\\Program Files\\GitHub CLI\\gh.exe",
-            "Assert-GmaGithubCliReady",
-            "$ghPath auth status",
-            "Upgrade to GitHub Pro or make this repository public",
-            "Branch protection is unavailable",
-            "Gma.SourceRoots.props",
-            "git -C $RepositoryPlan.LocalPath rm --cached --quiet -- Gma.SourceRoots.props",
-            "No changes were requested",
-            "required_status_checks",
-            "allow_force_pushes = $false",
-            "SkipDivergedMain",
-            "SkipSkeleton",
-            "AllowUnconvertedSkeletonPush",
-            "Skeleton repository is excluded by -SkipSkeleton",
-            "merge-base",
-            "$branchesToPush = @(",
-            "git -C $RepositoryPlan.LocalPath push -u origin @branchesToPush"
-        ];
-        string[] requiredDocsTokens =
+        string sourceFirstAppsDocs = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "getting-started", "source-first-apps.md"));
+        string appGenerator = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-gma-app.ps1"));
+        string[] obsoleteLiveTokens =
         [
             "gma-github-stage8.ps1",
-            "-InitializeCandidates",
-            "-AuditRepositories",
-            "-CreateRepositories",
-            "-PushCandidates",
-            "-ConfigureRepositories",
-            "-ProtectBranches",
-            "-Repository GMA-Framework",
-            "-SkipDivergedMain",
-            "-SkipSkeleton",
-            "-AllowUnconvertedSkeletonPush",
-            "-AllowBranchProtectionUnavailable",
-            "publish framework/module repositories before Stage 9 converts the skeleton",
-            "refuses to push `GMA-Skeleton` until Stage 9 has produced real `.gitmodules` entries and submodule gitlinks",
-            "-WhatIf"
-        ];
-
-        string[] offenders = requiredRepositories
-            .Where(repositoryName => !script.Contains(repositoryName, StringComparison.Ordinal) ||
-                                     !splitPlan.Contains($"SadPossum/{repositoryName}", StringComparison.Ordinal))
-            .Select(repositoryName => $"Stage 8 helper/docs missing {repositoryName}")
-            .Concat(requiredScriptTokens
-                .Where(token => !script.Contains(token, StringComparison.Ordinal))
-                .Select(token => $"eng/gma-github-stage8.ps1 missing {token}"))
-            .Concat(requiredDocsTokens
-                .Where(token => !setupDocs.Contains(token, StringComparison.Ordinal) &&
-                                !splitPlan.Contains(token, StringComparison.Ordinal))
-                .Select(token => $"Stage 8 docs missing {token}"))
-            .Order(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        Assert.Empty(offenders);
-    }
-
-    [Fact]
-    public void Stage9_skeleton_submodule_helper_is_guarded_and_documented()
-    {
-        string repositoryRoot = FindRepositoryRoot();
-        string script = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "gma-stage9.ps1"));
-        string setupDocs = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "getting-started", "setup.md"));
-        string splitPlan = File.ReadAllText(Path.Combine(
-            repositoryRoot,
-            "docs",
-            "architecture",
-            "gma-rebrand-and-source-repo-split.md"));
-        string slnx = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
-        string[] requiredScriptTokens =
-        [
-            "SupportsShouldProcess",
-            "CreateLocalRehearsal",
-            "ProveLocalRecursiveClone",
-            "WriteConvertedSolution",
-            "RewriteSkeletonDocsForSubmoduleLayout",
-            "UseLocalCandidates",
-            "SkipLocalValidation",
-            "LocalRehearsalPath",
-            "LocalCloneProofPath",
-            "ConvertedSolutionPath",
-            "SkeletonRootPath",
-            "Get-GmaStage9SubmodulePlans",
-            "Get-GmaStage9RootPackageSolutionFiles",
-            "Assert-GmaStage9SafeRehearsalPath",
-            "Test-GmaStage9StandaloneGitRepository",
-            "Test-GmaStage9RemoteReachable",
-            "Get-GmaStage9CommandPlanLines",
-            "Convert-GmaStage9SolutionPath",
-            "Write-GmaStage9ConvertedSolution",
-            "Rewrite-GmaStage9SkeletonDocsForSubmoduleLayout",
-            "Sync-GmaStage9SkeletonOwnedArtifacts",
-            "New-GmaStage9LocalRehearsal",
-            "Ensure-GmaStage9LocalRehearsalCommit",
-            "New-GmaStage9LocalRecursiveCloneProof",
-            "Invoke-GmaStage9Audit",
-            "protocol.file.allow=always",
-            "GIT_ALLOW_PROTOCOL",
-            "git clone",
-            "clone --recurse-submodules",
-            "Invoke-GmaDotNet",
-            "GMA-Framework",
-            "GMA-Module-Auth",
-            "GMA-Module-Notifications",
-            "gma\\framework",
-            "gma\\modules\\auth",
-            "GMA-Skeleton.slnx",
-            "Gma.SourceRoots.props.example",
-            "Stage 9 conversion requires a clean working tree",
-            "$submoduleCommand -f -b $DefaultBranch",
-            "'submodule', 'add', '-f', '-b'",
-            "-WriteConvertedSolution -ConvertedSolutionPath GMA-Skeleton.slnx -Force",
-            "-RewriteSkeletonDocsForSubmoduleLayout -SkeletonRootPath . -Force",
-            "eng\\gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
-            "dotnet restore GMA-Skeleton.slnx",
-            "dotnet build GMA-Skeleton.slnx --no-restore -m:1",
-            "dotnet test GMA-Skeleton.slnx --no-build",
-            "git rm -r src\\Framework",
-            "git rm Gma.Framework.slnx",
-            ".tmp\\gma-stage9-submodule-plan.ps1",
-            ".tmp\\gma-stage9-converted-solution.slnx",
-            ".agents\\stage9\\local-submodule-rehearsal",
-            ".agents\\stage9\\local-recursive-clone-proof",
-            "Refusing to overwrite the working-tree solution without -Force",
-            "Refusing to rewrite working-tree skeleton docs without -Force",
-            "eng\\gma-stage9.ps1",
-            "new-gma-app.ps1",
-            ".github\\workflows\\validate.yml",
-            "Stage 9 local submodule rehearsal ready",
-            "Stage 9 recursive clone proof ready",
-            "No changes were requested"
-        ];
-        string[] requiredDocsTokens =
-        [
             "gma-stage9.ps1",
-            "-Audit",
-            "-PrintCommands",
-            "-WriteCommandPlan",
-            "-UseLocalCandidates",
-            "-CreateLocalRehearsal",
-            "-ProveLocalRecursiveClone",
-            "-WriteConvertedSolution",
-            "-SkipLocalValidation",
-            ".tmp\\gma-stage9-submodule-plan.ps1",
-            ".tmp\\gma-stage9-converted-solution.slnx",
-            ".agents\\stage9\\local-submodule-rehearsal",
-            ".agents\\stage9\\local-recursive-clone-proof",
-            "source-first-apps.md",
-            "protocol.file.allow=always",
-            "non-destructive",
-            "removes old reusable source",
-            "root package `.slnx`",
-            "documentation-link",
-            "recursive-submodule CI workflow"
+            "UseLocalStage8Candidates",
+            "StageRoot",
+            "Add-GmaTemplateJunction"
         ];
 
-        string[] offenders = requiredScriptTokens
-            .Where(token => !script.Contains(token, StringComparison.Ordinal))
-            .Select(token => $"eng/gma-stage9.ps1 missing {token}")
-            .Concat(requiredDocsTokens
-                .Where(token => !setupDocs.Contains(token, StringComparison.Ordinal) &&
-                                !splitPlan.Contains(token, StringComparison.Ordinal))
-                .Select(token => $"Stage 9 docs missing {token}"))
-            .Concat(!slnx.Contains("eng/gma-stage9.ps1", StringComparison.Ordinal)
-                ? ["GMA-Skeleton.slnx missing eng/gma-stage9.ps1"]
-                : [])
+        string[] offenders = obsoleteLiveTokens
+            .Where(token => File.Exists(Path.Combine(repositoryRoot, "eng", token)))
+            .Select(token => $"eng/{token} should not exist in the live script surface.")
+            .Concat(obsoleteLiveTokens
+                .Where(token => solution.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"GMA-Skeleton.slnx should not list obsolete token {token}."))
+            .Concat(obsoleteLiveTokens
+                .Where(token => setupDocs.Contains(token, StringComparison.Ordinal) ||
+                                sourceFirstAppsDocs.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"Getting-started docs should not advertise obsolete token {token}."))
+            .Concat(obsoleteLiveTokens
+                .Where(token => appGenerator.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"eng/new-gma-app.ps1 should not contain obsolete token {token}."))
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -1625,11 +1428,30 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] requiredTokens =
         [
             "SupportsShouldProcess",
-            "UseLocalStage8Candidates",
             "Get-GmaSelectedModuleSpecs",
             "Unknown GMA module alias",
             "already exists with different contents",
+            "packageVersionTemplate",
+            "Get-Content -LiteralPath (Join-GmaPath 'Directory.Packages.props')",
             "selectedModuleAliases",
+            "submoduleCommandLines",
+            "docs\\gma-source.md",
+            "GMA Source Packages",
+            "Add Source Repositories",
+            "https://github.com/SadPossum/GMA-Framework.git",
+            "Use equivalent SSH or fork URLs",
+            "GMA source-package workflow notes live in",
+            "dotnet run --project",
+            "add or mount GMA source packages",
+            "src\\Hosts",
+            "src\\Modules",
+            "src\\Shared",
+            "src\\Hosts\\README.md",
+            "src\\Modules\\README.md",
+            "src\\Shared\\README.md",
+            "src/Hosts/$Name.Host.Api/$Name.Host.Api.csproj",
+            "src/Shared/$Name.SharedKernel/$Name.SharedKernel.csproj",
+            "..\\..\\Shared\\$Name.SharedKernel\\$Name.SharedKernel.csproj",
             "Selected reusable GMA modules for this shell",
             "foreach ($moduleSpec in $selectedModuleSpecArray)",
             "SharedKernel",
@@ -1669,7 +1491,11 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] requiredDocsTokens =
         [
             "new-gma-app.ps1",
-            "-UseLocalStage8Candidates",
+            "docs/gma-source.md",
+            "https://github.com/SadPossum/GMA-Framework.git",
+            "src/Hosts",
+            "src/Modules",
+            "src/Shared",
             "-Modules auth,notifications",
             "-Modules all",
             "gma-bootstrap.ps1 -Force",
@@ -1711,6 +1537,18 @@ public sealed partial class DeveloperExperienceGuardTests
             .ToArray();
 
         Assert.Empty(offenders);
+        Assert.DoesNotContain(
+            "This app is generated as a source-first GMA composition shell.",
+            script,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "src/$Name.Host.Api/$Name.Host.Api.csproj",
+            script,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "src/$Name.SharedKernel/$Name.SharedKernel.csproj",
+            script,
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -6377,13 +6215,13 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             "RouteGroupBuilder group = endpoints.MapGroup(\"/api/\" + ${Name}ModuleMetadata.Name)",
             "Command module = new(${Name}ModuleMetadata.Name, \"$Name administration operations.\");",
-            "_ = endpoints.MapGroup(\"/api/admin/\" + ${Name}ModuleMetadata.Name)"
+            "=> endpoints.MapGroup(\"/api/admin/\" + ${Name}ModuleMetadata.Name)"
         ];
         string[] forbiddenTokens =
         [
             "RouteGroupBuilder group = endpoints.MapGroup(\"/api/$moduleName\")",
             "Command module = new(\"$moduleName\", \"$Name administration operations.\");",
-            "_ = endpoints.MapGroup(\"/api/admin/$moduleName\")"
+            "endpoints.MapGroup(\"/api/admin/$moduleName\")"
         ];
         string[] offenders = requiredTokens
             .Where(token => !scaffolder.Contains(token, StringComparison.Ordinal))

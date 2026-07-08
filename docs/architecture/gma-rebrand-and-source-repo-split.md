@@ -1,6 +1,6 @@
 # GMA Rebrand And Source Repo Split Plan
 
-Status: implemented in the current source-first skeleton. Stages 1-10 are kept below as the migration history and operating rationale. The reusable framework and modules now live in independent repositories mounted under `gma/` as submodules, and `SadPossum/GMA-Skeleton` composes those source repositories on the `dev` branch.
+Status: implemented in the current source-first skeleton. Stages 1-10 are kept below as migration history and operating rationale only. The one-off Stage 8/Stage 9 automation scripts were removed from the live `eng/` surface after the split completed. The reusable framework and modules now live in independent repositories mounted under `gma/` as submodules, and `SadPossum/GMA-Skeleton` composes those source repositories on the `dev` branch.
 
 This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
 

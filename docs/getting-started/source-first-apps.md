@@ -8,11 +8,13 @@ Recommended app layout:
 MyProduct/
   MyProduct.slnx
   src/
-    MyProduct.Host.Api/
-    MyProduct.SharedKernel/
+    Hosts/
+      MyProduct.Host.Api/
     Modules/
       Billing/
       Reservations/
+    Shared/
+      MyProduct.SharedKernel/
   gma/
     framework/              # submodule: SadPossum/GMA-Framework
     modules/
@@ -21,7 +23,7 @@ MyProduct/
       notifications/        # submodule: SadPossum/GMA-Module-Notifications
 ```
 
-`SharedKernel` is app-owned. GMA framework code remains under `gma/framework`, and reusable GMA modules remain under `gma/modules/<alias>`. Do not put app-specific shared code inside GMA repositories just because the code is convenient today.
+`src/Hosts` contains process entrypoints, `src/Modules` contains app-owned domain modules, and `src/Shared` contains the app-owned shared kernel. GMA framework code remains under `gma/framework`, and reusable GMA modules remain under `gma/modules/<alias>`. Do not put app-specific shared code inside GMA repositories just because the code is convenient today.
 
 ## Create An App
 
@@ -31,22 +33,13 @@ Generate a source-first shell:
 .\eng\new-gma-app.ps1 -Name MyProduct -OutputPath ..\MyProduct -Modules auth,notifications
 ```
 
-For an offline historical proof of the template against the old extraction rehearsal, the generator still supports `-UseLocalStage8Candidates`:
-
-```powershell
-.\eng\new-gma-app.ps1 -Name SampleApp -OutputPath .tmp\SampleApp -Modules auth,notifications -UseLocalStage8Candidates
-cd .tmp\SampleApp
-.\eng\gma-bootstrap.ps1 -Force
-.\eng\gma-status.ps1
-.\eng\gma-update.ps1
-.\eng\gma-validate.ps1
-```
-
-Use the normal command without `-UseLocalStage8Candidates` for new production app shells.
-
 Omit `-Modules` for a framework-only app shell. Use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. For selected modules that expose a public `IModule` front door, the generated API host adds the project reference and explicit module registration. Admin CLI/API and worker-only surfaces remain app-specific; add those hosts deliberately when the product needs them.
 
 The generated shell is still a composition starting point. Runtime provider choices such as JWT/identity setup, storage adapters, messaging, production connection strings, migrations, admin hosts, and workers remain app-owned decisions.
+
+The generated `Directory.Packages.props` is seeded from the skeleton catalog so app-owned modules created later can restore immediately. Treat it as product-owned after generation: prune unused versions when convenient and add app-specific package versions deliberately.
+
+The generated root `README.md` is intentionally app-facing and short. GMA-specific mount, update, CI, and upstreaming notes are generated into `docs/gma-source.md` so a product can replace the root README with product language without losing the source-first operating guide.
 
 `gma-bootstrap.ps1` writes ignored `Gma.SourceRoots.props` files at the app root and inside mounted GMA repositories. Those files are local build configuration, not package history.
 Use `.\eng\gma-bootstrap.ps1 -Force` after moving source mounts, switching a reusable GMA checkout between app shells, or changing the selected module set.
@@ -54,12 +47,14 @@ Use `.\eng\gma-bootstrap.ps1 -Force` after moving source mounts, switching a reu
 For a real app, add source repositories at the same mount paths as Git submodules, then bootstrap:
 
 ```powershell
-git submodule add git@github.com-private:SadPossum/GMA-Framework.git gma/framework
-git submodule add git@github.com-private:SadPossum/GMA-Module-Auth.git gma/modules/auth
+git submodule add https://github.com/SadPossum/GMA-Framework.git gma/framework
+git submodule add https://github.com/SadPossum/GMA-Module-Auth.git gma/modules/auth
 .\eng\gma-update.ps1 -Init
 .\eng\gma-bootstrap.ps1
 .\eng\gma-validate.ps1
 ```
+
+Use equivalent SSH or fork URLs when an app should track private forks instead of the public GMA repositories. Generated app docs include the selected submodule commands in `docs/gma-source.md`.
 
 ## Patch GMA From An App
 
