@@ -775,10 +775,17 @@ Stage 9 local preflight result on 2026-07-08:
 - Added `eng\gma-stage9.ps1` as the guarded preflight/command-plan helper for the real skeleton submodule conversion.
 - The helper keeps the conversion explicit and reviewable: it generates an up-to-date submodule-backed skeleton `.slnx` from the current root solution, copies the already-proven Stage 8D `Gma.SourceRoots.props.example` and recursive-submodule CI workflow, adds `gma\framework` plus reusable module submodules, bootstraps `Gma.SourceRoots.props`, restores/builds before cleanup, removes old reusable monorepo source folders plus root package `.slnx` entrypoints, and runs tests after the final skeleton shape exists.
 - The generated submodule commands use `git submodule add -f` so the local Stage 8D skeleton rehearsal can replace ignored `gma\...` junction mount paths with tracked submodule gitlinks; this is harmless in a root checkout that does not ignore those paths.
-- `-Audit` currently proves the Stage 8D skeleton candidate, skeleton source-root example, and all local reusable candidate repositories are ready. It also reports the true external state: framework remote reachable, reusable module and skeleton remotes missing or inaccessible.
+- `-Audit` proves the Stage 8D skeleton candidate, skeleton source-root example, local reusable candidate repositories, and GitHub remotes are ready.
 - `-WriteCommandPlan` writes `.tmp\gma-stage9-submodule-plan.ps1`; the file is ignored local review output and should not be committed.
 - `-CreateLocalRehearsal -Force` passed against local Stage 8D candidates. It produced a real submodule-backed skeleton at `.agents\stage9\local-submodule-rehearsal`, overlaid the current skeleton-owned docs/scripts into that rehearsal, generated a converted `GenericModularApi.slnx` containing current solution items and `gma\...` package paths, removed root package `.slnx` files that now belong to package repositories, added `.gitmodules` entries for `gma\framework` and every reusable module on `dev`, and bootstrapped source roots inside the app/framework/module checkouts.
 - `-ProveLocalRecursiveClone -Force` passed after the local rehearsal. It committed the ignored rehearsal repository, cloned it into `.agents\stage9\local-recursive-clone-proof` with recursive submodules, bootstrapped source roots inside the clean clone and mounted package roots, verified the skeleton proof no longer contains root package `.slnx` files, restored `GenericModularApi.slnx`, and built it with zero warnings/errors.
+
+Stage 9 GitHub conversion result on 2026-07-08:
+
+- The root `dev` branch now contains real `.gitmodules` entries and gitlinks for `gma\framework` plus Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy modules.
+- `SadPossum/gma-skeleton` has `dev` as its default branch, with initial `dev` and `main` branches pointing at the converted skeleton commit.
+- Private branch protection was unavailable on the current GitHub plan for `gma-skeleton`; the helper configured the repository and skipped protection with `-AllowBranchProtectionUnavailable`.
+- A clean GitHub recursive clone into `.agents\stage9\github-recursive-clone-proof` bootstrapped source roots, restored `GenericModularApi.slnx`, built with zero warnings/errors, and passed the full no-build test suite.
 
 ## Stage 10: Production App Template And Operating Rules
 
