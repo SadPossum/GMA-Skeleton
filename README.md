@@ -1,5 +1,8 @@
 # GMA-Skeleton
 
+[![Validate](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/validate.yml/badge.svg?branch=dev)](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/validate.yml)
+[![Docker Tests](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/docker-tests.yml/badge.svg?branch=dev)](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/docker-tests.yml)
+
 GMA-Skeleton is a .NET 10 modular monolith skeleton for building projects from optional, replaceable modules.
 
 The repo is intentionally small and explicit:
@@ -80,6 +83,12 @@ For future source-submodule layouts, create a local source-root override with:
 ```
 
 To generate a new production app shell that consumes selected GMA source repositories, start with [Source-First Apps](docs/getting-started/source-first-apps.md).
+
+## GitHub Actions
+
+The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull requests, and manual dispatch. It checks submodule pointers against each reusable repository's `dev` head, bootstraps source roots, restores, builds, and runs fast tests.
+
+The `Docker Tests` workflow is manual. Use it when infrastructure behavior changes or before a release marker; it runs Docker-backed integration tests with `GMA_REQUIRE_DOCKER_TESTS=true`.
 
 ## Documentation
 

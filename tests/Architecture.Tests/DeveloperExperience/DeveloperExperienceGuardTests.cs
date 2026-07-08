@@ -233,6 +233,7 @@ public sealed partial class DeveloperExperienceGuardTests
             ".editorconfig",
             ".gitattributes",
             ".gitignore",
+            ".github/workflows/docker-tests.yml",
             ".github/workflows/validate.yml",
             ".gitmodules",
             "Directory.Build.props",
@@ -1365,6 +1366,82 @@ public sealed partial class DeveloperExperienceGuardTests
             .Concat(requiredDocsTokens
                 .Where(token => !setupDocs.Contains(token, StringComparison.Ordinal))
                 .Select(token => $"docs/getting-started/setup.md missing {token}"))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void Github_actions_are_wired_for_fast_and_docker_validation()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string validateWorkflow = File.ReadAllText(Path.Combine(repositoryRoot, ".github", "workflows", "validate.yml"));
+        string dockerWorkflow = File.ReadAllText(Path.Combine(repositoryRoot, ".github", "workflows", "docker-tests.yml"));
+        string commonScript = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "common.ps1"));
+        string readme = File.ReadAllText(Path.Combine(repositoryRoot, "README.md"));
+        string setupDocs = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "getting-started", "setup.md"));
+        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
+        string[] requiredValidateTokens =
+        [
+            "name: Validate",
+            "pull_request:",
+            "branches:",
+            "- main",
+            "- dev",
+            "workflow_dispatch:",
+            "concurrency:",
+            "cancel-in-progress: true",
+            "DOTNET_CLI_TELEMETRY_OPTOUT",
+            "runs-on: windows-latest",
+            "timeout-minutes: 30",
+            "./eng/check-submodule-dev-heads.ps1",
+            "./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
+            "./eng/restore.ps1",
+            "./eng/build.ps1 -NoRestore",
+            "./eng/test-fast.ps1 -NoBuild"
+        ];
+        string[] requiredDockerTokens =
+        [
+            "name: Docker Tests",
+            "workflow_dispatch:",
+            "GMA_REQUIRE_DOCKER_TESTS: 'true'",
+            "runs-on: ubuntu-latest",
+            "timeout-minutes: 45",
+            "cancel-in-progress: false",
+            "docker version",
+            "./eng/check-submodule-dev-heads.ps1",
+            "./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
+            "./eng/restore.ps1",
+            "./eng/build.ps1 -NoRestore",
+            "./eng/test-docker.ps1 -NoBuild"
+        ];
+        string[] requiredDocsTokens =
+        [
+            "actions/workflows/validate.yml",
+            "actions/workflows/docker-tests.yml",
+            "The `Validate` workflow",
+            "The `Docker Tests` workflow",
+            ".github\\workflows\\docker-tests.yml",
+            "GMA_REQUIRE_DOCKER_TESTS=true"
+        ];
+
+        string[] offenders = requiredValidateTokens
+            .Where(token => !validateWorkflow.Contains(token, StringComparison.Ordinal))
+            .Select(token => ".github/workflows/validate.yml missing " + token)
+            .Concat(requiredDockerTokens
+                .Where(token => !dockerWorkflow.Contains(token, StringComparison.Ordinal))
+                .Select(token => ".github/workflows/docker-tests.yml missing " + token))
+            .Concat(requiredDocsTokens
+                .Where(token => !readme.Contains(token, StringComparison.Ordinal) &&
+                                !setupDocs.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"GitHub Actions docs missing {token}"))
+            .Concat(!commonScript.Contains("Path]::DirectorySeparatorChar", StringComparison.Ordinal)
+                ? ["eng/common.ps1 should normalize separators for Linux GitHub Actions runners."]
+                : [])
+            .Concat(!solution.Contains(".github/workflows/docker-tests.yml", StringComparison.Ordinal)
+                ? ["GMA-Skeleton.slnx missing .github/workflows/docker-tests.yml"]
+                : [])
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 

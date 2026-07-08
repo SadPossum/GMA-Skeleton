@@ -26,7 +26,9 @@ Base `appsettings.json` files contain configuration shape and non-secret default
 
 `restore.ps1` restores both local tools and NuGet packages.
 
-The root `.github\workflows\validate.yml` runs the same non-Docker path on `main`, `dev`, pull requests, and manual dispatch: verify GMA submodules point at each reusable repository's `dev` head, bootstrap source roots, restore, build with `-m:1`, then `test-fast.ps1 -NoBuild`.
+The root `.github\workflows\validate.yml` runs the same non-Docker path on `main`, `dev`, pull requests, and manual dispatch: verify GMA submodules point at each reusable repository's `dev` head, bootstrap source roots, restore, build, then `test-fast.ps1 -NoBuild`.
+
+The root `.github\workflows\docker-tests.yml` is manual-only. Run it when infrastructure behavior changes or before a release marker; it uses the same bootstrap path and then executes `test-docker.ps1 -NoBuild` with `GMA_REQUIRE_DOCKER_TESTS=true`.
 
 ## Run With Aspire
 
@@ -186,6 +188,8 @@ Docker tests require Docker and set `GMA_REQUIRE_DOCKER_TESTS=true`:
 ```powershell
 .\eng\test-docker.ps1 -NoBuild
 ```
+
+The same check is available in GitHub Actions through the manual `Docker Tests` workflow.
 
 The normal full test command may skip Docker tests locally when Docker is unavailable:
 

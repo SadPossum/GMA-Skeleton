@@ -13,7 +13,11 @@ function Join-GmaPath {
         [string] $Path
     )
 
-    return Join-Path $script:RepositoryRoot $Path
+    $normalizedPath = $Path
+    $normalizedPath = $normalizedPath.Replace('\', [System.IO.Path]::DirectorySeparatorChar)
+    $normalizedPath = $normalizedPath.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
+
+    return Join-Path $script:RepositoryRoot $normalizedPath
 }
 
 function Resolve-GmaDotNet {

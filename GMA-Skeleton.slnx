@@ -36,6 +36,7 @@
     <File Path="gma/modules/README.md" />
   </Folder>
   <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/docker-tests.yml" />
     <File Path=".github/workflows/validate.yml" />
   </Folder>
   <Folder Name="/requests/">
