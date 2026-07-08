@@ -1,6 +1,6 @@
 # GMA Rebrand And Source Repo Split Plan
 
-Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8A has local candidate repositories with standalone and composed validation, and Stage 8D has flattened local repository-shape proof including split-skeleton architecture tests. Real GitHub repositories, history-preserving extraction, and permanent submodule replacement remain future work.
+Status: in progress; Stages 1-6 are implemented in the current repository, Stage 7 has local dry-run proof in the ignored `.agents` sandbox, Stage 8D has flattened local repository-shape proof plus guarded GitHub automation prep, Stage 9 has local submodule-conversion and recursive-clone proof, and Stage 10 has a source-first app template proof. Real GitHub repositories, branch protection, remote pushes, and permanent submodule replacement remain future work.
 
 This plan prepares the current repository for a source-first future where the reusable framework and reusable modules can evolve as independent Git repositories while production applications still consume them as editable source through submodules.
 
@@ -565,7 +565,7 @@ Stage 8B start result on 2026-07-07:
 
 - The source-split readiness work was committed to `dev` and pushed to `origin/dev`.
 - `gh` was not installed in the active shell, and no `GITHUB_TOKEN`/`GH_TOKEN` was available, so repository creation could not be performed from this environment.
-- `git ls-remote` returned `Repository not found` for the intended `SadPossum/gma-framework`, reusable module, and `gma-skeleton` repositories, confirming they still need to be created before candidate repos can be pushed.
+- At this point in the run, `git ls-remote` returned `Repository not found` for the intended reusable module and `gma-skeleton` repositories. Later Stage 8 audits found the framework remote reachable, while the reusable module and skeleton remotes were still missing or inaccessible.
 - A local submodule proof intentionally checked whether candidate repos could be mounted directly at `src\Framework` and `src\Modules\<Module>`. That does not work because each candidate repository owns its own root files and keeps package code under `src\Framework` or `src\Modules\<Module>` inside the repo.
 - Stage 9 should mount source repositories under stable dependency paths such as `gma\framework` and `gma\modules\<module>`, then update solution paths, source-root defaults, and source-package/architecture guards to consume flattened package roots such as `gma\framework\src` and `gma\modules\auth\src`.
 - Do not submodule a candidate repository directly into the old source-package folder unless that repository is intentionally flattened first.
@@ -648,9 +648,13 @@ Actions:
 - Create GitHub repositories.
 - Use `eng\gma-github-stage8.ps1` as the guarded automation entrypoint once GitHub CLI is installed and authenticated:
   - no switches prints the exact repository/local-candidate plan without external changes;
-  - `-InitializeCandidates` converts generated Stage 8D folders into standalone local Git repositories, commits their current contents as `SadPossum <258739@bk.ru>`, ensures `main` and `dev`, and ignores skeleton `gma\...` mount points so reusable source is not duplicated into the skeleton repository;
+  - `-InitializeCandidates` converts generated Stage 8D folders into standalone local Git repositories, commits their current contents as `SadPossum <258739@bk.ru>`, ensures `main` and `dev`, writes `Gma.SourceRoots.props.example`, `eng\bootstrap-source-roots.ps1`, and `.github\workflows\validate.yml`, keeps `Gma.SourceRoots.props` as an ignored local override, synchronizes the skeleton candidate from the current skeleton-owned docs/scripts and converted submodule `.slnx`, removes root package `.slnx` files from the skeleton candidate, and ignores skeleton `gma\...` mount points so reusable source is not duplicated into the skeleton repository;
+  - `-AuditRepositories` checks the planned SSH remotes without writing to GitHub and reports reachable branches plus local candidate readiness;
   - `-CreateRepositories` creates missing GitHub repositories;
-  - `-PushCandidates` adds/updates each candidate `origin` and pushes `main` plus `dev`;
+  - `-PushCandidates` preflights every candidate before any remote mutation, adds/updates each candidate `origin`, refuses to overwrite a diverged remote `main`, refuses to push `gma-skeleton` until Stage 9 has added real `.gitmodules` entries and submodule gitlinks, and pushes `dev` plus `main` only when `main` is absent or fast-forwardable;
+  - `-SkipSkeleton` excludes `gma-skeleton` from the selected repository plan, which is the normal way to publish framework/module repositories before Stage 9 converts the skeleton;
+  - `-SkipDivergedMain` may be combined with `-PushCandidates` to push `dev` while leaving an already-initialized remote `main` for manual reconciliation;
+  - `-AllowUnconvertedSkeletonPush` bypasses the `gma-skeleton` submodule-gitlink guard only for a deliberate placeholder skeleton push; do not use it for the normal source-first path;
   - `-ConfigureRepositories` sets repository metadata, default branch, squash-merge defaults, and topics;
   - `-ProtectBranches` applies branch protection to the configured default branch.
 - Push extracted histories.
@@ -672,13 +676,15 @@ Validation:
 .\eng\gma-github-stage8.ps1
 .\eng\gma-github-stage8.ps1 -InitializeCandidates -WhatIf
 .\eng\gma-github-stage8.ps1 -InitializeCandidates
+.\eng\gma-github-stage8.ps1 -AuditRepositories
 .\eng\gma-github-stage8.ps1 -CreateRepositories -WhatIf
+.\eng\gma-github-stage8.ps1 -PushCandidates -SkipSkeleton -WhatIf
 git ls-remote git@github.com-private:SadPossum/gma-framework.git
 git ls-remote git@github.com-private:SadPossum/gma-module-auth.git
 git clone --recurse-submodules git@github.com-private:SadPossum/gma-skeleton.git
-dotnet restore Gma.Skeleton.slnx
-dotnet build Gma.Skeleton.slnx --no-restore -m:1
-dotnet test Gma.Skeleton.slnx --no-build --logger "console;verbosity=minimal"
+dotnet restore GenericModularApi.slnx
+dotnet build GenericModularApi.slnx --no-restore -m:1
+dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 Agent goal:
@@ -693,9 +699,17 @@ Stage 8 automation-prep result on 2026-07-08:
 - The helper includes all Stage 8D flattened candidates: framework, Administration, Auth, Files, Notifications, TaskRuntime, Tenancy, and skeleton.
 - The helper is explicit-action only. With no switches it prints the repository/local-candidate plan without changes. With `-WhatIf`, candidate initialization, repository creation, repository configuration, and branch protection can be previewed even before GitHub CLI is installed.
 - The helper validates that push candidates are real standalone Git repositories instead of folders accidentally resolved through the parent monorepo worktree.
-- The Stage 8D local candidates were initialized with standalone `.git` directories, `main` and `dev` branches, clean working trees, and `SadPossum <258739@bk.ru>` local commit authorship. A `-PushCandidates -WhatIf` pass now reaches all framework, module, and skeleton candidates successfully.
+- The helper keeps `Gma.SourceRoots.props` local-only in candidate repositories. App bootstraps may generate it inside mounted framework/module repositories, but package histories should only carry checked-in defaults or examples.
+- The helper now gives each candidate repository its own source-root example and `eng\bootstrap-source-roots.ps1`. Framework candidates default to their local `src\`; reusable module candidates default to sibling `gma-framework` and `gma-module-*` checkouts; the skeleton candidate defaults to `gma\framework` and `gma\modules\<alias>` mounts plus skeleton-owned examples.
+- The helper writes `.github\workflows\validate.yml` into each candidate repository. Framework workflows validate only `Gma.Framework.slnx`; module workflows check out `gma-framework` beside the module before validating the module `.slnx`; the skeleton workflow uses recursive submodules and validates the all-up composition solution.
+- The helper now refreshes the skeleton candidate from the current skeleton-owned docs/scripts and the converted submodule `.slnx` during `-InitializeCandidates`, and removes root package `.slnx` files from that skeleton candidate so the eventual `gma-skeleton` repository does not carry framework/module entrypoints that belong to child repositories.
+- `-PushCandidates` now preflights all candidate repositories before any remote mutation. It refuses to push `gma-skeleton` until Stage 9 has produced real `.gitmodules` entries and submodule gitlinks, unless `-AllowUnconvertedSkeletonPush` is supplied for an intentional placeholder push.
+- `-SkipSkeleton` allows the framework and reusable module candidates to be pushed/configured first without weakening the `gma-skeleton` gitlink guard. The intended source-first publishing order is package repositories first, Stage 9 skeleton conversion second, skeleton repository push last.
+- The Stage 8D local candidates were initialized with standalone `.git` directories, `main` and `dev` branches, clean working trees, and `SadPossum <258739@bk.ru>` local commit authorship. A local `-PushCandidates -WhatIf` pass now previews the expected push operations for all framework, module, and skeleton candidates without requiring the missing remotes to exist yet.
 - The skeleton candidate tracks only `gma\.gitkeep` and `gma\modules\.gitkeep` for the mount shape; the actual `gma\framework` and `gma\modules\<module>` source mounts remain ignored local composition paths.
-- The active environment still lacks `gh` and `GH_TOKEN`/`GITHUB_TOKEN`, so real repository creation, pushes, branch protection, and clean recursive-submodule clone proof remain external Stage 8 work.
+- A read-only `-AuditRepositories` pass found `SadPossum/gma-framework` reachable over SSH with only `main`, while all reusable module and skeleton remotes were still missing or inaccessible. GitHub resolves the reachable framework repository as `SadPossum/GMA-Framework`.
+- The existing framework remote `main` contains an unrelated initial LICENSE commit, so the helper now refuses to overwrite diverged remote `main`. Use `-SkipDivergedMain` to push only `dev`, or reconcile the remote `main` deliberately before pushing it.
+- The active environment still lacks `gh` and `GH_TOKEN`/`GITHUB_TOKEN`, so real repository creation, pushes, branch protection, and a real GitHub recursive-submodule clone proof remain external Stage 8 work. The local recursive-submodule proof is covered by Stage 9.
 
 ## Stage 9: Replace Current Monorepo Internals With Submodules
 
@@ -708,8 +722,18 @@ Actions:
 - Replace framework source folder with a `gma/framework` submodule whose package projects live under `gma/framework/src/`.
 - Replace reusable module source folders with short alias submodules such as `gma/modules/auth`, `gma/modules/administration`, `gma/modules/notifications`, and `gma/modules/files`.
 - Keep skeleton hosts, examples, app-specific docs, and composition tests in the skeleton repo.
-- Update `Gma.Skeleton.slnx` to reference projects from submodule paths.
+- Update the skeleton `.slnx` file, currently `GenericModularApi.slnx`, to reference projects from submodule paths.
 - Generate source-root values that point to flattened package roots, for example `$(MSBuildThisFileDirectory)gma\modules\auth\src\`.
+- Use `eng\gma-stage9.ps1` as the guarded Stage 9 preflight and command-plan helper:
+  - no switches prints the planned submodule mount table without changes;
+  - `-Audit` verifies the Stage 8D skeleton candidate shape, local candidate repositories, current mount state, and remote reachability;
+  - `-PrintCommands` emits the reviewed conversion command sequence;
+  - `-UseLocalCandidates` makes the printed/written command plan use local Stage 8D candidate repositories instead of GitHub remotes;
+  - `-WriteCommandPlan` writes the same sequence to `.tmp\gma-stage9-submodule-plan.ps1` for manual review;
+  - `-WriteConvertedSolution` writes a converted submodule-backed `.slnx` from the current root solution; it writes to `.tmp` by default and refuses to overwrite the working-tree solution unless `-Force` is supplied;
+  - `-RewriteSkeletonDocsForSubmoduleLayout` rewrites root skeleton docs/README links from monorepo `src\...` package paths to mounted `gma\...` source paths; it refuses to rewrite the working tree unless `-Force` is supplied;
+  - `-CreateLocalRehearsal` clones the Stage 8D skeleton candidate into `.agents\stage9\local-submodule-rehearsal`, adds real local Git submodules from the candidate repositories, bootstraps source roots, and validates restore/build unless `-SkipLocalValidation` is set.
+  - `-ProveLocalRecursiveClone` commits the ignored local rehearsal, clones it into `.agents\stage9\local-recursive-clone-proof` with `git clone --recurse-submodules`, bootstraps source roots, and validates restore/build unless `-SkipLocalValidation` is set.
 - Update docs so new production apps can copy the skeleton pattern.
 - Ensure module repos do not accidentally include the skeleton's examples or host-specific code.
 - Keep skeleton architecture tests composition-focused; do not require them to inspect framework/module repository internals by physical monorepo paths.
@@ -717,11 +741,19 @@ Actions:
 Validation:
 
 ```powershell
+.\eng\gma-stage9.ps1
+.\eng\gma-stage9.ps1 -Audit
+.\eng\gma-stage9.ps1 -PrintCommands
+.\eng\gma-stage9.ps1 -WriteCommandPlan
+.\eng\gma-stage9.ps1 -WriteConvertedSolution
+.\eng\gma-stage9.ps1 -PrintCommands -UseLocalCandidates
+.\eng\gma-stage9.ps1 -CreateLocalRehearsal -Force
+.\eng\gma-stage9.ps1 -ProveLocalRecursiveClone -Force
 git submodule status --recursive
 git status --short --branch
-dotnet restore Gma.Skeleton.slnx
-dotnet build Gma.Skeleton.slnx --no-restore -m:1
-dotnet test Gma.Skeleton.slnx --no-build --logger "console;verbosity=minimal"
+dotnet restore GenericModularApi.slnx
+dotnet build GenericModularApi.slnx --no-restore -m:1
+dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 Agent goal:
@@ -730,6 +762,16 @@ Agent goal:
 Convert the skeleton/composition repository into a source-first consumer of independent GMA framework and module repositories. Replace internal framework and reusable module source with Git submodules, update solution/project paths, docs, scripts, and CI, and prove a clean recursive-submodule clone validates the same behavior as the monorepo did.
 ```
 
+Stage 9 local preflight result on 2026-07-08:
+
+- Added `eng\gma-stage9.ps1` as the guarded preflight/command-plan helper for the real skeleton submodule conversion.
+- The helper keeps the conversion explicit and reviewable: it generates an up-to-date submodule-backed skeleton `.slnx` from the current root solution, copies the already-proven Stage 8D `Gma.SourceRoots.props.example` and recursive-submodule CI workflow, adds `gma\framework` plus reusable module submodules, bootstraps `Gma.SourceRoots.props`, validates restore/build/test, and only then removes old reusable monorepo source folders plus root package `.slnx` entrypoints.
+- The generated submodule commands use `git submodule add -f` so the local Stage 8D skeleton rehearsal can replace ignored `gma\...` junction mount paths with tracked submodule gitlinks; this is harmless in a root checkout that does not ignore those paths.
+- `-Audit` currently proves the Stage 8D skeleton candidate, skeleton source-root example, and all local reusable candidate repositories are ready. It also reports the true external state: framework remote reachable, reusable module and skeleton remotes missing or inaccessible.
+- `-WriteCommandPlan` writes `.tmp\gma-stage9-submodule-plan.ps1`; the file is ignored local review output and should not be committed.
+- `-CreateLocalRehearsal -Force` passed against local Stage 8D candidates. It produced a real submodule-backed skeleton at `.agents\stage9\local-submodule-rehearsal`, overlaid the current skeleton-owned docs/scripts into that rehearsal, generated a converted `GenericModularApi.slnx` containing current solution items and `gma\...` package paths, removed root package `.slnx` files that now belong to package repositories, added `.gitmodules` entries for `gma\framework` and every reusable module on `dev`, and bootstrapped source roots inside the app/framework/module checkouts.
+- `-ProveLocalRecursiveClone -Force` passed after the local rehearsal. It committed the ignored rehearsal repository, cloned it into `.agents\stage9\local-recursive-clone-proof` with recursive submodules, bootstrapped source roots inside the clean clone and mounted package roots, verified the skeleton proof no longer contains root package `.slnx` files, restored `GenericModularApi.slnx`, and built it with zero warnings/errors.
+
 ## Stage 10: Production App Template And Operating Rules
 
 Goal: make the pattern easy to reuse for the next real business application.
@@ -737,7 +779,7 @@ Goal: make the pattern easy to reuse for the next real business application.
 Actions:
 
 - Add a production app template or docs page showing:
-  - app-owned shared project naming;
+  - app-owned shared-kernel project naming;
   - GMA submodule layout;
   - app `.slnx` composition;
   - host composition;
@@ -752,9 +794,9 @@ Actions:
 Validation:
 
 ```powershell
-eng\new-gma-app.ps1 -Name SampleApp -OutputPath .tmp\SampleApp
+eng\new-gma-app.ps1 -Name SampleApp -OutputPath .tmp\SampleApp -UseLocalStage8Candidates
 cd .tmp\SampleApp
-eng\gma-bootstrap.ps1
+eng\gma-bootstrap.ps1 -Force
 dotnet restore SampleApp.slnx
 dotnet build SampleApp.slnx --no-restore -m:1
 ```
@@ -764,6 +806,16 @@ Agent goal:
 ```text
 Create the production-app source composition template and operating docs. The template should let a new app consume selected GMA framework and module repositories as editable submodules, keep its own app-owned shared code, compose only chosen modules, and validate with a clean bootstrap/build workflow.
 ```
+
+Stage 10 local template result on 2026-07-08:
+
+- Added `eng\new-gma-app.ps1` as the source-first production app shell generator.
+- The generated app uses an app-owned `SharedKernel` project instead of a literal `Shared` namespace, avoiding analyzer conflicts while keeping app-specific shared code separate from GMA framework code.
+- The template creates an app `.slnx`, minimal API host, root `Directory.Build.props`, source-root example, local bootstrap/status/validate scripts, and `gma\framework` plus `gma\modules\<alias>` mount shape.
+- `-Modules` selects which reusable modules are mounted and written into source-root config. Public API modules are also referenced and registered by the generated API host; admin CLI/API and worker-only surfaces remain explicit app-owned host work. The default is framework-only, while `-Modules all` exists for deliberate full local proof.
+- `-UseLocalStage8Candidates` mounts the ignored Stage 8D candidate repositories as local junctions so the template can be validated before real GitHub submodules exist.
+- Validation passed with `.tmp\SampleApp`: generated app, ran `eng\gma-bootstrap.ps1`, restored `SampleApp.slnx`, and built `SampleApp.slnx --no-restore -m:1` with zero warnings/errors.
+- Follow-up composition proof passed with selected Auth and Notifications without Tenancy, using `AuthProfile.Global()`, and with `-Modules all`, where the API host registered Tenancy, Auth, Files, and Notifications while keeping Administration and TaskRuntime as mounted but host-specific surfaces. Both generated apps restored and built with zero warnings/errors.
 
 ## Verification Checklist For The Whole Migration
 

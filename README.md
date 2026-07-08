@@ -79,6 +79,8 @@ For future source-submodule layouts, create a local source-root override with:
 .\eng\gma-bootstrap.ps1
 ```
 
+To generate a new production app shell that consumes selected GMA source repositories, start with [Source-First Apps](docs/getting-started/source-first-apps.md).
+
 ## Documentation
 
 Start with [docs/README.md](docs/README.md).
@@ -86,6 +88,7 @@ Start with [docs/README.md](docs/README.md).
 Useful entry points:
 
 - [Setup](docs/getting-started/setup.md)
+- [Source-First Apps](docs/getting-started/source-first-apps.md)
 - [Architecture Overview](docs/architecture/overview.md)
 - [GMA Framework Docs](src/Framework/docs/README.md)
 - [Module System](src/Framework/docs/architecture/module-system.md)

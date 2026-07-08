@@ -5,6 +5,7 @@
     <File Path="docs/examples/cross-module-integration.md" />
     <File Path="docs/getting-started/local-development.md" />
     <File Path="docs/getting-started/setup.md" />
+    <File Path="docs/getting-started/source-first-apps.md" />
     <File Path="docs/README.md" />
   </Folder>
   <Folder Name="/eng/">
@@ -15,9 +16,11 @@
     <File Path="eng/common.ps1" />
     <File Path="eng/gma-bootstrap.ps1" />
     <File Path="eng/gma-github-stage8.ps1" />
+    <File Path="eng/gma-stage9.ps1" />
     <File Path="eng/gma-status.ps1" />
     <File Path="eng/gma-update.ps1" />
     <File Path="eng/gma-validate.ps1" />
+    <File Path="eng/new-gma-app.ps1" />
     <File Path="eng/new-module.ps1" />
     <File Path="eng/restore.ps1" />
     <File Path="eng/run-admin.ps1" />
@@ -28,6 +31,9 @@
     <File Path="eng/test-docker.ps1" />
     <File Path="eng/test-fast.ps1" />
     <File Path="eng/verify.ps1" />
+  </Folder>
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/validate.yml" />
   </Folder>
   <Folder Name="/requests/">
     <File Path="requests/admin-api.http" />

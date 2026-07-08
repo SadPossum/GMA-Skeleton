@@ -16,6 +16,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 
 - [Setup](getting-started/setup.md)
 - [Local Development](getting-started/local-development.md)
+- [Source-First Apps](getting-started/source-first-apps.md)
 - [Skeleton Overview](architecture/overview.md)
 - [GMA Rebrand And Source Repo Split Plan](architecture/gma-rebrand-and-source-repo-split.md)
 

@@ -19,6 +19,8 @@ param(
 
     [switch] $InitializeCandidates,
 
+    [switch] $AuditRepositories,
+
     [switch] $CreateRepositories,
 
     [switch] $PushCandidates,
@@ -27,7 +29,13 @@ param(
 
     [switch] $ProtectBranches,
 
-    [switch] $AllowDirtyCandidates
+    [switch] $SkipSkeleton,
+
+    [switch] $AllowDirtyCandidates,
+
+    [switch] $AllowUnconvertedSkeletonPush,
+
+    [switch] $SkipDivergedMain
 )
 
 . (Join-Path $PSScriptRoot 'common.ps1')
@@ -52,51 +60,398 @@ function Get-GmaStage8RepositoryPlans {
         [pscustomobject] @{
             Name = 'gma-framework'
             LocalPath = Join-Path $stageRootPath 'repos\gma-framework'
+            Solution = 'Gma.Framework.slnx'
             Description = 'Reusable GMA framework packages for modular monolith applications.'
             Topics = @('gma', 'dotnet', 'framework', 'modular-monolith')
         },
         [pscustomobject] @{
             Name = 'gma-module-administration'
             LocalPath = Join-Path $stageRootPath 'repos\gma-module-administration'
+            Solution = 'Gma.Modules.Administration.slnx'
             Description = 'Reusable GMA Administration module with RBAC, audit, CLI, and admin API surfaces.'
             Topics = @('gma', 'dotnet', 'module', 'administration')
         },
         [pscustomobject] @{
             Name = 'gma-module-auth'
             LocalPath = Join-Path $stageRootPath 'repos\gma-module-auth'
+            Solution = 'Gma.Modules.Auth.slnx'
             Description = 'Reusable GMA Auth module for first-party member authentication and administration.'
             Topics = @('gma', 'dotnet', 'module', 'auth')
         },
         [pscustomobject] @{
             Name = 'gma-module-files'
             LocalPath = Join-Path $stageRootPath 'repos\gma-module-files'
+            Solution = 'Gma.Modules.Files.slnx'
             Description = 'Reusable GMA Files module front door for optional file-management workflows.'
             Topics = @('gma', 'dotnet', 'module', 'files')
         },
         [pscustomobject] @{
             Name = 'gma-module-notifications'
             LocalPath = Join-Path $stageRootPath 'repos\gma-module-notifications'
+            Solution = 'Gma.Modules.Notifications.slnx'
             Description = 'Reusable GMA Notifications module for persisted notifications and streaming front doors.'
             Topics = @('gma', 'dotnet', 'module', 'notifications')
         },
         [pscustomobject] @{
             Name = 'gma-module-task-runtime'
             LocalPath = Join-Path $stageRootPath 'repos\gma-module-task-runtime'
+            Solution = 'Gma.Modules.TaskRuntime.slnx'
             Description = 'Reusable GMA TaskRuntime module for persisted task runs and operator control.'
             Topics = @('gma', 'dotnet', 'module', 'tasks')
         },
         [pscustomobject] @{
             Name = 'gma-module-tenancy'
             LocalPath = Join-Path $stageRootPath 'repos\gma-module-tenancy'
+            Solution = 'Gma.Modules.Tenancy.slnx'
             Description = 'Reusable GMA Tenancy module for optional tenant front doors and contracts.'
             Topics = @('gma', 'dotnet', 'module', 'tenancy')
         },
         [pscustomobject] @{
             Name = 'gma-skeleton'
             LocalPath = Join-Path $stageRootPath 'skeleton'
+            Solution = 'GenericModularApi.slnx'
             Description = 'GMA skeleton and composition repository for source-first modular monolith applications.'
             Topics = @('gma', 'dotnet', 'template', 'modular-monolith')
         }
+    )
+}
+
+function Get-GmaSelectedStage8RepositoryPlans {
+    $plans = @(Get-GmaStage8RepositoryPlans)
+    if ($SkipSkeleton) {
+        $plans = @($plans | Where-Object { $_.Name -ne 'gma-skeleton' })
+    }
+
+    return $plans
+}
+
+function Get-GmaStage8ModuleSourceRootSpecs {
+    return @(
+        [pscustomobject] @{
+            Alias = 'administration'
+            Repository = 'gma-module-administration'
+            Property = 'GmaModuleAdministrationRoot'
+        },
+        [pscustomobject] @{
+            Alias = 'auth'
+            Repository = 'gma-module-auth'
+            Property = 'GmaModuleAuthRoot'
+        },
+        [pscustomobject] @{
+            Alias = 'files'
+            Repository = 'gma-module-files'
+            Property = 'GmaModuleFilesRoot'
+        },
+        [pscustomobject] @{
+            Alias = 'notifications'
+            Repository = 'gma-module-notifications'
+            Property = 'GmaModuleNotificationsRoot'
+        },
+        [pscustomobject] @{
+            Alias = 'task-runtime'
+            Repository = 'gma-module-task-runtime'
+            Property = 'GmaModuleTaskRuntimeRoot'
+        },
+        [pscustomobject] @{
+            Alias = 'tenancy'
+            Repository = 'gma-module-tenancy'
+            Property = 'GmaModuleTenancyRoot'
+        }
+    )
+}
+
+function Get-GmaStage8RootPackageSolutionFiles {
+    return @(
+        'Gma.Framework.slnx',
+        'Gma.Modules.Administration.slnx',
+        'Gma.Modules.Auth.slnx',
+        'Gma.Modules.Files.slnx',
+        'Gma.Modules.Notifications.slnx',
+        'Gma.Modules.TaskRuntime.slnx',
+        'Gma.Modules.Tenancy.slnx'
+    )
+}
+
+function Get-GmaStage8SkeletonSubmoduleMountPaths {
+    $paths = @('gma/framework')
+    foreach ($moduleSpec in Get-GmaStage8ModuleSourceRootSpecs) {
+        $paths += "gma/modules/$($moduleSpec.Alias)"
+    }
+
+    return $paths
+}
+
+function Set-GmaUtf8FileLines {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path,
+
+        [AllowEmptyString()]
+        [Parameter(Mandatory = $true)]
+        [string[]] $Lines
+    )
+
+    $directory = Split-Path -Parent $Path
+    if (-not (Test-Path -LiteralPath $directory -PathType Container)) {
+        New-Item -ItemType Directory -Force -Path $directory | Out-Null
+    }
+
+    if (Test-Path -LiteralPath $Path) {
+        $existingLines = [System.IO.File]::ReadAllLines($Path)
+        if ([string]::Join("`n", $existingLines) -eq [string]::Join("`n", $Lines)) {
+            return
+        }
+    }
+
+    [System.IO.File]::WriteAllLines($Path, $Lines, [System.Text.UTF8Encoding]::new($false))
+}
+
+function Get-GmaCandidateSourceRootExampleLines {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    if ($RepositoryPlan.Name -eq 'gma-framework') {
+        return @(
+            '<Project>',
+            '  <PropertyGroup>',
+            '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)src\</GmaFrameworkRoot>',
+            '  </PropertyGroup>',
+            '</Project>'
+        )
+    }
+
+    if ($RepositoryPlan.Name -eq 'gma-skeleton') {
+        $lines = @(
+            '<Project>',
+            '  <PropertyGroup>',
+            '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)gma\framework\src\</GmaFrameworkRoot>',
+            '    <GmaModulesRoot>$(MSBuildThisFileDirectory)gma\modules\</GmaModulesRoot>'
+        )
+
+        foreach ($moduleSpec in Get-GmaStage8ModuleSourceRootSpecs) {
+            $lines += "    <$($moduleSpec.Property)>`$(GmaModulesRoot)$($moduleSpec.Alias)\src\</$($moduleSpec.Property)>"
+        }
+
+        $lines += @(
+            '    <GmaModuleCatalogRoot>$(GmaRepositoryRoot)src\Modules\Catalog\</GmaModuleCatalogRoot>',
+            '    <GmaModuleOrderingRoot>$(GmaRepositoryRoot)src\Modules\Ordering\</GmaModuleOrderingRoot>',
+            '    <GmaModuleTaskSamplesRoot>$(GmaRepositoryRoot)src\Modules\TaskSamples\</GmaModuleTaskSamplesRoot>',
+            '  </PropertyGroup>',
+            '</Project>'
+        )
+
+        return $lines
+    }
+
+    $moduleLines = @(
+        '<Project>',
+        '  <PropertyGroup>',
+        '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)..\gma-framework\src\</GmaFrameworkRoot>',
+        '    <GmaModulesRoot>$(MSBuildThisFileDirectory)..\</GmaModulesRoot>'
+    )
+
+    foreach ($moduleSpec in Get-GmaStage8ModuleSourceRootSpecs) {
+        $moduleLines += "    <$($moduleSpec.Property)>`$(GmaModulesRoot)$($moduleSpec.Repository)\src\</$($moduleSpec.Property)>"
+    }
+
+    $moduleLines += @(
+        '  </PropertyGroup>',
+        '</Project>'
+    )
+
+    return $moduleLines
+}
+
+function Get-GmaCandidateSourceRootBootstrapLines {
+    return @(
+        '[CmdletBinding(SupportsShouldProcess = $true)]',
+        'param([switch] $Force)',
+        '',
+        'Set-StrictMode -Version Latest',
+        '$ErrorActionPreference = ''Stop''',
+        '',
+        '$repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot ''..'')).Path',
+        '$source = Join-Path $repositoryRoot ''Gma.SourceRoots.props.example''',
+        '$target = Join-Path $repositoryRoot ''Gma.SourceRoots.props''',
+        '',
+        'if (-not (Test-Path -LiteralPath $source)) {',
+        '    throw "Missing source-root example file: $source"',
+        '}',
+        '',
+        '$sourceLines = [System.IO.File]::ReadAllLines($source)',
+        'if (Test-Path -LiteralPath $target) {',
+        '    $targetLines = [System.IO.File]::ReadAllLines($target)',
+        '    if ([string]::Join("`n", $sourceLines) -eq [string]::Join("`n", $targetLines)) {',
+        '        Write-Host "Gma.SourceRoots.props already matches the example."',
+        '        return',
+        '    }',
+        '',
+        '    if (-not $Force) {',
+        '        throw "Gma.SourceRoots.props already exists with different contents. Use -Force to refresh it from the example."',
+        '    }',
+        '}',
+        '',
+        '$action = if (Test-Path -LiteralPath $target) { ''Overwrite'' } else { ''Create'' }',
+        'if ($PSCmdlet.ShouldProcess($target, "$action local source-root configuration")) {',
+        '    [System.IO.File]::WriteAllLines($target, $sourceLines, [System.Text.UTF8Encoding]::new($false))',
+        '    Write-Host "$action local source-root configuration: $target"',
+        '}'
+    )
+}
+
+function Get-GmaCandidateValidationWorkflowLines {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    $checkoutToken = '${{ secrets.GMA_CI_TOKEN || github.token }}'
+
+    if ($RepositoryPlan.Name -eq 'gma-framework') {
+        return @(
+            'name: validate',
+            '',
+            'on:',
+            '  pull_request:',
+            '  push:',
+            '    branches:',
+            '      - main',
+            '      - dev',
+            '  workflow_dispatch:',
+            '',
+            'permissions:',
+            '  contents: read',
+            '',
+            'jobs:',
+            '  validate:',
+            '    runs-on: windows-latest',
+            '    steps:',
+            '      - name: Checkout framework',
+            '        uses: actions/checkout@v4',
+            '        with:',
+            '          fetch-depth: 0',
+            '',
+            '      - name: Setup .NET',
+            '        uses: actions/setup-dotnet@v4',
+            '        with:',
+            '          dotnet-version: 10.0.x',
+            '',
+            '      - name: Bootstrap source roots',
+            '        shell: pwsh',
+            '        run: ./eng/bootstrap-source-roots.ps1 -Force',
+            '',
+            '      - name: Restore',
+            ('        run: dotnet restore ' + $RepositoryPlan.Solution),
+            '',
+            '      - name: Build',
+            ('        run: dotnet build ' + $RepositoryPlan.Solution + ' --no-restore -m:1'),
+            '',
+            '      - name: Test',
+            ('        run: dotnet test ' + $RepositoryPlan.Solution + ' --no-build --logger "console;verbosity=minimal"')
+        )
+    }
+
+    if ($RepositoryPlan.Name -eq 'gma-skeleton') {
+        return @(
+            'name: validate',
+            '',
+            'on:',
+            '  pull_request:',
+            '  push:',
+            '    branches:',
+            '      - main',
+            '      - dev',
+            '  workflow_dispatch:',
+            '',
+            'permissions:',
+            '  contents: read',
+            '',
+            'jobs:',
+            '  validate:',
+            '    runs-on: windows-latest',
+            '    steps:',
+            '      - name: Checkout skeleton',
+            '        uses: actions/checkout@v4',
+            '        with:',
+            '          fetch-depth: 0',
+            '          submodules: recursive',
+            "          token: $checkoutToken",
+            '',
+            '      - name: Setup .NET',
+            '        uses: actions/setup-dotnet@v4',
+            '        with:',
+            '          dotnet-version: 10.0.x',
+            '',
+            '      - name: Bootstrap source roots',
+            '        shell: pwsh',
+            '        run: ./eng/bootstrap-source-roots.ps1 -Force',
+            '',
+            '      - name: Restore',
+            ('        run: dotnet restore ' + $RepositoryPlan.Solution),
+            '',
+            '      - name: Build',
+            ('        run: dotnet build ' + $RepositoryPlan.Solution + ' --no-restore -m:1'),
+            '',
+            '      - name: Test',
+            ('        run: dotnet test ' + $RepositoryPlan.Solution + ' --no-build --logger "console;verbosity=minimal"')
+        )
+    }
+
+    return @(
+        'name: validate',
+        '',
+        'on:',
+        '  pull_request:',
+        '  push:',
+        '    branches:',
+        '      - main',
+        '      - dev',
+        '  workflow_dispatch:',
+        '',
+        'permissions:',
+        '  contents: read',
+        '',
+        'jobs:',
+        '  validate:',
+        '    runs-on: windows-latest',
+        '    steps:',
+        '      - name: Checkout module',
+        '        uses: actions/checkout@v4',
+        '        with:',
+        "          path: $($RepositoryPlan.Name)",
+        '          fetch-depth: 0',
+        '',
+        '      - name: Checkout framework',
+        '        uses: actions/checkout@v4',
+        '        with:',
+        "          repository: $Owner/gma-framework",
+        '          path: gma-framework',
+        "          token: $checkoutToken",
+        '          fetch-depth: 0',
+        '',
+        '      - name: Setup .NET',
+        '        uses: actions/setup-dotnet@v4',
+        '        with:',
+        '          dotnet-version: 10.0.x',
+        '',
+        '      - name: Bootstrap source roots',
+        '        shell: pwsh',
+        "        working-directory: $($RepositoryPlan.Name)",
+        '        run: ./eng/bootstrap-source-roots.ps1 -Force',
+        '',
+        '      - name: Restore',
+        "        working-directory: $($RepositoryPlan.Name)",
+        ('        run: dotnet restore ' + $RepositoryPlan.Solution),
+        '',
+        '      - name: Build',
+        "        working-directory: $($RepositoryPlan.Name)",
+        ('        run: dotnet build ' + $RepositoryPlan.Solution + ' --no-restore -m:1'),
+        '',
+        '      - name: Test',
+        "        working-directory: $($RepositoryPlan.Name)",
+        ('        run: dotnet test ' + $RepositoryPlan.Solution + ' --no-build --logger "console;verbosity=minimal"')
     )
 }
 
@@ -151,6 +506,87 @@ function Invoke-GmaQuietNativeCommand {
     }
 }
 
+function Invoke-GmaNativeOutput {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $FilePath,
+
+        [Parameter(Mandatory = $true)]
+        [string[]] $Arguments
+    )
+
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = & $FilePath @Arguments 2>$null
+        return [pscustomobject] @{
+            ExitCode = $LASTEXITCODE
+            Output = @($output)
+        }
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+}
+
+function Get-GmaStage8SshUrl {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    return "git@${RemoteHostAlias}:$Owner/$($RepositoryPlan.Name).git"
+}
+
+function Get-GmaRemoteRepositoryAudit {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    $sshUrl = Get-GmaStage8SshUrl $RepositoryPlan
+    $heads = Invoke-GmaNativeOutput `
+        -FilePath 'git' `
+        -Arguments @('ls-remote', '--heads', $sshUrl)
+
+    if ($heads.ExitCode -ne 0) {
+        return [pscustomobject] @{
+            Repository = "$Owner/$($RepositoryPlan.Name)"
+            Reachable = $false
+            Branches = ''
+            CandidateReady = Test-GmaCandidateOwnsGitRepository $RepositoryPlan.LocalPath
+            SkeletonSubmodulesReady = if ($RepositoryPlan.Name -eq 'gma-skeleton') { Test-GmaSkeletonCandidateHasSubmoduleGitlinks $RepositoryPlan.LocalPath } else { $null }
+            Note = 'not found or no SSH access'
+        }
+    }
+
+    $branches = @($heads.Output |
+        ForEach-Object { ($_ -split '\s+')[-1] } |
+        Where-Object { $_ -like 'refs/heads/*' } |
+        ForEach-Object { $_.Substring('refs/heads/'.Length) } |
+        Sort-Object)
+
+    return [pscustomobject] @{
+        Repository = "$Owner/$($RepositoryPlan.Name)"
+        Reachable = $true
+        Branches = $branches -join ','
+        CandidateReady = Test-GmaCandidateOwnsGitRepository $RepositoryPlan.LocalPath
+        SkeletonSubmodulesReady = if ($RepositoryPlan.Name -eq 'gma-skeleton') { Test-GmaSkeletonCandidateHasSubmoduleGitlinks $RepositoryPlan.LocalPath } else { $null }
+        Note = if (@($branches).Count -eq 0) { 'empty repository' } else { '' }
+    }
+}
+
+function Write-GmaRemoteRepositoryAudit {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]] $RepositoryPlans
+    )
+
+    $RepositoryPlans |
+        ForEach-Object { Get-GmaRemoteRepositoryAudit $_ } |
+        Format-Table -AutoSize
+}
+
 function Test-GmaCandidateOwnsGitRepository {
     param(
         [Parameter(Mandatory = $true)]
@@ -179,6 +615,68 @@ function Test-GmaCandidateOwnsGitRepository {
     $actualRoot = [System.IO.Path]::GetFullPath($repositoryRoot).TrimEnd('\', '/')
 
     return [string]::Equals($expectedRoot, $actualRoot, [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Test-GmaSkeletonCandidateHasSubmoduleGitlinks {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path
+    )
+
+    if (-not (Test-GmaCandidateOwnsGitRepository $Path)) {
+        return $false
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $Path '.gitmodules') -PathType Leaf)) {
+        return $false
+    }
+
+    foreach ($mountPath in Get-GmaStage8SkeletonSubmoduleMountPaths) {
+        $indexEntry = git -C $Path ls-files --stage -- $mountPath
+        if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($indexEntry)) {
+            return $false
+        }
+
+        if (-not ($indexEntry -match '^160000\s')) {
+            return $false
+        }
+    }
+
+    return $true
+}
+
+function Assert-GmaSkeletonCandidateCanBePushed {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    if ($RepositoryPlan.Name -ne 'gma-skeleton' -or $AllowUnconvertedSkeletonPush -or $WhatIfPreference) {
+        return
+    }
+
+    if (-not (Test-GmaSkeletonCandidateHasSubmoduleGitlinks $RepositoryPlan.LocalPath)) {
+        throw "Refusing to push '$Owner/$($RepositoryPlan.Name)' before Stage 9 has added real .gitmodules entries and submodule gitlinks. Run the Stage 9 conversion first, or rerun with -AllowUnconvertedSkeletonPush only for a deliberate placeholder push."
+    }
+}
+
+function Assert-GmaCandidatePushPreconditions {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    if (-not (Test-Path -LiteralPath $RepositoryPlan.LocalPath -PathType Container)) {
+        throw "Candidate repository path is missing: $($RepositoryPlan.LocalPath)"
+    }
+
+    Assert-GmaCandidateOwnsGitRepository $RepositoryPlan
+    Assert-GmaSkeletonCandidateCanBePushed $RepositoryPlan
+
+    $status = git -C $RepositoryPlan.LocalPath status --short
+    if ($status -and -not $AllowDirtyCandidates) {
+        throw "Candidate repository has uncommitted changes: $($RepositoryPlan.LocalPath). Commit, clean, or rerun with -AllowDirtyCandidates."
+    }
 }
 
 function Assert-GmaCandidateOwnsGitRepository {
@@ -228,6 +726,185 @@ function Ensure-GmaSkeletonCandidateMountIgnores {
     )
 }
 
+function Ensure-GmaCandidateSourceRootOverridesAreLocalOnly {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    $gitIgnorePath = Join-Path $RepositoryPlan.LocalPath '.gitignore'
+    $gitIgnore = if (Test-Path -LiteralPath $gitIgnorePath) {
+        @(Get-Content -LiteralPath $gitIgnorePath)
+    }
+    else {
+        @()
+    }
+
+    if ($gitIgnore -notcontains 'Gma.SourceRoots.props') {
+        $linesToAppend = @()
+        if ($gitIgnore.Count -gt 0 -and -not [string]::IsNullOrWhiteSpace($gitIgnore[-1])) {
+            $linesToAppend += ''
+        }
+
+        $linesToAppend += '# GMA local source-root overrides'
+        $linesToAppend += 'Gma.SourceRoots.props'
+        Add-Content -LiteralPath $gitIgnorePath -Encoding utf8 -Value $linesToAppend
+    }
+
+    $trackedSourceRoots = (Invoke-GmaQuietNativeCommand `
+        -FilePath 'git' `
+        -Arguments @('-C', $RepositoryPlan.LocalPath, 'ls-files', '--error-unmatch', 'Gma.SourceRoots.props')) -eq 0
+    if ($trackedSourceRoots) {
+        git -C $RepositoryPlan.LocalPath rm --cached --quiet -- Gma.SourceRoots.props
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to untrack local source-root override in '$($RepositoryPlan.LocalPath)'."
+        }
+    }
+}
+
+function Ensure-GmaCandidateSourceRootBootstrap {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    Set-GmaUtf8FileLines `
+        -Path (Join-Path $RepositoryPlan.LocalPath 'Gma.SourceRoots.props.example') `
+        -Lines (Get-GmaCandidateSourceRootExampleLines $RepositoryPlan)
+
+    Set-GmaUtf8FileLines `
+        -Path (Join-Path $RepositoryPlan.LocalPath 'eng\bootstrap-source-roots.ps1') `
+        -Lines (Get-GmaCandidateSourceRootBootstrapLines)
+}
+
+function Ensure-GmaCandidateValidationWorkflow {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    Set-GmaUtf8FileLines `
+        -Path (Join-Path $RepositoryPlan.LocalPath '.github\workflows\validate.yml') `
+        -Lines (Get-GmaCandidateValidationWorkflowLines $RepositoryPlan)
+}
+
+function Copy-GmaStage8Directory {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $SourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string] $DestinationPath
+    )
+
+    if (Test-Path -LiteralPath $DestinationPath -PathType Container) {
+        Remove-Item -LiteralPath $DestinationPath -Recurse -Force
+    }
+
+    if (Test-Path -LiteralPath $SourcePath -PathType Container) {
+        $parent = Split-Path -Parent $DestinationPath
+        if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
+            New-Item -ItemType Directory -Force -Path $parent | Out-Null
+        }
+
+        Copy-Item -LiteralPath $SourcePath -Destination $DestinationPath -Recurse -Force
+    }
+}
+
+function Copy-GmaStage8FileIfExists {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $SourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string] $DestinationPath
+    )
+
+    if (-not (Test-Path -LiteralPath $SourcePath -PathType Leaf)) {
+        return
+    }
+
+    $parent = Split-Path -Parent $DestinationPath
+    if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
+        New-Item -ItemType Directory -Force -Path $parent | Out-Null
+    }
+
+    Copy-Item -LiteralPath $SourcePath -Destination $DestinationPath -Force
+}
+
+function Sync-GmaSkeletonCandidateFromCurrentWorkspace {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object] $RepositoryPlan
+    )
+
+    if ($RepositoryPlan.Name -ne 'gma-skeleton') {
+        return
+    }
+
+    $repositoryRoot = Get-GmaRepositoryRoot
+
+    Copy-GmaStage8Directory `
+        -SourcePath (Join-Path $repositoryRoot 'docs') `
+        -DestinationPath (Join-Path $RepositoryPlan.LocalPath 'docs')
+    Copy-GmaStage8Directory `
+        -SourcePath (Join-Path $repositoryRoot 'requests') `
+        -DestinationPath (Join-Path $RepositoryPlan.LocalPath 'requests')
+
+    $engDestinationPath = Join-Path $RepositoryPlan.LocalPath 'eng'
+    if (-not (Test-Path -LiteralPath $engDestinationPath -PathType Container)) {
+        New-Item -ItemType Directory -Force -Path $engDestinationPath | Out-Null
+    }
+
+    Get-ChildItem -LiteralPath (Join-Path $repositoryRoot 'eng') -Filter '*.ps1' -File |
+        ForEach-Object {
+            Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $engDestinationPath $_.Name) -Force
+        }
+
+    foreach ($fileName in @(
+        '.editorconfig',
+        '.gitattributes',
+        '.gitignore',
+        'Directory.Build.props',
+        'Directory.Packages.props',
+        'global.json',
+        'LICENSE',
+        'nuget.config',
+        'README.md')) {
+        Copy-GmaStage8FileIfExists `
+            -SourcePath (Join-Path $repositoryRoot $fileName) `
+            -DestinationPath (Join-Path $RepositoryPlan.LocalPath $fileName)
+    }
+
+    $stage9Script = Join-Path $repositoryRoot 'eng\gma-stage9.ps1'
+    if (-not (Test-Path -LiteralPath $stage9Script -PathType Leaf)) {
+        throw "Cannot synchronize skeleton candidate because Stage 9 helper is missing: $stage9Script"
+    }
+
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $stage9Script `
+        -WriteConvertedSolution `
+        -ConvertedSolutionPath (Join-Path $RepositoryPlan.LocalPath 'GenericModularApi.slnx') `
+        -Force
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to write converted skeleton candidate solution."
+    }
+
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $stage9Script `
+        -RewriteSkeletonDocsForSubmoduleLayout `
+        -SkeletonRootPath $RepositoryPlan.LocalPath `
+        -Force
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to rewrite skeleton candidate docs for submodule layout."
+    }
+
+    foreach ($solutionFile in Get-GmaStage8RootPackageSolutionFiles) {
+        $solutionPath = Join-Path $RepositoryPlan.LocalPath $solutionFile
+        if (Test-Path -LiteralPath $solutionPath -PathType Leaf) {
+            Remove-Item -LiteralPath $solutionPath -Force
+        }
+    }
+}
+
 function Initialize-GmaCandidateRepository {
     param(
         [Parameter(Mandatory = $true)]
@@ -252,7 +929,11 @@ function Initialize-GmaCandidateRepository {
         }
     }
 
+    Sync-GmaSkeletonCandidateFromCurrentWorkspace $RepositoryPlan
     Ensure-GmaSkeletonCandidateMountIgnores $RepositoryPlan
+    Ensure-GmaCandidateSourceRootOverridesAreLocalOnly $RepositoryPlan
+    Ensure-GmaCandidateSourceRootBootstrap $RepositoryPlan
+    Ensure-GmaCandidateValidationWorkflow $RepositoryPlan
 
     git -C $RepositoryPlan.LocalPath config user.name $GitUserName
     if ($LASTEXITCODE -ne 0) {
@@ -485,17 +1166,8 @@ function Push-GmaCandidateRepository {
     )
 
     $fullName = "$Owner/$($RepositoryPlan.Name)"
-    $sshUrl = "git@${RemoteHostAlias}:$Owner/$($RepositoryPlan.Name).git"
-    if (-not (Test-Path -LiteralPath $RepositoryPlan.LocalPath -PathType Container)) {
-        throw "Candidate repository path is missing: $($RepositoryPlan.LocalPath)"
-    }
-
-    Assert-GmaCandidateOwnsGitRepository $RepositoryPlan
-
-    $status = git -C $RepositoryPlan.LocalPath status --short
-    if ($status -and -not $AllowDirtyCandidates) {
-        throw "Candidate repository has uncommitted changes: $($RepositoryPlan.LocalPath). Commit, clean, or rerun with -AllowDirtyCandidates."
-    }
+    $sshUrl = Get-GmaStage8SshUrl $RepositoryPlan
+    Assert-GmaCandidatePushPreconditions $RepositoryPlan
 
     $remoteNames = git -C $RepositoryPlan.LocalPath remote
     if ($remoteNames -contains 'origin') {
@@ -513,6 +1185,39 @@ function Push-GmaCandidateRepository {
         }
     }
 
+    $pushMain = $true
+    if (-not $WhatIfPreference) {
+        $remoteMain = Invoke-GmaNativeOutput `
+            -FilePath 'git' `
+            -Arguments @('ls-remote', '--heads', $sshUrl, 'main')
+        if ($remoteMain.ExitCode -ne 0) {
+            throw "Could not inspect remote repository '$fullName'. Create it first and verify SSH access."
+        }
+
+        if ($remoteMain.Output.Count -gt 0) {
+            $fetchMainExitCode = Invoke-GmaQuietNativeCommand `
+            -FilePath 'git' `
+            -Arguments @('-C', $RepositoryPlan.LocalPath, 'fetch', '--quiet', 'origin', 'main')
+            if ($fetchMainExitCode -ne 0) {
+                throw "Could not fetch remote main for '$fullName'."
+            }
+
+            $mainIsFastForward = (Invoke-GmaQuietNativeCommand `
+            -FilePath 'git' `
+            -Arguments @('-C', $RepositoryPlan.LocalPath, 'merge-base', '--is-ancestor', 'FETCH_HEAD', 'main')) -eq 0
+            if (-not $mainIsFastForward) {
+                $message = "Remote main for '$fullName' is not an ancestor of the local candidate main. Refusing to overwrite existing history."
+                if ($SkipDivergedMain) {
+                    Write-Warning "$message Skipping main push; dev can still be pushed."
+                    $pushMain = $false
+                }
+                else {
+                    throw "$message Rerun with -SkipDivergedMain to push only dev, or reconcile the remote manually."
+                }
+            }
+        }
+    }
+
     foreach ($branch in @('main', 'dev')) {
         $hasBranch = (Invoke-GmaQuietNativeCommand `
             -FilePath 'git' `
@@ -522,16 +1227,17 @@ function Push-GmaCandidateRepository {
         }
     }
 
-    if ($PSCmdlet.ShouldProcess($fullName, 'Push main and dev branches')) {
-        git -C $RepositoryPlan.LocalPath push -u origin main dev
+    $branchesToPush = if ($pushMain) { @('main', 'dev') } else { @('dev') }
+    if ($PSCmdlet.ShouldProcess($fullName, "Push $($branchesToPush -join ' and ') branch(es)")) {
+        git -C $RepositoryPlan.LocalPath push -u origin @branchesToPush
         if ($LASTEXITCODE -ne 0) {
             throw "Failed to push candidate repository '$fullName'."
         }
     }
 }
 
-$repositoryPlans = Get-GmaStage8RepositoryPlans
-$hasAction = $InitializeCandidates -or $CreateRepositories -or $PushCandidates -or $ConfigureRepositories -or $ProtectBranches
+$repositoryPlans = Get-GmaSelectedStage8RepositoryPlans
+$hasAction = $InitializeCandidates -or $AuditRepositories -or $CreateRepositories -or $PushCandidates -or $ConfigureRepositories -or $ProtectBranches
 
 if (-not $hasAction) {
     Write-Host 'Stage 8 repository plan:'
@@ -540,7 +1246,11 @@ if (-not $hasAction) {
     }
 
     Write-Host ''
-    Write-Host 'No changes were requested. Add -InitializeCandidates, -CreateRepositories, -PushCandidates, -ConfigureRepositories, or -ProtectBranches.'
+    if ($SkipSkeleton) {
+        Write-Host 'Skeleton repository is excluded by -SkipSkeleton.'
+    }
+
+    Write-Host 'No changes were requested. Add -InitializeCandidates, -AuditRepositories, -CreateRepositories, -PushCandidates, -ConfigureRepositories, or -ProtectBranches.'
     return
 }
 
@@ -549,11 +1259,23 @@ if ($requiresGithubCli -and -not $WhatIfPreference) {
     Assert-GmaGithubCliReady
 }
 
+if ($PushCandidates -and -not $WhatIfPreference) {
+    foreach ($repositoryPlan in $repositoryPlans) {
+        Assert-GmaCandidatePushPreconditions $repositoryPlan
+    }
+}
+
 foreach ($repositoryPlan in $repositoryPlans) {
     if ($InitializeCandidates) {
         Initialize-GmaCandidateRepository $repositoryPlan
     }
+}
 
+if ($AuditRepositories) {
+    Write-GmaRemoteRepositoryAudit $repositoryPlans
+}
+
+foreach ($repositoryPlan in $repositoryPlans) {
     if ($CreateRepositories) {
         Ensure-GmaGithubRepository $repositoryPlan
     }
