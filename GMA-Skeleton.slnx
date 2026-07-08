@@ -12,6 +12,7 @@
     <File Path="eng/add-migration.ps1" />
     <File Path="eng/build.ps1" />
     <File Path="eng/check-source-packages.ps1" />
+    <File Path="eng/check-submodule-dev-heads.ps1" />
     <File Path="eng/check-migrations.ps1" />
     <File Path="eng/common.ps1" />
     <File Path="eng/gma-bootstrap.ps1" />

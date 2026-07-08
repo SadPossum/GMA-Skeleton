@@ -1372,6 +1372,78 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
+    public void Skeleton_submodule_dev_head_guard_is_wired_into_validation()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string script = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "check-submodule-dev-heads.ps1"));
+        string workflow = File.ReadAllText(Path.Combine(repositoryRoot, ".github", "workflows", "validate.yml"));
+        string setupDocs = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "getting-started", "setup.md"));
+        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
+        string gitmodules = File.ReadAllText(Path.Combine(repositoryRoot, ".gitmodules"));
+        string[] submodulePaths =
+        [
+            "gma/framework",
+            "gma/modules/administration",
+            "gma/modules/auth",
+            "gma/modules/files",
+            "gma/modules/notifications",
+            "gma/modules/task-runtime",
+            "gma/modules/tenancy"
+        ];
+        string[] requiredScriptTokens =
+        [
+            "ls-remote",
+            "refs/heads/$Branch",
+            "HEAD:$relativePath",
+            "submodule.$name.branch",
+            "diff', '--cached', '--quiet'",
+            "status', '--porcelain'",
+            "gma-update.ps1 -Remote",
+            "All GMA submodule pointers match origin/$Branch"
+        ];
+        string[] requiredWorkflowTokens =
+        [
+            "Check GMA submodule dev heads",
+            "./eng/check-submodule-dev-heads.ps1",
+            "./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
+            "./eng/test-fast.ps1 -NoBuild"
+        ];
+        string[] requiredDocsTokens =
+        [
+            "check-submodule-dev-heads.ps1",
+            "origin/dev",
+            "gma-update.ps1 -Remote",
+            "Commit the skeleton's changed submodule pointer"
+        ];
+
+        string[] offenders = submodulePaths
+            .Where(path => !Regex.IsMatch(
+                gitmodules,
+                $@"\[submodule ""{Regex.Escape(path)}""\]\s+path = {Regex.Escape(path)}\s+url = .+\s+branch = dev",
+                RegexOptions.Multiline))
+            .Select(path => $".gitmodules missing dev branch metadata for {path}")
+            .Concat(requiredScriptTokens
+                .Where(token => !script.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"eng/check-submodule-dev-heads.ps1 missing {token}"))
+            .Concat(requiredWorkflowTokens
+                .Where(token => !workflow.Contains(token, StringComparison.Ordinal))
+                .Select(token => $".github/workflows/validate.yml missing {token}"))
+            .Concat(requiredDocsTokens
+                .Where(token => !setupDocs.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"docs/getting-started/setup.md missing {token}"))
+            .Concat(!solution.Contains("eng/check-submodule-dev-heads.ps1", StringComparison.Ordinal)
+                ? ["GMA-Skeleton.slnx missing eng/check-submodule-dev-heads.ps1"]
+                : [])
+            .Concat(gitmodules.Contains("github.com-private", StringComparison.Ordinal)
+                ? [".gitmodules should use portable GitHub URLs instead of a local SSH host alias."]
+                : [])
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
     public void Completed_source_split_migration_scripts_are_not_live_workflow()
     {
         string repositoryRoot = FindRepositoryRoot();
@@ -1483,10 +1555,11 @@ public sealed partial class DeveloperExperienceGuardTests
             "secrets.GMA_CI_TOKEN",
             "actions/setup-dotnet@v4",
             "dotnet-version: 10.0.x",
-            "./eng/bootstrap-source-roots.ps1 -Force",
-            "dotnet restore GMA-Skeleton.slnx",
-            "dotnet build GMA-Skeleton.slnx --no-restore -m:1",
-            "dotnet test GMA-Skeleton.slnx --no-build"
+            "./eng/check-submodule-dev-heads.ps1",
+            "./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
+            "./eng/restore.ps1",
+            "./eng/build.ps1 -NoRestore",
+            "./eng/test-fast.ps1 -NoBuild"
         ];
         string[] requiredDocsTokens =
         [

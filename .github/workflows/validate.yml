@@ -27,15 +27,22 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Check GMA submodule dev heads
+        shell: pwsh
+        run: ./eng/check-submodule-dev-heads.ps1
+
       - name: Bootstrap source roots
         shell: pwsh
-        run: ./eng/bootstrap-source-roots.ps1 -Force
+        run: ./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force
 
       - name: Restore
-        run: dotnet restore GMA-Skeleton.slnx
+        shell: pwsh
+        run: ./eng/restore.ps1
 
       - name: Build
-        run: dotnet build GMA-Skeleton.slnx --no-restore -m:1
+        shell: pwsh
+        run: ./eng/build.ps1 -NoRestore
 
       - name: Test
-        run: dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
+        shell: pwsh
+        run: ./eng/test-fast.ps1 -NoBuild

@@ -26,7 +26,7 @@ Base `appsettings.json` files contain configuration shape and non-secret default
 
 `restore.ps1` restores both local tools and NuGet packages.
 
-The root `.github\workflows\validate.yml` runs the same non-Docker path on `main`, `dev`, pull requests, and manual dispatch: restore, build with `-m:1`, then `test-fast.ps1 -NoBuild`.
+The root `.github\workflows\validate.yml` runs the same non-Docker path on `main`, `dev`, pull requests, and manual dispatch: verify GMA submodules point at each reusable repository's `dev` head, bootstrap source roots, restore, build with `-m:1`, then `test-fast.ps1 -NoBuild`.
 
 ## Run With Aspire
 
@@ -271,8 +271,21 @@ Useful source-first helpers:
 ```powershell
 .\eng\gma-status.ps1
 .\eng\gma-update.ps1
+.\eng\check-submodule-dev-heads.ps1
 .\eng\check-source-packages.ps1 -SkipRestore
 .\eng\gma-validate.ps1 -FocusedSolutions
 ```
 
-`gma-status` reports dirty working tree, source-root, and submodule state. `gma-update` runs `git submodule update --recursive`, with `-Init` for first checkout and `-Remote` when you deliberately want to move mounted repositories to their configured branch tips. `check-source-packages` validates package-local solution ownership and builds focused packages. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.
+`gma-status` reports dirty working tree, source-root, and submodule state. `gma-update` runs `git submodule update --recursive`, with `-Init` for first checkout and `-Remote` when you deliberately want to move mounted repositories to their configured branch tips. `check-submodule-dev-heads` verifies the skeleton's checked-in GMA submodule pointers match `origin/dev` for every reusable source repository. `check-source-packages` validates package-local solution ownership and builds focused packages. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.
+
+When a reusable GMA repository advances, update the skeleton pointers deliberately:
+
+```powershell
+.\eng\gma-update.ps1 -Remote
+.\eng\check-submodule-dev-heads.ps1
+.\eng\gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force
+.\eng\gma-validate.ps1
+git status --short
+```
+
+Commit the skeleton's changed submodule pointer only after the guard and validation pass.
