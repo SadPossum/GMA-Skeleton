@@ -27,7 +27,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Projects_under_src_and_tests_are_in_solution()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
         string[] projectPaths = Directory
             .EnumerateFiles(repositoryRoot, "*.csproj", SearchOption.AllDirectories)
             .Where(path => IsUnder(path, Path.Combine(repositoryRoot, "src")) ||
@@ -93,7 +93,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Operational_docs_scripts_and_requests_are_solution_items()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
         string[] expectedSolutionItems = EnumerateDocumentationMarkdownFiles(repositoryRoot)
             .Concat(Directory.EnumerateFiles(Path.Combine(repositoryRoot, "eng"), "*.ps1", SearchOption.TopDirectoryOnly))
             .Concat(Directory.EnumerateFiles(Path.Combine(repositoryRoot, "requests"), "*.*", SearchOption.TopDirectoryOnly))
@@ -136,6 +136,39 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
+    public void Skeleton_docs_do_not_link_to_deep_submodule_files()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        Regex markdownLinkPattern = new(@"\[[^\]]+\]\((?<target>[^)\s]+)(?:\s+""[^""]*"")?\)");
+        string[] skeletonDocs = Directory
+            .EnumerateFiles(Path.Combine(repositoryRoot, "docs"), "*.md", SearchOption.AllDirectories)
+            .Prepend(Path.Combine(repositoryRoot, "README.md"))
+            .Where(path => !HasIgnoredPathSegment(path))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        string[] offenders = skeletonDocs
+            .SelectMany(path =>
+            {
+                string source = File.ReadAllText(path);
+                string relativePath = NormalizePath(Path.GetRelativePath(repositoryRoot, path));
+                return markdownLinkPattern
+                    .Matches(source)
+                    .Select(match => match.Groups["target"].Value.Trim())
+                    .Where(target => !target.Contains("://", StringComparison.Ordinal) &&
+                                     !target.StartsWith('#'))
+                    .Select(target => target.Replace('\\', '/'))
+                    .Where(target => target.StartsWith("gma/", StringComparison.OrdinalIgnoreCase) ||
+                                     target.StartsWith("../gma/", StringComparison.OrdinalIgnoreCase) ||
+                                     target.StartsWith("../../gma/", StringComparison.OrdinalIgnoreCase))
+                    .Select(target => $"{relativePath} links to submodule file '{target}'. Use the owning source repository URL instead.");
+            })
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
     public void Source_repo_split_docs_prefer_flat_package_roots()
     {
         string repositoryRoot = FindRepositoryRoot();
@@ -144,6 +177,12 @@ public sealed partial class DeveloperExperienceGuardTests
             "docs",
             "architecture",
             "gma-rebrand-and-source-repo-split.md"));
+        string skeletonDocsIndex = File.ReadAllText(Path.Combine(repositoryRoot, "docs", "README.md"));
+        string skeletonArchitectureOverview = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "docs",
+            "architecture",
+            "overview.md"));
         string documentationGuidelines = File.ReadAllText(FrameworkDocsPath(
             repositoryRoot,
             "guidelines",
@@ -154,7 +193,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "0001-documentation-structure.md"));
         string[] requiredSplitPlanTokens =
         [
-            @"gma-module-auth\src\Gma.Modules.Auth.Application",
+            @"GMA-Module-Auth\src\Gma.Modules.Auth.Application",
             @"gma\modules\auth",
             @"gma\modules\auth\src\",
             @"Do not preserve `src\Framework\...` or `src\Modules\<Module>\...` inside the independent repositories.",
@@ -163,8 +202,8 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         string[] requiredDocsTokens =
         [
-            "move its docs to that repository's root-level `docs/` folder",
-            "standalone module repository, the same content should live at `docs/README.md`"
+            "links to reusable docs should point at the owning source repository on GitHub",
+            "GitHub cannot reliably render deep file links through a skeleton submodule path"
         ];
 
         string[] offenders = requiredSplitPlanTokens
@@ -172,6 +211,8 @@ public sealed partial class DeveloperExperienceGuardTests
             .Select(token => $"docs/architecture/gma-rebrand-and-source-repo-split.md missing {token}")
             .Concat(requiredDocsTokens
                 .Where(token =>
+                    !skeletonDocsIndex.Contains(token, StringComparison.Ordinal) &&
+                    !skeletonArchitectureOverview.Contains(token, StringComparison.Ordinal) &&
                     !documentationGuidelines.Contains(token, StringComparison.Ordinal) &&
                     !documentationAdr.Contains(token, StringComparison.Ordinal))
                 .Select(token => $"documentation ownership docs missing {token}"))
@@ -185,7 +226,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Repository_root_policy_files_are_solution_items()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
         string[] expectedSolutionItems =
         [
             @".config\dotnet-tools.json",
@@ -198,6 +239,8 @@ public sealed partial class DeveloperExperienceGuardTests
             "Directory.Packages.props",
             "Gma.SourceRoots.props.example",
             "global.json",
+            "gma/README.md",
+            "gma/modules/README.md",
             "LICENSE",
             "nuget.config",
             "README.md"
@@ -225,17 +268,17 @@ public sealed partial class DeveloperExperienceGuardTests
             "src/Modules/TaskSamples/Gma.Modules.TaskSamples.slnx"
         ];
 
-        string allUpSolution = File.ReadAllText(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        string allUpSolution = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
         string validationScript = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "gma-validate.ps1"));
         string sourcePackageChecker = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "check-source-packages.ps1"));
         string[] offenders = forbiddenSolutionPaths
             .SelectMany(path => new[]
             {
                 File.Exists(Path.Combine(repositoryRoot, path))
-                    ? $"{path} should not exist; examples are skeleton-owned and build through GenericModularApi.slnx"
+                    ? $"{path} should not exist; examples are skeleton-owned and build through GMA-Skeleton.slnx"
                     : string.Empty,
                 allUpSolution.Contains(path, StringComparison.OrdinalIgnoreCase)
-                    ? $"GenericModularApi.slnx should not list {path}"
+                    ? $"GMA-Skeleton.slnx should not list {path}"
                     : string.Empty,
                 validationScript.Contains(Path.GetFileName(path), StringComparison.OrdinalIgnoreCase)
                     ? $"eng/gma-validate.ps1 should not validate example solution {Path.GetFileName(path)}"
@@ -864,13 +907,13 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         HashSet<string> allowedRelativePaths = new(StringComparer.OrdinalIgnoreCase)
         {
-            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Application.Composition", "ApplicationServiceCollectionExtensions.cs")),
-            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Cqrs.Infrastructure", "RequestDispatcher.cs")),
-            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Application.Events.Infrastructure", "DomainEventDispatcher.cs")),
-            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Modules", "ModuleMetadataAttributeReader.cs")),
-            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Messaging.Infrastructure", "IntegrationEventHandlerInvoker.cs")),
-            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Tasks.Infrastructure", "TaskHandlerInvoker.cs")),
-            NormalizePath(Path.Combine("src", "Framework", "Gma.Framework.Persistence.EntityFrameworkCore", "TenantEntityTypeBuilderExtensions.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Application", "Gma.Framework.Application.Composition", "ApplicationServiceCollectionExtensions.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Cqrs", "Gma.Framework.Cqrs.Infrastructure", "RequestDispatcher.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Application", "Gma.Framework.Application.Events.Infrastructure", "DomainEventDispatcher.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Modules", "Gma.Framework.Modules", "ModuleMetadataAttributeReader.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Messaging", "Gma.Framework.Messaging.Infrastructure", "IntegrationEventHandlerInvoker.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Tasks", "Gma.Framework.Tasks.Infrastructure", "TaskHandlerInvoker.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Persistence", "Gma.Framework.Persistence.EntityFrameworkCore", "TenantEntityTypeBuilderExtensions.cs")),
             NormalizePath(Path.Combine("src", "Host.Api", "ApiAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Host.AdminApi", "AdminApiAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Host.AdminCli", "AdminCliAssemblyReference.cs")),
@@ -952,7 +995,7 @@ public sealed partial class DeveloperExperienceGuardTests
         Assert.Equal("latestFeature", sdk.GetProperty("rollForward").GetString());
         Assert.Equal("net10.0", props.Descendants("TargetFramework").Single().Value.Trim());
         Assert.Contains($"SDK `{sdkVersion}`", setupDocs, StringComparison.Ordinal);
-        Assert.Contains("GenericModularApi is a .NET 10 modular monolith skeleton", readme, StringComparison.Ordinal);
+        Assert.Contains("GMA-Skeleton is a .NET 10 modular monolith skeleton", readme, StringComparison.Ordinal);
         Assert.Contains("$version -match '^10\\.'", commonScript, StringComparison.Ordinal);
         Assert.Contains("Could not resolve a .NET 10 SDK", commonScript, StringComparison.Ordinal);
     }
@@ -1147,7 +1190,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Solution_folders_are_unique_per_parent_folder()
     {
         string repositoryRoot = FindRepositoryRoot();
-        XDocument solution = XDocument.Load(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        XDocument solution = XDocument.Load(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
 
         string[] duplicateFolders = solution
             .Descendants("Folder")
@@ -1166,7 +1209,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Test_projects_are_listed_under_test_solution_folders()
     {
         string repositoryRoot = FindRepositoryRoot();
-        XDocument solution = XDocument.Load(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        XDocument solution = XDocument.Load(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
 
         string[] offenders = solution
             .Descendants("Folder")
@@ -1193,10 +1236,10 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Framework_source_projects_are_nested_under_framework_solution_folder()
+    public void Framework_source_projects_are_nested_under_framework_feature_solution_folders()
     {
         string repositoryRoot = FindRepositoryRoot();
-        XDocument solution = XDocument.Load(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        XDocument solution = XDocument.Load(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
 
         string[] offenders = solution
             .Descendants("Folder")
@@ -1211,11 +1254,12 @@ public sealed partial class DeveloperExperienceGuardTests
                         ProjectPath = NormalizePath(project.Attribute("Path")?.Value ?? string.Empty)
                     });
             })
-            .Where(project => project.ProjectPath.StartsWith("src/Framework/", StringComparison.OrdinalIgnoreCase) &&
+            .Where(project => project.ProjectPath.StartsWith("gma/framework/src/", StringComparison.OrdinalIgnoreCase) &&
                               !project.ProjectPath.Contains("/tests/", StringComparison.OrdinalIgnoreCase) &&
                               project.ProjectPath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
-            .Where(project => !string.Equals(project.FolderName, "/src/Framework/src/", StringComparison.Ordinal))
-            .Select(project => $"{project.ProjectPath} is listed under {project.FolderName}, expected /src/Framework/src/.")
+            .Where(project => !project.FolderName.StartsWith("/gma/framework/src/", StringComparison.Ordinal) ||
+                              string.Equals(project.FolderName, "/gma/framework/src/", StringComparison.Ordinal))
+            .Select(project => $"{project.ProjectPath} is listed under {project.FolderName}, expected a /gma/framework/src/<feature>/ folder.")
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -1226,7 +1270,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Legacy_solution_file_is_removed_after_slnx_migration()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string legacySolutionFileName = string.Concat("GenericModularApi", ".sln");
+        string legacySolutionFileName = string.Concat("GMA-Skeleton", ".sln");
         string[] offenders = Directory
             .EnumerateFiles(repositoryRoot, "*.sln", SearchOption.TopDirectoryOnly)
             .Select(path => Path.GetFileName(path))
@@ -1340,14 +1384,14 @@ public sealed partial class DeveloperExperienceGuardTests
             "gma-rebrand-and-source-repo-split.md"));
         string[] requiredRepositories =
         [
-            "gma-framework",
-            "gma-module-administration",
-            "gma-module-auth",
-            "gma-module-files",
-            "gma-module-notifications",
-            "gma-module-task-runtime",
-            "gma-module-tenancy",
-            "gma-skeleton"
+            "GMA-Framework",
+            "GMA-Module-Administration",
+            "GMA-Module-Auth",
+            "GMA-Module-Files",
+            "GMA-Module-Notifications",
+            "GMA-Module-Task-Runtime",
+            "GMA-Module-Tenancy",
+            "GMA-Skeleton"
         ];
         string[] requiredScriptTokens =
         [
@@ -1418,13 +1462,13 @@ public sealed partial class DeveloperExperienceGuardTests
             "-PushCandidates",
             "-ConfigureRepositories",
             "-ProtectBranches",
-            "-Repository gma-framework",
+            "-Repository GMA-Framework",
             "-SkipDivergedMain",
             "-SkipSkeleton",
             "-AllowUnconvertedSkeletonPush",
             "-AllowBranchProtectionUnavailable",
             "publish framework/module repositories before Stage 9 converts the skeleton",
-            "refuses to push `gma-skeleton` until Stage 9 has produced real `.gitmodules` entries and submodule gitlinks",
+            "refuses to push `GMA-Skeleton` until Stage 9 has produced real `.gitmodules` entries and submodule gitlinks",
             "-WhatIf"
         ];
 
@@ -1456,7 +1500,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "docs",
             "architecture",
             "gma-rebrand-and-source-repo-split.md"));
-        string slnx = File.ReadAllText(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        string slnx = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
         string[] requiredScriptTokens =
         [
             "SupportsShouldProcess",
@@ -1489,22 +1533,22 @@ public sealed partial class DeveloperExperienceGuardTests
             "git clone",
             "clone --recurse-submodules",
             "Invoke-GmaDotNet",
-            "gma-framework",
-            "gma-module-auth",
-            "gma-module-notifications",
+            "GMA-Framework",
+            "GMA-Module-Auth",
+            "GMA-Module-Notifications",
             "gma\\framework",
             "gma\\modules\\auth",
-            "GenericModularApi.slnx",
+            "GMA-Skeleton.slnx",
             "Gma.SourceRoots.props.example",
             "Stage 9 conversion requires a clean working tree",
             "$submoduleCommand -f -b $DefaultBranch",
             "'submodule', 'add', '-f', '-b'",
-            "-WriteConvertedSolution -ConvertedSolutionPath GenericModularApi.slnx -Force",
+            "-WriteConvertedSolution -ConvertedSolutionPath GMA-Skeleton.slnx -Force",
             "-RewriteSkeletonDocsForSubmoduleLayout -SkeletonRootPath . -Force",
             "eng\\gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
-            "dotnet restore GenericModularApi.slnx",
-            "dotnet build GenericModularApi.slnx --no-restore -m:1",
-            "dotnet test GenericModularApi.slnx --no-build",
+            "dotnet restore GMA-Skeleton.slnx",
+            "dotnet build GMA-Skeleton.slnx --no-restore -m:1",
+            "dotnet test GMA-Skeleton.slnx --no-build",
             "git rm -r src\\Framework",
             "git rm Gma.Framework.slnx",
             ".tmp\\gma-stage9-submodule-plan.ps1",
@@ -1552,7 +1596,7 @@ public sealed partial class DeveloperExperienceGuardTests
                                 !splitPlan.Contains(token, StringComparison.Ordinal))
                 .Select(token => $"Stage 9 docs missing {token}"))
             .Concat(!slnx.Contains("eng/gma-stage9.ps1", StringComparison.Ordinal)
-                ? ["GenericModularApi.slnx missing eng/gma-stage9.ps1"]
+                ? ["GMA-Skeleton.slnx missing eng/gma-stage9.ps1"]
                 : [])
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -1577,7 +1621,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "docs",
             "architecture",
             "gma-rebrand-and-source-repo-split.md"));
-        string slnx = File.ReadAllText(Path.Combine(repositoryRoot, "GenericModularApi.slnx"));
+        string slnx = File.ReadAllText(Path.Combine(repositoryRoot, "GMA-Skeleton.slnx"));
         string[] requiredTokens =
         [
             "SupportsShouldProcess",
@@ -1618,9 +1662,9 @@ public sealed partial class DeveloperExperienceGuardTests
             "actions/setup-dotnet@v4",
             "dotnet-version: 10.0.x",
             "./eng/bootstrap-source-roots.ps1 -Force",
-            "dotnet restore GenericModularApi.slnx",
-            "dotnet build GenericModularApi.slnx --no-restore -m:1",
-            "dotnet test GenericModularApi.slnx --no-build"
+            "dotnet restore GMA-Skeleton.slnx",
+            "dotnet build GMA-Skeleton.slnx --no-restore -m:1",
+            "dotnet test GMA-Skeleton.slnx --no-build"
         ];
         string[] requiredDocsTokens =
         [
@@ -1655,13 +1699,13 @@ public sealed partial class DeveloperExperienceGuardTests
                                 !sourceFirstAppsDocs.Contains(token, StringComparison.Ordinal))
                 .Select(token => $"Stage 10 docs missing {token}"))
             .Concat(!slnx.Contains("eng/new-gma-app.ps1", StringComparison.Ordinal)
-                ? ["GenericModularApi.slnx missing eng/new-gma-app.ps1"]
+                ? ["GMA-Skeleton.slnx missing eng/new-gma-app.ps1"]
                 : [])
             .Concat(!slnx.Contains("docs/getting-started/source-first-apps.md", StringComparison.Ordinal)
-                ? ["GenericModularApi.slnx missing docs/getting-started/source-first-apps.md"]
+                ? ["GMA-Skeleton.slnx missing docs/getting-started/source-first-apps.md"]
                 : [])
             .Concat(!slnx.Contains(".github/workflows/validate.yml", StringComparison.Ordinal)
-                ? ["GenericModularApi.slnx missing .github/workflows/validate.yml"]
+                ? ["GMA-Skeleton.slnx missing .github/workflows/validate.yml"]
                 : [])
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -1826,7 +1870,7 @@ public sealed partial class DeveloperExperienceGuardTests
             ["Gma.Framework.slnx"] = (
                 Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"),
                 [
-                    "src/Gma.Framework.Results/Gma.Framework.Results.csproj",
+                    "src/Results/Gma.Framework.Results/Gma.Framework.Results.csproj",
                     "tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj"
                 ],
                 [
@@ -1927,7 +1971,9 @@ public sealed partial class DeveloperExperienceGuardTests
                 string[] folderOffenders = solution
                     .Descendants("Folder")
                     .Select(folder => folder.Attribute("Name")?.Value ?? string.Empty)
-                    .Where(folderName => !item.Value.AllowedFolders.Contains(folderName, StringComparer.Ordinal))
+                    .Where(folderName => !item.Value.AllowedFolders.Any(allowedFolder =>
+                        string.Equals(folderName, allowedFolder, StringComparison.Ordinal) ||
+                        folderName.StartsWith(allowedFolder, StringComparison.Ordinal)))
                     .Select(folderName => $"{item.Key} contains non-package-local folder {folderName}")
                     .ToArray();
                 string[] pathOffenders = solution
@@ -1972,9 +2018,10 @@ public sealed partial class DeveloperExperienceGuardTests
                 }
 
                 string[] localEntries = GetSolutionEntryPaths(XDocument.Load(item.Value));
+                bool isFrameworkPackage = string.Equals(item.Key, "Gma.Framework.slnx", StringComparison.OrdinalIgnoreCase);
                 string[] staleLocalPrefixes = localEntries
                     .Where(path => path.StartsWith("src/Framework/", StringComparison.OrdinalIgnoreCase) ||
-                                   path.StartsWith("src/Modules/", StringComparison.OrdinalIgnoreCase))
+                                   (!isFrameworkPackage && path.StartsWith("src/Modules/", StringComparison.OrdinalIgnoreCase)))
                     .Select(path => $"{solutionDisplayPath} keeps monorepo-staged path {path}")
                     .ToArray();
                 string[] nonLocalEntries = localEntries
@@ -2010,10 +2057,10 @@ public sealed partial class DeveloperExperienceGuardTests
 
         Assert.Contains("gma\\framework\\eng\\new-module.ps1", wrapper, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("-RepositoryRoot $repositoryRoot", wrapper, StringComparison.Ordinal);
-        Assert.Contains("-CompositionSolution 'GenericModularApi.slnx'", wrapper, StringComparison.Ordinal);
+        Assert.Contains("-CompositionSolution 'GMA-Skeleton.slnx'", wrapper, StringComparison.Ordinal);
         Assert.DoesNotContain("function Add-Project", wrapper, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("CompositionSolution is required", implementation, StringComparison.Ordinal);
-        Assert.DoesNotContain("GenericModularApi.slnx", implementation, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("GMA-Skeleton.slnx", implementation, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -2953,7 +3000,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        Assert.Equal([Path.Combine("src", "Framework", "Gma.Framework.Naming", "TenantIds.cs")], tenantIdHelpers);
+        Assert.Equal([Path.Combine("src", "Framework", "Naming", "Gma.Framework.Naming", "TenantIds.cs")], tenantIdHelpers);
         Assert.Empty(domainTrimOffenders);
     }
 
@@ -3652,7 +3699,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] requiredFastTokens =
         [
             ". (Join-Path $PSScriptRoot 'common.ps1')",
-            "GenericModularApi.slnx",
+            "GMA-Skeleton.slnx",
             "--filter",
             "Category!=Docker",
             "console;verbosity=minimal"
@@ -4168,7 +4215,7 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             "using Gma.Framework.Persistence.EntityFrameworkCore;",
             "using Gma.Framework.Tenancy;",
-            @"$(GmaFrameworkRoot)Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj",
+            @"$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj",
             "ITenantContext tenantContext",
             ": TenantAwareDbContext<${Name}DbContext>(options, tenantContext)",
             "this.ApplyTenantConventions(modelBuilder);",
@@ -4291,45 +4338,53 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_core_projects_keep_dependency_free_or_abstractions_only_shape()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         string[] dependencyFreeProjects =
         [
-            Path.Combine(sharedRoot, "Gma.Framework.Results", "Gma.Framework.Results.csproj"),
-            Path.Combine(sharedRoot, "Gma.Framework.Naming", "Gma.Framework.Naming.csproj"),
-            Path.Combine(sharedRoot, "Gma.Framework.Numerics", "Gma.Framework.Numerics.csproj"),
-            Path.Combine(sharedRoot, "Gma.Framework.Pagination", "Gma.Framework.Pagination.csproj"),
-            Path.Combine(sharedRoot, "Gma.Framework.Security", "Gma.Framework.Security.csproj")
+            GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Results", "Gma.Framework.Results.csproj"),
+            GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Naming", "Gma.Framework.Naming.csproj"),
+            GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Numerics", "Gma.Framework.Numerics.csproj"),
+            GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Pagination", "Gma.Framework.Pagination.csproj"),
+            GmaSourceLayout.FrameworkPath(repositoryRoot, "Gma.Framework.Security", "Gma.Framework.Security.csproj")
         ];
-        string notificationsProjectPath = Path.Combine(sharedRoot, "Gma.Framework.Notifications", "Gma.Framework.Notifications.csproj");
+        string notificationsProjectPath = GmaSourceLayout.FrameworkPath(
+            repositoryRoot,
+            "Gma.Framework.Notifications",
+            "Gma.Framework.Notifications.csproj");
         XDocument notificationsProject = XDocument.Load(notificationsProjectPath);
         HashSet<string> allowedNotificationsProjectReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
-            @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
-            @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
+            NormalizePath(@"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"),
+            NormalizePath(@"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj"),
+            NormalizePath(@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj")
         };
-        string modulesProjectPath = Path.Combine(sharedRoot, "Gma.Framework.Modules", "Gma.Framework.Modules.csproj");
+        string modulesProjectPath = GmaSourceLayout.FrameworkPath(
+            repositoryRoot,
+            "Gma.Framework.Modules",
+            "Gma.Framework.Modules.csproj");
         XDocument modulesProject = XDocument.Load(modulesProjectPath);
         HashSet<string> allowedModulesProjectReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
+            NormalizePath(@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj")
         };
-        string domainProjectPath = Path.Combine(sharedRoot, "Gma.Framework.Domain", "Gma.Framework.Domain.csproj");
+        string domainProjectPath = GmaSourceLayout.FrameworkPath(
+            repositoryRoot,
+            "Gma.Framework.Domain",
+            "Gma.Framework.Domain.csproj");
         XDocument domainProject = XDocument.Load(domainProjectPath);
         HashSet<string> allowedDomainProjectReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
-            @"..\Gma.Framework.Numerics\Gma.Framework.Numerics.csproj"
+            NormalizePath(@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"),
+            NormalizePath(@"..\Gma.Framework.Numerics\Gma.Framework.Numerics.csproj")
         };
-        string applicationProjectPath = Path.Combine(
-            sharedRoot,
+        string applicationProjectPath = GmaSourceLayout.FrameworkPath(
+            repositoryRoot,
             "Gma.Framework.Application.Composition",
             "Gma.Framework.Application.Composition.csproj");
         XDocument applicationProject = XDocument.Load(applicationProjectPath);
         HashSet<string> allowedApplicationProjectReferences = new(StringComparer.OrdinalIgnoreCase)
         {
-            @"..\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj",
-            @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"
+            NormalizePath(@"..\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj"),
+            NormalizePath(@"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj")
         };
         HashSet<string> allowedApplicationPackageReferences = new(StringComparer.Ordinal)
         {
@@ -4351,14 +4406,14 @@ public sealed partial class DeveloperExperienceGuardTests
             .Descendants("ProjectReference")
             .Select(element => element.Attribute("Include")?.Value)
             .Where(reference => !string.IsNullOrWhiteSpace(reference))
-            .Where(reference => !allowedApplicationProjectReferences.Contains(reference!))
+            .Where(reference => !allowedApplicationProjectReferences.Contains(NormalizePath(reference!)))
             .Select(reference => $"{Path.GetRelativePath(repositoryRoot, applicationProjectPath)}->ProjectReference:{reference}")
             .ToArray();
         string[] domainReferenceOffenders = domainProject
             .Descendants("ProjectReference")
             .Select(element => element.Attribute("Include")?.Value)
             .Where(reference => !string.IsNullOrWhiteSpace(reference))
-            .Where(reference => !allowedDomainProjectReferences.Contains(reference!))
+            .Where(reference => !allowedDomainProjectReferences.Contains(NormalizePath(reference!)))
             .Select(reference => $"{Path.GetRelativePath(repositoryRoot, domainProjectPath)}->ProjectReference:{reference}")
             .ToArray();
         string[] domainPackageOrFrameworkOffenders = domainProject
@@ -4370,7 +4425,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Descendants("ProjectReference")
             .Select(element => element.Attribute("Include")?.Value)
             .Where(reference => !string.IsNullOrWhiteSpace(reference))
-            .Where(reference => !allowedModulesProjectReferences.Contains(reference!))
+            .Where(reference => !allowedModulesProjectReferences.Contains(NormalizePath(reference!)))
             .Select(reference => $"{Path.GetRelativePath(repositoryRoot, modulesProjectPath)}->ProjectReference:{reference}")
             .ToArray();
         string[] modulesPackageOrFrameworkOffenders = modulesProject
@@ -4382,7 +4437,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Descendants("ProjectReference")
             .Select(element => element.Attribute("Include")?.Value)
             .Where(reference => !string.IsNullOrWhiteSpace(reference))
-            .Where(reference => !allowedNotificationsProjectReferences.Contains(reference!))
+            .Where(reference => !allowedNotificationsProjectReferences.Contains(NormalizePath(reference!)))
             .Select(reference => $"{Path.GetRelativePath(repositoryRoot, notificationsProjectPath)}->ProjectReference:{reference}")
             .ToArray();
         string[] notificationPackageOrFrameworkOffenders = notificationsProject
@@ -4420,7 +4475,6 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Framework_application_boundary_projects_stay_source_narrow()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
         IReadOnlyDictionary<string, string[]> expectedProjectSources = new Dictionary<string, string[]>(
             StringComparer.Ordinal)
         {
@@ -4438,7 +4492,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] sourceShapeOffenders = expectedProjectSources
             .SelectMany(entry =>
             {
-                string projectRoot = Path.Combine(sharedRoot, entry.Key);
+                string projectRoot = GmaSourceLayout.FrameworkPath(repositoryRoot, entry.Key);
                 string[] actualSources = Directory
                     .EnumerateFiles(projectRoot, "*.cs", SearchOption.AllDirectories)
                     .Where(path => !HasIgnoredPathSegment(path))
@@ -4497,7 +4551,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] forbiddenSourceOffenders = forbiddenTokensByProject
             .SelectMany(entry =>
             {
-                string projectRoot = Path.Combine(sharedRoot, entry.Key);
+                string projectRoot = GmaSourceLayout.FrameworkPath(repositoryRoot, entry.Key);
                 return Directory
                     .EnumerateFiles(projectRoot, "*.cs", SearchOption.AllDirectories)
                     .Where(path => !HasIgnoredPathSegment(path))
@@ -5132,9 +5186,9 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] manifestOffenders = expectedShapes
             .SelectMany(shape =>
             {
-                string projectPath = Path.Combine(sharedRoot, shape.ProjectName, $"{shape.ProjectName}.csproj");
+                string projectPath = GmaSourceLayout.FrameworkPath(repositoryRoot, shape.ProjectName, $"{shape.ProjectName}.csproj");
                 XDocument project = XDocument.Load(projectPath);
-                string relativePath = Path.GetRelativePath(repositoryRoot, projectPath);
+                string relativePath = CanonicalRelativePath(repositoryRoot, projectPath);
 
                 return CompareDependencySet(relativePath, "PackageReference", shape.PackageReferences, GetProjectIncludes(project, "PackageReference"))
                     .Concat(CompareDependencySet(relativePath, "FrameworkReference", shape.FrameworkReferences, GetProjectIncludes(project, "FrameworkReference")))
@@ -6225,16 +6279,16 @@ public sealed partial class DeveloperExperienceGuardTests
             "$metadataDescriptorLines = @(",
             "$metadataDescriptor = $metadataDescriptorLines -join \"`r`n\"",
             "using Gma.Framework.Modules;",
-            "$(GmaFrameworkRoot)Gma.Framework.Modules\\Gma.Framework.Modules.csproj",
+            "$(GmaFrameworkRoot)Modules\\Gma.Framework.Modules\\Gma.Framework.Modules.csproj",
             "using Gma.Framework.Authorization;",
-            "$(GmaFrameworkRoot)Gma.Framework.Authorization\\Gma.Framework.Authorization.csproj",
-            "$(GmaFrameworkRoot)Gma.Framework.Messaging\\Gma.Framework.Messaging.csproj",
+            "$(GmaFrameworkRoot)Security\\Gma.Framework.Authorization\\Gma.Framework.Authorization.csproj",
+            "$(GmaFrameworkRoot)Messaging\\Gma.Framework.Messaging\\Gma.Framework.Messaging.csproj",
             "Write-GmaFile (Join-Path $moduleRoot \"$Name.Contracts\\Metadata\\${Name}ModuleMetadata.cs\")",
             "tenantScoped: true",
             "ModuleCacheTag",
             "ModuleCacheEntry",
             "using Gma.Framework.Caching;",
-            "$(GmaFrameworkRoot)Gma.Framework.Caching\\Gma.Framework.Caching.csproj",
+            "$(GmaFrameworkRoot)Caching\\Gma.Framework.Caching\\Gma.Framework.Caching.csproj",
             ".WithPermission($metadataPermissionDescriptor)",
             ".WithCacheEntry(new ModuleCacheDescriptor(ModuleCacheEntry, CacheScope.Tenant, [ModuleCacheTag]))",
             "public static CacheKey ModuleKey(params string[] segments) => CacheKey.Tenant(",
@@ -6600,7 +6654,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string scaffolder = File.ReadAllText(ModuleScaffolderPath(repositoryRoot));
         List<string> requiredTokens =
         [
-            @"$(GmaFrameworkRoot)Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+            @"$(GmaFrameworkRoot)Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
             "using Gma.Framework.Naming;"
         ];
         if (scaffolder.Contains("TenantId", StringComparison.Ordinal))
@@ -7980,6 +8034,15 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string normalized = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
+        if (normalized.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
+        {
+            string? frameworkProjectReference = NormalizeFrameworkProjectReference(normalized);
+            if (frameworkProjectReference is not null)
+            {
+                return frameworkProjectReference;
+            }
+        }
+
         string[] legacyFrameworkPrefixes =
         [
             @"..\..\..\..\Framework\",
@@ -8025,6 +8088,27 @@ public sealed partial class DeveloperExperienceGuardTests
         }
 
         return normalized;
+
+        static string? NormalizeFrameworkProjectReference(string value)
+        {
+            string[] segments = value.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            for (int index = 0; index < segments.Length - 1; index++)
+            {
+                string segment = segments[index];
+                if (!segment.StartsWith("Gma.Framework.", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                string projectFileName = segments[index + 1];
+                if (string.Equals(projectFileName, $"{segment}.csproj", StringComparison.OrdinalIgnoreCase))
+                {
+                    return $"$GmaFrameworkRoot{Path.DirectorySeparatorChar}{segment}{Path.DirectorySeparatorChar}{projectFileName}";
+                }
+            }
+
+            return null;
+        }
 
         string? NormalizeSourceRoot(string propertyName, string[] legacyPrefixes)
         {
@@ -8663,7 +8747,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "GenericModularApi.slnx")))
+            if (File.Exists(Path.Combine(directory.FullName, "GMA-Skeleton.slnx")))
             {
                 return directory.FullName;
             }
@@ -8724,7 +8808,7 @@ public sealed partial class DeveloperExperienceGuardTests
     [GeneratedRegex(@"<Project\s+Path=""(?<path>[^""]+\.csproj)""\s*/>", RegexOptions.Multiline)]
     private static partial Regex SolutionProjectPathPattern();
 
-    [GeneratedRegex(@"GenericModularApi\.sln(?!x)", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"GMA-Skeleton\.sln(?!x)", RegexOptions.IgnoreCase)]
     private static partial Regex LegacySolutionReferencePattern();
 
     [GeneratedRegex(@"\b(?:public|internal)\s+(?:sealed\s+)?class\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)")]

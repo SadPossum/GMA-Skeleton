@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
@@ -27,18 +27,18 @@
     <ProjectReference Include="$(GmaModuleTaskRuntimeRoot)Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleTaskSamplesRoot)TaskSamples.Application\TaskSamples.Application.csproj" />
     <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Logging.Serilog\Gma.Framework.Logging.Serilog.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Messaging.Nats.Aspire\Gma.Framework.Messaging.Nats.Aspire.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tasks.Cqrs\Gma.Framework.Tasks.Cqrs.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tasks.Infrastructure\Gma.Framework.Tasks.Infrastructure.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Tenancy.Tasks\Gma.Framework.Tenancy.Tasks.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Infrastructure\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Logging\Gma.Framework.Logging.Serilog\Gma.Framework.Logging.Serilog.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Messaging\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Messaging\Gma.Framework.Messaging.Nats.Aspire\Gma.Framework.Messaging.Nats.Aspire.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Tasks\Gma.Framework.Tasks.Cqrs\Gma.Framework.Tasks.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Tasks\Gma.Framework.Tasks.Infrastructure\Gma.Framework.Tasks.Infrastructure.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Tasks\Gma.Framework.Tenancy.Tasks.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings*.json">

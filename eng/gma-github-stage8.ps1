@@ -62,58 +62,58 @@ function Get-GmaStage8RepositoryPlans {
 
     return @(
         [pscustomobject] @{
-            Name = 'gma-framework'
-            LocalPath = Join-Path $stageRootPath 'repos\gma-framework'
+            Name = 'GMA-Framework'
+            LocalPath = Join-Path $stageRootPath 'repos\GMA-Framework'
             Solution = 'Gma.Framework.slnx'
             Description = 'Reusable GMA framework packages for modular monolith applications.'
             Topics = @('gma', 'dotnet', 'framework', 'modular-monolith')
         },
         [pscustomobject] @{
-            Name = 'gma-module-administration'
-            LocalPath = Join-Path $stageRootPath 'repos\gma-module-administration'
+            Name = 'GMA-Module-Administration'
+            LocalPath = Join-Path $stageRootPath 'repos\GMA-Module-Administration'
             Solution = 'Gma.Modules.Administration.slnx'
             Description = 'Reusable GMA Administration module with RBAC, audit, CLI, and admin API surfaces.'
             Topics = @('gma', 'dotnet', 'module', 'administration')
         },
         [pscustomobject] @{
-            Name = 'gma-module-auth'
-            LocalPath = Join-Path $stageRootPath 'repos\gma-module-auth'
+            Name = 'GMA-Module-Auth'
+            LocalPath = Join-Path $stageRootPath 'repos\GMA-Module-Auth'
             Solution = 'Gma.Modules.Auth.slnx'
             Description = 'Reusable GMA Auth module for first-party member authentication and administration.'
             Topics = @('gma', 'dotnet', 'module', 'auth')
         },
         [pscustomobject] @{
-            Name = 'gma-module-files'
-            LocalPath = Join-Path $stageRootPath 'repos\gma-module-files'
+            Name = 'GMA-Module-Files'
+            LocalPath = Join-Path $stageRootPath 'repos\GMA-Module-Files'
             Solution = 'Gma.Modules.Files.slnx'
             Description = 'Reusable GMA Files module front door for optional file-management workflows.'
             Topics = @('gma', 'dotnet', 'module', 'files')
         },
         [pscustomobject] @{
-            Name = 'gma-module-notifications'
-            LocalPath = Join-Path $stageRootPath 'repos\gma-module-notifications'
+            Name = 'GMA-Module-Notifications'
+            LocalPath = Join-Path $stageRootPath 'repos\GMA-Module-Notifications'
             Solution = 'Gma.Modules.Notifications.slnx'
             Description = 'Reusable GMA Notifications module for persisted notifications and streaming front doors.'
             Topics = @('gma', 'dotnet', 'module', 'notifications')
         },
         [pscustomobject] @{
-            Name = 'gma-module-task-runtime'
-            LocalPath = Join-Path $stageRootPath 'repos\gma-module-task-runtime'
+            Name = 'GMA-Module-Task-Runtime'
+            LocalPath = Join-Path $stageRootPath 'repos\GMA-Module-Task-Runtime'
             Solution = 'Gma.Modules.TaskRuntime.slnx'
             Description = 'Reusable GMA TaskRuntime module for persisted task runs and operator control.'
             Topics = @('gma', 'dotnet', 'module', 'tasks')
         },
         [pscustomobject] @{
-            Name = 'gma-module-tenancy'
-            LocalPath = Join-Path $stageRootPath 'repos\gma-module-tenancy'
+            Name = 'GMA-Module-Tenancy'
+            LocalPath = Join-Path $stageRootPath 'repos\GMA-Module-Tenancy'
             Solution = 'Gma.Modules.Tenancy.slnx'
             Description = 'Reusable GMA Tenancy module for optional tenant front doors and contracts.'
             Topics = @('gma', 'dotnet', 'module', 'tenancy')
         },
         [pscustomobject] @{
-            Name = 'gma-skeleton'
+            Name = 'GMA-Skeleton'
             LocalPath = Join-Path $stageRootPath 'skeleton'
-            Solution = 'GenericModularApi.slnx'
+            Solution = 'GMA-Skeleton.slnx'
             Description = 'GMA skeleton and composition repository for source-first modular monolith applications.'
             Topics = @('gma', 'dotnet', 'template', 'modular-monolith')
         }
@@ -138,7 +138,7 @@ function Get-GmaSelectedStage8RepositoryPlans {
     }
 
     if ($SkipSkeleton) {
-        $plans = @($plans | Where-Object { $_.Name -ne 'gma-skeleton' })
+        $plans = @($plans | Where-Object { $_.Name -ne 'GMA-Skeleton' })
     }
 
     return $plans
@@ -148,32 +148,32 @@ function Get-GmaStage8ModuleSourceRootSpecs {
     return @(
         [pscustomobject] @{
             Alias = 'administration'
-            Repository = 'gma-module-administration'
+            Repository = 'GMA-Module-Administration'
             Property = 'GmaModuleAdministrationRoot'
         },
         [pscustomobject] @{
             Alias = 'auth'
-            Repository = 'gma-module-auth'
+            Repository = 'GMA-Module-Auth'
             Property = 'GmaModuleAuthRoot'
         },
         [pscustomobject] @{
             Alias = 'files'
-            Repository = 'gma-module-files'
+            Repository = 'GMA-Module-Files'
             Property = 'GmaModuleFilesRoot'
         },
         [pscustomobject] @{
             Alias = 'notifications'
-            Repository = 'gma-module-notifications'
+            Repository = 'GMA-Module-Notifications'
             Property = 'GmaModuleNotificationsRoot'
         },
         [pscustomobject] @{
             Alias = 'task-runtime'
-            Repository = 'gma-module-task-runtime'
+            Repository = 'GMA-Module-Task-Runtime'
             Property = 'GmaModuleTaskRuntimeRoot'
         },
         [pscustomobject] @{
             Alias = 'tenancy'
-            Repository = 'gma-module-tenancy'
+            Repository = 'GMA-Module-Tenancy'
             Property = 'GmaModuleTenancyRoot'
         }
     )
@@ -231,7 +231,7 @@ function Get-GmaCandidateSourceRootExampleLines {
         [object] $RepositoryPlan
     )
 
-    if ($RepositoryPlan.Name -eq 'gma-framework') {
+    if ($RepositoryPlan.Name -eq 'GMA-Framework') {
         return @(
             '<Project>',
             '  <PropertyGroup>',
@@ -241,7 +241,7 @@ function Get-GmaCandidateSourceRootExampleLines {
         )
     }
 
-    if ($RepositoryPlan.Name -eq 'gma-skeleton') {
+    if ($RepositoryPlan.Name -eq 'GMA-Skeleton') {
         $lines = @(
             '<Project>',
             '  <PropertyGroup>',
@@ -267,7 +267,7 @@ function Get-GmaCandidateSourceRootExampleLines {
     $moduleLines = @(
         '<Project>',
         '  <PropertyGroup>',
-        '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)..\gma-framework\src\</GmaFrameworkRoot>',
+        '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)..\GMA-Framework\src\</GmaFrameworkRoot>',
         '    <GmaModulesRoot>$(MSBuildThisFileDirectory)..\</GmaModulesRoot>'
     )
 
@@ -328,7 +328,7 @@ function Get-GmaCandidateValidationWorkflowLines {
 
     $checkoutToken = '${{ secrets.GMA_CI_TOKEN || github.token }}'
 
-    if ($RepositoryPlan.Name -eq 'gma-framework') {
+    if ($RepositoryPlan.Name -eq 'GMA-Framework') {
         return @(
             'name: validate',
             '',
@@ -372,7 +372,7 @@ function Get-GmaCandidateValidationWorkflowLines {
         )
     }
 
-    if ($RepositoryPlan.Name -eq 'gma-skeleton') {
+    if ($RepositoryPlan.Name -eq 'GMA-Skeleton') {
         return @(
             'name: validate',
             '',
@@ -445,8 +445,8 @@ function Get-GmaCandidateValidationWorkflowLines {
         '      - name: Checkout framework',
         '        uses: actions/checkout@v4',
         '        with:',
-        "          repository: $Owner/gma-framework",
-        '          path: gma-framework',
+        "          repository: $Owner/GMA-Framework",
+        '          path: GMA-Framework',
         "          token: $checkoutToken",
         '          fetch-depth: 0',
         '',
@@ -598,7 +598,7 @@ function Get-GmaRemoteRepositoryAudit {
             Reachable = $false
             Branches = ''
             CandidateReady = Test-GmaCandidateOwnsGitRepository $RepositoryPlan.LocalPath
-            SkeletonSubmodulesReady = if ($RepositoryPlan.Name -eq 'gma-skeleton') { Test-GmaSkeletonCandidateHasSubmoduleGitlinks $RepositoryPlan.LocalPath } else { $null }
+            SkeletonSubmodulesReady = if ($RepositoryPlan.Name -eq 'GMA-Skeleton') { Test-GmaSkeletonCandidateHasSubmoduleGitlinks $RepositoryPlan.LocalPath } else { $null }
             Note = 'not found or no SSH access'
         }
     }
@@ -614,7 +614,7 @@ function Get-GmaRemoteRepositoryAudit {
         Reachable = $true
         Branches = $branches -join ','
         CandidateReady = Test-GmaCandidateOwnsGitRepository $RepositoryPlan.LocalPath
-        SkeletonSubmodulesReady = if ($RepositoryPlan.Name -eq 'gma-skeleton') { Test-GmaSkeletonCandidateHasSubmoduleGitlinks $RepositoryPlan.LocalPath } else { $null }
+        SkeletonSubmodulesReady = if ($RepositoryPlan.Name -eq 'GMA-Skeleton') { Test-GmaSkeletonCandidateHasSubmoduleGitlinks $RepositoryPlan.LocalPath } else { $null }
         Note = if (@($branches).Count -eq 0) { 'empty repository' } else { '' }
     }
 }
@@ -694,7 +694,7 @@ function Assert-GmaSkeletonCandidateCanBePushed {
         [object] $RepositoryPlan
     )
 
-    if ($RepositoryPlan.Name -ne 'gma-skeleton' -or $AllowUnconvertedSkeletonPush -or $WhatIfPreference) {
+    if ($RepositoryPlan.Name -ne 'GMA-Skeleton' -or $AllowUnconvertedSkeletonPush -or $WhatIfPreference) {
         return
     }
 
@@ -739,7 +739,7 @@ function Ensure-GmaSkeletonCandidateMountIgnores {
         [object] $RepositoryPlan
     )
 
-    if ($RepositoryPlan.Name -ne 'gma-skeleton') {
+    if ($RepositoryPlan.Name -ne 'GMA-Skeleton') {
         return
     }
 
@@ -881,7 +881,7 @@ function Sync-GmaSkeletonCandidateFromCurrentWorkspace {
         [object] $RepositoryPlan
     )
 
-    if ($RepositoryPlan.Name -ne 'gma-skeleton') {
+    if ($RepositoryPlan.Name -ne 'GMA-Skeleton') {
         return
     }
 
@@ -926,7 +926,7 @@ function Sync-GmaSkeletonCandidateFromCurrentWorkspace {
 
     & powershell -NoProfile -ExecutionPolicy Bypass -File $stage9Script `
         -WriteConvertedSolution `
-        -ConvertedSolutionPath (Join-Path $RepositoryPlan.LocalPath 'GenericModularApi.slnx') `
+        -ConvertedSolutionPath (Join-Path $RepositoryPlan.LocalPath 'GMA-Skeleton.slnx') `
         -Force
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to write converted skeleton candidate solution."

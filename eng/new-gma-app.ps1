@@ -21,7 +21,7 @@ param(
 $script:GmaKnownModuleSpecs = @(
     [pscustomobject] @{
         Alias = 'administration'
-        Repository = 'gma-module-administration'
+        Repository = 'GMA-Module-Administration'
         SourceRootProperty = 'GmaModuleAdministrationRoot'
         PublicApiProject = $null
         PublicApiNamespace = $null
@@ -29,7 +29,7 @@ $script:GmaKnownModuleSpecs = @(
     },
     [pscustomobject] @{
         Alias = 'auth'
-        Repository = 'gma-module-auth'
+        Repository = 'GMA-Module-Auth'
         SourceRootProperty = 'GmaModuleAuthRoot'
         PublicApiProject = 'Gma.Modules.Auth.Api'
         PublicApiNamespace = 'Gma.Modules.Auth.Api'
@@ -37,7 +37,7 @@ $script:GmaKnownModuleSpecs = @(
     },
     [pscustomobject] @{
         Alias = 'files'
-        Repository = 'gma-module-files'
+        Repository = 'GMA-Module-Files'
         SourceRootProperty = 'GmaModuleFilesRoot'
         PublicApiProject = 'Gma.Modules.Files.Api'
         PublicApiNamespace = 'Gma.Modules.Files.Api'
@@ -45,7 +45,7 @@ $script:GmaKnownModuleSpecs = @(
     },
     [pscustomobject] @{
         Alias = 'notifications'
-        Repository = 'gma-module-notifications'
+        Repository = 'GMA-Module-Notifications'
         SourceRootProperty = 'GmaModuleNotificationsRoot'
         PublicApiProject = 'Gma.Modules.Notifications.Api'
         PublicApiNamespace = 'Gma.Modules.Notifications.Api'
@@ -53,7 +53,7 @@ $script:GmaKnownModuleSpecs = @(
     },
     [pscustomobject] @{
         Alias = 'task-runtime'
-        Repository = 'gma-module-task-runtime'
+        Repository = 'GMA-Module-Task-Runtime'
         SourceRootProperty = 'GmaModuleTaskRuntimeRoot'
         PublicApiProject = $null
         PublicApiNamespace = $null
@@ -61,7 +61,7 @@ $script:GmaKnownModuleSpecs = @(
     },
     [pscustomobject] @{
         Alias = 'tenancy'
-        Repository = 'gma-module-tenancy'
+        Repository = 'GMA-Module-Tenancy'
         SourceRootProperty = 'GmaModuleTenancyRoot'
         PublicApiProject = 'Gma.Modules.Tenancy.Api'
         PublicApiNamespace = 'Gma.Modules.Tenancy.Api'
@@ -609,9 +609,9 @@ $hostApiProjectLines = @(
     '<Project Sdk="Microsoft.NET.Sdk.Web">',
     '  <ItemGroup>',
     "    <ProjectReference Include=`"..\$Name.SharedKernel\$Name.SharedKernel.csproj`" />",
-    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Api\Gma.Framework.Api.csproj" />',
-    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />',
-    '    <ProjectReference Include="$(GmaFrameworkRoot)Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />'
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api\Gma.Framework.Api.csproj" />',
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Infrastructure\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />',
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />'
 )
 
 foreach ($moduleSpec in $publicApiModuleSpecs) {
@@ -708,7 +708,7 @@ if ($UseLocalStage8Candidates) {
     $resolvedStageRoot = Resolve-GmaTemplatePath $StageRoot
     Add-GmaTemplateJunction `
         -Path (Join-Path $resolvedOutputPath 'gma\framework') `
-        -Target (Join-Path $resolvedStageRoot 'repos\gma-framework')
+        -Target (Join-Path $resolvedStageRoot 'repos\GMA-Framework')
 
     foreach ($moduleSpec in $selectedModuleSpecArray) {
         Add-GmaTemplateJunction `

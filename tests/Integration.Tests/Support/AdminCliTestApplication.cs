@@ -42,8 +42,8 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
             ["Administration:Bootstrap:AllowWhenAssignmentsExist"] = "false",
             ["Auth:RefreshTokenLifetimeDays"] = "30",
             ["Auth:RefreshTokens:Pepper"] = "integration-test-refresh-token-pepper-change-me-000000000000000000",
-            ["Auth:Jwt:Issuer"] = "GenericModularApi",
-            ["Auth:Jwt:Audience"] = "GenericModularApi",
+            ["Auth:Jwt:Issuer"] = "GMA-Skeleton",
+            ["Auth:Jwt:Audience"] = "GMA-Skeleton",
             ["Auth:Jwt:SigningKey"] = "integration-test-signing-key-change-me-000000000000000000",
             ["Auth:Jwt:AccessTokenLifetimeMinutes"] = "15",
             ["Caching:Enabled"] = "false"

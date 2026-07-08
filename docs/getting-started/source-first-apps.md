@@ -14,11 +14,11 @@ MyProduct/
       Billing/
       Reservations/
   gma/
-    framework/              # submodule: SadPossum/gma-framework
+    framework/              # submodule: SadPossum/GMA-Framework
     modules/
-      auth/                 # submodule: SadPossum/gma-module-auth
-      administration/       # submodule: SadPossum/gma-module-administration
-      notifications/        # submodule: SadPossum/gma-module-notifications
+      auth/                 # submodule: SadPossum/GMA-Module-Auth
+      administration/       # submodule: SadPossum/GMA-Module-Administration
+      notifications/        # submodule: SadPossum/GMA-Module-Notifications
 ```
 
 `SharedKernel` is app-owned. GMA framework code remains under `gma/framework`, and reusable GMA modules remain under `gma/modules/<alias>`. Do not put app-specific shared code inside GMA repositories just because the code is convenient today.
@@ -31,7 +31,7 @@ Generate a source-first shell:
 .\eng\new-gma-app.ps1 -Name MyProduct -OutputPath ..\MyProduct -Modules auth,notifications
 ```
 
-For local proof before real GitHub repositories exist, use the Stage 8D candidates:
+For an offline historical proof of the template against the old extraction rehearsal, the generator still supports `-UseLocalStage8Candidates`:
 
 ```powershell
 .\eng\new-gma-app.ps1 -Name SampleApp -OutputPath .tmp\SampleApp -Modules auth,notifications -UseLocalStage8Candidates
@@ -41,6 +41,8 @@ cd .tmp\SampleApp
 .\eng\gma-update.ps1
 .\eng\gma-validate.ps1
 ```
+
+Use the normal command without `-UseLocalStage8Candidates` for new production app shells.
 
 Omit `-Modules` for a framework-only app shell. Use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. For selected modules that expose a public `IModule` front door, the generated API host adds the project reference and explicit module registration. Admin CLI/API and worker-only surfaces remain app-specific; add those hosts deliberately when the product needs them.
 
@@ -52,8 +54,8 @@ Use `.\eng\gma-bootstrap.ps1 -Force` after moving source mounts, switching a reu
 For a real app, add source repositories at the same mount paths as Git submodules, then bootstrap:
 
 ```powershell
-git submodule add git@github.com-private:SadPossum/gma-framework.git gma/framework
-git submodule add git@github.com-private:SadPossum/gma-module-auth.git gma/modules/auth
+git submodule add git@github.com-private:SadPossum/GMA-Framework.git gma/framework
+git submodule add git@github.com-private:SadPossum/GMA-Module-Auth.git gma/modules/auth
 .\eng\gma-update.ps1 -Init
 .\eng\gma-bootstrap.ps1
 .\eng\gma-validate.ps1

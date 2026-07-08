@@ -190,12 +190,12 @@ Docker tests require Docker and set `GMA_REQUIRE_DOCKER_TESTS=true`:
 The normal full test command may skip Docker tests locally when Docker is unavailable:
 
 ```powershell
-dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"
 ```
 
 ## Focused Solution Entrypoints
 
-Use `GenericModularApi.slnx` for the full skeleton/composition repository. Use the focused package-local `.slnx` files when working inside a framework or reusable-module source boundary:
+Use `GMA-Skeleton.slnx` for the full skeleton/composition repository. Use the focused package-local `.slnx` files when working inside a framework or reusable-module source boundary:
 
 ```text
 gma/framework/Gma.Framework.slnx
@@ -219,7 +219,7 @@ Open the package-local solution when you want to work as if the framework or mod
 
 Focused framework and reusable-module tests are colocated with their package repositories, for example `gma/framework/tests/Gma.Framework.Tests` and `gma/modules/auth/tests/Gma.Modules.Auth.Tests`. Cross-module architecture and integration tests stay under the skeleton repository-level `tests/` folder.
 
-Catalog, Ordering, and TaskSamples are skeleton-owned examples, not reusable GMA source packages. They do not have standalone `.slnx` entrypoints; validate them through `GenericModularApi.slnx` and the skeleton-level test suites.
+Catalog, Ordering, and TaskSamples are skeleton-owned examples, not reusable GMA source packages. They do not have standalone `.slnx` entrypoints; validate them through `GMA-Skeleton.slnx` and the skeleton-level test suites.
 
 Focused module `.slnx` files list only module-owned projects, focused module tests, and the module-owned docs index. They do not list framework projects as solution entries; framework dependencies resolve through `GmaFrameworkRoot` project references so the same module solution can build in the monorepo, an extracted module repo, or a source-submodule application checkout. In an extracted repository, the `.slnx`, `docs/`, `tests/`, `eng/`, and `src/` folders should live at the repository root rather than under preserved monorepo parent folders.
 
@@ -233,7 +233,7 @@ The script verifies focused `.slnx` ownership, stale root docs/tests, package-lo
 
 ## Source-First GMA Development
 
-The current repository still contains the framework and reusable modules directly, but project references are ready for future source submodule composition. Framework references go through `GmaFrameworkRoot`, with checked-in defaults in `Directory.Build.props`.
+The skeleton repository consumes the framework and reusable modules as Git submodules under `gma/framework` and `gma/modules/<alias>`. Framework references go through `GmaFrameworkRoot`, and module references go through `GmaModule*Root` properties with checked-in defaults in `Directory.Build.props`.
 
 To create a local override file:
 
@@ -251,19 +251,10 @@ For an app-style checkout that already has flattened GMA source repositories mou
 
 That command writes ignored `Gma.SourceRoots.props` files at the skeleton root, `gma/framework`, and each mounted reusable module root. The module-local files are required because each source repository imports its own `Directory.Build.props`; the skeleton root props file does not flow into projects inside a mounted source repository. Use `-WhatIf` to preview writes and `-Force` to refresh existing local files.
 
-When moving from local rehearsal to real GitHub repositories, use the guarded Stage 8 helper:
+The Stage 8 and Stage 9 helpers remain in `eng/` as migration/recovery tooling for the source-repo split. They are not part of the normal day-to-day app workflow. Use them only when auditing or replaying the repository extraction/submodule-conversion process:
 
 ```powershell
 .\eng\gma-github-stage8.ps1
-```
-
-With no action switches, the helper prints the planned `SadPossum/gma-*` repositories and local candidate paths without touching GitHub. Use `-InitializeCandidates` after generating the local Stage 8 candidates so each split folder becomes a standalone local repository with `main` and `dev` branches and the expected local author. That initialization also refreshes the skeleton candidate from the current skeleton-owned docs/scripts and converted submodule `.slnx`, while keeping root package `.slnx` entrypoints out of the skeleton candidate. Use `-AuditRepositories` for a read-only SSH check of which planned remotes already exist. Add `-Repository gma-framework` or another explicit repository name when only part of the external repository set is ready. Once GitHub CLI is installed and authenticated, run explicit switches such as `-CreateRepositories`, `-PushCandidates`, `-ConfigureRepositories`, and `-ProtectBranches`. The helper resolves the standard Windows GitHub CLI install path if the current shell has not refreshed `PATH` yet. Keep `-WhatIf` on the first external pass. If a remote `main` already has unrelated history, the helper refuses to overwrite it; use `-SkipDivergedMain` to push only `dev` and reconcile `main` manually. `-PushCandidates` also refuses to push `gma-skeleton` until Stage 9 has produced real `.gitmodules` entries and submodule gitlinks; `-AllowUnconvertedSkeletonPush` exists only for a deliberate placeholder skeleton push. If private-repository branch protection is unavailable on the current GitHub plan, `-AllowBranchProtectionUnavailable` lets `-ProtectBranches` warn and continue after repository configuration. Use `-SkipSkeleton` for the normal first publishing pass when framework/module repositories should move before the skeleton is converted.
-
-For source-split dry runs on Windows, keep sandbox paths short and clone with `core.longpaths=true`. Early extraction proofs used short ignored `.agents` roots and validated composition clones against local source repositories. The final package-repo rehearsal should use flattened package roots such as `gma-framework\src\Gma.Framework.Results` and `gma-module-auth\src\Gma.Modules.Auth.Application`, then mount them into applications at ergonomic paths such as `gma\framework` and `gma\modules\auth`.
-
-Before replacing the skeleton/composition repository with real submodules, use the Stage 9 helper:
-
-```powershell
 .\eng\gma-stage9.ps1
 .\eng\gma-stage9.ps1 -Audit
 .\eng\gma-stage9.ps1 -WriteCommandPlan
@@ -272,22 +263,20 @@ Before replacing the skeleton/composition repository with real submodules, use t
 .\eng\gma-stage9.ps1 -ProveLocalRecursiveClone -Force
 ```
 
-The helper is non-destructive unless you run the generated command plan yourself, explicitly request a local rehearsal under `.agents`, or pass `-Force` to a working-tree rewrite helper. It verifies the Stage 8D skeleton candidate, local candidate repositories, current mount paths, and remote reachability; then it can write `.tmp\gma-stage9-submodule-plan.ps1` with the reviewed conversion sequence. `-WriteConvertedSolution` writes a converted submodule-backed solution to `.tmp\gma-stage9-converted-solution.slnx` by default, so the `.slnx` path conversion can be reviewed without touching the root solution. The command plan updates the `.slnx`, source-root shape, recursive-submodule CI workflow, and skeleton docs before adding submodules; then it restores and builds the submodule-backed composition, removes old reusable source and root package `.slnx` entrypoints, and runs the full test pass after the final skeleton shape exists.
+Keep `-WhatIf` on the first external pass. These helpers are deliberately guarded because they can create repositories, push branches, or rewrite the skeleton checkout when action switches are supplied. For source-split dry runs on Windows, keep sandbox paths short and clone with `core.longpaths=true`.
 
-Use `-CreateLocalRehearsal -Force` to clone the prepared skeleton into `.agents\stage9\local-submodule-rehearsal`, overlay current skeleton-owned docs/scripts, generate the converted solution, add real local submodules with `protocol.file.allow=always`, bootstrap source roots, and prove the submodule-backed composition before touching the real worktree.
-
-After the rehearsal exists, use `-ProveLocalRecursiveClone -Force` to commit the ignored rehearsal repository, clone it into `.agents\stage9\local-recursive-clone-proof` with recursive submodules, bootstrap source roots, and restore/build the clean clone. This local proof does not replace the later real GitHub clone check, but it catches broken `.gitmodules`, stale solution items, root package `.slnx` leakage, source-root, documentation-link, and submodule checkout assumptions before any external repository work.
+Stage 9 remains non-destructive unless you run the generated command plan, request a local rehearsal under `.agents`, or pass `-Force` to a working-tree rewrite helper. Its review artifacts include `.tmp\gma-stage9-submodule-plan.ps1` and `.tmp\gma-stage9-converted-solution.slnx`. The rehearsal path `.agents\stage9\local-submodule-rehearsal` uses `protocol.file.allow=always` for local submodules; the recursive proof path `.agents\stage9\local-recursive-clone-proof` catches broken `.gitmodules`, stale solution items, root package `.slnx` leakage, source-root, documentation-link, and recursive-submodule CI workflow assumptions. The reviewed command plan adds real submodule gitlinks, bootstraps source roots, removes old reusable source, and removes root package `.slnx` entrypoints from the skeleton.
 
 To create a new source-first production app shell:
 
 ```powershell
-.\eng\new-gma-app.ps1 -Name SampleApp -OutputPath .tmp\SampleApp -UseLocalStage8Candidates
+.\eng\new-gma-app.ps1 -Name SampleApp -OutputPath .tmp\SampleApp -Modules auth,notifications
 cd .tmp\SampleApp
 .\eng\gma-bootstrap.ps1
 .\eng\gma-validate.ps1
 ```
 
-The generated app keeps app-owned common code in `SampleApp.SharedKernel`, mounts GMA framework and explicitly selected reusable modules under `gma\...`, composes selected public API modules in the generated API host, and validates through its own `.slnx`. Use `-Modules auth,notifications` or another explicit list for the reusable modules the app wants; omit `-Modules` for a framework-only shell, or use `-Modules all` only for full local proof. Admin CLI/API and worker-only module surfaces stay explicit app-owned host work. The `-UseLocalStage8Candidates` switch is only for local proof before the real repositories are available; production apps should use real submodules at the same mount paths. The template also includes `.github\workflows\validate.yml`; set `GMA_CI_TOKEN` when private GMA submodules need cross-repository read access in GitHub Actions.
+The generated app keeps app-owned common code in `SampleApp.SharedKernel`, mounts GMA framework and explicitly selected reusable modules under `gma\...`, composes selected public API modules in the generated API host, and validates through its own `.slnx`. Use `-Modules auth,notifications` or another explicit list for the reusable modules the app wants; omit `-Modules` for a framework-only shell, or use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. Admin CLI/API and worker-only module surfaces stay explicit app-owned host work. The template also includes `.github\workflows\validate.yml`; set `GMA_CI_TOKEN` when private GMA submodules need cross-repository read access in GitHub Actions.
 
 See [Source-first apps](source-first-apps.md) for the app layout, patch/update workflow, upstream-vs-app-local guidance, and submodule detached-HEAD warning.
 
@@ -300,4 +289,4 @@ Useful source-first helpers:
 .\eng\gma-validate.ps1 -FocusedSolutions
 ```
 
-`gma-status` reports dirty working tree and submodule state when submodules exist. `gma-update` is a no-op until `.gitmodules` exists. `check-source-packages` validates package-local solution ownership and builds focused packages. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.
+`gma-status` reports dirty working tree, source-root, and submodule state. `gma-update` runs `git submodule update --recursive`, with `-Init` for first checkout and `-Remote` when you deliberately want to move mounted repositories to their configured branch tips. `check-source-packages` validates package-local solution ownership and builds focused packages. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.

@@ -1,6 +1,6 @@
-# GenericModularApi
+# GMA-Skeleton
 
-GenericModularApi is a .NET 10 modular monolith skeleton for building projects from optional, replaceable modules.
+GMA-Skeleton is a .NET 10 modular monolith skeleton for building projects from optional, replaceable modules.
 
 The repo is intentionally small and explicit:
 
@@ -90,17 +90,17 @@ Useful entry points:
 - [Setup](docs/getting-started/setup.md)
 - [Source-First Apps](docs/getting-started/source-first-apps.md)
 - [Architecture Overview](docs/architecture/overview.md)
-- [GMA Framework Docs](gma/framework/docs/README.md)
-- [Module System](gma/framework/docs/architecture/module-system.md)
-- [Administration Architecture](gma/framework/docs/architecture/administration.md)
-- [Messaging and Outbox](gma/framework/docs/architecture/messaging-and-outbox.md)
-- [Tasks and Daemons](gma/framework/docs/architecture/tasks-and-daemons.md)
-- [Auth Module](gma/modules/auth/docs/README.md)
-- [Administration Module](gma/modules/administration/docs/README.md)
-- [Tenancy Module](gma/modules/tenancy/docs/README.md)
-- [Naming Conventions](gma/framework/docs/guidelines/naming-conventions.md)
-- [Development Guidelines](gma/framework/docs/guidelines/development-guidelines.md)
-- [Documentation Guidelines](gma/framework/docs/guidelines/documentation-guidelines.md)
+- [GMA Framework Docs](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/README.md)
+- [Module System](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/module-system.md)
+- [Administration Architecture](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/administration.md)
+- [Messaging and Outbox](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/messaging-and-outbox.md)
+- [Tasks and Daemons](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/tasks-and-daemons.md)
+- [Auth Module](https://github.com/SadPossum/GMA-Module-Auth/blob/dev/docs/README.md)
+- [Administration Module](https://github.com/SadPossum/GMA-Module-Administration/blob/dev/docs/README.md)
+- [Tenancy Module](https://github.com/SadPossum/GMA-Module-Tenancy/blob/dev/docs/README.md)
+- [Naming Conventions](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/guidelines/naming-conventions.md)
+- [Development Guidelines](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/guidelines/development-guidelines.md)
+- [Documentation Guidelines](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/guidelines/documentation-guidelines.md)
 
 ## Request Examples
 

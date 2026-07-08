@@ -32,10 +32,10 @@ jobs:
         run: ./eng/bootstrap-source-roots.ps1 -Force
 
       - name: Restore
-        run: dotnet restore GenericModularApi.slnx
+        run: dotnet restore GMA-Skeleton.slnx
 
       - name: Build
-        run: dotnet build GenericModularApi.slnx --no-restore -m:1
+        run: dotnet build GMA-Skeleton.slnx --no-restore -m:1
 
       - name: Test
-        run: dotnet test GenericModularApi.slnx --no-build --logger "console;verbosity=minimal"
+        run: dotnet test GMA-Skeleton.slnx --no-build --logger "console;verbosity=minimal"

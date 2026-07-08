@@ -17,8 +17,8 @@ using Gma.Framework.Tenancy;
 internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled = true)
     : WebApplicationFactory<ApiAssemblyReference>
 {
-    private const string JwtIssuer = "GenericModularApi";
-    private const string JwtAudience = "GenericModularApi";
+    private const string JwtIssuer = "GMA-Skeleton";
+    private const string JwtAudience = "GMA-Skeleton";
     private const string JwtSigningKey = "notification-streaming-test-signing-key-change-me-0000000000";
     private const string RefreshTokenPepper = "notification-streaming-test-refresh-token-pepper-change-me-000000";
 

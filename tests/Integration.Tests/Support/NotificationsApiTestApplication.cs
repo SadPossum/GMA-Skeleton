@@ -29,8 +29,8 @@ using DomainNotificationSeverity = Gma.Modules.Notifications.Domain.ValueObjects
 
 internal sealed class NotificationsApiTestApplication : IAsyncDisposable
 {
-    private const string JwtIssuer = "GenericModularApi";
-    private const string JwtAudience = "GenericModularApi";
+    private const string JwtIssuer = "GMA-Skeleton";
+    private const string JwtAudience = "GMA-Skeleton";
     private const string JwtSigningKey = "notifications-api-test-signing-key-change-me-000000000000";
 
     private readonly WebApplication app;

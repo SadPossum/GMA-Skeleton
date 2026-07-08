@@ -160,7 +160,10 @@ foreach ($package in $packages) {
 
     foreach ($folder in $solutionXml.SelectNodes('//Folder')) {
         $folderName = $folder.GetAttribute('Name')
-        if ($package.AllowedFolders -notcontains $folderName) {
+        $isAllowedFolder = @($package.AllowedFolders | Where-Object {
+            $folderName -eq $_ -or $folderName.StartsWith($_, [System.StringComparison]::Ordinal)
+        }).Count -gt 0
+        if (-not $isAllowedFolder) {
             $errors.Add("$($package.Solution) contains non-package-local folder '$folderName'.")
         }
     }

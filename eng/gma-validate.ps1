@@ -7,7 +7,7 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
-$solutions = @('GenericModularApi.slnx')
+$solutions = @('GMA-Skeleton.slnx')
 
 if ($FocusedSolutions) {
     $solutions += @(
