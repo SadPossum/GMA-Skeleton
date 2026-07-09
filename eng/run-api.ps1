@@ -7,7 +7,7 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
-$projectPath = Join-GmaPath 'src\Host.Api\Host.Api.csproj'
+$projectPath = Join-GmaPath 'src\Hosts\Host.Api\Host.Api.csproj'
 $projectDirectory = Split-Path -Parent $projectPath
 
 $arguments = @(

@@ -14,7 +14,7 @@ try {
     Invoke-GmaDotNet -Arguments (@(
         'run',
         '--project',
-        (Join-GmaPath 'src\Host.AdminCli\Host.AdminCli.csproj'),
+        (Join-GmaPath 'src\Hosts\Host.AdminCli\Host.AdminCli.csproj'),
         '--'
     ) + $AdminArgs)
 }

@@ -1,14 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
-    <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.AdminApi\Gma.Modules.Administration.AdminApi.csproj" />
-    <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.Persistence.PostgreSqlMigrations\Gma.Modules.Administration.Persistence.PostgreSqlMigrations.csproj" />
-    <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.Persistence.SqlServerMigrations\Gma.Modules.Administration.Persistence.SqlServerMigrations.csproj" />
-    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.AdminApi\Gma.Modules.Auth.AdminApi.csproj" />
+    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Api\Gma.Modules.Auth.Api.csproj" />
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj" />
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj" />
-    <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Administration\Gma.Framework.Administration.Api\Gma.Framework.Administration.Api.csproj" />
+    <ProjectReference Include="$(GmaModuleTenancyRoot)Gma.Modules.Tenancy.Api\Gma.Modules.Tenancy.Api.csproj" />
+    <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api\Gma.Framework.Api.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api.OpenApi\Gma.Framework.Api.OpenApi.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api.Serilog\Gma.Framework.Api.Serilog.csproj" />
@@ -19,6 +16,10 @@
     <ProjectReference Include="$(GmaFrameworkRoot)Messaging\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Messaging\Gma.Framework.Messaging.Nats.Aspire\Gma.Framework.Messaging.Nats.Aspire.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.Api\Gma.Framework.Notifications.Api.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.Cqrs\Gma.Framework.Notifications.Cqrs.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.SignalR\Gma.Framework.Notifications.SignalR.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Realtime\Gma.Framework.Realtime.Notifications\Gma.Framework.Realtime.Notifications.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Api.Serilog\Gma.Framework.Tenancy.Api.Serilog.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj" />

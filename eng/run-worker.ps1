@@ -5,7 +5,7 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
-$projectPath = Join-GmaPath 'src\Host.Worker\Host.Worker.csproj'
+$projectPath = Join-GmaPath 'src\Hosts\Host.Worker\Host.Worker.csproj'
 $projectDirectory = Split-Path -Parent $projectPath
 
 $previousDotnetEnvironment = $env:DOTNET_ENVIRONMENT

@@ -12,9 +12,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Host.AdminCli\Host.AdminCli.csproj" />
-    <ProjectReference Include="..\..\src\Host.AdminApi\Host.AdminApi.csproj" />
-    <ProjectReference Include="..\..\src\Host.Worker\Host.Worker.csproj" />
+    <ProjectReference Include="..\..\src\Hosts\Host.AdminCli\Host.AdminCli.csproj" />
+    <ProjectReference Include="..\..\src\Hosts\Host.AdminApi\Host.AdminApi.csproj" />
+    <ProjectReference Include="..\..\src\Hosts\Host.Worker\Host.Worker.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.AdminCli\Gma.Modules.Administration.AdminCli.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.AdminApi\Gma.Modules.Administration.AdminApi.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj" />

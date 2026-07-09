@@ -68,8 +68,9 @@ The production application should look like this:
 my-business-app/
   MyBusinessApp.slnx
   src/
-    Host.Api/
-    Host.Worker/
+    Hosts/
+      Host.Api/
+      Host.Worker/
     Modules/
       MyBusinessFeature/
     MyBusiness.Shared/

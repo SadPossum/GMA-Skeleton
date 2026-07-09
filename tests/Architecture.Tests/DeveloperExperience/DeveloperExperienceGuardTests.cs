@@ -456,8 +456,8 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Local_request_hosts_and_docs_match_launch_settings()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string apiLaunchSettings = Path.Combine(repositoryRoot, "src", "Host.Api", "Properties", "launchSettings.json");
-        string adminApiLaunchSettings = Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Properties", "launchSettings.json");
+        string apiLaunchSettings = Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Properties", "launchSettings.json");
+        string adminApiLaunchSettings = Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Properties", "launchSettings.json");
 
         string apiHttpsUrl = GetLaunchProfileUrls(apiLaunchSettings, "https")
             .Single(url => url.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
@@ -491,7 +491,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string runAdminApi = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "run-admin-api.ps1"));
         string runAdmin = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "run-admin.ps1"));
         string runWorker = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "run-worker.ps1"));
-        string appHost = File.ReadAllText(Path.Combine(repositoryRoot, "src", "AppHost", "Program.cs"));
+        string appHost = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Hosts", "AppHost", "Program.cs"));
 
         Assert.Contains("'--launch-profile'", runApi, StringComparison.Ordinal);
         Assert.Contains("'--launch-profile'", runAdminApi, StringComparison.Ordinal);
@@ -508,7 +508,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Admin_api_requests_match_default_generated_password_policy()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string adminApiAppsettings = Path.Combine(repositoryRoot, "src", "Host.AdminApi", "appsettings.json");
+        string adminApiAppsettings = Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "appsettings.json");
         string adminApiRequests = File.ReadAllText(Path.Combine(repositoryRoot, "requests", "admin-api.http"));
 
         Assert.True(HasRequiredBoolean(
@@ -566,13 +566,13 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostPrograms =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Program.cs")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Program.cs")
         ];
         string[] hostProjects =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Host.Api.csproj"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Host.AdminApi.csproj")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Host.Api.csproj"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Host.AdminApi.csproj")
         ];
         string openApiProject = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
@@ -612,8 +612,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostPrograms =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Program.cs")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Program.cs")
         ];
 
         foreach (string hostProgram in hostPrograms)
@@ -631,8 +631,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostPrograms =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Program.cs")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Program.cs")
         ];
         string serviceDefaults = File.ReadAllText(Path.Combine(
             repositoryRoot,
@@ -658,8 +658,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostPrograms =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Program.cs")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Program.cs")
         ];
         string sharedSecurity = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
@@ -824,13 +824,13 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostPrograms =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Program.cs")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Program.cs")
         ];
         string[] hostProjects =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Host.Api.csproj"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Host.AdminApi.csproj")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Host.Api.csproj"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Host.AdminApi.csproj")
         ];
         string sharedApiProject = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
@@ -915,10 +915,10 @@ public sealed partial class DeveloperExperienceGuardTests
             NormalizePath(Path.Combine("src", "Framework", "Messaging", "Gma.Framework.Messaging.Infrastructure", "IntegrationEventHandlerInvoker.cs")),
             NormalizePath(Path.Combine("src", "Framework", "Tasks", "Gma.Framework.Tasks.Infrastructure", "TaskHandlerInvoker.cs")),
             NormalizePath(Path.Combine("src", "Framework", "Persistence", "Gma.Framework.Persistence.EntityFrameworkCore", "TenantEntityTypeBuilderExtensions.cs")),
-            NormalizePath(Path.Combine("src", "Host.Api", "ApiAssemblyReference.cs")),
-            NormalizePath(Path.Combine("src", "Host.AdminApi", "AdminApiAssemblyReference.cs")),
-            NormalizePath(Path.Combine("src", "Host.AdminCli", "AdminCliAssemblyReference.cs")),
-            NormalizePath(Path.Combine("src", "Host.Worker", "WorkerAssemblyReference.cs")),
+            NormalizePath(Path.Combine("src", "Hosts", "Host.Api", "ApiAssemblyReference.cs")),
+            NormalizePath(Path.Combine("src", "Hosts", "Host.AdminApi", "AdminApiAssemblyReference.cs")),
+            NormalizePath(Path.Combine("src", "Hosts", "Host.AdminCli", "AdminCliAssemblyReference.cs")),
+            NormalizePath(Path.Combine("src", "Hosts", "Host.Worker", "WorkerAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Administration", "Gma.Modules.Administration.Persistence", "AdminDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Auth", "Gma.Modules.Auth.Persistence", "AuthDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Catalog", "Catalog.Persistence", "CatalogDbContext.cs")),
@@ -3078,9 +3078,9 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostDirectories =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminCli")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminCli")
         ];
         (string Name, string[] JsonPath)[] runtimeSecretKeys =
         [
@@ -3244,8 +3244,8 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] httpHostDevelopmentSettings =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "appsettings.Development.json"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "appsettings.Development.json")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "appsettings.Development.json"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "appsettings.Development.json")
         ];
 
         string[] offenders = httpHostDevelopmentSettings
@@ -3276,9 +3276,9 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostDirectories =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminCli")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminCli")
         ];
         string[] offenders = hostDirectories
             .SelectMany(hostDirectory =>
@@ -3377,7 +3377,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Public_api_composes_shared_infrastructure_before_tenancy_module()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string program = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"));
+        string program = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"));
         int sharedInfrastructureIndex = program.IndexOf("builder.AddGmaInfrastructure();", StringComparison.Ordinal);
         int tenancyModuleIndex = program.IndexOf("builder.AddModule<TenancyModule>();", StringComparison.Ordinal);
 
@@ -3418,7 +3418,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Aspire_admin_api_is_explicitly_opt_in()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string appHostRoot = Path.Combine(repositoryRoot, "src", "AppHost");
+        string appHostRoot = Path.Combine(repositoryRoot, "src", "Hosts", "AppHost");
         string program = File.ReadAllText(Path.Combine(appHostRoot, "Program.cs"));
         string project = File.ReadAllText(Path.Combine(appHostRoot, "AppHost.csproj"));
         using JsonDocument appsettings = JsonDocument.Parse(File.ReadAllText(Path.Combine(appHostRoot, "appsettings.json")));
@@ -3798,7 +3798,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 .GetRelativePath(repositoryRoot, path)
                 .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 .Any(segment => segment.EndsWith(".AdminCli", StringComparison.Ordinal))),
-            Path.Combine(repositoryRoot, "src", "Host.AdminCli", "Program.cs")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminCli", "Program.cs")
         ];
         string[] offenders = cliFrontDoorFiles
             .SelectMany(path =>
@@ -5401,10 +5401,10 @@ public sealed partial class DeveloperExperienceGuardTests
         string repositoryRoot = FindRepositoryRoot();
         HashSet<string> allowedProjectPaths = new(StringComparer.OrdinalIgnoreCase)
         {
-            NormalizePath(Path.Combine("src", "Host.Api", "Host.Api.csproj")),
-            NormalizePath(Path.Combine("src", "Host.AdminApi", "Host.AdminApi.csproj")),
-            NormalizePath(Path.Combine("src", "Host.AdminCli", "Host.AdminCli.csproj")),
-            NormalizePath(Path.Combine("src", "Host.Worker", "Host.Worker.csproj")),
+            NormalizePath(Path.Combine("src", "Hosts", "Host.Api", "Host.Api.csproj")),
+            NormalizePath(Path.Combine("src", "Hosts", "Host.AdminApi", "Host.AdminApi.csproj")),
+            NormalizePath(Path.Combine("src", "Hosts", "Host.AdminCli", "Host.AdminCli.csproj")),
+            NormalizePath(Path.Combine("src", "Hosts", "Host.Worker", "Host.Worker.csproj")),
             NormalizePath(Path.Combine("tests", "Integration.Tests", "Integration.Tests.csproj")),
             NormalizePath(Path.Combine("src", "Framework", "tests", "Gma.Framework.Tests", "Gma.Framework.Tests.csproj"))
         };
@@ -5441,7 +5441,7 @@ public sealed partial class DeveloperExperienceGuardTests
         HostProjectShape[] expectedShapes =
         [
             new(
-                Path.Combine("AppHost", "AppHost.csproj"),
+                Path.Combine("Hosts", "AppHost", "AppHost.csproj"),
                 [
                     "Aspire.Hosting.AppHost",
                     "Aspire.Hosting.Nats",
@@ -5457,7 +5457,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Host.Worker\Host.Worker.csproj"
                 ]),
             new(
-                Path.Combine("Host.AdminApi", "Host.AdminApi.csproj"),
+                Path.Combine("Hosts", "Host.AdminApi", "Host.AdminApi.csproj"),
                 [],
                 [],
                 [
@@ -5468,7 +5468,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj",
-                    @"..\ServiceDefaults\ServiceDefaults.csproj",
+                    @"..\..\ServiceDefaults\ServiceDefaults.csproj",
                     @"..\Framework\Gma.Framework.Administration.Api\Gma.Framework.Administration.Api.csproj",
                     @"..\Framework\Gma.Framework.Api\Gma.Framework.Api.csproj",
                     @"..\Framework\Gma.Framework.Api.OpenApi\Gma.Framework.Api.OpenApi.csproj",
@@ -5485,7 +5485,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj"
                 ]),
             new(
-                Path.Combine("Host.AdminCli", "Host.AdminCli.csproj"),
+                Path.Combine("Hosts", "Host.AdminCli", "Host.AdminCli.csproj"),
                 ["Microsoft.Extensions.Hosting", "System.CommandLine"],
                 [],
                 [
@@ -5506,7 +5506,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj"
                 ]),
             new(
-                Path.Combine("Host.Api", "Host.Api.csproj"),
+                Path.Combine("Hosts", "Host.Api", "Host.Api.csproj"),
                 [],
                 [],
                 [
@@ -5515,7 +5515,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\Tenancy\Gma.Modules.Tenancy.Api\Gma.Modules.Tenancy.Api.csproj",
-                    @"..\ServiceDefaults\ServiceDefaults.csproj",
+                    @"..\..\ServiceDefaults\ServiceDefaults.csproj",
                     @"..\Framework\Gma.Framework.Api\Gma.Framework.Api.csproj",
                     @"..\Framework\Gma.Framework.Api.OpenApi\Gma.Framework.Api.OpenApi.csproj",
                     @"..\Framework\Gma.Framework.Api.Serilog\Gma.Framework.Api.Serilog.csproj",
@@ -5535,7 +5535,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj"
                 ]),
             new(
-                Path.Combine("Host.Worker", "Host.Worker.csproj"),
+                Path.Combine("Hosts", "Host.Worker", "Host.Worker.csproj"),
                 ["Microsoft.Extensions.Hosting"],
                 [],
                 [
@@ -5559,7 +5559,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations\Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\TaskRuntime\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\TaskSamples\TaskSamples.Application\TaskSamples.Application.csproj",
-                    @"..\ServiceDefaults\ServiceDefaults.csproj",
+                    @"..\..\ServiceDefaults\ServiceDefaults.csproj",
                     @"..\Framework\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj",
                     @"..\Framework\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj",
                     @"..\Framework\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj",
@@ -6737,7 +6737,7 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string repositoryRoot = FindRepositoryRoot();
         string scaffolder = File.ReadAllText(ModuleScaffolderPath(repositoryRoot));
-        string apiHost = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"));
+        string apiHost = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"));
         string[] requiredTokens =
         [
             "$hostRegistrationAnchor = '// module-scaffold:public-api-modules'",
@@ -6765,7 +6765,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Admin_cli_host_uses_bounded_exception_handling()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string program = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Host.AdminCli", "Program.cs"));
+        string program = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminCli", "Program.cs"));
 
         Assert.Contains("EnableDefaultExceptionHandler = false", program, StringComparison.Ordinal);
         Assert.Contains("Admin command failed unexpectedly.", program, StringComparison.Ordinal);
@@ -6776,7 +6776,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Admin_cli_host_validates_startup_options_without_starting_hosted_services()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string program = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Host.AdminCli", "Program.cs"));
+        string program = File.ReadAllText(Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminCli", "Program.cs"));
         int tryIndex = program.IndexOf("try", StringComparison.Ordinal);
         int compositionIndex = program.IndexOf("HostApplicationBuilder builder", StringComparison.Ordinal);
         int buildIndex = program.IndexOf("using IHost host = builder.Build();", StringComparison.Ordinal);

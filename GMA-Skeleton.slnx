@@ -57,8 +57,13 @@
     <File Path="nuget.config" />
     <File Path="README.md" />
   </Folder>
-  <Folder Name="/src/AppHost/">
-    <Project Path="src/AppHost/AppHost.csproj" />
+  <Folder Name="/src/Hosts/">
+    <File Path="src/Hosts/README.md" />
+    <Project Path="src/Hosts/AppHost/AppHost.csproj" />
+    <Project Path="src/Hosts/Host.AdminApi/Host.AdminApi.csproj" />
+    <Project Path="src/Hosts/Host.AdminCli/Host.AdminCli.csproj" />
+    <Project Path="src/Hosts/Host.Api/Host.Api.csproj" />
+    <Project Path="src/Hosts/Host.Worker/Host.Worker.csproj" />
   </Folder>
   <Folder Name="/gma/framework/docs/">
     <File Path="gma/framework/docs/adr/0001-documentation-structure.md" />
@@ -229,12 +234,6 @@
   </Folder>
   <Folder Name="/gma/framework/tests/">
     <Project Path="gma/framework/tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj" />
-  </Folder>
-  <Folder Name="/src/Host/">
-    <Project Path="src/Host.AdminApi/Host.AdminApi.csproj" />
-    <Project Path="src/Host.AdminCli/Host.AdminCli.csproj" />
-    <Project Path="src/Host.Api/Host.Api.csproj" />
-    <Project Path="src/Host.Worker/Host.Worker.csproj" />
   </Folder>
   <Folder Name="/src/ServiceDefaults/">
     <Project Path="src/ServiceDefaults/ServiceDefaults.csproj" />

@@ -26,7 +26,7 @@
     <ProjectReference Include="$(GmaModuleTaskRuntimeRoot)Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations\Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleTaskRuntimeRoot)Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleTaskSamplesRoot)TaskSamples.Application\TaskSamples.Application.csproj" />
-    <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Infrastructure\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />

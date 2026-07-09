@@ -5,7 +5,7 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
-$projectPath = Join-GmaPath 'src\Host.AdminApi\Host.AdminApi.csproj'
+$projectPath = Join-GmaPath 'src\Hosts\Host.AdminApi\Host.AdminApi.csproj'
 $projectDirectory = Split-Path -Parent $projectPath
 
 Invoke-GmaDotNet -Arguments (@(

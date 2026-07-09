@@ -59,9 +59,9 @@
     <ProjectReference Include="$(GmaModuleTaskRuntimeRoot)Gma.Modules.TaskRuntime.Application\Gma.Modules.TaskRuntime.Application.csproj" />
     <ProjectReference Include="$(GmaModuleTaskSamplesRoot)TaskSamples.Application\TaskSamples.Application.csproj" />
     <ProjectReference Include="$(GmaModuleTaskSamplesRoot)TaskSamples.Contracts\TaskSamples.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\Host.Api\Host.Api.csproj" />
-    <ProjectReference Include="..\..\src\Host.AdminApi\Host.AdminApi.csproj" />
-    <ProjectReference Include="..\..\src\Host.Worker\Host.Worker.csproj" />
+    <ProjectReference Include="..\..\src\Hosts\Host.Api\Host.Api.csproj" />
+    <ProjectReference Include="..\..\src\Hosts\Host.AdminApi\Host.AdminApi.csproj" />
+    <ProjectReference Include="..\..\src\Hosts\Host.Worker\Host.Worker.csproj" />
     <ProjectReference Include="$(GmaModuleTenancyRoot)Gma.Modules.Tenancy.Api\Gma.Modules.Tenancy.Api.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching\Gma.Framework.Caching.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj" />

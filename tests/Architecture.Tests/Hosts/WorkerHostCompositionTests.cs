@@ -125,7 +125,7 @@ public sealed class WorkerHostCompositionTests
     public void Worker_host_does_not_reference_front_door_modules_or_map_business_endpoints()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string workerRoot = Path.Combine(repositoryRoot, "src", "Host.Worker");
+        string workerRoot = Path.Combine(repositoryRoot, "src", "Hosts", "Host.Worker");
         string project = File.ReadAllText(Path.Combine(workerRoot, "Host.Worker.csproj"));
         string program = File.ReadAllText(Path.Combine(workerRoot, "Program.cs"));
         string composition = File.ReadAllText(Path.Combine(workerRoot, "WorkerHostBuilderExtensions.cs"));
@@ -145,7 +145,7 @@ public sealed class WorkerHostCompositionTests
     public void Aspire_worker_is_explicitly_opt_in_and_demonstrates_separated_publishing()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string appHostRoot = Path.Combine(repositoryRoot, "src", "AppHost");
+        string appHostRoot = Path.Combine(repositoryRoot, "src", "Hosts", "AppHost");
         string appsettings = File.ReadAllText(Path.Combine(appHostRoot, "appsettings.json"));
         string program = File.ReadAllText(Path.Combine(appHostRoot, "Program.cs"));
         string project = File.ReadAllText(Path.Combine(appHostRoot, "AppHost.csproj"));

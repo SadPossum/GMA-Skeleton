@@ -244,9 +244,9 @@ public sealed class ModuleBoundaryTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostFiles =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminCli", "Program.cs"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Program.cs")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminCli", "Program.cs"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Program.cs")
         ];
 
         string[] forbiddenTokens =
@@ -276,13 +276,13 @@ public sealed class ModuleBoundaryTests
         string repositoryRoot = FindRepositoryRoot();
         string[] hostFiles =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Program.cs"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Program.cs")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Program.cs"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Program.cs")
         ];
         string[] hostProjects =
         [
-            Path.Combine(repositoryRoot, "src", "Host.Api", "Host.Api.csproj"),
-            Path.Combine(repositoryRoot, "src", "Host.AdminApi", "Host.AdminApi.csproj")
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "Host.Api.csproj"),
+            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi", "Host.AdminApi.csproj")
         ];
         string adapterSource = File.ReadAllText(GmaSourceLayout.FrameworkPath(
             repositoryRoot,
