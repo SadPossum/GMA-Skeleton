@@ -24,6 +24,7 @@ public sealed class ModuleBoundaryTests
         "Gma.Framework.Notifications.Api",
         "Gma.Framework.Notifications.Cqrs",
         "Gma.Framework.Notifications.SignalR",
+        "Gma.Framework.Realtime.Notifications",
         "Gma.Framework.Persistence.EntityFrameworkCore",
         "Gma.Framework.Tenancy.Api.Serilog",
         "Gma.Framework.Tenancy.Caching",
@@ -159,14 +160,16 @@ public sealed class ModuleBoundaryTests
     }
 
     [Fact]
-    public void Modules_do_not_depend_on_notification_front_door_adapters_or_signalr()
+    public void Modules_do_not_depend_on_notification_front_door_or_realtime_adapters()
     {
         string[] forbiddenPrefixes =
         [
             "Microsoft.AspNetCore.SignalR",
             "Gma.Framework.Notifications.Api",
             "Gma.Framework.Notifications.Cqrs",
-            "Gma.Framework.Notifications.SignalR"
+            "Gma.Framework.Notifications.SignalR",
+            "Gma.Framework.Realtime.Infrastructure",
+            "Gma.Framework.Realtime.Notifications"
         ];
 
         foreach (Assembly assembly in ArchitectureCatalog.ModuleBoundaryAssemblies)

@@ -15,6 +15,7 @@ using Gma.Framework.ModuleComposition;
 using Gma.Framework.Notifications.Api;
 using Gma.Framework.Notifications.Cqrs;
 using Gma.Framework.Notifications.SignalR;
+using Gma.Framework.Realtime.Notifications;
 using Gma.Framework.Tenancy.Api.Serilog;
 using Gma.Framework.Tenancy.Caching;
 using Gma.Framework.Tenancy.Messaging.Infrastructure;
@@ -25,6 +26,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Host.UseConfiguredSerilog();
 
 builder.AddUserNotificationsCqrs();
+builder.AddUserNotificationsRealtime();
 builder.AddRedisCaching();
 builder.AddCachingCqrs();
 builder.AddGmaInfrastructure();

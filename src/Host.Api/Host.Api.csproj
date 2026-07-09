@@ -19,6 +19,7 @@
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.Api\Gma.Framework.Notifications.Api.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.Cqrs\Gma.Framework.Notifications.Cqrs.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.SignalR\Gma.Framework.Notifications.SignalR.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Realtime\Gma.Framework.Realtime.Notifications\Gma.Framework.Realtime.Notifications.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Api.Serilog\Gma.Framework.Tenancy.Api.Serilog.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj" />

@@ -4966,6 +4966,35 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
+                "Gma.Framework.Realtime",
+                [],
+                [],
+                [@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"]),
+            new(
+                "Gma.Framework.Realtime.Infrastructure",
+                [
+                    "Microsoft.Extensions.DependencyInjection.Abstractions",
+                    "Microsoft.Extensions.Logging.Abstractions",
+                    "Microsoft.Extensions.Options"
+                ],
+                [],
+                [@"..\Gma.Framework.Realtime\Gma.Framework.Realtime.csproj"]),
+            new(
+                "Gma.Framework.Realtime.Notifications",
+                [
+                    "Microsoft.Extensions.DependencyInjection",
+                    "Microsoft.Extensions.Hosting",
+                    "Microsoft.Extensions.Options",
+                    "Microsoft.Extensions.Options.ConfigurationExtensions"
+                ],
+                [],
+                [
+                    @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj",
+                    @"..\Gma.Framework.Realtime\Gma.Framework.Realtime.csproj",
+                    @"..\Gma.Framework.Realtime.Infrastructure\Gma.Framework.Realtime.Infrastructure.csproj"
+                ]),
+            new(
                 "Gma.Framework.Observability",
                 [],
                 [],
@@ -5500,6 +5529,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Framework\Gma.Framework.Notifications.Api\Gma.Framework.Notifications.Api.csproj",
                     @"..\Framework\Gma.Framework.Notifications.Cqrs\Gma.Framework.Notifications.Cqrs.csproj",
                     @"..\Framework\Gma.Framework.Notifications.SignalR\Gma.Framework.Notifications.SignalR.csproj",
+                    @"..\Framework\Gma.Framework.Realtime.Notifications\Gma.Framework.Realtime.Notifications.csproj",
                     @"..\Framework\Gma.Framework.Tenancy.Api.Serilog\Gma.Framework.Tenancy.Api.Serilog.csproj",
                     @"..\Framework\Gma.Framework.Tenancy.Caching\Gma.Framework.Tenancy.Caching.csproj",
                     @"..\Framework\Gma.Framework.Tenancy.Messaging.Infrastructure\Gma.Framework.Tenancy.Messaging.Infrastructure.csproj"

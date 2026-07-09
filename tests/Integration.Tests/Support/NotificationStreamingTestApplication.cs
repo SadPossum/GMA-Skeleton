@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Gma.Framework.Notifications;
+using Gma.Framework.Realtime.Notifications;
 using Gma.Framework.Security;
 using Gma.Framework.Tenancy;
 

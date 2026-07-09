@@ -84,6 +84,9 @@
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.Infrastructure\Gma.Framework.Notifications.Infrastructure.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.SignalR\Gma.Framework.Notifications.SignalR.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Realtime\Gma.Framework.Realtime\Gma.Framework.Realtime.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Realtime\Gma.Framework.Realtime.Infrastructure\Gma.Framework.Realtime.Infrastructure.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Realtime\Gma.Framework.Realtime.Notifications\Gma.Framework.Realtime.Notifications.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.Modules\Gma.Framework.Modules.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Observability\Gma.Framework.Observability\Gma.Framework.Observability.csproj" />
