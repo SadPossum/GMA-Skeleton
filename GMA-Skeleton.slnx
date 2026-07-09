@@ -11,9 +11,9 @@
   <Folder Name="/eng/">
     <File Path="eng/add-migration.ps1" />
     <File Path="eng/build.ps1" />
+    <File Path="eng/check-migrations.ps1" />
     <File Path="eng/check-source-packages.ps1" />
     <File Path="eng/check-submodule-dev-heads.ps1" />
-    <File Path="eng/check-migrations.ps1" />
     <File Path="eng/common.ps1" />
     <File Path="eng/gma-bootstrap.ps1" />
     <File Path="eng/gma-status.ps1" />
@@ -32,8 +32,8 @@
     <File Path="eng/verify.ps1" />
   </Folder>
   <Folder Name="/gma/">
-    <File Path="gma/README.md" />
     <File Path="gma/modules/README.md" />
+    <File Path="gma/README.md" />
   </Folder>
   <Folder Name="/.github/workflows/">
     <File Path=".github/workflows/docker-tests.yml" />
@@ -124,37 +124,37 @@
     <File Path="gma/framework/eng/new-module.ps1" />
   </Folder>
   <Folder Name="/gma/framework/src/Administration/">
-    <Project Path="gma/framework/src/Administration/Gma.Framework.Administration/Gma.Framework.Administration.csproj" />
     <Project Path="gma/framework/src/Administration/Gma.Framework.Administration.Api/Gma.Framework.Administration.Api.csproj" />
     <Project Path="gma/framework/src/Administration/Gma.Framework.Administration.Cli/Gma.Framework.Administration.Cli.csproj" />
+    <Project Path="gma/framework/src/Administration/Gma.Framework.Administration/Gma.Framework.Administration.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Api/">
-    <Project Path="gma/framework/src/Api/Gma.Framework.Api/Gma.Framework.Api.csproj" />
     <Project Path="gma/framework/src/Api/Gma.Framework.Api.OpenApi/Gma.Framework.Api.OpenApi.csproj" />
     <Project Path="gma/framework/src/Api/Gma.Framework.Api.Serilog/Gma.Framework.Api.Serilog.csproj" />
+    <Project Path="gma/framework/src/Api/Gma.Framework.Api/Gma.Framework.Api.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Application/">
     <Project Path="gma/framework/src/Application/Gma.Framework.Application.Composition/Gma.Framework.Application.Composition.csproj" />
-    <Project Path="gma/framework/src/Application/Gma.Framework.Application.Events/Gma.Framework.Application.Events.csproj" />
     <Project Path="gma/framework/src/Application/Gma.Framework.Application.Events.Infrastructure/Gma.Framework.Application.Events.Infrastructure.csproj" />
+    <Project Path="gma/framework/src/Application/Gma.Framework.Application.Events/Gma.Framework.Application.Events.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Caching/">
-    <Project Path="gma/framework/src/Caching/Gma.Framework.Caching/Gma.Framework.Caching.csproj" />
     <Project Path="gma/framework/src/Caching/Gma.Framework.Caching.Cqrs/Gma.Framework.Caching.Cqrs.csproj" />
     <Project Path="gma/framework/src/Caching/Gma.Framework.Caching.Infrastructure/Gma.Framework.Caching.Infrastructure.csproj" />
     <Project Path="gma/framework/src/Caching/Gma.Framework.Caching.Redis/Gma.Framework.Caching.Redis.csproj" />
+    <Project Path="gma/framework/src/Caching/Gma.Framework.Caching/Gma.Framework.Caching.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Cqrs/">
-    <Project Path="gma/framework/src/Cqrs/Gma.Framework.Cqrs/Gma.Framework.Cqrs.csproj" />
     <Project Path="gma/framework/src/Cqrs/Gma.Framework.Cqrs.Infrastructure/Gma.Framework.Cqrs.Infrastructure.csproj" />
+    <Project Path="gma/framework/src/Cqrs/Gma.Framework.Cqrs/Gma.Framework.Cqrs.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Domain/">
     <Project Path="gma/framework/src/Domain/Gma.Framework.Domain/Gma.Framework.Domain.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/FileManagement/">
-    <Project Path="gma/framework/src/FileManagement/Gma.Framework.FileManagement/Gma.Framework.FileManagement.csproj" />
     <Project Path="gma/framework/src/FileManagement/Gma.Framework.FileManagement.LocalStorage/Gma.Framework.FileManagement.LocalStorage.csproj" />
     <Project Path="gma/framework/src/FileManagement/Gma.Framework.FileManagement.Minio/Gma.Framework.FileManagement.Minio.csproj" />
+    <Project Path="gma/framework/src/FileManagement/Gma.Framework.FileManagement/Gma.Framework.FileManagement.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Infrastructure/">
     <Project Path="gma/framework/src/Infrastructure/Gma.Framework.Infrastructure/Gma.Framework.Infrastructure.csproj" />
@@ -163,10 +163,10 @@
     <Project Path="gma/framework/src/Logging/Gma.Framework.Logging.Serilog/Gma.Framework.Logging.Serilog.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Messaging/">
-    <Project Path="gma/framework/src/Messaging/Gma.Framework.Messaging/Gma.Framework.Messaging.csproj" />
     <Project Path="gma/framework/src/Messaging/Gma.Framework.Messaging.Infrastructure/Gma.Framework.Messaging.Infrastructure.csproj" />
-    <Project Path="gma/framework/src/Messaging/Gma.Framework.Messaging.Nats/Gma.Framework.Messaging.Nats.csproj" />
     <Project Path="gma/framework/src/Messaging/Gma.Framework.Messaging.Nats.Aspire/Gma.Framework.Messaging.Nats.Aspire.csproj" />
+    <Project Path="gma/framework/src/Messaging/Gma.Framework.Messaging.Nats/Gma.Framework.Messaging.Nats.csproj" />
+    <Project Path="gma/framework/src/Messaging/Gma.Framework.Messaging/Gma.Framework.Messaging.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Modules/">
     <Project Path="gma/framework/src/Modules/Gma.Framework.ModuleComposition/Gma.Framework.ModuleComposition.csproj" />
@@ -176,18 +176,18 @@
     <Project Path="gma/framework/src/Naming/Gma.Framework.Naming/Gma.Framework.Naming.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Notifications/">
-    <Project Path="gma/framework/src/Notifications/Gma.Framework.Notifications/Gma.Framework.Notifications.csproj" />
     <Project Path="gma/framework/src/Notifications/Gma.Framework.Notifications.Api/Gma.Framework.Notifications.Api.csproj" />
     <Project Path="gma/framework/src/Notifications/Gma.Framework.Notifications.Cqrs/Gma.Framework.Notifications.Cqrs.csproj" />
     <Project Path="gma/framework/src/Notifications/Gma.Framework.Notifications.Infrastructure/Gma.Framework.Notifications.Infrastructure.csproj" />
     <Project Path="gma/framework/src/Notifications/Gma.Framework.Notifications.SignalR/Gma.Framework.Notifications.SignalR.csproj" />
+    <Project Path="gma/framework/src/Notifications/Gma.Framework.Notifications/Gma.Framework.Notifications.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Numerics/">
     <Project Path="gma/framework/src/Numerics/Gma.Framework.Numerics/Gma.Framework.Numerics.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Observability/">
-    <Project Path="gma/framework/src/Observability/Gma.Framework.Observability/Gma.Framework.Observability.csproj" />
     <Project Path="gma/framework/src/Observability/Gma.Framework.Observability.Infrastructure/Gma.Framework.Observability.Infrastructure.csproj" />
+    <Project Path="gma/framework/src/Observability/Gma.Framework.Observability/Gma.Framework.Observability.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Pagination/">
     <Project Path="gma/framework/src/Pagination/Gma.Framework.Pagination/Gma.Framework.Pagination.csproj" />
@@ -196,21 +196,21 @@
     <Project Path="gma/framework/src/Persistence/Gma.Framework.Persistence.EntityFrameworkCore/Gma.Framework.Persistence.EntityFrameworkCore.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/ProjectionRebuild/">
-    <Project Path="gma/framework/src/ProjectionRebuild/Gma.Framework.ProjectionRebuild/Gma.Framework.ProjectionRebuild.csproj" />
     <Project Path="gma/framework/src/ProjectionRebuild/Gma.Framework.ProjectionRebuild.EntityFrameworkCore/Gma.Framework.ProjectionRebuild.EntityFrameworkCore.csproj" />
     <Project Path="gma/framework/src/ProjectionRebuild/Gma.Framework.ProjectionRebuild.Tasks/Gma.Framework.ProjectionRebuild.Tasks.csproj" />
+    <Project Path="gma/framework/src/ProjectionRebuild/Gma.Framework.ProjectionRebuild/Gma.Framework.ProjectionRebuild.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Realtime/">
-    <Project Path="gma/framework/src/Realtime/Gma.Framework.Realtime/Gma.Framework.Realtime.csproj" />
     <Project Path="gma/framework/src/Realtime/Gma.Framework.Realtime.Infrastructure/Gma.Framework.Realtime.Infrastructure.csproj" />
     <Project Path="gma/framework/src/Realtime/Gma.Framework.Realtime.Notifications/Gma.Framework.Realtime.Notifications.csproj" />
+    <Project Path="gma/framework/src/Realtime/Gma.Framework.Realtime/Gma.Framework.Realtime.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Results/">
     <Project Path="gma/framework/src/Results/Gma.Framework.Results/Gma.Framework.Results.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Runtime/">
-    <Project Path="gma/framework/src/Runtime/Gma.Framework.Runtime/Gma.Framework.Runtime.csproj" />
     <Project Path="gma/framework/src/Runtime/Gma.Framework.Runtime.Infrastructure/Gma.Framework.Runtime.Infrastructure.csproj" />
+    <Project Path="gma/framework/src/Runtime/Gma.Framework.Runtime/Gma.Framework.Runtime.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Security/">
     <Project Path="gma/framework/src/Security/Gma.Framework.AccessControl/Gma.Framework.AccessControl.csproj" />
@@ -218,19 +218,19 @@
     <Project Path="gma/framework/src/Security/Gma.Framework.Security/Gma.Framework.Security.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Tasks/">
-    <Project Path="gma/framework/src/Tasks/Gma.Framework.Tasks/Gma.Framework.Tasks.csproj" />
     <Project Path="gma/framework/src/Tasks/Gma.Framework.Tasks.Cqrs/Gma.Framework.Tasks.Cqrs.csproj" />
     <Project Path="gma/framework/src/Tasks/Gma.Framework.Tasks.Infrastructure/Gma.Framework.Tasks.Infrastructure.csproj" />
+    <Project Path="gma/framework/src/Tasks/Gma.Framework.Tasks/Gma.Framework.Tasks.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Tenancy/">
-    <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy/Gma.Framework.Tenancy.csproj" />
     <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy.Api.Serilog/Gma.Framework.Tenancy.Api.Serilog.csproj" />
     <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy.Caching/Gma.Framework.Tenancy.Caching.csproj" />
     <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy.Cqrs/Gma.Framework.Tenancy.Cqrs.csproj" />
     <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy.Infrastructure/Gma.Framework.Tenancy.Infrastructure.csproj" />
-    <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy.Messaging/Gma.Framework.Tenancy.Messaging.csproj" />
     <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy.Messaging.Infrastructure/Gma.Framework.Tenancy.Messaging.Infrastructure.csproj" />
+    <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy.Messaging/Gma.Framework.Tenancy.Messaging.csproj" />
     <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy.Tasks/Gma.Framework.Tenancy.Tasks.csproj" />
+    <Project Path="gma/framework/src/Tenancy/Gma.Framework.Tenancy/Gma.Framework.Tenancy.csproj" />
   </Folder>
   <Folder Name="/gma/framework/tests/">
     <Project Path="gma/framework/tests/Gma.Framework.Tests/Gma.Framework.Tests.csproj" />
@@ -241,11 +241,17 @@
   <Folder Name="/gma/modules/administration/docs/">
     <File Path="gma/modules/administration/docs/README.md" />
   </Folder>
-  <Folder Name="/gma/modules/administration/src/">
+  <Folder Name="/gma/modules/administration/src/Admin/">
     <Project Path="gma/modules/administration/src/Gma.Modules.Administration.AdminApi/Gma.Modules.Administration.AdminApi.csproj" />
     <Project Path="gma/modules/administration/src/Gma.Modules.Administration.AdminCli/Gma.Modules.Administration.AdminCli.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/administration/src/Application/">
     <Project Path="gma/modules/administration/src/Gma.Modules.Administration.Application/Gma.Modules.Administration.Application.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/administration/src/Contracts/">
     <Project Path="gma/modules/administration/src/Gma.Modules.Administration.Contracts/Gma.Modules.Administration.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/administration/src/Persistence/">
     <Project Path="gma/modules/administration/src/Gma.Modules.Administration.Persistence.PostgreSqlMigrations/Gma.Modules.Administration.Persistence.PostgreSqlMigrations.csproj" />
     <Project Path="gma/modules/administration/src/Gma.Modules.Administration.Persistence.SqlServerMigrations/Gma.Modules.Administration.Persistence.SqlServerMigrations.csproj" />
     <Project Path="gma/modules/administration/src/Gma.Modules.Administration.Persistence/Gma.Modules.Administration.Persistence.csproj" />
@@ -256,16 +262,28 @@
   <Folder Name="/gma/modules/auth/docs/">
     <File Path="gma/modules/auth/docs/README.md" />
   </Folder>
-  <Folder Name="/gma/modules/auth/src/">
+  <Folder Name="/gma/modules/auth/src/Admin/">
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Admin.Contracts/Gma.Modules.Auth.Admin.Contracts.csproj" />
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.AdminApi/Gma.Modules.Auth.AdminApi.csproj" />
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.AdminCli/Gma.Modules.Auth.AdminCli.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/auth/src/Api/">
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Api/Gma.Modules.Auth.Api.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/auth/src/Application/">
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Application/Gma.Modules.Auth.Application.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/auth/src/Contracts/">
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Contracts/Gma.Modules.Auth.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/auth/src/Domain/">
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Domain/Gma.Modules.Auth.Domain.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/auth/src/Infrastructure/">
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Infrastructure.JwtBearer/Gma.Modules.Auth.Infrastructure.JwtBearer.csproj" />
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Infrastructure/Gma.Modules.Auth.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/auth/src/Persistence/">
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Persistence.PostgreSqlMigrations/Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj" />
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Persistence.SqlServerMigrations/Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj" />
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Persistence/Gma.Modules.Auth.Persistence.csproj" />
@@ -273,14 +291,24 @@
   <Folder Name="/gma/modules/auth/tests/">
     <Project Path="gma/modules/auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj" />
   </Folder>
-  <Folder Name="/src/Modules/Catalog/src/">
+  <Folder Name="/src/Modules/Catalog/src/Admin/">
     <Project Path="src/Modules/Catalog/Catalog.Admin.Contracts/Catalog.Admin.Contracts.csproj" />
     <Project Path="src/Modules/Catalog/Catalog.AdminApi/Catalog.AdminApi.csproj" />
     <Project Path="src/Modules/Catalog/Catalog.AdminCli/Catalog.AdminCli.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/src/Api/">
     <Project Path="src/Modules/Catalog/Catalog.Api/Catalog.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/src/Application/">
     <Project Path="src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/src/Contracts/">
     <Project Path="src/Modules/Catalog/Catalog.Contracts/Catalog.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/src/Domain/">
     <Project Path="src/Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/src/Persistence/">
     <Project Path="src/Modules/Catalog/Catalog.Persistence.PostgreSqlMigrations/Catalog.Persistence.PostgreSqlMigrations.csproj" />
     <Project Path="src/Modules/Catalog/Catalog.Persistence.SqlServerMigrations/Catalog.Persistence.SqlServerMigrations.csproj" />
     <Project Path="src/Modules/Catalog/Catalog.Persistence/Catalog.Persistence.csproj" />
@@ -294,21 +322,35 @@
   <Folder Name="/gma/modules/files/docs/">
     <File Path="gma/modules/files/docs/README.md" />
   </Folder>
-  <Folder Name="/gma/modules/files/src/">
+  <Folder Name="/gma/modules/files/src/Api/">
     <Project Path="gma/modules/files/src/Gma.Modules.Files.Api/Gma.Modules.Files.Api.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/files/src/Application/">
     <Project Path="gma/modules/files/src/Gma.Modules.Files.Application/Gma.Modules.Files.Application.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/files/src/Contracts/">
     <Project Path="gma/modules/files/src/Gma.Modules.Files.Contracts/Gma.Modules.Files.Contracts.csproj" />
   </Folder>
   <Folder Name="/gma/modules/notifications/docs/">
     <File Path="gma/modules/notifications/docs/README.md" />
   </Folder>
-  <Folder Name="/gma/modules/notifications/src/">
+  <Folder Name="/gma/modules/notifications/src/Admin/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Admin.Contracts/Gma.Modules.Notifications.Admin.Contracts.csproj" />
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.AdminApi/Gma.Modules.Notifications.AdminApi.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/notifications/src/Api/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Api/Gma.Modules.Notifications.Api.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/notifications/src/Application/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Application/Gma.Modules.Notifications.Application.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/notifications/src/Contracts/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Contracts/Gma.Modules.Notifications.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/notifications/src/Domain/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Domain/Gma.Modules.Notifications.Domain.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/notifications/src/Persistence/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Persistence.PostgreSqlMigrations/Gma.Modules.Notifications.Persistence.PostgreSqlMigrations.csproj" />
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Persistence.SqlServerMigrations/Gma.Modules.Notifications.Persistence.SqlServerMigrations.csproj" />
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Persistence/Gma.Modules.Notifications.Persistence.csproj" />
@@ -316,11 +358,19 @@
   <Folder Name="/gma/modules/notifications/tests/">
     <Project Path="gma/modules/notifications/tests/Gma.Modules.Notifications.Tests/Gma.Modules.Notifications.Tests.csproj" />
   </Folder>
-  <Folder Name="/src/Modules/Ordering/src/">
+  <Folder Name="/src/Modules/Ordering/src/Api/">
     <Project Path="src/Modules/Ordering/Ordering.Api/Ordering.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ordering/src/Application/">
     <Project Path="src/Modules/Ordering/Ordering.Application/Ordering.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ordering/src/Contracts/">
     <Project Path="src/Modules/Ordering/Ordering.Contracts/Ordering.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ordering/src/Domain/">
     <Project Path="src/Modules/Ordering/Ordering.Domain/Ordering.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Ordering/src/Persistence/">
     <Project Path="src/Modules/Ordering/Ordering.Persistence.PostgreSqlMigrations/Ordering.Persistence.PostgreSqlMigrations.csproj" />
     <Project Path="src/Modules/Ordering/Ordering.Persistence.SqlServerMigrations/Ordering.Persistence.SqlServerMigrations.csproj" />
     <Project Path="src/Modules/Ordering/Ordering.Persistence/Ordering.Persistence.csproj" />
@@ -334,18 +384,26 @@
   <Folder Name="/gma/modules/task-runtime/docs/">
     <File Path="gma/modules/task-runtime/docs/README.md" />
   </Folder>
-  <Folder Name="/gma/modules/task-runtime/src/">
+  <Folder Name="/gma/modules/task-runtime/src/Admin/">
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.Admin.Contracts/Gma.Modules.TaskRuntime.Admin.Contracts.csproj" />
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.AdminApi/Gma.Modules.TaskRuntime.AdminApi.csproj" />
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.AdminCli/Gma.Modules.TaskRuntime.AdminCli.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/task-runtime/src/Application/">
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.Application/Gma.Modules.TaskRuntime.Application.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/task-runtime/src/Contracts/">
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.Contracts/Gma.Modules.TaskRuntime.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/task-runtime/src/Persistence/">
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations/Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations.csproj" />
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations/Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations.csproj" />
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.Persistence/Gma.Modules.TaskRuntime.Persistence.csproj" />
   </Folder>
-  <Folder Name="/src/Modules/TaskSamples/src/">
+  <Folder Name="/src/Modules/TaskSamples/src/Application/">
     <Project Path="src/Modules/TaskSamples/TaskSamples.Application/TaskSamples.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/TaskSamples/src/Contracts/">
     <Project Path="src/Modules/TaskSamples/TaskSamples.Contracts/TaskSamples.Contracts.csproj" />
   </Folder>
   <Folder Name="/src/Modules/TaskSamples/docs/">
@@ -354,8 +412,10 @@
   <Folder Name="/gma/modules/tenancy/docs/">
     <File Path="gma/modules/tenancy/docs/README.md" />
   </Folder>
-  <Folder Name="/gma/modules/tenancy/src/">
+  <Folder Name="/gma/modules/tenancy/src/Api/">
     <Project Path="gma/modules/tenancy/src/Gma.Modules.Tenancy.Api/Gma.Modules.Tenancy.Api.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/tenancy/src/Contracts/">
     <Project Path="gma/modules/tenancy/src/Gma.Modules.Tenancy.Contracts/Gma.Modules.Tenancy.Contracts.csproj" />
   </Folder>
   <Folder Name="/tests/">
