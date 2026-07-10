@@ -40,7 +40,7 @@ builder.AddUserNotificationSignalR();
 builder.Services.AddApiSecurityDefaults();
 
 builder.AddModule<TenancyModule>();
-builder.AddAuthModule(AuthProfile.TenantScoped());
+builder.AddAuthModule(AuthProfile.ScopeAware());
 // module-scaffold:public-api-modules
 
 builder.AddServiceDefaults();

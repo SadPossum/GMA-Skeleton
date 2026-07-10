@@ -21,14 +21,14 @@ The module is intentionally not registered in `Host.Api`, `Host.AdminCli`, or `H
 
 ## Rules Demonstrated
 
-- Task payload attributes, descriptors, and task-handler registration must match, including task kind, tenant scope, payload version, worker group, and control-message support.
+- Task payload attributes, descriptors, and task-handler registration must match, including task kind, scope context, payload version, worker group, and control-message support.
 - Serialized task payloads that appear in module metadata live in the owning module contracts layer.
 - Task payload versions are explicit: v1 and v2 handlers share the same logical task name but use different `payloadVersion` metadata.
 - `FlakyReportTaskHandler` demonstrates retry behavior by failing until a configured attempt.
 - `SlowReportTaskHandler` demonstrates heartbeat/progress reporting plus cooperative pause/resume/cancel/drain handling through `ITaskControlLoop`.
 - `TaskSamplesScheduleProvider` demonstrates code-defined schedules that enqueue task requests through the optional scheduler adapter and use the default version-aware schedule dedupe shape.
 - Task handlers use shared application contracts, not HTTP, CLI, EF, or scheduler APIs.
-- Tenant-scoped tasks require a tenant id on the run request.
+- Scope-aware tasks require a scope id on the run request.
 - The persisted task runtime is optional host composition, not default host behavior.
 
 ## Tests

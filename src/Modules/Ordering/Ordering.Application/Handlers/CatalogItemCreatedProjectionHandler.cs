@@ -13,7 +13,7 @@ internal sealed class CatalogItemCreatedProjectionHandler(ICatalogItemProjection
     {
         await repository.UpsertAsync(
             new CatalogItemProjectionWriteModel(
-                integrationEvent.TenantId,
+                integrationEvent.ScopeId,
                 integrationEvent.ItemId,
                 integrationEvent.Sku,
                 integrationEvent.Name,

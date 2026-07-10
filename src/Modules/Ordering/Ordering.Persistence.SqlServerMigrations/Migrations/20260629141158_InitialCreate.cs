@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -20,7 +20,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ScopeId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     CatalogItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Sku = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
@@ -43,7 +43,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     Subject = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     EventType = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ScopeId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Attempts = table.Column<int>(type: "int", nullable: false),
                     OccurredAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -65,7 +65,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ScopeId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     CatalogItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CatalogSku = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     CatalogItemName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
@@ -82,10 +82,10 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_catalog_item_projections_TenantId_CatalogItemId",
+                name: "IX_catalog_item_projections_ScopeId_CatalogItemId",
                 schema: "ordering",
                 table: "catalog_item_projections",
-                columns: new[] { "TenantId", "CatalogItemId" },
+                columns: new[] { "ScopeId", "CatalogItemId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -95,10 +95,10 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                 columns: new[] { "Handler", "Status" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_orders_TenantId_CatalogItemId",
+                name: "IX_orders_ScopeId_CatalogItemId",
                 schema: "ordering",
                 table: "orders",
-                columns: new[] { "TenantId", "CatalogItemId" });
+                columns: new[] { "ScopeId", "CatalogItemId" });
         }
 
         /// <inheritdoc />

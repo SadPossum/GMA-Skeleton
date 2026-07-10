@@ -13,7 +13,7 @@ using Ordering.Domain.Errors;
 using Gma.Framework.AccessControl;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Messaging;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 using Gma.Framework.Numerics;
 using Gma.Framework.Results;
 using Gma.Framework.Cqrs.Infrastructure;
@@ -95,10 +95,10 @@ public sealed class PlaceOrderCommandHandlerTests
     {
         Result<Order> normalized = CreateOrder(" tenant-a ");
         Result<Order> missing = CreateOrder(" ");
-        Result<Order> invalid = CreateOrder(new string('x', TenantIds.MaxLength + 1));
+        Result<Order> invalid = CreateOrder(new string('x', ScopeIds.MaxLength + 1));
 
         Assert.True(normalized.IsSuccess);
-        Assert.Equal("tenant-a", normalized.Value.TenantId);
+        Assert.Equal("tenant-a", normalized.Value.ScopeId);
         Assert.True(missing.IsFailure);
         Assert.Equal(OrderingDomainErrors.TenantRequired, missing.Error);
         Assert.True(invalid.IsFailure);
@@ -198,7 +198,7 @@ public sealed class PlaceOrderCommandHandlerTests
     }
 
     private static Result<Order> CreateOrder(
-        string tenantId,
+        string scopeId,
         Guid? orderId = null,
         string userId = "user-1",
         Guid? catalogItemId = null,
@@ -210,7 +210,7 @@ public sealed class PlaceOrderCommandHandlerTests
         int quantity = 1) =>
         Order.Create(
             orderId ?? Guid.NewGuid(),
-            tenantId,
+            scopeId,
             userId,
             catalogItemId ?? Guid.NewGuid(),
             catalogSku,
@@ -221,34 +221,34 @@ public sealed class PlaceOrderCommandHandlerTests
             quantity,
             DateTimeOffset.UtcNow);
 
-    private static AccessSubject UserSubject() => AccessSubject.User("user-1", "tenant-a");
+    private static AccessSubject UserSubject() => AccessSubject.User("user-1");
 
     private static IHost BuildHost(
         RecordingOrderRepository orderRepository,
         CatalogProjectionRepository catalogRepository)
     {
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
-        TestTenantContext tenantContext = new("tenant-a");
+        TestScopeContext scopeContext = new("tenant-a");
 
         builder.AddRuntimeInfrastructure();
         builder.AddCqrsInfrastructure();
         builder.Services.AddOrderingApplication();
-        builder.Services.AddSingleton<ITenantContext>(tenantContext);
-        builder.Services.AddSingleton<ITenantContextAccessor>(tenantContext);
+        builder.Services.AddSingleton<IScopeContext>(scopeContext);
+        builder.Services.AddSingleton<IScopeContextAccessor>(scopeContext);
         builder.Services.AddScoped<IOrderRepository>(_ => orderRepository);
         builder.Services.AddScoped<ICatalogItemProjectionRepository>(_ => catalogRepository);
 
         return builder.Build();
     }
 
-    private sealed class TestTenantContext(string tenantId) : ITenantContextAccessor
+    private sealed class TestScopeContext(string scopeId) : IScopeContextAccessor
     {
         public bool IsEnabled => true;
-        public string? TenantId { get; private set; } = tenantId;
+        public string? ScopeId { get; private set; } = scopeId;
 
-        public void SetTenant(string tenantId) => this.TenantId = tenantId;
+        public void SetScope(string scopeId) => this.ScopeId = scopeId;
 
-        public void ClearTenant() => this.TenantId = null;
+        public void ClearScope() => this.ScopeId = null;
     }
 
     private sealed class RecordingOrderRepository : IOrderRepository
@@ -262,12 +262,12 @@ public sealed class PlaceOrderCommandHandlerTests
         }
 
         public Task<IReadOnlyCollection<string>> ListDistinctUserIdsByCatalogItemAsync(
-            string tenantId,
+            string scopeId,
             Guid catalogItemId,
             CancellationToken cancellationToken) =>
             Task.FromResult<IReadOnlyCollection<string>>(
                 this.Orders
-                    .Where(order => order.TenantId == tenantId && order.CatalogItemId == catalogItemId)
+                    .Where(order => order.ScopeId == scopeId && order.CatalogItemId == catalogItemId)
                     .Select(order => order.UserId)
                     .Distinct(StringComparer.Ordinal)
                     .ToArray());
@@ -282,7 +282,7 @@ public sealed class PlaceOrderCommandHandlerTests
         public Task UpsertAsync(CatalogItemProjectionWriteModel item, CancellationToken cancellationToken) =>
             throw new NotSupportedException();
 
-        public Task MarkDiscontinuedAsync(string tenantId, Guid catalogItemId, CancellationToken cancellationToken) =>
+        public Task MarkDiscontinuedAsync(string scopeId, Guid catalogItemId, CancellationToken cancellationToken) =>
             throw new NotSupportedException();
     }
 }

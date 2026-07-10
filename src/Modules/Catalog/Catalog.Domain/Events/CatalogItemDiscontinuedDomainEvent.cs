@@ -3,15 +3,15 @@ namespace Catalog.Domain.Events;
 using Catalog.Domain.Aggregates;
 using Gma.Framework.Domain;
 
-public sealed record CatalogItemDiscontinuedDomainEvent : TenantDomainEvent
+public sealed record CatalogItemDiscontinuedDomainEvent : ScopedDomainEvent
 {
     public CatalogItemDiscontinuedDomainEvent(
         Guid eventId,
         DateTimeOffset occurredAtUtc,
         Guid itemId,
-        string tenantId,
+        string scopeId,
         string sku)
-        : base(eventId, occurredAtUtc, tenantId)
+        : base(eventId, occurredAtUtc, scopeId)
     {
         this.ItemId = DomainEventGuards.RequireId(itemId, nameof(itemId));
         this.Sku = DomainEventGuards

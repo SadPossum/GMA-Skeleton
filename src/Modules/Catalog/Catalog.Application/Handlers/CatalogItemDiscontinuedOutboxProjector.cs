@@ -12,7 +12,7 @@ internal sealed class CatalogItemDiscontinuedOutboxProjector(IOutboxWriterRegist
         outboxWriters.GetRequired(CatalogModuleMetadata.Name).EnqueueAsync(
             new CatalogItemDiscontinuedIntegrationEvent(
                 domainEvent.EventId,
-                domainEvent.TenantId,
+                domainEvent.ScopeId,
                 domainEvent.OccurredAtUtc,
                 domainEvent.ItemId,
                 domainEvent.Sku),

@@ -11,7 +11,7 @@ namespace Ordering.Persistence.PostgreSqlMigrations.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "TenantId",
+                name: "ScopeId",
                 schema: "ordering",
                 table: "inbox_messages",
                 type: "character varying(128)",
@@ -26,7 +26,7 @@ namespace Ordering.Persistence.PostgreSqlMigrations.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "TenantId",
+                name: "ScopeId",
                 schema: "ordering",
                 table: "inbox_messages",
                 type: "character varying(128)",

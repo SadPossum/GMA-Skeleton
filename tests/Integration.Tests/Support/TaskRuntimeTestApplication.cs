@@ -131,7 +131,7 @@ internal sealed class TaskRuntimeTestApplication : IAsyncDisposable
                     createdAtUtc,
                     createdAtUtc,
                     TaskSamplesModuleMetadata.WorkerGroup,
-                    tenantId: "tenant-a",
+                    scopeId: "tenant-a",
                     requestedBy: "operator",
                     maxAttempts: maxAttempts,
                     payloadVersion: payloadVersion,

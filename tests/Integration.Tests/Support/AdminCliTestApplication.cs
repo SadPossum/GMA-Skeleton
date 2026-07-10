@@ -1,7 +1,9 @@
 namespace Integration.Tests.Support;
 
+using Gma.Modules.AccessControl.AdminCli;
 using Gma.Modules.Administration.AdminCli;
 using Gma.Modules.Administration.Persistence;
+using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Auth.AdminCli;
 using Gma.Modules.Auth.Application.Commands;
 using Gma.Modules.Auth.Contracts;
@@ -39,7 +41,7 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
             ["ConnectionStrings:SqlServer"] = provider == "SqlServer" ? connectionString : string.Empty,
             ["ConnectionStrings:PostgreSql"] = provider == "PostgreSql" ? connectionString : string.Empty,
             ["Tenancy:Enabled"] = "true",
-            ["Administration:Bootstrap:AllowWhenAssignmentsExist"] = "false",
+            ["AccessControl:Bootstrap:AllowWhenAssignmentsExist"] = "false",
             ["Auth:RefreshTokenLifetimeDays"] = "30",
             ["Auth:RefreshTokens:Pepper"] = "integration-test-refresh-token-pepper-change-me-000000000000000000",
             ["Auth:Jwt:Issuer"] = "GMA-Skeleton",
@@ -56,6 +58,7 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
         builder.AddMessagingInfrastructure();
         builder.AddTenantAwareMessaging();
         builder.AddAdminModule<AdministrationAdminCliModule>();
+        builder.AddAdminModule<AccessControlAdminCliModule>();
         builder.AddAdminModule<AuthAdminCliModule>();
 
         this.host = builder.Build();
@@ -67,6 +70,7 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
     {
         using IServiceScope scope = this.host.Services.CreateScope();
         await scope.ServiceProvider.GetRequiredService<AdminDbContext>().Database.MigrateAsync().ConfigureAwait(false);
+        await scope.ServiceProvider.GetRequiredService<AccessControlDbContext>().Database.MigrateAsync().ConfigureAwait(false);
         await scope.ServiceProvider.GetRequiredService<AuthDbContext>().Database.MigrateAsync().ConfigureAwait(false);
     }
 
@@ -96,11 +100,11 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
         }
     }
 
-    public async Task<Result<AuthTokensResponse>> LoginAsync(string tenantId, string username, string password)
+    public async Task<Result<AuthTokensResponse>> LoginAsync(string scopeId, string username, string password)
     {
         using IServiceScope scope = this.host.Services.CreateScope();
         ITenantContextAccessor tenantContext = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
-        tenantContext.SetTenant(tenantId);
+        tenantContext.SetTenant(scopeId);
         IRequestDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
 
         return await dispatcher.SendAsync(new LoginMemberCommand(username, password), CancellationToken.None)

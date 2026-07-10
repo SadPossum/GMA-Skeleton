@@ -10,11 +10,11 @@ internal static class AuthApiClient
     public const string Password = "Passw0rd!integration";
     private const string TenantHeader = "X-Tenant-Id";
 
-    public static async Task<AuthTokensResponse> RegisterAsync(HttpClient client, string tenantId, string username)
+    public static async Task<AuthTokensResponse> RegisterAsync(HttpClient client, string scopeId, string username)
     {
         using HttpResponseMessage response = await PostJsonAsync(
             client,
-            tenantId,
+            scopeId,
             "/api/auth/register",
             new RegisterMemberRequest(username, UsernameType.Email, Password)).ConfigureAwait(false);
 
@@ -26,11 +26,11 @@ internal static class AuthApiClient
         return tokens;
     }
 
-    public static async Task<AuthTokensResponse> LoginAsync(HttpClient client, string tenantId, string username)
+    public static async Task<AuthTokensResponse> LoginAsync(HttpClient client, string scopeId, string username)
     {
         using HttpResponseMessage response = await PostJsonAsync(
             client,
-            tenantId,
+            scopeId,
             "/api/auth/login",
             new LoginMemberRequest(username, Password)).ConfigureAwait(false);
 
@@ -44,12 +44,12 @@ internal static class AuthApiClient
 
     public static async Task<AuthTokensResponse> RefreshAsync(
         HttpClient client,
-        string tenantId,
+        string scopeId,
         AuthTokensResponse tokens)
     {
         using HttpResponseMessage response = await PostJsonAsync(
             client,
-            tenantId,
+            scopeId,
             "/api/auth/refresh",
             new RefreshTokenRequest(tokens.AccessToken, tokens.RefreshToken)).ConfigureAwait(false);
 
@@ -63,13 +63,13 @@ internal static class AuthApiClient
 
     public static async Task<HttpResponseMessage> PostJsonAsync<TValue>(
         HttpClient client,
-        string tenantId,
+        string scopeId,
         string path,
         TValue value,
         string? bearerToken = null)
     {
         using HttpRequestMessage request = new(HttpMethod.Post, path);
-        request.Headers.Add(TenantHeader, tenantId);
+        request.Headers.Add(TenantHeader, scopeId);
 
         if (!string.IsNullOrWhiteSpace(bearerToken))
         {

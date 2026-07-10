@@ -725,7 +725,7 @@ if ($selectedModuleSpecArray | Where-Object { $_.Alias -eq 'tenancy' }) {
 
 if ($selectedModuleSpecArray | Where-Object { $_.Alias -eq 'auth' }) {
     if ($selectedModuleSpecArray | Where-Object { $_.Alias -eq 'tenancy' }) {
-        $moduleRegistrationLines.Add('builder.AddAuthModule(AuthProfile.TenantScoped());')
+        $moduleRegistrationLines.Add('builder.AddAuthModule(AuthProfile.ScopeAware());')
     }
     else {
         $moduleRegistrationLines.Add('builder.AddAuthModule(AuthProfile.Global());')

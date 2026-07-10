@@ -12,6 +12,7 @@ $solutions = @('GMA-Skeleton.slnx')
 if ($FocusedSolutions) {
     $solutions += @(
         'gma\framework\Gma.Framework.slnx',
+        'gma\modules\access-control\Gma.Modules.AccessControl.slnx',
         'gma\modules\administration\Gma.Modules.Administration.slnx',
         'gma\modules\auth\Gma.Modules.Auth.slnx',
         'gma\modules\files\Gma.Modules.Files.slnx',

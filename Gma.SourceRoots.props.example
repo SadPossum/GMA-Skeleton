@@ -2,6 +2,7 @@
   <PropertyGroup>
     <GmaFrameworkRoot>$(MSBuildThisFileDirectory)gma\framework\src\</GmaFrameworkRoot>
     <GmaModulesRoot>$(MSBuildThisFileDirectory)gma\modules\</GmaModulesRoot>
+    <GmaModuleAccessControlRoot>$(GmaModulesRoot)access-control\src\</GmaModuleAccessControlRoot>
     <GmaModuleAdministrationRoot>$(GmaModulesRoot)administration\src\</GmaModuleAdministrationRoot>
     <GmaModuleAuthRoot>$(GmaModulesRoot)auth\src\</GmaModuleAuthRoot>
     <GmaModuleFilesRoot>$(GmaModulesRoot)files\src\</GmaModuleFilesRoot>

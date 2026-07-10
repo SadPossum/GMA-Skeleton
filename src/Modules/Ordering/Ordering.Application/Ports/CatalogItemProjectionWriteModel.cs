@@ -9,7 +9,7 @@ using Gma.Framework.Results;
 public sealed record CatalogItemProjectionWriteModel
 {
     public CatalogItemProjectionWriteModel(
-        string tenantId,
+        string scopeId,
         Guid catalogItemId,
         string sku,
         string name,
@@ -24,7 +24,7 @@ public sealed record CatalogItemProjectionWriteModel
             throw new ArgumentException(validation.Error.Code, nameof(sku));
         }
 
-        this.TenantId = TenantIds.Normalize(tenantId);
+        this.ScopeId = ScopeIds.Normalize(scopeId);
         this.CatalogItemId = catalogItemId;
         this.Sku = Order.NormalizeCatalogSku(sku);
         this.Name = Order.NormalizeCatalogItemName(name);
@@ -34,7 +34,7 @@ public sealed record CatalogItemProjectionWriteModel
         this.AvailableRegions = CatalogRegionCodes.NormalizeMany(availableRegions);
     }
 
-    public string TenantId { get; }
+    public string ScopeId { get; }
     public Guid CatalogItemId { get; }
     public string Sku { get; }
     public string Name { get; }

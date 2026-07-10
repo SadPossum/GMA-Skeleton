@@ -31,7 +31,7 @@ internal sealed class RebuildCatalogItemProjectionTaskHandler(
                 source,
                 writer,
                 context,
-                tenantScoped: true,
+                scopeAware: true,
                 cancellationToken)
             .ConfigureAwait(false);
     }

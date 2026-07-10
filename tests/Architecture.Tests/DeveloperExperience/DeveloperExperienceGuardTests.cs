@@ -901,7 +901,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "ModuleMetadataAttributeReader",
             "ApplicationServiceCollectionExtensions",
             "ApplyConfigurationsFromAssembly",
-            "TenantEntityTypeBuilderExtensions",
+            "ScopedEntityTypeBuilderExtensions",
             "host assembly marker classes",
             "observability module-name inference",
             "Do not use reflection or attributes to auto-register modules"
@@ -914,11 +914,12 @@ public sealed partial class DeveloperExperienceGuardTests
             NormalizePath(Path.Combine("src", "Framework", "Modules", "Gma.Framework.Modules", "ModuleMetadataAttributeReader.cs")),
             NormalizePath(Path.Combine("src", "Framework", "Messaging", "Gma.Framework.Messaging.Infrastructure", "IntegrationEventHandlerInvoker.cs")),
             NormalizePath(Path.Combine("src", "Framework", "Tasks", "Gma.Framework.Tasks.Infrastructure", "TaskHandlerInvoker.cs")),
-            NormalizePath(Path.Combine("src", "Framework", "Persistence", "Gma.Framework.Persistence.EntityFrameworkCore", "TenantEntityTypeBuilderExtensions.cs")),
+            NormalizePath(Path.Combine("src", "Framework", "Persistence", "Gma.Framework.Persistence.EntityFrameworkCore", "ScopedEntityTypeBuilderExtensions.cs")),
             NormalizePath(Path.Combine("src", "Hosts", "Host.Api", "ApiAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Hosts", "Host.AdminApi", "AdminApiAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Hosts", "Host.AdminCli", "AdminCliAssemblyReference.cs")),
             NormalizePath(Path.Combine("src", "Hosts", "Host.Worker", "WorkerAssemblyReference.cs")),
+            NormalizePath(Path.Combine("src", "Modules", "AccessControl", "Gma.Modules.AccessControl.Persistence", "AccessControlDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Administration", "Gma.Modules.Administration.Persistence", "AdminDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Auth", "Gma.Modules.Auth.Persistence", "AuthDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Catalog", "Catalog.Persistence", "CatalogDbContext.cs")),
@@ -1100,10 +1101,13 @@ public sealed partial class DeveloperExperienceGuardTests
             string.Equals(command.GetString(), "dotnet-ef", StringComparison.Ordinal));
         Assert.Contains("'tool', 'restore'", restoreScript, StringComparison.Ordinal);
         Assert.Contains("'tool', 'restore'", addMigrationScript, StringComparison.Ordinal);
+        Assert.Contains("src\\Modules", addMigrationScript, StringComparison.Ordinal);
+        Assert.Contains("gma\\modules", addMigrationScript, StringComparison.Ordinal);
         Assert.Contains("'tool', 'restore'", checkMigrationsScript, StringComparison.Ordinal);
         Assert.Contains("'tool',", checkMigrationsScript, StringComparison.Ordinal);
         Assert.Contains("'run',", checkMigrationsScript, StringComparison.Ordinal);
         Assert.Contains("'dotnet-ef',", checkMigrationsScript, StringComparison.Ordinal);
+        Assert.Contains("gma\\modules", checkMigrationsScript, StringComparison.Ordinal);
         Assert.Contains("pinned local `dotnet-ef` tool", persistenceDocs, StringComparison.Ordinal);
     }
 
@@ -1334,6 +1338,7 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             "GmaFrameworkRoot",
             "GmaModulesRoot",
+            "GmaModuleAccessControlRoot",
             "GmaModuleAdministrationRoot",
             "GmaModuleAuthRoot",
             "GmaModuleCatalogRoot",
@@ -1371,6 +1376,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "GmaSubmodules",
             @"gma\framework\src\",
             @"gma\modules\",
+            @"$(GmaModulesRoot)access-control\src\",
             @"$(GmaModulesRoot)auth\src\",
             @"..\..\framework\src\",
             @"gma\modules\$moduleAlias\Gma.SourceRoots.props",
@@ -1644,7 +1650,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "AddApiSecurityDefaults",
             "ValidateModuleComposition",
             "AddAuthModule(AuthProfile.Global())",
-            "AddAuthModule(AuthProfile.TenantScoped())",
+            "AddAuthModule(AuthProfile.ScopeAware())",
             "Gma.SourceRoots.props.example",
             "gma\\framework",
             "gma\\modules",
@@ -1899,6 +1905,20 @@ public sealed partial class DeveloperExperienceGuardTests
                     "eng/bootstrap-source-roots.ps1",
                     "eng/new-module.ps1"
                 ]),
+            ["Gma.Modules.AccessControl.slnx"] = (
+                Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"),
+                [
+                    "src/Gma.Modules.AccessControl.AdminApi/Gma.Modules.AccessControl.AdminApi.csproj",
+                    "src/Gma.Modules.AccessControl.AdminCli/Gma.Modules.AccessControl.AdminCli.csproj",
+                    "src/Gma.Modules.AccessControl.Application/Gma.Modules.AccessControl.Application.csproj",
+                    "tests/Gma.Modules.AccessControl.Tests/Gma.Modules.AccessControl.Tests.csproj"
+                ],
+                [
+                    ".github/workflows/validate.yml",
+                    "docs/README.md",
+                    "eng/bootstrap-source-roots.ps1",
+                    "README.md"
+                ]),
             ["Gma.Modules.Administration.slnx"] = (
                 Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"),
                 [
@@ -2008,6 +2028,7 @@ public sealed partial class DeveloperExperienceGuardTests
         Dictionary<string, (string SolutionPath, string[] AllowedFolders)> packages = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Gma.Framework.slnx"] = (Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
+            ["Gma.Modules.AccessControl.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
             ["Gma.Modules.Administration.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
             ["Gma.Modules.Auth.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
             ["Gma.Modules.Files.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
@@ -2065,6 +2086,7 @@ public sealed partial class DeveloperExperienceGuardTests
         GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
         Dictionary<string, string> moduleSolutions = new(StringComparer.OrdinalIgnoreCase)
         {
+            ["Gma.Modules.AccessControl.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"),
             ["Gma.Modules.Administration.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"),
             ["Gma.Modules.Auth.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"),
             ["Gma.Modules.Files.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"),
@@ -2109,6 +2131,7 @@ public sealed partial class DeveloperExperienceGuardTests
         Dictionary<string, string> packages = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Gma.Framework.slnx"] = Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"),
+            ["Gma.Modules.AccessControl.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"),
             ["Gma.Modules.Administration.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"),
             ["Gma.Modules.Auth.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"),
             ["Gma.Modules.Files.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"),
@@ -2195,6 +2218,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] focusedSolutions =
         [
             "Gma.Framework.slnx",
+            "Gma.Modules.AccessControl.slnx",
             "Gma.Modules.Administration.slnx",
             "Gma.Modules.Auth.slnx",
             "Gma.Modules.Files.slnx",
@@ -2249,6 +2273,7 @@ public sealed partial class DeveloperExperienceGuardTests
         GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
         Dictionary<string, string> moduleBySolution = new(StringComparer.OrdinalIgnoreCase)
         {
+            ["Gma.Modules.AccessControl.slnx"] = "AccessControl",
             ["Gma.Modules.Administration.slnx"] = "Administration",
             ["Gma.Modules.Auth.slnx"] = "Auth",
             ["Gma.Modules.Files.slnx"] = "Files",
@@ -3646,23 +3671,23 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Administration_options_are_validated_on_start()
+    public void Access_control_options_are_validated_on_start()
     {
         string repositoryRoot = FindRepositoryRoot();
         string source = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "Administration",
-            "Gma.Modules.Administration.Application",
+            "AccessControl",
+            "Gma.Modules.AccessControl.Application",
             "DependencyInjection.cs"));
         string[] requiredTokens =
         [
-            "AdministrationOptionsValidation.GetValidatedOptions(configuration);",
-            "IValidateOptions<AdministrationOptions>, AdministrationOptionsValidator",
+            "AccessControlOptionsValidation.GetValidatedOptions(configuration);",
+            "IValidateOptions<AccessControlOptions>, AccessControlOptionsValidator",
             ".ValidateOnStart()"
         ];
         string[] offenders = requiredTokens
             .Where(token => !source.Contains(token, StringComparison.Ordinal))
-            .Select(token => $"Gma.Modules.Administration.Application dependency injection missing {token}")
+            .Select(token => $"Gma.Modules.AccessControl.Application dependency injection missing {token}")
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -3681,7 +3706,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 string source = File.ReadAllText(path);
                 return source.Contains("private static string GetConnectionString", StringComparison.Ordinal) ||
                        source.Contains("private static DatabaseProvider GetProvider", StringComparison.Ordinal) ||
-                       source.Contains("class DesignTimeTenantContext", StringComparison.Ordinal);
+                       source.Contains("class DesignTimeScopeContext", StringComparison.Ordinal);
             })
             .Select(path => Path.GetRelativePath(repositoryRoot, path))
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -3718,9 +3743,15 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Persisted_modules_keep_sql_server_and_postgresql_migration_project_parity()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
-        string[] offenders = Directory
-            .EnumerateDirectories(modulesRoot)
+        GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
+        string[] modulePaths = sourceLayout
+            .ModuleRoots
+            .Values
+            .Where(Directory.Exists)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        string[] offenders = modulePaths
             .SelectMany(modulePath =>
             {
                 string[] projectNames = Directory
@@ -3793,6 +3824,8 @@ public sealed partial class DeveloperExperienceGuardTests
         ];
         string[] requiredCheckTokens =
         [
+            "src\\Modules",
+            "gma\\modules",
             "dotnet-ef",
             "has-pending-model-changes",
             ".Persistence.SqlServerMigrations",
@@ -4112,9 +4145,9 @@ public sealed partial class DeveloperExperienceGuardTests
                 "AdminOperationRunner.cs"),
             GmaSourceLayout.ModulePath(
                 repositoryRoot,
-                "Administration",
-                "Gma.Modules.Administration.AdminCli",
-                "AdministrationAdminCliModule.cs")
+                "AccessControl",
+                "Gma.Modules.AccessControl.AdminCli",
+                "AccessControlAdminCliModule.cs")
         ];
         string[] forbiddenTokens =
         [
@@ -4138,7 +4171,7 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Administration_persistence_uses_named_length_constants()
+    public void Administration_audit_persistence_uses_named_length_constants()
     {
         string repositoryRoot = FindRepositoryRoot();
         IReadOnlyDictionary<string, string[]> expectedTokensByFile = new Dictionary<string, string[]>
@@ -4151,24 +4184,6 @@ public sealed partial class DeveloperExperienceGuardTests
                 "AdminPermission.MaxLength",
                 "AdminAuditResults.MaxLength",
                 "AdminAuditRecord.ErrorCodeMaxLength"
-            ],
-            [Path.Combine("Configurations", "AdminPrincipalConfiguration.cs")] =
-            [
-                "AdminActor.MaxLength"
-            ],
-            [Path.Combine("Configurations", "AdminPrincipalRoleConfiguration.cs")] =
-            [
-                "AdminActor.MaxLength",
-                "TenantIds.MaxLength",
-                "HasIndex(role => new { role.PrincipalId, role.TenantId })"
-            ],
-            [Path.Combine("Configurations", "AdminRoleConfiguration.cs")] =
-            [
-                "AdminRoleName.MaxLength"
-            ],
-            [Path.Combine("Configurations", "AdminRolePermissionConfiguration.cs")] =
-            [
-                "AdminPermission.MaxLength"
             ]
         };
         string administrationPersistenceRoot = GmaSourceLayout.ModulePath(
@@ -4179,6 +4194,51 @@ public sealed partial class DeveloperExperienceGuardTests
             .SelectMany(item =>
             {
                 string path = Path.Combine(administrationPersistenceRoot, item.Key);
+                string source = File.ReadAllText(path);
+
+                return item.Value
+                    .Where(token => !source.Contains(token, StringComparison.Ordinal))
+                    .Select(token => $"{Path.GetRelativePath(repositoryRoot, path)} missing {token}");
+            })
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void Access_control_persistence_uses_named_length_constants()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        IReadOnlyDictionary<string, string[]> expectedTokensByFile = new Dictionary<string, string[]>
+        {
+            [Path.Combine("Configurations", "AccessPrincipalConfiguration.cs")] =
+            [
+                "AccessSubject.IdMaxLength"
+            ],
+            [Path.Combine("Configurations", "AccessRoleConfiguration.cs")] =
+            [
+                "AccessControlRoleName.MaxLength"
+            ],
+            [Path.Combine("Configurations", "AccessRolePermissionConfiguration.cs")] =
+            [
+                "PermissionCode.MaxLength"
+            ],
+            [Path.Combine("Configurations", "AccessSubjectRoleAssignmentConfiguration.cs")] =
+            [
+                "AccessSubject.IdMaxLength",
+                "AccessScope.MaxLength",
+                "HasIndex(assignment => new { assignment.SubjectKind, assignment.SubjectId, assignment.ScopeValue })"
+            ]
+        };
+        string accessControlPersistenceRoot = GmaSourceLayout.ModulePath(
+            repositoryRoot,
+            "AccessControl",
+            "Gma.Modules.AccessControl.Persistence");
+        string[] offenders = expectedTokensByFile
+            .SelectMany(item =>
+            {
+                string path = Path.Combine(accessControlPersistenceRoot, item.Key);
                 string source = File.ReadAllText(path);
 
                 return item.Value
@@ -4300,23 +4360,23 @@ public sealed partial class DeveloperExperienceGuardTests
         {
             [Path.Combine("Auth", "Gma.Modules.Auth.Persistence", "AuthDbContext.cs")] =
             [
-                ": TenantAwareDbContext<AuthDbContext>(options, tenantContext)",
-                "this.ApplyTenantConventions(modelBuilder);"
+                ": ScopeAwareDbContext<AuthDbContext>(options, scopeContext)",
+                "this.ApplyScopeConventions(modelBuilder);"
             ],
             [Path.Combine("Catalog", "Catalog.Persistence", "CatalogDbContext.cs")] =
             [
-                ": TenantAwareDbContext<CatalogDbContext>(options, tenantContext)",
-                "this.ApplyTenantConventions(modelBuilder);"
+                ": ScopeAwareDbContext<CatalogDbContext>(options, scopeContext)",
+                "this.ApplyScopeConventions(modelBuilder);"
             ],
             [Path.Combine("Ordering", "Ordering.Persistence", "OrderingDbContext.cs")] =
             [
-                ": TenantAwareDbContext<OrderingDbContext>(options, tenantContext)",
-                "this.ApplyTenantConventions(modelBuilder);"
+                ": ScopeAwareDbContext<OrderingDbContext>(options, scopeContext)",
+                "this.ApplyScopeConventions(modelBuilder);"
             ],
             [Path.Combine("Notifications", "Gma.Modules.Notifications.Persistence", "NotificationsDbContext.cs")] =
             [
-                ": TenantAwareDbContext<NotificationsDbContext>(options, tenantContext)",
-                "this.ApplyTenantConventions(modelBuilder);"
+                ": ScopeAwareDbContext<NotificationsDbContext>(options, scopeContext)",
+                "this.ApplyScopeConventions(modelBuilder);"
             ]
         };
         string[] offenders = expectedTokensByPath
@@ -4337,12 +4397,12 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] scaffoldRequiredTokens =
         [
             "using Gma.Framework.Persistence.EntityFrameworkCore;",
-            "using Gma.Framework.Tenancy;",
-            @"$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj",
-            "ITenantContext tenantContext",
-            ": TenantAwareDbContext<${Name}DbContext>(options, tenantContext)",
-            "this.ApplyTenantConventions(modelBuilder);",
-            "new DesignTimeTenantContext()"
+            "using Gma.Framework.Scoping;",
+            @"$(GmaFrameworkRoot)Scoping\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj",
+            "IScopeContext scopeContext",
+            ": ScopeAwareDbContext<${Name}DbContext>(options, scopeContext)",
+            "this.ApplyScopeConventions(modelBuilder);",
+            "new DesignTimeScopeContext()"
         ];
         string[] scaffoldOffenders = scaffoldRequiredTokens
             .Where(token => !scaffolder.Contains(token, StringComparison.Ordinal))
@@ -4358,19 +4418,19 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         IEntityType[] entityTypes = CreateTenantConventionModelEntityTypes();
         string[] offenders = entityTypes
-            .Where(type => typeof(ITenantScoped).IsAssignableFrom(type.ClrType))
+            .Where(type => typeof(IScopedEntity).IsAssignableFrom(type.ClrType))
             .SelectMany(type =>
             {
                 List<string> failures = [];
-                if (type.FindProperty(nameof(ITenantScoped.TenantId))?.GetMaxLength() != TenantIds.MaxLength)
+                if (type.FindProperty(nameof(IScopedEntity.ScopeId))?.GetMaxLength() != ScopeIds.MaxLength)
                 {
-                    failures.Add($"{type.ClrType.FullName} TenantId is not configured with TenantIds.MaxLength");
+                    failures.Add($"{type.ClrType.FullName} ScopeId is not configured with ScopeIds.MaxLength");
                 }
 
                 if (!type.GetDeclaredQueryFilters().Any(filter =>
-                        string.Equals(filter.Key, TenantFilterNames.TenantFilter, StringComparison.Ordinal)))
+                        string.Equals(filter.Key, ScopeFilterNames.ScopeFilter, StringComparison.Ordinal)))
                 {
-                    failures.Add($"{type.ClrType.FullName} is missing named {TenantFilterNames.TenantFilter}");
+                    failures.Add($"{type.ClrType.FullName} is missing named {ScopeFilterNames.ScopeFilter}");
                 }
 
                 return failures;
@@ -4390,9 +4450,9 @@ public sealed partial class DeveloperExperienceGuardTests
             typeof(OutboxMessage)
         ];
         string[] offenders = CreateTenantConventionModelEntityTypes()
-            .Where(type => !typeof(ITenantScoped).IsAssignableFrom(type.ClrType))
+            .Where(type => !typeof(IScopedEntity).IsAssignableFrom(type.ClrType))
             .Where(type => type.ClrType.GetCustomAttribute<GlobalEntityAttribute>() is null)
-            .Where(type => type.ClrType.GetCustomAttribute<DisableTenantFilterAttribute>() is null)
+            .Where(type => type.ClrType.GetCustomAttribute<DisableScopeFilterAttribute>() is null)
             .Where(type => !allowedInfrastructureExceptions.Contains(type.ClrType))
             .Select(type => $"{type.ClrType.FullName} is not tenant-scoped, global, tenant-filter-disabled, or an allowed infrastructure exception")
             .Order(StringComparer.Ordinal)
@@ -4405,13 +4465,13 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Tenant_filter_disable_attributes_have_reasons()
     {
         string[] offenders = ArchitectureCatalog.ModuleBoundaryAssemblies
-            .Append(typeof(TenantFilterNames).Assembly)
-            .Append(typeof(ITenantScoped).Assembly)
+            .Append(typeof(ScopeFilterNames).Assembly)
+            .Append(typeof(IScopedEntity).Assembly)
             .SelectMany(assembly => assembly.GetTypes())
             .Select(type => new
             {
                 Type = type,
-                Attribute = type.GetCustomAttribute<DisableTenantFilterAttribute>()
+                Attribute = type.GetCustomAttribute<DisableScopeFilterAttribute>()
             })
             .Where(item => item.Attribute is not null && string.IsNullOrWhiteSpace(item.Attribute.Reason))
             .Select(item => item.Type.FullName ?? item.Type.Name)
@@ -4422,14 +4482,67 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Administration_role_name_length_is_not_hidden_in_regex()
+    public void Administration_front_doors_do_not_reference_access_control_persistence()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string[] projectFiles =
+        [
+            GmaSourceLayout.ModulePath(
+                repositoryRoot,
+                "Administration",
+                "Gma.Modules.Administration.AdminApi",
+                "Gma.Modules.Administration.AdminApi.csproj"),
+            GmaSourceLayout.ModulePath(
+                repositoryRoot,
+                "Administration",
+                "Gma.Modules.Administration.AdminCli",
+                "Gma.Modules.Administration.AdminCli.csproj")
+        ];
+        string[] sourceFiles =
+        [
+            GmaSourceLayout.ModulePath(
+                repositoryRoot,
+                "Administration",
+                "Gma.Modules.Administration.AdminApi",
+                "AdministrationAdminApiModule.cs"),
+            GmaSourceLayout.ModulePath(
+                repositoryRoot,
+                "Administration",
+                "Gma.Modules.Administration.AdminCli",
+                "AdministrationAdminCliModule.cs")
+        ];
+        string[] offenders = projectFiles
+            .SelectMany(path =>
+            {
+                XDocument project = XDocument.Load(path);
+                return project
+                    .Descendants("ProjectReference")
+                    .Select(reference => NormalizePath(reference.Attribute("Include")?.Value ?? string.Empty))
+                    .Where(reference => reference.Contains(
+                        "Gma.Modules.AccessControl.Persistence",
+                        StringComparison.Ordinal))
+                    .Select(reference => $"{Path.GetRelativePath(repositoryRoot, path)} references {reference}");
+            })
+            .Concat(sourceFiles
+                .Where(path => File.ReadAllText(path).Contains(
+                        "Gma.Modules.AccessControl.Persistence",
+                        StringComparison.Ordinal))
+                .Select(path => $"{Path.GetRelativePath(repositoryRoot, path)} imports Gma.Modules.AccessControl.Persistence"))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void Access_control_role_name_length_is_not_hidden_in_regex()
     {
         string repositoryRoot = FindRepositoryRoot();
         string source = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
-            "Administration",
-            "Gma.Modules.Administration.Application",
-            "AdminRoleName.cs"));
+            "AccessControl",
+            "Gma.Modules.AccessControl.Application",
+            "AccessControlRoleName.cs"));
 
         Assert.Contains("candidate.Length > MaxLength", source, StringComparison.Ordinal);
         Assert.DoesNotContain("{0,127}", source, StringComparison.Ordinal);
@@ -4742,10 +4855,19 @@ public sealed partial class DeveloperExperienceGuardTests
                 ["Microsoft.Extensions.Logging.Abstractions"],
                 [],
                 [
-                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
-                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
-                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
-                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
+                    @"..\..\Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\..\Results\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\..\Runtime\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\..\Tenancy\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
+                ]),
+            new(
+                "Gma.Framework.Administration.AccessControl",
+                ["Microsoft.Extensions.DependencyInjection.Abstractions"],
+                [],
+                [
+                    @"..\Gma.Framework.Administration\Gma.Framework.Administration.csproj",
+                    @"..\..\Security\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj",
+                    @"..\..\Security\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj"
                 ]),
             new(
                 "Gma.Framework.Administration.Api",
@@ -4753,12 +4875,12 @@ public sealed partial class DeveloperExperienceGuardTests
                 ["Microsoft.AspNetCore.App"],
                 [
                     @"..\Gma.Framework.Administration\Gma.Framework.Administration.csproj",
-                    @"..\Gma.Framework.Api\Gma.Framework.Api.csproj",
-                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
-                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
-                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
-                    @"..\Gma.Framework.Security\Gma.Framework.Security.csproj",
-                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
+                    @"..\..\Api\Gma.Framework.Api\Gma.Framework.Api.csproj",
+                    @"..\..\Cqrs\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\..\Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\..\Results\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\..\Security\Gma.Framework.Security\Gma.Framework.Security.csproj",
+                    @"..\..\Tenancy\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
                 "Gma.Framework.Administration.Cli",
@@ -4766,17 +4888,27 @@ public sealed partial class DeveloperExperienceGuardTests
                 [],
                 [
                     @"..\Gma.Framework.Administration\Gma.Framework.Administration.csproj",
-                    @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
-                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
-                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
-                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
+                    @"..\..\Cqrs\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\..\Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\..\Results\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\..\Runtime\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
                 ]),
             new(
                 "Gma.Framework.AccessControl",
-                [],
+                ["Microsoft.Extensions.DependencyInjection.Abstractions"],
                 [],
                 [
-                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
+                    @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj"
+                ]),
+            new(
+                "Gma.Framework.AccessControl.AspNetCore",
+                [],
+                ["Microsoft.AspNetCore.App"],
+                [
+                    @"..\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj",
+                    @"..\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj",
+                    @"..\Gma.Framework.Security\Gma.Framework.Security.csproj"
                 ]),
             new(
                 "Gma.Framework.Api",
@@ -4785,6 +4917,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 [
                     @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
                     @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\..\Scoping\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj",
                     @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
@@ -4853,7 +4986,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.Results\Gma.Framework.Results.csproj"
                 ]),
             new(
-                "Gma.Framework.Authorization",
+                "Gma.Framework.Permissions",
                 [],
                 [],
                 [
@@ -4962,9 +5095,11 @@ public sealed partial class DeveloperExperienceGuardTests
                 [
                     @"..\Gma.Framework.Application.Events.Infrastructure\Gma.Framework.Application.Events.Infrastructure.csproj",
                     @"..\Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj",
+                    @"..\Gma.Framework.Scoping.Infrastructure\Gma.Framework.Scoping.Infrastructure.csproj",
                     @"..\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj",
                     @"..\Gma.Framework.Tenancy.Cqrs\Gma.Framework.Tenancy.Cqrs.csproj",
-                    @"..\Gma.Framework.Tenancy.Infrastructure\Gma.Framework.Tenancy.Infrastructure.csproj"
+                    @"..\Gma.Framework.Tenancy.Infrastructure\Gma.Framework.Tenancy.Infrastructure.csproj",
+                    @"..\Gma.Framework.Tenancy.Scoping\Gma.Framework.Tenancy.Scoping.csproj"
                 ]),
             new(
                 "Gma.Framework.Logging.Serilog",
@@ -5067,8 +5202,8 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
                     @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
                     @"..\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj",
+                    @"..\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj",
                     @"..\Gma.Framework.Security\Gma.Framework.Security.csproj",
-                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
                 "Gma.Framework.Notifications.Infrastructure",
@@ -5097,8 +5232,8 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
                     @"..\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj",
                     @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj",
                     @"..\Gma.Framework.Security\Gma.Framework.Security.csproj",
-                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
                 "Gma.Framework.Realtime",
@@ -5136,6 +5271,28 @@ public sealed partial class DeveloperExperienceGuardTests
                 [@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"]),
             new("Gma.Framework.Pagination", [], [], []),
             new(
+                "Gma.Framework.Scoping",
+                [],
+                [],
+                [
+                    @"..\..\Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\..\Modules\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
+                    @"..\..\Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\..\Results\Gma.Framework.Results\Gma.Framework.Results.csproj"
+                ]),
+            new(
+                "Gma.Framework.Scoping.Infrastructure",
+                [
+                    "Microsoft.Extensions.Configuration.Binder",
+                    "Microsoft.Extensions.Hosting"
+                ],
+                [],
+                [
+                    @"..\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj",
+                    @"..\..\Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\..\Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
+                ]),
+            new(
                 "Gma.Framework.Observability.Infrastructure",
                 ["Microsoft.Extensions.Options.ConfigurationExtensions"],
                 [],
@@ -5158,7 +5315,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
                     @"..\Gma.Framework.Domain\Gma.Framework.Domain.csproj",
                     @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
-                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
+                    @"..\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj"
                 ]),
             new(
                 "Gma.Framework.ProjectionRebuild",
@@ -5257,6 +5414,16 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.Results\Gma.Framework.Results.csproj"
                 ]),
             new(
+                "Gma.Framework.Tenancy.AccessControl.AspNetCore",
+                [],
+                ["Microsoft.AspNetCore.App"],
+                [
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj",
+                    @"..\..\Security\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj",
+                    @"..\..\Security\Gma.Framework.AccessControl.AspNetCore\Gma.Framework.AccessControl.AspNetCore.csproj",
+                    @"..\..\Security\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj"
+                ]),
+            new(
                 "Gma.Framework.Tenancy.Infrastructure",
                 [
                     "Microsoft.Extensions.Configuration.Binder",
@@ -5314,6 +5481,17 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
                     @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj",
                     @"..\Gma.Framework.Tenancy.Messaging\Gma.Framework.Tenancy.Messaging.csproj"
+                ]),
+            new(
+                "Gma.Framework.Tenancy.Scoping",
+                ["Microsoft.Extensions.Hosting"],
+                [],
+                [
+                    @"..\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj",
+                    @"..\..\Scoping\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj",
+                    @"..\..\Scoping\Gma.Framework.Scoping.Infrastructure\Gma.Framework.Scoping.Infrastructure.csproj",
+                    @"..\..\Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\..\Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj"
                 ]),
             new(
                 "Gma.Framework.Tenancy.Tasks",
@@ -5599,6 +5777,9 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\Administration\Gma.Modules.Administration.AdminApi\Gma.Modules.Administration.AdminApi.csproj",
                     @"..\Modules\Administration\Gma.Modules.Administration.Persistence.PostgreSqlMigrations\Gma.Modules.Administration.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Administration\Gma.Modules.Administration.Persistence.SqlServerMigrations\Gma.Modules.Administration.Persistence.SqlServerMigrations.csproj",
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.AdminApi\Gma.Modules.AccessControl.AdminApi.csproj",
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations\Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.Persistence.SqlServerMigrations\Gma.Modules.AccessControl.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.AdminApi\Gma.Modules.Auth.AdminApi.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
@@ -5627,6 +5808,9 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\Administration\Gma.Modules.Administration.AdminCli\Gma.Modules.Administration.AdminCli.csproj",
                     @"..\Modules\Administration\Gma.Modules.Administration.Persistence.PostgreSqlMigrations\Gma.Modules.Administration.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Administration\Gma.Modules.Administration.Persistence.SqlServerMigrations\Gma.Modules.Administration.Persistence.SqlServerMigrations.csproj",
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.AdminCli\Gma.Modules.AccessControl.AdminCli.csproj",
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations\Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.Persistence.SqlServerMigrations\Gma.Modules.AccessControl.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.AdminCli\Gma.Modules.Auth.AdminCli.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
@@ -5781,8 +5965,17 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             "Microsoft.AspNetCore.App"
         ];
+        string[] forbiddenProjectReferenceTokens =
+        [
+            "Gma.Framework.AccessControl"
+        ];
         string[] forbiddenSourceTokens =
         [
+            "AccessDecision",
+            "AccessRequirement",
+            "AccessScope",
+            "Gma.Framework.AccessControl",
+            "IAccessAuthorizationService",
             "IEndpointRouteBuilder",
             "IHostApplicationBuilder",
             "Microsoft.AspNetCore",
@@ -5803,6 +5996,12 @@ public sealed partial class DeveloperExperienceGuardTests
             .Where(reference => reference is not null && forbiddenFrameworkReferences.Contains(reference, StringComparer.Ordinal))
             .Select(reference => $"Gma.Framework.Administration.csproj:{reference}")
             .ToArray();
+        string[] projectReferenceOffenders = project
+            .Descendants("ProjectReference")
+            .Select(element => element.Attribute("Include")?.Value)
+            .Where(reference => reference is not null && forbiddenProjectReferenceTokens.Any(token => reference.Contains(token, StringComparison.OrdinalIgnoreCase)))
+            .Select(reference => $"Gma.Framework.Administration.csproj:{reference}")
+            .ToArray();
         string[] sourceOffenders = EnumerateSourceFiles(sharedAdministrationRoot)
             .SelectMany(path =>
             {
@@ -5816,6 +6015,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
         Assert.Empty(packageOffenders
             .Concat(frameworkOffenders)
+            .Concat(projectReferenceOffenders)
             .Concat(sourceOffenders)
             .Order(StringComparer.OrdinalIgnoreCase));
     }
@@ -6433,18 +6633,18 @@ public sealed partial class DeveloperExperienceGuardTests
             "$metadataDescriptor = $metadataDescriptorLines -join \"`r`n\"",
             "using Gma.Framework.Modules;",
             "$(GmaFrameworkRoot)Modules\\Gma.Framework.Modules\\Gma.Framework.Modules.csproj",
-            "using Gma.Framework.Authorization;",
-            "$(GmaFrameworkRoot)Security\\Gma.Framework.Authorization\\Gma.Framework.Authorization.csproj",
+            "using Gma.Framework.Permissions;",
+            "$(GmaFrameworkRoot)Security\\Gma.Framework.Permissions\\Gma.Framework.Permissions.csproj",
             "$(GmaFrameworkRoot)Messaging\\Gma.Framework.Messaging\\Gma.Framework.Messaging.csproj",
             "Write-GmaFile (Join-Path $moduleRoot \"$Name.Contracts\\Metadata\\${Name}ModuleMetadata.cs\")",
-            "tenantScoped: true",
+            "scopeRequirement: PermissionScopeRequirement.Scoped",
             "ModuleCacheTag",
             "ModuleCacheEntry",
             "using Gma.Framework.Caching;",
             "$(GmaFrameworkRoot)Caching\\Gma.Framework.Caching\\Gma.Framework.Caching.csproj",
             ".WithPermission($metadataPermissionDescriptor)",
-            ".WithCacheEntry(new ModuleCacheDescriptor(ModuleCacheEntry, CacheScope.Tenant, [ModuleCacheTag]))",
-            "public static CacheKey ModuleKey(params string[] segments) => CacheKey.Tenant(",
+            ".WithCacheEntry(new ModuleCacheDescriptor(ModuleCacheEntry, CacheScope.Scope, [ModuleCacheTag]))",
+            "public static CacheKey ModuleKey(params string[] segments) => CacheKey.Scoped(",
             "$AdminCli -or $AdminApi",
             "if ($AdminCli)",
             "${Name}ModuleMetadata.Name",
@@ -6474,7 +6674,7 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             "$metadataPermissionsBlock$metadataCacheDescriptorBlock",
             ".WithPermission($metadataPermissionDescriptor)`r`n",
-            ".WithCacheEntry(new ModuleCacheDescriptor(ModuleCacheEntry, CacheScope.Tenant, [ModuleCacheTag]))`r`n"
+            ".WithCacheEntry(new ModuleCacheDescriptor(ModuleCacheEntry, CacheScope.Scope, [ModuleCacheTag]))`r`n"
         ];
         string[] offenders = forbiddenTokens
             .Where(token => scaffolder.Contains(token, StringComparison.Ordinal))
@@ -7838,16 +8038,16 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         using AuthDbContext auth = new(
             CreateTenantConventionOptions<AuthDbContext>(),
-            new DesignTimeTenantContext());
+            new DesignTimeScopeContext());
         using CatalogDbContext catalog = new(
             CreateTenantConventionOptions<CatalogDbContext>(),
-            new DesignTimeTenantContext());
+            new DesignTimeScopeContext());
         using OrderingDbContext ordering = new(
             CreateTenantConventionOptions<OrderingDbContext>(),
-            new DesignTimeTenantContext());
+            new DesignTimeScopeContext());
         using NotificationsDbContext notifications = new(
             CreateTenantConventionOptions<NotificationsDbContext>(),
-            new DesignTimeTenantContext());
+            new DesignTimeScopeContext());
 
         return auth.Model.GetEntityTypes()
             .Concat(catalog.Model.GetEntityTypes())
@@ -7909,7 +8109,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
         return string.Equals(
                    normalizedReference,
-                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Authorization\Gma.Framework.Authorization.csproj"),
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
@@ -7987,6 +8187,7 @@ public sealed partial class DeveloperExperienceGuardTests
             NormalizePath(@"..\..\..\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.Pagination\Gma.Framework.Pagination.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.Persistence.EntityFrameworkCore\Gma.Framework.Persistence.EntityFrameworkCore.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild.EntityFrameworkCore\Gma.Framework.ProjectionRebuild.EntityFrameworkCore.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj"),
@@ -8212,6 +8413,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
         (string PropertyName, string FolderName)[] moduleRoots =
         [
+            ("GmaModuleAccessControlRoot", "AccessControl"),
             ("GmaModuleAdministrationRoot", "Administration"),
             ("GmaModuleAuthRoot", "Auth"),
             ("GmaModuleCatalogRoot", "Catalog"),
@@ -9030,7 +9232,7 @@ public sealed partial class DeveloperExperienceGuardTests
     [GeneratedRegex(@"public\s+sealed\s+record\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*\(", RegexOptions.Multiline)]
     private static partial Regex PositionalPublicDomainEventPattern();
 
-    [GeneratedRegex(@"public\s+sealed\s+record\s+[A-Za-z_][A-Za-z0-9_]*DomainEvent\s*:\s*(?:DomainEvent|TenantDomainEvent)\b", RegexOptions.Multiline)]
+    [GeneratedRegex(@"public\s+sealed\s+record\s+[A-Za-z_][A-Za-z0-9_]*DomainEvent\s*:\s*(?:DomainEvent|ScopedDomainEvent)\b", RegexOptions.Multiline)]
     private static partial Regex ModuleDomainEventBasePattern();
 
     [GeneratedRegex(@"\brecord\s+struct\s+[A-Za-z_][A-Za-z0-9_]*Id\s*\(\s*Guid\s+Value\s*\)", RegexOptions.Multiline)]

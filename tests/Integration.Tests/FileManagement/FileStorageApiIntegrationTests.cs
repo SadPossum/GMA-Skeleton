@@ -39,14 +39,14 @@ public sealed class FileStorageApiIntegrationTests
 
     private static HttpClient CreateAuthenticatedClient(
         FilesApiTestApplication application,
-        string tenantId,
+        string scopeId,
         string userId)
     {
         HttpClient client = application.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            FilesApiTestApplication.CreateAccessToken(tenantId, userId));
-        client.DefaultRequestHeaders.Add("X-Tenant-Id", tenantId);
+            FilesApiTestApplication.CreateAccessToken(scopeId, userId));
+        client.DefaultRequestHeaders.Add("X-Tenant-Id", scopeId);
         return client;
     }
 

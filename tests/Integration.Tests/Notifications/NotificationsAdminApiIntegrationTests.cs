@@ -35,7 +35,7 @@ public sealed class NotificationsAdminApiIntegrationTests
                 2);
         using HttpClient ownerTenantA = CreateAuthenticatedClient(application, ownerActor, "tenant-a", "tenant-a");
         using HttpClient ownerTenantB = CreateAuthenticatedClient(application, ownerActor, "tenant-b", "tenant-b");
-        using HttpClient platformOwner = CreateAuthenticatedClient(application, ownerActor, tokenTenantId: null, headerTenantId: null);
+        using HttpClient platformOwner = CreateAuthenticatedClient(application, ownerActor, tokenScopeId: null, headerScopeId: null);
         using HttpClient strangerTenantA = CreateAuthenticatedClient(application, strangerActor, "tenant-a", "tenant-a");
 
         AdminNotificationHistoryListResponse history = await GetJsonAsync<AdminNotificationHistoryListResponse>(
@@ -98,7 +98,7 @@ public sealed class NotificationsAdminApiIntegrationTests
         Assert.Equal(1, history.TotalCount);
         AdminNotificationHistoryItem historyItem = Assert.Single(history.Items);
         Assert.Equal(tenantNotificationId, historyItem.NotificationId);
-        Assert.Equal("tenant-a", historyItem.TenantId);
+        Assert.Equal("tenant-a", historyItem.ScopeId);
         Assert.Equal(HttpStatusCode.Forbidden, deniedHistory.StatusCode);
         Assert.Equal(1, deniedAuditCount);
 
@@ -107,7 +107,7 @@ public sealed class NotificationsAdminApiIntegrationTests
         Assert.Contains(tenantBroadcasts.Items, item => item.BroadcastId == tenantUserBroadcast.BroadcastId);
         AdminNotificationBroadcastItem platformBroadcast = Assert.Single(platformBroadcasts.Items);
         Assert.Equal(platformAdminBroadcast.BroadcastId, platformBroadcast.BroadcastId);
-        Assert.Null(platformBroadcast.TenantId);
+        Assert.Null(platformBroadcast.ScopeId);
 
         Assert.Equal(2, tenantAInbox.TotalCount);
         Assert.Equal(2, tenantAInbox.UnreadCount);
@@ -127,17 +127,17 @@ public sealed class NotificationsAdminApiIntegrationTests
     private static HttpClient CreateAuthenticatedClient(
         NotificationsAdminApiTestApplication application,
         string actorId,
-        string? tokenTenantId,
-        string? headerTenantId)
+        string? tokenScopeId,
+        string? headerScopeId)
     {
         HttpClient client = application.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            NotificationsAdminApiTestApplication.CreateAccessToken(actorId, tokenTenantId));
+            NotificationsAdminApiTestApplication.CreateAccessToken(actorId, tokenScopeId));
 
-        if (!string.IsNullOrWhiteSpace(headerTenantId))
+        if (!string.IsNullOrWhiteSpace(headerScopeId))
         {
-            client.DefaultRequestHeaders.Add("X-Tenant-Id", headerTenantId);
+            client.DefaultRequestHeaders.Add("X-Tenant-Id", headerScopeId);
         }
 
         return client;

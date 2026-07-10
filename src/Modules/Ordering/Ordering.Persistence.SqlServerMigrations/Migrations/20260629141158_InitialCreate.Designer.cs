@@ -59,7 +59,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
@@ -74,7 +74,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "CatalogItemId");
+                    b.HasIndex("ScopeId", "CatalogItemId");
 
                     b.ToTable("orders", "ordering");
                 });
@@ -110,14 +110,14 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "CatalogItemId")
+                    b.HasIndex("ScopeId", "CatalogItemId")
                         .IsUnique();
 
                     b.ToTable("catalog_item_projections", "ordering");
@@ -171,7 +171,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");

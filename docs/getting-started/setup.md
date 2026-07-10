@@ -166,8 +166,8 @@ Core runtime keys:
 - `Auth:Jwt:Audience` optional override; defaults to `ApplicationIdentity:DisplayName`
 - `Auth:Jwt:SigningKey`
 - `Auth:Jwt:AccessTokenLifetimeMinutes`
-- `Administration:Bootstrap:AllowWhenAssignmentsExist`
-- `Administration:Bootstrap:OwnerRoleName`
+- `AccessControl:Bootstrap:AllowWhenAssignmentsExist`
+- `AccessControl:Bootstrap:OwnerRoleName`
 - `Administration:Api:ActorIdClaim`
 - `Administration:Api:TenantIdClaim`
 - `Administration:Api:RequireTenantClaimMatch`
@@ -237,7 +237,7 @@ The script verifies focused `.slnx` ownership, stale root docs/tests, package-lo
 
 ## Source-First GMA Development
 
-The skeleton repository consumes the framework and reusable modules as Git submodules under `gma/framework` and `gma/modules/<alias>`. Framework references go through `GmaFrameworkRoot`, and module references go through `GmaModule*Root` properties with checked-in defaults in `Directory.Build.props`.
+The skeleton repository consumes the framework and reusable modules as Git submodules under `gma/framework` and `gma/modules/<alias>`. AccessControl is currently the source-first local package exception until `GMA-Module-AccessControl` is created. Framework references go through `GmaFrameworkRoot`, and module references go through `GmaModule*Root` properties with checked-in defaults in `Directory.Build.props`.
 
 To create a local override file:
 
@@ -280,7 +280,7 @@ Useful source-first helpers:
 .\eng\gma-validate.ps1 -FocusedSolutions
 ```
 
-`gma-status` reports dirty working tree, source-root, and submodule state. `gma-update` runs `git submodule update --recursive`, with `-Init` for first checkout and `-Remote` when you deliberately want to move mounted repositories to their configured branch tips. `check-submodule-dev-heads` verifies the skeleton's checked-in GMA submodule pointers match `origin/dev` for every reusable source repository. `check-source-packages` validates package-local solution ownership and builds focused packages. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.
+`gma-status` reports dirty working tree, source-root, and submodule state. `gma-update` runs `git submodule update --recursive`, with `-Init` for first checkout and `-Remote` when you deliberately want to move mounted repositories to their configured branch tips. `check-submodule-dev-heads` verifies the skeleton's checked-in GMA submodule pointers match `origin/dev` for every reusable source repository that already has a remote submodule. `check-source-packages` validates package-local solution ownership and builds focused packages. `gma-validate` validates the all-up solution and, with `-FocusedSolutions`, each framework/module entrypoint.
 
 When a reusable GMA repository advances, update the skeleton pointers deliberately:
 

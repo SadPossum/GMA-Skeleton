@@ -8,7 +8,9 @@ internal sealed class GmaSourceLayout
         new(StringComparer.Ordinal)
         {
             ["Gma.Framework.AccessControl"] = "Security",
+            ["Gma.Framework.AccessControl.AspNetCore"] = "Security",
             ["Gma.Framework.Administration"] = "Administration",
+            ["Gma.Framework.Administration.AccessControl"] = "Administration",
             ["Gma.Framework.Administration.Api"] = "Administration",
             ["Gma.Framework.Administration.Cli"] = "Administration",
             ["Gma.Framework.Api"] = "Api",
@@ -17,7 +19,7 @@ internal sealed class GmaSourceLayout
             ["Gma.Framework.Application.Composition"] = "Application",
             ["Gma.Framework.Application.Events"] = "Application",
             ["Gma.Framework.Application.Events.Infrastructure"] = "Application",
-            ["Gma.Framework.Authorization"] = "Security",
+            ["Gma.Framework.Permissions"] = "Security",
             ["Gma.Framework.Caching"] = "Caching",
             ["Gma.Framework.Caching.Cqrs"] = "Caching",
             ["Gma.Framework.Caching.Infrastructure"] = "Caching",
@@ -46,6 +48,8 @@ internal sealed class GmaSourceLayout
             ["Gma.Framework.Observability"] = "Observability",
             ["Gma.Framework.Observability.Infrastructure"] = "Observability",
             ["Gma.Framework.Pagination"] = "Pagination",
+            ["Gma.Framework.Scoping"] = "Scoping",
+            ["Gma.Framework.Scoping.Infrastructure"] = "Scoping",
             ["Gma.Framework.Persistence.EntityFrameworkCore"] = "Persistence",
             ["Gma.Framework.ProjectionRebuild"] = "ProjectionRebuild",
             ["Gma.Framework.ProjectionRebuild.EntityFrameworkCore"] = "ProjectionRebuild",
@@ -62,17 +66,20 @@ internal sealed class GmaSourceLayout
             ["Gma.Framework.Tasks.Infrastructure"] = "Tasks",
             ["Gma.Framework.Tenancy"] = "Tenancy",
             ["Gma.Framework.Tenancy.Api.Serilog"] = "Tenancy",
+            ["Gma.Framework.Tenancy.AccessControl.AspNetCore"] = "Tenancy",
             ["Gma.Framework.Tenancy.Caching"] = "Tenancy",
             ["Gma.Framework.Tenancy.Cqrs"] = "Tenancy",
             ["Gma.Framework.Tenancy.Infrastructure"] = "Tenancy",
             ["Gma.Framework.Tenancy.Messaging"] = "Tenancy",
             ["Gma.Framework.Tenancy.Messaging.Infrastructure"] = "Tenancy",
+            ["Gma.Framework.Tenancy.Scoping"] = "Tenancy",
             ["Gma.Framework.Tenancy.Tasks"] = "Tenancy",
         };
 
     private static readonly IReadOnlyDictionary<string, string> ModulePropertyNames =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            ["AccessControl"] = "GmaModuleAccessControlRoot",
             ["Administration"] = "GmaModuleAdministrationRoot",
             ["Auth"] = "GmaModuleAuthRoot",
             ["Catalog"] = "GmaModuleCatalogRoot",

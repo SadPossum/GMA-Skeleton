@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Gma.Modules.AccessControl.Admin.Contracts;
+using Gma.Modules.AccessControl.Application;
 using Gma.Modules.Administration.Application;
 using Gma.Modules.Auth.Admin.Contracts;
 using Gma.Modules.Auth.Application;
@@ -101,7 +103,7 @@ public sealed class AdminApiIntegrationTests
             application.CreateAccessToken(ownerId, "tenant-admin"));
 
         int invalidRoleAuditCountBefore = await application
-            .CountAuditEntriesAsync(AdministrationAdminOperationNames.RolesCreate, AdministrationApplicationErrors.RoleNameInvalid.Code)
+            .CountAuditEntriesAsync(AccessControlAdminOperationNames.RolesCreate, AccessControlApplicationErrors.RoleNameInvalid.Code)
             .ConfigureAwait(false);
         using HttpResponseMessage invalidRole = await ownerClient.PostAsJsonAsync(
                 "/api/admin/roles",
@@ -110,12 +112,12 @@ public sealed class AdminApiIntegrationTests
         string invalidRoleBody = await invalidRole.Content.ReadAsStringAsync().ConfigureAwait(false);
         Assert.Equal(HttpStatusCode.BadRequest, invalidRole.StatusCode);
         Assert.Contains(RequestValidationErrors.FailedCode, invalidRoleBody, StringComparison.Ordinal);
-        Assert.Contains("Admin role name is invalid.", invalidRoleBody, StringComparison.Ordinal);
+        Assert.Contains(AccessControlApplicationErrors.RoleNameInvalid.Message, invalidRoleBody, StringComparison.Ordinal);
         Assert.DoesNotContain(AdminErrors.OperationFailed.Code, invalidRoleBody, StringComparison.Ordinal);
         Assert.Equal(
             invalidRoleAuditCountBefore,
             await application
-                .CountAuditEntriesAsync(AdministrationAdminOperationNames.RolesCreate, AdministrationApplicationErrors.RoleNameInvalid.Code)
+                .CountAuditEntriesAsync(AccessControlAdminOperationNames.RolesCreate, AccessControlApplicationErrors.RoleNameInvalid.Code)
                 .ConfigureAwait(false));
 
         await AssertSuccess(ownerClient.PostAsJsonAsync("/api/admin/roles", new { name = "support" }));
@@ -124,10 +126,10 @@ public sealed class AdminApiIntegrationTests
             new { name = "support" }).ConfigureAwait(false);
         string duplicateRoleBody = await duplicateRole.Content.ReadAsStringAsync().ConfigureAwait(false);
         Assert.Equal(HttpStatusCode.Conflict, duplicateRole.StatusCode);
-        Assert.Contains(AdministrationApplicationErrors.RoleAlreadyExists.Code, duplicateRoleBody, StringComparison.Ordinal);
+        Assert.Contains(AccessControlApplicationErrors.RoleAlreadyExists.Code, duplicateRoleBody, StringComparison.Ordinal);
 
         int invalidPermissionAuditCountBefore = await application
-            .CountAuditEntriesAsync(AdministrationAdminOperationNames.RolesGrant, AdministrationApplicationErrors.PermissionCodeInvalid.Code)
+            .CountAuditEntriesAsync(AccessControlAdminOperationNames.RolesGrant, AccessControlApplicationErrors.PermissionCodeInvalid.Code)
             .ConfigureAwait(false);
         using HttpResponseMessage invalidPermission = await ownerClient.PostAsJsonAsync(
                 "/api/admin/roles/support/permissions",
@@ -136,12 +138,12 @@ public sealed class AdminApiIntegrationTests
         string invalidPermissionBody = await invalidPermission.Content.ReadAsStringAsync().ConfigureAwait(false);
         Assert.Equal(HttpStatusCode.BadRequest, invalidPermission.StatusCode);
         Assert.Contains(RequestValidationErrors.FailedCode, invalidPermissionBody, StringComparison.Ordinal);
-        Assert.Contains("Admin permission code is invalid.", invalidPermissionBody, StringComparison.Ordinal);
+        Assert.Contains(AccessControlApplicationErrors.PermissionCodeInvalid.Message, invalidPermissionBody, StringComparison.Ordinal);
         Assert.DoesNotContain(AdminErrors.OperationFailed.Code, invalidPermissionBody, StringComparison.Ordinal);
         Assert.Equal(
             invalidPermissionAuditCountBefore,
             await application
-                .CountAuditEntriesAsync(AdministrationAdminOperationNames.RolesGrant, AdministrationApplicationErrors.PermissionCodeInvalid.Code)
+                .CountAuditEntriesAsync(AccessControlAdminOperationNames.RolesGrant, AccessControlApplicationErrors.PermissionCodeInvalid.Code)
                 .ConfigureAwait(false));
 
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersRead);
@@ -151,7 +153,7 @@ public sealed class AdminApiIntegrationTests
             .ConfigureAwait(false);
         string duplicatePermissionBody = await duplicatePermission.Content.ReadAsStringAsync().ConfigureAwait(false);
         Assert.Equal(HttpStatusCode.Conflict, duplicatePermission.StatusCode);
-        Assert.Contains(AdministrationApplicationErrors.PermissionAlreadyGranted.Code, duplicatePermissionBody, StringComparison.Ordinal);
+        Assert.Contains(AccessControlApplicationErrors.PermissionAlreadyGranted.Code, duplicatePermissionBody, StringComparison.Ordinal);
 
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersCreate);
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersDisable);
@@ -160,7 +162,7 @@ public sealed class AdminApiIntegrationTests
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersRevokeSessions);
         await AssertSuccess(ownerClient.PostAsJsonAsync(
             "/api/admin/roles/support/assignments",
-            new { actorId = supportId.ToString(), tenantId = "tenant-admin" }));
+            new { actorId = supportId.ToString(), scope = "tenant:tenant-admin" }));
 
         using HttpClient strangerClient = application.CreateClient();
         strangerClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
@@ -222,7 +224,7 @@ public sealed class AdminApiIntegrationTests
         using HttpClient invalidTenantClaimClient = application.CreateClient();
         invalidTenantClaimClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            AdminApiTestApplication.CreateAccessTokenWithTenantClaim(supportId, new string('x', TenantIds.MaxLength + 1)));
+            AdminApiTestApplication.CreateAccessTokenWithTenantClaim(supportId, new string('x', ScopeIds.MaxLength + 1)));
         invalidTenantClaimClient.DefaultRequestHeaders.Add("X-Tenant-Id", "tenant-admin");
         int invalidTenantClaimAuditCountBefore = await application
             .CountAuditEntriesAsync(AuthAdminOperationNames.MembersList, AdminErrors.TenantClaimMismatch.Code)

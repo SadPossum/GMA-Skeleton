@@ -71,7 +71,7 @@ public sealed class TaskRuntimeIntegrationTests
 
         Assert.Single(reports);
         Assert.Equal(runId, reports[0].RunId);
-        Assert.Equal("tenant-a", reports[0].TenantId);
+        Assert.Equal("tenant-a", reports[0].ScopeId);
         Assert.Equal(TaskRunStatus.Succeeded, snapshot.Status);
         Assert.Equal(1, snapshot.Attempts);
         Assert.Null(snapshot.LockedBy);
@@ -158,7 +158,7 @@ public sealed class TaskRuntimeIntegrationTests
             "worker-b",
             context.NodeId,
             context.Attempt,
-            context.TenantId);
+            context.ScopeId);
 
         await application.MarkStartedAsync(wrongWorker, Now.AddSeconds(1)).ConfigureAwait(false);
         TaskRunSnapshot afterWrongWorker = await application.GetSnapshotAsync(runId).ConfigureAwait(false);

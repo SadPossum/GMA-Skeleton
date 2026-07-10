@@ -28,7 +28,7 @@ public sealed class CatalogItemProjectionModelTests
             " usd ",
             CatalogItemStatus.Active);
 
-        Assert.Equal("tenant-a", model.TenantId);
+        Assert.Equal("tenant-a", model.ScopeId);
         Assert.Equal(ItemId, model.CatalogItemId);
         Assert.Equal("SKU-1", model.Sku);
         Assert.Equal("Projection item", model.Name);
@@ -40,8 +40,8 @@ public sealed class CatalogItemProjectionModelTests
     [Fact]
     public void Write_model_rejects_invalid_tenant_and_catalog_snapshot_data()
     {
-        Assert.Throws<ArgumentException>(() => CreateWriteModel(tenantId: " "));
-        Assert.Throws<ArgumentException>(() => CreateWriteModel(tenantId: new string('x', TenantIds.MaxLength + 1)));
+        Assert.Throws<ArgumentException>(() => CreateWriteModel(scopeId: " "));
+        Assert.Throws<ArgumentException>(() => CreateWriteModel(scopeId: new string('x', ScopeIds.MaxLength + 1)));
         Assert.Throws<ArgumentException>(() => CreateWriteModel(catalogItemId: Guid.Empty));
         Assert.Throws<ArgumentException>(() => CreateWriteModel(sku: " "));
         Assert.Throws<ArgumentException>(() => CreateWriteModel(sku: new string('x', Order.CatalogSkuMaxLength + 1)));
@@ -127,7 +127,7 @@ public sealed class CatalogItemProjectionModelTests
         ProjectionRebuildCheckpoint roundTripped = state.ToCheckpoint();
 
         Assert.Equal(RunId, state.RunId);
-        Assert.Equal("tenant-a", state.TenantId);
+        Assert.Equal("tenant-a", state.ScopeId);
         Assert.Equal("catalog-item-projections", state.ProjectionName);
         Assert.Equal("sku-1", state.Cursor);
         Assert.Equal(checkpoint, roundTripped);
@@ -137,7 +137,7 @@ public sealed class CatalogItemProjectionModelTests
 
         Assert.Equal(completed, state.ToCheckpoint());
         Assert.Throws<InvalidOperationException>(() => OrderingProjectionRebuildCheckpoint.Create(
-            new ProjectionRebuildCheckpointKey("ordering", RunId, "catalog-item-projections", tenantId: null),
+            new ProjectionRebuildCheckpointKey("ordering", RunId, "catalog-item-projections", scopeId: null),
             checkpoint));
         Assert.Throws<ArgumentException>(() => OrderingProjectionRebuildCheckpoint.Create(
             key,
@@ -152,7 +152,7 @@ public sealed class CatalogItemProjectionModelTests
     }
 
     private static CatalogItemProjectionWriteModel CreateWriteModel(
-        string tenantId = "tenant-a",
+        string scopeId = "tenant-a",
         Guid? catalogItemId = null,
         string sku = "SKU-1",
         string name = "Projection item",
@@ -160,7 +160,7 @@ public sealed class CatalogItemProjectionModelTests
         string currency = "USD",
         CatalogItemStatus status = CatalogItemStatus.Active) =>
         new(
-            tenantId,
+            scopeId,
             catalogItemId ?? ItemId,
             sku,
             name,

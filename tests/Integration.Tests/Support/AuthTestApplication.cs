@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NATS.Client.Core;
 using Gma.Framework.Messaging;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 using Gma.Framework.Persistence.EntityFrameworkCore;
 
 internal sealed class AuthTestApplication(
@@ -223,11 +223,11 @@ internal sealed class AuthTestApplication(
         return snapshot;
     }
 
-    private sealed class DisabledTenantContext : ITenantContext
+    private sealed class DisabledTenantContext : IScopeContext
     {
         public static readonly DisabledTenantContext Instance = new();
 
         public bool IsEnabled => false;
-        public string? TenantId => null;
+        public string? ScopeId => null;
     }
 }

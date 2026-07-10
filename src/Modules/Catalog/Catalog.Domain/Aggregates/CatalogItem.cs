@@ -8,7 +8,7 @@ using Catalog.Domain.ValueObjects;
 using Gma.Framework.Domain.Models;
 using Gma.Framework.Results;
 
-public sealed class CatalogItem : TenantAggregateRoot<Guid>
+public sealed class CatalogItem : ScopedAggregateRoot<Guid>
 {
     public const int SkuMaxLength = 64;
     public const int NameMaxLength = 256;
@@ -22,8 +22,8 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
 
     private CatalogItem() { }
 
-    private CatalogItem(Guid id, string tenantId)
-        : base(id, tenantId)
+    private CatalogItem(Guid id, string scopeId)
+        : base(id, scopeId)
     {
     }
 
@@ -39,7 +39,7 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
 
     public static Result<CatalogItem> Create(
         Guid id,
-        string tenantId,
+        string scopeId,
         string sku,
         string name,
         decimal price,
@@ -58,13 +58,13 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
             return Result.Failure<CatalogItem>(CatalogDomainErrors.DomainEventIdRequired);
         }
 
-        Result<CatalogItemValues> values = CatalogItemValues.Create(tenantId, sku, name, price, currency);
+        Result<CatalogItemValues> values = CatalogItemValues.Create(scopeId, sku, name, price, currency);
         if (values.IsFailure)
         {
             return Result.Failure<CatalogItem>(values.Error);
         }
 
-        CatalogItem item = new(id, values.Value.TenantId)
+        CatalogItem item = new(id, values.Value.ScopeId)
         {
             Sku = values.Value.Sku,
             Name = values.Value.Name,
@@ -83,7 +83,7 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
             eventId,
             nowUtc,
             item.Id,
-            item.TenantId,
+            item.ScopeId,
             item.Sku.Value,
             item.Name.Value,
             item.Price.Value,
@@ -113,7 +113,7 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
             return Result.Failure(CatalogDomainErrors.DomainEventIdRequired);
         }
 
-        Result<CatalogItemValues> values = CatalogItemValues.Create(this.TenantId, sku, name, price, currency);
+        Result<CatalogItemValues> values = CatalogItemValues.Create(this.ScopeId, sku, name, price, currency);
         if (values.IsFailure)
         {
             return Result.Failure(values.Error);
@@ -134,7 +134,7 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
             eventId,
             nowUtc,
             this.Id,
-            this.TenantId,
+            this.ScopeId,
             this.Sku.Value,
             this.Name.Value,
             this.Price.Value,
@@ -166,7 +166,7 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
             eventId,
             nowUtc,
             this.Id,
-            this.TenantId,
+            this.ScopeId,
             this.Sku.Value));
 
         return Result.Success();
@@ -251,25 +251,25 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
             : Result.Failure(CatalogDomainErrors.ItemStatusUnknown);
 
     private sealed record CatalogItemValues(
-        string TenantId,
+        string ScopeId,
         CatalogSku Sku,
         CatalogItemName Name,
         CatalogPrice Price,
         CurrencyCode Currency)
     {
         public static Result<CatalogItemValues> Create(
-            string tenantId,
+            string scopeId,
             string? sku,
             string? name,
             decimal price,
             string? currency)
         {
-            if (string.IsNullOrWhiteSpace(tenantId))
+            if (string.IsNullOrWhiteSpace(scopeId))
             {
                 return Result.Failure<CatalogItemValues>(CatalogDomainErrors.TenantRequired);
             }
 
-            if (!TenantIds.TryNormalize(tenantId, out string? normalizedTenantId))
+            if (!ScopeIds.TryNormalize(scopeId, out string? normalizedScopeId))
             {
                 return Result.Failure<CatalogItemValues>(CatalogDomainErrors.TenantInvalid);
             }
@@ -299,7 +299,7 @@ public sealed class CatalogItem : TenantAggregateRoot<Guid>
             }
 
             return Result.Success(new CatalogItemValues(
-                normalizedTenantId,
+                normalizedScopeId,
                 skuResult.Value,
                 nameResult.Value,
                 priceResult.Value,

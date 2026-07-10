@@ -18,7 +18,7 @@ public static class CatalogAvailabilityPolicy
 
         CatalogRegionCode requestedRegion = requestedRegionResult.Value;
         return viewer.Region == requestedRegion
-            ? Result.Success(new AvailableCatalogItemsScope(viewer.TenantId, requestedRegion))
+            ? Result.Success(new AvailableCatalogItemsScope(viewer.ScopeId, requestedRegion))
             : Result.Failure<AvailableCatalogItemsScope>(CatalogDomainErrors.AccessDenied);
     }
 }

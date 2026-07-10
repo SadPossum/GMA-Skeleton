@@ -14,6 +14,6 @@ public sealed class CatalogSqlServerDesignTimeDbContextFactory : IDesignTimeDbCo
                 CatalogMigrations.SqlServerAssembly,
                 CatalogMigrations.Schema,
                 CatalogMigrations.HistoryTable),
-            new DesignTimeTenantContext());
+            new DesignTimeScopeContext());
     }
 }

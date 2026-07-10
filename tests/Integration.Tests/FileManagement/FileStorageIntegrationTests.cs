@@ -20,9 +20,9 @@ using Gma.Framework.FileManagement;
 using Gma.Framework.FileManagement.LocalStorage;
 using Gma.Framework.FileManagement.Minio;
 using Gma.Framework.ModuleComposition;
+using Gma.Framework.Scoping.Infrastructure;
 using Gma.Framework.Results;
 using Gma.Framework.Runtime.Infrastructure;
-using Gma.Framework.Tenancy.Infrastructure;
 using Xunit;
 
 [Trait("Category", "Integration")]
@@ -190,7 +190,7 @@ public sealed class FileStorageIntegrationTests
         builder.Configuration["FileManagement:MaximumObjectBytes"] = "1048576";
         builder.Configuration["FileManagement:AllowedContentTypes:0"] = "text/plain";
         builder.Configuration["FileManagement:LocalStorage:RootPath"] = root;
-        builder.AddTenancyInfrastructure();
+        builder.AddScopingInfrastructure();
         builder.AddRuntimeInfrastructure();
         builder.AddCqrsInfrastructure();
         builder.AddLocalFileStorage();
@@ -219,5 +219,5 @@ public sealed class FileStorageIntegrationTests
         return builder.Services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
     }
 
-    private static AccessSubject UserSubject(string userId) => AccessSubject.User(userId, tenantId: null);
+    private static AccessSubject UserSubject(string userId) => AccessSubject.User(userId);
 }

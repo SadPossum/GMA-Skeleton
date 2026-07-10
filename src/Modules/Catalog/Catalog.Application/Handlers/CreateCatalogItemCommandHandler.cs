@@ -9,13 +9,13 @@ using Catalog.Domain.Errors;
 using Gma.Framework.Caching;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Runtime.Identity;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 using Gma.Framework.Runtime.Time;
 using Gma.Framework.Results;
 
 internal sealed class CreateCatalogItemCommandHandler(
     ICatalogItemRepository repository,
-    ITenantContext tenantContext,
+    IScopeContext scopeContext,
     ISystemClock clock,
     IIdGenerator idGenerator,
     ICacheInvalidationQueue cacheInvalidation)
@@ -23,14 +23,14 @@ internal sealed class CreateCatalogItemCommandHandler(
 {
     public async Task<Result<CatalogItemDto>> HandleAsync(CreateCatalogItemCommand command, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(tenantContext.TenantId))
+        if (string.IsNullOrWhiteSpace(scopeContext.ScopeId))
         {
             return Result.Failure<CatalogItemDto>(CatalogDomainErrors.TenantRequired);
         }
 
         Result<CatalogItem> itemResult = CatalogItem.Create(
             idGenerator.NewId(),
-            tenantContext.TenantId,
+            scopeContext.ScopeId,
             command.Sku,
             command.Name,
             command.Price,

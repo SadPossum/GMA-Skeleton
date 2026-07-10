@@ -120,7 +120,7 @@ public sealed class NotificationStreamingIntegrationTests
         UserNotificationMessage message = await received.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
         Assert.Equal("SignalR message", message.Title);
-        Assert.Equal("tenant-a", message.TenantId);
+        Assert.Equal("tenant-a", message.ScopeId);
         Assert.Equal("user-a", message.UserId);
         Assert.Equal(NotificationSeverity.Success, message.Severity);
     }
@@ -173,7 +173,7 @@ public sealed class NotificationStreamingIntegrationTests
         UserNotificationMessage message = await received.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
         Assert.Equal("Default tenant SignalR message", message.Title);
-        Assert.Equal("default", message.TenantId);
+        Assert.Equal("default", message.ScopeId);
         Assert.Equal("user-a", message.UserId);
     }
 

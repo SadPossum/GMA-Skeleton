@@ -7,7 +7,17 @@ param(
 Invoke-GmaDotNet -Arguments @('tool', 'restore')
 
 $repositoryRoot = Get-GmaRepositoryRoot
-$migrationProjects = Get-ChildItem -LiteralPath (Join-GmaPath 'src\Modules') -Recurse -Filter *.csproj -File |
+$migrationSearchRoots = @(
+    'src\Modules',
+    'gma\modules'
+) |
+    ForEach-Object { Join-GmaPath $_ } |
+    Where-Object { Test-Path -LiteralPath $_ -PathType Container }
+
+$migrationProjects = $migrationSearchRoots |
+    ForEach-Object {
+        Get-ChildItem -LiteralPath $_ -Recurse -Filter *.csproj -File
+    } |
     Where-Object {
         $_.BaseName.EndsWith('.Persistence.SqlServerMigrations', [System.StringComparison]::Ordinal) -or
         $_.BaseName.EndsWith('.Persistence.PostgreSqlMigrations', [System.StringComparison]::Ordinal)
@@ -15,7 +25,7 @@ $migrationProjects = Get-ChildItem -LiteralPath (Join-GmaPath 'src\Modules') -Re
     Sort-Object FullName
 
 if ($migrationProjects.Count -eq 0) {
-    throw 'No provider migration projects were found under src\Modules.'
+    throw 'No provider migration projects were found under src\Modules or gma\modules.'
 }
 
 foreach ($project in $migrationProjects) {

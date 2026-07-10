@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -17,7 +17,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                 columns: table => new
                 {
                     RunId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ScopeId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     ProjectionName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     Cursor = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
                     ProcessedCount = table.Column<long>(type: "bigint", nullable: false),
@@ -30,7 +30,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_projection_rebuild_checkpoints", x => new { x.TenantId, x.ProjectionName, x.RunId });
+                    table.PrimaryKey("PK_projection_rebuild_checkpoints", x => new { x.ScopeId, x.ProjectionName, x.RunId });
                 });
         }
 

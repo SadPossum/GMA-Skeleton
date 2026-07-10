@@ -1,4 +1,5 @@
 using Gma.Modules.Administration.AdminApi;
+using Gma.Modules.AccessControl.AdminApi;
 using Gma.Modules.Auth.AdminApi;
 using Gma.Modules.Auth.Contracts;
 using ServiceDefaults;
@@ -33,7 +34,8 @@ builder.AddConfiguredNatsJetStreamMessaging();
 builder.Services.AddApiSecurityDefaults();
 
 builder.AddAdminApiModule<AdministrationAdminApiModule>();
-builder.AddAuthAdminApiModule(AuthProfile.TenantScoped());
+builder.AddAdminApiModule<AccessControlAdminApiModule>();
+builder.AddAuthAdminApiModule(AuthProfile.ScopeAware());
 
 builder.AddServiceDefaults();
 builder.AddGmaOpenApi();

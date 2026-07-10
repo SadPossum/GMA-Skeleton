@@ -14,6 +14,6 @@ public sealed class OrderingSqlServerDesignTimeDbContextFactory : IDesignTimeDbC
                 OrderingMigrations.SqlServerAssembly,
                 OrderingMigrations.Schema,
                 OrderingMigrations.HistoryTable),
-            new DesignTimeTenantContext());
+            new DesignTimeScopeContext());
     }
 }

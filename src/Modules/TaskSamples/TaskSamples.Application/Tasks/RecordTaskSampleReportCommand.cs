@@ -6,5 +6,5 @@ public sealed record RecordTaskSampleReportCommand(
     string ReportName,
     int ExpectedRows,
     Guid RunId,
-    string TenantId,
+    string ScopeId,
     int Attempt) : ICommand<Unit>;

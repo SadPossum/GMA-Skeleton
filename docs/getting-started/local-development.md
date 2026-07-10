@@ -113,10 +113,10 @@ Authorization: Bearer <access-token>
 X-Tenant-Id: default
 ```
 
-By default, tenant-scoped admin API calls require any present token `tenant_id` claim to match `X-Tenant-Id`. That default claim name is centralized as `ApplicationClaimNames.TenantId`. Tokens without a tenant claim are allowed for external identity-provider or global-admin scenarios, but RBAC must still grant the actor access to the requested tenant. The knobs are:
+By default, tenant-scoped admin API calls require any present token `scope_id` claim to match `X-Tenant-Id`. That default claim name is centralized as `ApplicationClaimNames.ScopeId`; `ApplicationClaimNames.TenantId` remains an alias for compatibility. Tokens without a scope claim are allowed for external identity-provider or global-admin scenarios, but RBAC must still grant the actor access to the requested tenant. The knobs are:
 
 ```text
-Administration__Api__TenantIdClaim=tenant_id
+Administration__Api__TenantIdClaim=scope_id
 Administration__Api__RequireTenantClaimMatch=true
 ```
 
@@ -168,11 +168,12 @@ Each provider has its own migration assembly for each module that owns persisten
 ```powershell
 .\eng\add-migration.ps1 -Module Auth -Provider SqlServer -Name AddExample
 .\eng\add-migration.ps1 -Module Auth -Provider PostgreSql -Name AddExample
+.\eng\add-migration.ps1 -Module AccessControl -Provider SqlServer -Name AddExample
 .\eng\add-migration.ps1 -Module Catalog -Provider SqlServer -Name AddExample
 .\eng\add-migration.ps1 -Module Ordering -Provider PostgreSql -Name AddExample
 ```
 
-The script discovers the module persistence project, provider-specific migrations project, and DbContext. Use `-Context <Name>DbContext` only when a module has more than one DbContext or uses a non-obvious name.
+The script discovers the module persistence project, provider-specific migrations project, and DbContext for both app-owned modules under `src/Modules` and reusable GMA modules under `gma/modules`. Use `-Context <Name>DbContext` only when a module has more than one DbContext or uses a non-obvious name.
 
 After changing EF mappings or migrations, check all provider snapshots:
 
@@ -180,7 +181,7 @@ After changing EF mappings or migrations, check all provider snapshots:
 .\eng\check-migrations.ps1 -NoBuild
 ```
 
-The script runs `dotnet-ef migrations has-pending-model-changes` for every provider migration project under `src/Modules`.
+The script runs `dotnet-ef migrations has-pending-model-changes` for every provider migration project under `src/Modules` and `gma/modules`.
 
 ## Adding a Module
 

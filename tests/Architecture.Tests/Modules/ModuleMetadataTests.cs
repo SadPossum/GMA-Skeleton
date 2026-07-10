@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Gma.Framework.Administration;
-using Gma.Framework.Authorization;
+using Gma.Framework.Permissions;
 using Gma.Framework.Caching;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
@@ -53,7 +53,7 @@ public sealed partial class ModuleMetadataTests
         [
             new(
                 typeof(ModuleDescriptorPermissionExtensions),
-                "Gma.Framework.Authorization",
+                "Gma.Framework.Permissions",
                 ["GetPermissions", "WithPermission", "WithPermissions"]),
             new(
                 typeof(ModuleDescriptorCachingExtensions),

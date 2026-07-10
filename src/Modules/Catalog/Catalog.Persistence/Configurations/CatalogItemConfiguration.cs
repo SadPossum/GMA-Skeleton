@@ -44,6 +44,6 @@ internal sealed class CatalogItemConfiguration : IEntityTypeConfiguration<Catalo
                 regions.HasIndex("CatalogItemId", nameof(CatalogItemAvailableRegion.Region)).IsUnique();
             });
         builder.Navigation(item => item.AvailableRegions).UsePropertyAccessMode(PropertyAccessMode.Field);
-        builder.HasIndex(item => new { item.TenantId, item.Sku }).IsUnique();
+        builder.HasIndex(item => new { item.ScopeId, item.Sku }).IsUnique();
     }
 }

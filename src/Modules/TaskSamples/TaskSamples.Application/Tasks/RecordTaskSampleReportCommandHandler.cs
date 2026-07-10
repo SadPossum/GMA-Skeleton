@@ -15,7 +15,7 @@ internal sealed class RecordTaskSampleReportCommandHandler(ITaskSampleReportSink
                     command.ReportName,
                     command.ExpectedRows,
                     command.RunId,
-                    command.TenantId,
+                    command.ScopeId,
                     command.Attempt),
                 cancellationToken)
             .ConfigureAwait(false);

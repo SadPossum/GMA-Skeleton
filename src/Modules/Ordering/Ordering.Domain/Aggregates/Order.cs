@@ -6,7 +6,7 @@ using Ordering.Domain.ValueObjects;
 using Gma.Framework.Domain.Models;
 using Gma.Framework.Results;
 
-public sealed class Order : TenantAggregateRoot<Guid>
+public sealed class Order : ScopedAggregateRoot<Guid>
 {
     public const int CatalogSkuMaxLength = 64;
     public const int CatalogItemNameMaxLength = 256;
@@ -18,8 +18,8 @@ public sealed class Order : TenantAggregateRoot<Guid>
 
     private Order() { }
 
-    private Order(Guid id, string tenantId)
-        : base(id, tenantId)
+    private Order(Guid id, string scopeId)
+        : base(id, scopeId)
     {
     }
 
@@ -53,7 +53,7 @@ public sealed class Order : TenantAggregateRoot<Guid>
 
     public static Result<Order> Create(
         Guid id,
-        string tenantId,
+        string scopeId,
         string userId,
         Guid catalogItemId,
         string catalogSku,
@@ -69,12 +69,12 @@ public sealed class Order : TenantAggregateRoot<Guid>
             return Result.Failure<Order>(OrderingDomainErrors.OrderIdRequired);
         }
 
-        if (string.IsNullOrWhiteSpace(tenantId))
+        if (string.IsNullOrWhiteSpace(scopeId))
         {
             return Result.Failure<Order>(OrderingDomainErrors.TenantRequired);
         }
 
-        if (!TenantIds.TryNormalize(tenantId, out string? normalizedTenantId))
+        if (!ScopeIds.TryNormalize(scopeId, out string? normalizedScopeId))
         {
             return Result.Failure<Order>(OrderingDomainErrors.TenantInvalid);
         }
@@ -114,7 +114,7 @@ public sealed class Order : TenantAggregateRoot<Guid>
             return Result.Failure<Order>(total.Error);
         }
 
-        Order order = new(id, normalizedTenantId)
+        Order order = new(id, normalizedScopeId)
         {
             userId = userIdResult.Value.Value,
             catalogItemId = catalogSnapshot.Value.CatalogItemId,

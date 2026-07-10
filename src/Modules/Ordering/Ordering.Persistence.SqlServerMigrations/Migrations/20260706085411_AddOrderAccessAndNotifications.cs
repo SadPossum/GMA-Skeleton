@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -47,7 +47,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     Subject = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     EventType = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
+                    ScopeId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
                     OccurredAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CreatedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Payload = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -64,10 +64,10 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_orders_TenantId_UserId_CreatedAtUtc",
+                name: "IX_orders_ScopeId_UserId_CreatedAtUtc",
                 schema: "ordering",
                 table: "orders",
-                columns: new[] { "TenantId", "UserId", "CreatedAtUtc" });
+                columns: new[] { "ScopeId", "UserId", "CreatedAtUtc" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_outbox_messages_ProcessedAtUtc_NextAttemptAtUtc_LockedUntilUtc_CreatedAtUtc",
@@ -84,7 +84,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                 schema: "ordering");
 
             migrationBuilder.DropIndex(
-                name: "IX_orders_TenantId_UserId_CreatedAtUtc",
+                name: "IX_orders_ScopeId_UserId_CreatedAtUtc",
                 schema: "ordering",
                 table: "orders");
 

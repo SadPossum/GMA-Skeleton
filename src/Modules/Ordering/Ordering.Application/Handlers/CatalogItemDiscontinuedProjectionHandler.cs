@@ -13,11 +13,11 @@ internal sealed class CatalogItemDiscontinuedProjectionHandler(
 {
     public async Task HandleAsync(CatalogItemDiscontinuedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        await repository.MarkDiscontinuedAsync(integrationEvent.TenantId, integrationEvent.ItemId, cancellationToken)
+        await repository.MarkDiscontinuedAsync(integrationEvent.ScopeId, integrationEvent.ItemId, cancellationToken)
             .ConfigureAwait(false);
 
         await notifications.PublishAsync(
-            integrationEvent.TenantId,
+            integrationEvent.ScopeId,
             integrationEvent.ItemId,
             integrationEvent.Sku,
             integrationEvent.Sku,

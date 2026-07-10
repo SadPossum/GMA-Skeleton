@@ -22,7 +22,7 @@ public sealed class CatalogAvailabilityPolicyTests
             CatalogAvailabilityPolicy.CanViewAvailableItems(viewer, requestedRegion);
 
         Assert.True(result.IsSuccess);
-        Assert.Equal("tenant-a", result.Value.TenantId);
+        Assert.Equal("tenant-a", result.Value.ScopeId);
         Assert.Equal(CatalogUserId.Create("user-1").Value, viewer.UserId);
         Assert.Equal(CatalogRegionCode.Create(viewerRegion).Value, result.Value.Region);
     }

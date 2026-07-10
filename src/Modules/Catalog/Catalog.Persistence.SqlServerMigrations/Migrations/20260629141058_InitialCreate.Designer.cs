@@ -60,7 +60,7 @@ namespace Catalog.Persistence.SqlServerMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
@@ -70,7 +70,7 @@ namespace Catalog.Persistence.SqlServerMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "Sku")
+                    b.HasIndex("ScopeId", "Sku")
                         .IsUnique();
 
                     b.ToTable("items", "catalog");
@@ -124,7 +124,7 @@ namespace Catalog.Persistence.SqlServerMigrations.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
@@ -184,7 +184,7 @@ namespace Catalog.Persistence.SqlServerMigrations.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");

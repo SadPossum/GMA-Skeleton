@@ -15,6 +15,12 @@
     <ProjectReference Include="..\..\src\Hosts\Host.AdminCli\Host.AdminCli.csproj" />
     <ProjectReference Include="..\..\src\Hosts\Host.AdminApi\Host.AdminApi.csproj" />
     <ProjectReference Include="..\..\src\Hosts\Host.Worker\Host.Worker.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Admin.Contracts\Gma.Modules.AccessControl.Admin.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.AdminCli\Gma.Modules.AccessControl.AdminCli.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.AdminApi\Gma.Modules.AccessControl.AdminApi.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Application\Gma.Modules.AccessControl.Application.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Contracts\Gma.Modules.AccessControl.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Persistence\Gma.Modules.AccessControl.Persistence.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.AdminCli\Gma.Modules.Administration.AdminCli.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.AdminApi\Gma.Modules.Administration.AdminApi.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj" />
@@ -69,7 +75,7 @@
     <ProjectReference Include="$(GmaFrameworkRoot)Security\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api\Gma.Framework.Api.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Application\Gma.Framework.Application.Composition\Gma.Framework.Application.Composition.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Security\Gma.Framework.Authorization\Gma.Framework.Authorization.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Security\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching\Gma.Framework.Caching.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching.Infrastructure\Gma.Framework.Caching.Infrastructure.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Cqrs\Gma.Framework.Cqrs.Infrastructure\Gma.Framework.Cqrs.Infrastructure.csproj" />

@@ -20,7 +20,7 @@ internal sealed class GenerateReportTaskHandler(ITaskCommandDispatcher dispatche
                     payload.ReportName,
                     payload.ExpectedRows,
                     context.RunId,
-                    context.TenantId ?? string.Empty,
+                    context.ScopeId ?? string.Empty,
                     context.Attempt),
                 cancellationToken)
             .ConfigureAwait(false);

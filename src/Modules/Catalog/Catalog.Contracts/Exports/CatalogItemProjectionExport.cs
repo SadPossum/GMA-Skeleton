@@ -6,7 +6,7 @@ using Gma.Framework.Naming;
 public sealed record CatalogItemProjectionExport
 {
     public CatalogItemProjectionExport(
-        string tenantId,
+        string scopeId,
         Guid itemId,
         string sku,
         string name,
@@ -15,7 +15,7 @@ public sealed record CatalogItemProjectionExport
         CatalogItemStatus status,
         IReadOnlyCollection<string>? availableRegions = null)
     {
-        this.TenantId = TenantIds.Normalize(tenantId);
+        this.ScopeId = ScopeIds.Normalize(scopeId);
         this.ItemId = IntegrationEventContractGuards.RequireId(itemId, nameof(itemId));
         this.Sku = NormalizeSku(sku);
         this.Name = IntegrationEventContractGuards.NormalizeRequiredText(
@@ -32,7 +32,7 @@ public sealed record CatalogItemProjectionExport
         this.AvailableRegions = CatalogRegionCodes.NormalizeMany(availableRegions);
     }
 
-    public string TenantId { get; }
+    public string ScopeId { get; }
     public Guid ItemId { get; }
     public string Sku { get; }
     public string Name { get; }

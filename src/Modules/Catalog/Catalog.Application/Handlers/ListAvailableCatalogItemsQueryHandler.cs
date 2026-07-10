@@ -8,17 +8,19 @@ using Gma.Framework.Caching;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Pagination;
 using Gma.Framework.Results;
+using Gma.Framework.Scoping;
 
 internal sealed class ListAvailableCatalogItemsQueryHandler(
     ICatalogItemReadRepository repository,
-    IApplicationCache cache)
+    IApplicationCache cache,
+    IScopeContext scopeContext)
     : IQueryHandler<ListAvailableCatalogItemsQuery, CatalogItemListResponse>
 {
     public async Task<Result<CatalogItemListResponse>> HandleAsync(
         ListAvailableCatalogItemsQuery query,
         CancellationToken cancellationToken)
     {
-        Result<AvailableCatalogItemsScope> scopeResult = CreateAvailableItemsScope(query);
+        Result<AvailableCatalogItemsScope> scopeResult = this.CreateAvailableItemsScope(query);
         if (scopeResult.IsFailure)
         {
             return Result.Failure<CatalogItemListResponse>(scopeResult.Error);
@@ -36,11 +38,11 @@ internal sealed class ListAvailableCatalogItemsQueryHandler(
         return Result.Success(response);
     }
 
-    private static Result<AvailableCatalogItemsScope> CreateAvailableItemsScope(ListAvailableCatalogItemsQuery query)
+    private Result<AvailableCatalogItemsScope> CreateAvailableItemsScope(ListAvailableCatalogItemsQuery query)
     {
         Result<CatalogViewer> viewerResult = CatalogViewer.User(
             query.Subject.Id,
-            query.Subject.TenantId,
+            scopeContext.ScopeId,
             query.SubjectRegionCode);
         return viewerResult.IsFailure
             ? Result.Failure<AvailableCatalogItemsScope>(viewerResult.Error)

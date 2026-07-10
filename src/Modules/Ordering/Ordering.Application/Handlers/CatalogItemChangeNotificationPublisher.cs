@@ -18,7 +18,7 @@ internal sealed class CatalogItemChangeNotificationPublisher(
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     public async Task PublishAsync(
-        string tenantId,
+        string scopeId,
         Guid catalogItemId,
         string sku,
         string name,
@@ -27,7 +27,7 @@ internal sealed class CatalogItemChangeNotificationPublisher(
         CancellationToken cancellationToken)
     {
         IReadOnlyCollection<string> userIds = await orderRepository
-            .ListDistinctUserIdsByCatalogItemAsync(tenantId, catalogItemId, cancellationToken)
+            .ListDistinctUserIdsByCatalogItemAsync(scopeId, catalogItemId, cancellationToken)
             .ConfigureAwait(false);
         if (userIds.Count == 0)
         {
@@ -44,7 +44,7 @@ internal sealed class CatalogItemChangeNotificationPublisher(
             await outbox.EnqueueAsync(
                 new UserNotificationRequestedIntegrationEvent(
                     idGenerator.NewId(),
-                    tenantId,
+                    scopeId,
                     clock.UtcNow,
                     userId,
                     OrderingModuleMetadata.Name,

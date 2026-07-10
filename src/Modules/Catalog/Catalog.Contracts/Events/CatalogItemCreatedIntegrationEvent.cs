@@ -1,20 +1,19 @@
 namespace Catalog.Contracts;
 
 using Gma.Framework.Messaging;
-using Gma.Framework.Tenancy;
-using Gma.Framework.Tenancy.Messaging;
+using Gma.Framework.Scoping;
 
 [IntegrationEventName(EventType)]
 [IntegrationEventVersion(EventVersion)]
-[TenantScoped]
-public sealed record CatalogItemCreatedIntegrationEvent : TenantIntegrationEvent
+[ScopeAware]
+public sealed record CatalogItemCreatedIntegrationEvent : ScopedIntegrationEvent
 {
     public const string EventType = "item-created";
     public const int EventVersion = 1;
 
     public CatalogItemCreatedIntegrationEvent(
         Guid eventId,
-        string tenantId,
+        string scopeId,
         DateTimeOffset occurredAtUtc,
         Guid itemId,
         string sku,
@@ -22,7 +21,7 @@ public sealed record CatalogItemCreatedIntegrationEvent : TenantIntegrationEvent
         decimal price,
         string currency,
         IReadOnlyCollection<string>? availableRegions = null)
-        : base(eventId, tenantId, occurredAtUtc, EventType, EventVersion)
+        : base(eventId, scopeId, occurredAtUtc, EventType, EventVersion)
     {
         this.ItemId = IntegrationEventContractGuards.RequireId(itemId, nameof(itemId));
         this.Sku = NormalizeSku(sku);

@@ -1,6 +1,6 @@
 namespace Catalog.Contracts;
 
-using Gma.Framework.Authorization;
+using Gma.Framework.Permissions;
 using Gma.Framework.Caching;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
@@ -18,17 +18,17 @@ public static class CatalogModuleMetadata
         .Create(Name)
         .WithSchema(Schema)
         .WithPermissions([
-            new ModulePermissionDescriptor(CatalogAdminPermissionCodes.ItemsRead, "Read catalog items.", tenantScoped: true),
-            new ModulePermissionDescriptor(CatalogAdminPermissionCodes.ItemsCreate, "Create catalog items.", tenantScoped: true),
-            new ModulePermissionDescriptor(CatalogAdminPermissionCodes.ItemsUpdate, "Update catalog items.", tenantScoped: true),
-            new ModulePermissionDescriptor(CatalogAdminPermissionCodes.ItemsDiscontinue, "Discontinue catalog items.", tenantScoped: true),
+            new ModulePermissionDescriptor(CatalogAdminPermissionCodes.ItemsRead, "Read catalog items.", scopeRequirement: PermissionScopeRequirement.Scoped),
+            new ModulePermissionDescriptor(CatalogAdminPermissionCodes.ItemsCreate, "Create catalog items.", scopeRequirement: PermissionScopeRequirement.Scoped),
+            new ModulePermissionDescriptor(CatalogAdminPermissionCodes.ItemsUpdate, "Update catalog items.", scopeRequirement: PermissionScopeRequirement.Scoped),
+            new ModulePermissionDescriptor(CatalogAdminPermissionCodes.ItemsDiscontinue, "Discontinue catalog items.", scopeRequirement: PermissionScopeRequirement.Scoped),
         ])
         .WithPublishedEvent<CatalogItemCreatedIntegrationEvent>()
         .WithPublishedEvent<CatalogItemUpdatedIntegrationEvent>()
         .WithPublishedEvent<CatalogItemDiscontinuedIntegrationEvent>()
         .WithCacheEntries([
-            new ModuleCacheDescriptor(ItemsCacheEntry, CacheScope.Tenant, [ItemsCacheTag]),
-            new ModuleCacheDescriptor(ItemCacheEntry, CacheScope.Tenant, [ItemsCacheTag]),
+            new ModuleCacheDescriptor(ItemsCacheEntry, CacheScope.Scope, [ItemsCacheTag]),
+            new ModuleCacheDescriptor(ItemCacheEntry, CacheScope.Scope, [ItemsCacheTag]),
         ])
         .WithProfile(CatalogProfiles.Default)
         .Build();

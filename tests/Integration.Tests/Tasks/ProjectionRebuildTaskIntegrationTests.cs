@@ -87,7 +87,7 @@ public sealed class ProjectionRebuildTaskIntegrationTests
             tenantAProjections,
             item =>
             {
-                Assert.Equal("tenant-a", item.TenantId);
+                Assert.Equal("tenant-a", item.ScopeId);
                 Assert.Equal(tenantAItemOne, item.CatalogItemId);
                 Assert.Equal("SKU-001", item.Sku);
                 Assert.Equal("First item", item.Name);
@@ -97,7 +97,7 @@ public sealed class ProjectionRebuildTaskIntegrationTests
             },
             item =>
             {
-                Assert.Equal("tenant-a", item.TenantId);
+                Assert.Equal("tenant-a", item.ScopeId);
                 Assert.Equal(tenantAItemTwo, item.CatalogItemId);
                 Assert.Equal("SKU-002", item.Sku);
                 Assert.Equal("Second item", item.Name);
@@ -108,7 +108,7 @@ public sealed class ProjectionRebuildTaskIntegrationTests
         Assert.Empty(tenantBProjections);
         Assert.NotNull(checkpoint);
         Assert.Equal(runId, checkpoint.RunId);
-        Assert.Equal("tenant-a", checkpoint.TenantId);
+        Assert.Equal("tenant-a", checkpoint.ScopeId);
         Assert.Equal(OrderingModuleMetadata.CatalogItemProjectionName, checkpoint.ProjectionName);
         Assert.Equal("SKU-002", checkpoint.Cursor);
         Assert.Equal(2, checkpoint.ProcessedCount);

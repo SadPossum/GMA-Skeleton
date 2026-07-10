@@ -89,7 +89,7 @@ public static class WorkerHostBuilderExtensions
     {
         if (workerOptions.Modules.Auth)
         {
-            builder.SelectModuleProfile(AuthProfile.TenantScoped().Descriptor, "Host.Worker/Auth");
+            builder.SelectModuleProfile(AuthProfile.ScopeAware().Descriptor, "Host.Worker/Auth");
             builder.AddAuthPersistence();
         }
 

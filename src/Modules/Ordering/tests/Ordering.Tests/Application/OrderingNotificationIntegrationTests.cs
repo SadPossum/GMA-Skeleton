@@ -68,7 +68,7 @@ public sealed class OrderingNotificationIntegrationTests
             outbox.Events.OfType<UserNotificationRequestedIntegrationEvent>(),
             integrationEvent =>
             {
-                Assert.Equal("tenant-a", integrationEvent.TenantId);
+                Assert.Equal("tenant-a", integrationEvent.ScopeId);
                 Assert.Equal(OrderingModuleMetadata.Name, integrationEvent.SourceModule);
                 Assert.Equal(OrderingNotificationNames.CatalogItemChanged, integrationEvent.NotificationName);
                 Assert.Equal(OrderingNotificationNames.CatalogItemChangedVersion, integrationEvent.NotificationVersion);
@@ -95,7 +95,7 @@ public sealed class OrderingNotificationIntegrationTests
         });
     }
 
-    private sealed record OrderOwner(string TenantId, Guid CatalogItemId, string UserId);
+    private sealed record OrderOwner(string ScopeId, Guid CatalogItemId, string UserId);
 
     private sealed class RecordingOrderRepository(IReadOnlyCollection<OrderOwner> owners) : IOrderRepository
     {
@@ -103,12 +103,12 @@ public sealed class OrderingNotificationIntegrationTests
             throw new NotSupportedException();
 
         public Task<IReadOnlyCollection<string>> ListDistinctUserIdsByCatalogItemAsync(
-            string tenantId,
+            string scopeId,
             Guid catalogItemId,
             CancellationToken cancellationToken) =>
             Task.FromResult<IReadOnlyCollection<string>>(owners
                 .Where(owner =>
-                    owner.TenantId == tenantId &&
+                    owner.ScopeId == scopeId &&
                     owner.CatalogItemId == catalogItemId)
                 .Select(owner => owner.UserId)
                 .Distinct(StringComparer.Ordinal)
@@ -129,7 +129,7 @@ public sealed class OrderingNotificationIntegrationTests
             return Task.CompletedTask;
         }
 
-        public Task MarkDiscontinuedAsync(string tenantId, Guid catalogItemId, CancellationToken cancellationToken) =>
+        public Task MarkDiscontinuedAsync(string scopeId, Guid catalogItemId, CancellationToken cancellationToken) =>
             throw new NotSupportedException();
     }
 

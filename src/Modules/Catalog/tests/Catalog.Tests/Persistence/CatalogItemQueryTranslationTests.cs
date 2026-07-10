@@ -5,7 +5,7 @@ using Catalog.Domain.Visibility;
 using Catalog.Persistence;
 using Catalog.Persistence.QueryScopes;
 using Microsoft.EntityFrameworkCore;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 using Xunit;
 
 [Trait("Category", "Unit")]
@@ -47,14 +47,14 @@ public sealed class CatalogItemQueryTranslationTests
             .AsNoTracking()
             .ToQueryString();
 
-        Assert.Contains("TenantId", sql, StringComparison.Ordinal);
+        Assert.Contains("ScopeId", sql, StringComparison.Ordinal);
         Assert.Contains("Status", sql, StringComparison.Ordinal);
         Assert.Contains("RegionCode", sql, StringComparison.Ordinal);
     }
 
-    private sealed class TestTenantContext(string tenantId) : ITenantContext
+    private sealed class TestTenantContext(string scopeId) : IScopeContext
     {
         public bool IsEnabled => true;
-        public string? TenantId { get; } = tenantId;
+        public string? ScopeId { get; } = scopeId;
     }
 }

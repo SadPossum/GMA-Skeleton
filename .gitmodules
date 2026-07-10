@@ -26,3 +26,7 @@
 	path = gma/modules/tenancy
 	url = https://github.com/SadPossum/GMA-Module-Tenancy.git
 	branch = dev
+[submodule "gma/modules/access-control"]
+	path = gma/modules/access-control
+	url = https://github.com/SadPossum/GMA-Module-Access-Control.git
+	branch = dev

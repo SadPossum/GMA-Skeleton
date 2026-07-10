@@ -6,7 +6,7 @@ public interface IOrderRepository
 {
     Task AddAsync(Order order, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<string>> ListDistinctUserIdsByCatalogItemAsync(
-        string tenantId,
+        string scopeId,
         Guid catalogItemId,
         CancellationToken cancellationToken);
 }

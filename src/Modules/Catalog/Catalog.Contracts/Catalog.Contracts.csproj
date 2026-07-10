@@ -1,13 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="$(GmaFrameworkRoot)Security\Gma.Framework.Authorization\Gma.Framework.Authorization.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Caching\Gma.Framework.Caching\Gma.Framework.Caching.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Messaging\Gma.Framework.Messaging\Gma.Framework.Messaging.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.Modules\Gma.Framework.Modules.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Scoping\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Security\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)ProjectionRebuild\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy.Messaging\Gma.Framework.Tenancy.Messaging.csproj" />
   </ItemGroup>
 </Project>

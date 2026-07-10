@@ -7,18 +7,18 @@ using Gma.Framework.Results;
 
 public sealed record CatalogViewer
 {
-    private CatalogViewer(CatalogUserId userId, string tenantId, CatalogRegionCode region)
+    private CatalogViewer(CatalogUserId userId, string scopeId, CatalogRegionCode region)
     {
         this.UserId = userId;
-        this.TenantId = tenantId;
+        this.ScopeId = scopeId;
         this.Region = region;
     }
 
     public CatalogUserId UserId { get; }
-    public string TenantId { get; }
+    public string ScopeId { get; }
     public CatalogRegionCode Region { get; }
 
-    public static Result<CatalogViewer> User(string? userId, string? tenantId, string? regionCode)
+    public static Result<CatalogViewer> User(string? userId, string? scopeId, string? regionCode)
     {
         Result<CatalogUserId> userIdResult = CatalogUserId.Create(userId);
         if (userIdResult.IsFailure)
@@ -26,12 +26,12 @@ public sealed record CatalogViewer
             return Result.Failure<CatalogViewer>(CatalogDomainErrors.AccessDenied);
         }
 
-        if (string.IsNullOrWhiteSpace(tenantId))
+        if (string.IsNullOrWhiteSpace(scopeId))
         {
             return Result.Failure<CatalogViewer>(CatalogDomainErrors.TenantRequired);
         }
 
-        if (!TenantIds.TryNormalize(tenantId, out string? normalizedTenantId))
+        if (!ScopeIds.TryNormalize(scopeId, out string? normalizedScopeId))
         {
             return Result.Failure<CatalogViewer>(CatalogDomainErrors.TenantInvalid);
         }
@@ -39,6 +39,6 @@ public sealed record CatalogViewer
         Result<CatalogRegionCode> regionResult = CatalogRegionCode.Create(regionCode);
         return regionResult.IsFailure
             ? Result.Failure<CatalogViewer>(CatalogDomainErrors.AccessDenied)
-            : Result.Success(new CatalogViewer(userIdResult.Value, normalizedTenantId, regionResult.Value));
+            : Result.Success(new CatalogViewer(userIdResult.Value, normalizedScopeId, regionResult.Value));
     }
 }

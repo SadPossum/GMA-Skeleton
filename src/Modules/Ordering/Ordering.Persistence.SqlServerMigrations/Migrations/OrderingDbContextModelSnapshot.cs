@@ -62,7 +62,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
@@ -83,9 +83,9 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "CatalogItemId");
+                    b.HasIndex("ScopeId", "CatalogItemId");
 
-                    b.HasIndex("TenantId", "UserId", "CreatedAtUtc");
+                    b.HasIndex("ScopeId", "UserId", "CreatedAtUtc");
 
                     b.ToTable("orders", "ordering");
                 });
@@ -126,14 +126,14 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "CatalogItemId")
+                    b.HasIndex("ScopeId", "CatalogItemId")
                         .IsUnique();
 
                     b.ToTable("catalog_item_projections", "ordering");
@@ -141,7 +141,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
 
             modelBuilder.Entity("Ordering.Persistence.OrderingProjectionRebuildCheckpoint", b =>
                 {
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
@@ -177,7 +177,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     b.Property<long>("WrittenCount")
                         .HasColumnType("bigint");
 
-                    b.HasKey("TenantId", "ProjectionName", "RunId");
+                    b.HasKey("ScopeId", "ProjectionName", "RunId");
 
                     b.ToTable("projection_rebuild_checkpoints", "ordering");
                 });
@@ -225,7 +225,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     b.Property<string>("ScopeId")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
-                        .HasColumnName("TenantId");
+                        .HasColumnName("ScopeId");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -288,7 +288,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
                     b.Property<string>("ScopeId")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
-                        .HasColumnName("TenantId");
+                        .HasColumnName("ScopeId");
 
                     b.Property<string>("Subject")
                         .IsRequired()

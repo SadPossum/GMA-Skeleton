@@ -4,7 +4,7 @@ using Catalog.Contracts;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
 using Gma.Framework.Tasks;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 
 public static class OrderingProfiles
 {
@@ -21,9 +21,9 @@ public static class OrderingProfiles
         requires:
         [
             new RequiredCompositionFeature(
-                TenancyCompositionFeatures.Context,
+                ScopeCompositionFeatures.Context,
                 Provider(DefaultName),
-                reason: "Ordering is tenant-scoped; register TenancyModule or at least Gma.Framework.Tenancy.Infrastructure."),
+                reason: "Ordering is scope-aware; register a scope provider such as TenancyModule or Gma.Framework.Tenancy.Infrastructure."),
             CatalogCompositionFeatures.ItemsRequired(
                 Provider(DefaultName),
                 "Ordering decisions are based on Catalog-owned item facts copied into local projections."),
@@ -35,9 +35,9 @@ public static class OrderingProfiles
                 Provider(DefaultName),
                 "Catalog projection rebuild tasks require a task worker host; live consumers or manual backfill can be used instead.",
                 optional: true),
-            TasksCompositionFeatures.TenantScopeRequired(
+            TasksCompositionFeatures.ScopeContextRequired(
                 Provider(DefaultName),
-                "Catalog projection rebuild tasks are tenant-scoped; compose Gma.Framework.Tenancy.Tasks in worker hosts that run them.",
+                "Catalog projection rebuild tasks are scope-aware; compose a task scope provider such as Gma.Framework.Tenancy.Tasks in worker hosts that run them.",
                 optional: true)
         ],
         requiredModules:
@@ -48,7 +48,7 @@ public static class OrderingProfiles
                 reason: "Ordering example imports Catalog contracts and expects Catalog item facts as the source of projection truth.")
         ],
         displayName: "Ordering default",
-        description: "Tenant-scoped ordering with local catalog item projections and optional live/rebuild projection maintenance.");
+        description: "Scope-aware ordering with local catalog item projections and optional live/rebuild projection maintenance.");
 
     private static string Provider(string profileName) => $"{OrderingModuleMetadata.Name}/{profileName}";
 }

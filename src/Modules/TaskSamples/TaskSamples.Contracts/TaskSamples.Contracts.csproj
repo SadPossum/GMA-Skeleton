@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.Modules\Gma.Framework.Modules.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)Scoping\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Tasks\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj" />
-    <ProjectReference Include="$(GmaFrameworkRoot)Tenancy\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj" />
   </ItemGroup>
 </Project>

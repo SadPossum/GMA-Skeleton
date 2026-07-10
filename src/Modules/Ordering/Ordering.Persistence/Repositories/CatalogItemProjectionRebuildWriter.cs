@@ -20,7 +20,7 @@ internal sealed class CatalogItemProjectionRebuildWriter(
         foreach (CatalogItemProjectionExport snapshot in snapshots)
         {
             CatalogItemProjectionWriteModel writeModel = new(
-                snapshot.TenantId,
+                snapshot.ScopeId,
                 snapshot.ItemId,
                 snapshot.Sku,
                 snapshot.Name,

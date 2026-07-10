@@ -3,11 +3,11 @@ namespace Ordering.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Ordering.Domain.Aggregates;
 using Gma.Framework.Persistence.EntityFrameworkCore;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 using Gma.Framework.Messaging.Infrastructure;
 
-public sealed class OrderingDbContext(DbContextOptions<OrderingDbContext> options, ITenantContext tenantContext)
-    : TenantAwareDbContext<OrderingDbContext>(options, tenantContext)
+public sealed class OrderingDbContext(DbContextOptions<OrderingDbContext> options, IScopeContext scopeContext)
+    : ScopeAwareDbContext<OrderingDbContext>(options, scopeContext)
 {
     public DbSet<Order> Orders => this.Set<Order>();
     public DbSet<CatalogItemProjection> CatalogItemProjections => this.Set<CatalogItemProjection>();
@@ -20,6 +20,6 @@ public sealed class OrderingDbContext(DbContextOptions<OrderingDbContext> option
     {
         modelBuilder.HasDefaultSchema(OrderingMigrations.Schema);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrderingDbContext).Assembly);
-        this.ApplyTenantConventions(modelBuilder);
+        this.ApplyScopeConventions(modelBuilder);
     }
 }

@@ -14,7 +14,7 @@ internal static class CatalogItemAccessScopeExtensions
 
         return query.Where(item =>
             item.Status == CatalogItemState.Active &&
-            item.TenantId == scope.TenantId &&
+            item.ScopeId == scope.ScopeId &&
             (!item.AvailableRegions.Any() ||
              item.AvailableRegions.Any(region => region.Region == scope.Region)));
     }

@@ -25,7 +25,7 @@ internal sealed class FlakyReportTaskHandler(ITaskCommandDispatcher dispatcher)
                     payload.ReportName,
                     payload.ExpectedRows,
                     context.RunId,
-                    context.TenantId ?? string.Empty,
+                    context.ScopeId ?? string.Empty,
                     context.Attempt),
                 cancellationToken)
             .ConfigureAwait(false);

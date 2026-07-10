@@ -60,7 +60,7 @@ namespace Ordering.Persistence.PostgreSqlMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
@@ -76,7 +76,7 @@ namespace Ordering.Persistence.PostgreSqlMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "CatalogItemId");
+                    b.HasIndex("ScopeId", "CatalogItemId");
 
                     b.ToTable("orders", "ordering");
                 });
@@ -112,14 +112,14 @@ namespace Ordering.Persistence.PostgreSqlMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "CatalogItemId")
+                    b.HasIndex("ScopeId", "CatalogItemId")
                         .IsUnique();
 
                     b.ToTable("catalog_item_projections", "ordering");
@@ -127,7 +127,7 @@ namespace Ordering.Persistence.PostgreSqlMigrations.Migrations
 
             modelBuilder.Entity("Ordering.Persistence.OrderingProjectionRebuildCheckpoint", b =>
                 {
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
@@ -163,7 +163,7 @@ namespace Ordering.Persistence.PostgreSqlMigrations.Migrations
                     b.Property<long>("WrittenCount")
                         .HasColumnType("bigint");
 
-                    b.HasKey("TenantId", "ProjectionName", "RunId");
+                    b.HasKey("ScopeId", "ProjectionName", "RunId");
 
                     b.ToTable("projection_rebuild_checkpoints", "ordering");
                 });
@@ -211,7 +211,7 @@ namespace Ordering.Persistence.PostgreSqlMigrations.Migrations
                     b.Property<string>("ScopeId")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
-                        .HasColumnName("TenantId");
+                        .HasColumnName("ScopeId");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");

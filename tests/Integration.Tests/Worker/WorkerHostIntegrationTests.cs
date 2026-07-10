@@ -63,7 +63,7 @@ public sealed class WorkerHostIntegrationTests
 
             Assert.Single(reports);
             Assert.Equal(runId, reports[0].RunId);
-            Assert.Equal("tenant-worker", reports[0].TenantId);
+            Assert.Equal("tenant-worker", reports[0].ScopeId);
             Assert.Equal(TaskRunStatus.Succeeded, snapshot.Status);
             Assert.Equal(1, snapshot.Attempts);
             Assert.Null(snapshot.LockedBy);
@@ -167,7 +167,7 @@ public sealed class WorkerHostIntegrationTests
                     createdAtUtc,
                     createdAtUtc,
                     TaskSamplesModuleMetadata.WorkerGroup,
-                    tenantId: "tenant-worker",
+                    scopeId: "tenant-worker",
                     requestedBy: "integration-test",
                     maxAttempts: 3,
                     payloadVersion: GenerateReportTaskPayload.PayloadVersion,

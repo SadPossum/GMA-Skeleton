@@ -6,8 +6,8 @@ public static class CatalogDomainErrors
 {
     public static readonly Error ItemIdRequired = new("Catalog.ItemIdRequired", "A catalog item id is required.");
     public static readonly Error DomainEventIdRequired = new("Catalog.DomainEventIdRequired", "A domain event id is required.");
-    public static readonly Error TenantRequired = new("Catalog.TenantRequired", "A tenant id is required.");
-    public static readonly Error TenantInvalid = new("Catalog.TenantInvalid", "The tenant id is not valid.");
+    public static readonly Error TenantRequired = new("Catalog.TenantRequired", "A scope id is required.");
+    public static readonly Error TenantInvalid = new("Catalog.TenantInvalid", "The scope id is not valid.");
     public static readonly Error UserIdRequired = new("Catalog.UserIdRequired", "A user id is required.");
     public static readonly Error UserIdInvalid = new("Catalog.UserIdInvalid", "The user id is not valid.");
     public static readonly Error SkuRequired = new("Catalog.SkuRequired", "A SKU is required.");

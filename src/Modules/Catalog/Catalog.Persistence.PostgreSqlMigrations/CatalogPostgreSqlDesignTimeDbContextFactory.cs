@@ -14,6 +14,6 @@ public sealed class CatalogPostgreSqlDesignTimeDbContextFactory : IDesignTimeDbC
                 CatalogMigrations.PostgreSqlAssembly,
                 CatalogMigrations.Schema,
                 CatalogMigrations.HistoryTable),
-            new DesignTimeTenantContext());
+            new DesignTimeScopeContext());
     }
 }

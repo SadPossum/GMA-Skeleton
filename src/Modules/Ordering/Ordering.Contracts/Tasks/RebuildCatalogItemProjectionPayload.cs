@@ -1,7 +1,7 @@
 namespace Ordering.Contracts;
 
 using Gma.Framework.Tasks;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 
 [TaskName(TaskName)]
 [TaskPayloadVersion(PayloadVersion)]
@@ -9,7 +9,7 @@ using Gma.Framework.Tenancy;
 [TaskKind(ModuleTaskKind.OneShot)]
 [TaskWorkerGroup(OrderingModuleMetadata.ProjectionWorkerGroup)]
 [SupportsTaskControl]
-[TenantScoped]
+[ScopeAware]
 public sealed record RebuildCatalogItemProjectionPayload(
     int ProjectionVersion = OrderingModuleMetadata.CatalogItemProjectionVersion,
     int BatchSize = RebuildCatalogItemProjectionPayload.DefaultBatchSize,

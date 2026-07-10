@@ -3,7 +3,7 @@ namespace Catalog.Contracts;
 using Gma.Framework.Caching;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 
 public static class CatalogProfiles
 {
@@ -19,12 +19,12 @@ public static class CatalogProfiles
         requires:
         [
             new RequiredCompositionFeature(
-                TenancyCompositionFeatures.Context,
+                ScopeCompositionFeatures.Context,
                 Provider(DefaultName),
-                reason: "Catalog is tenant-scoped; register TenancyModule or at least Gma.Framework.Tenancy.Infrastructure."),
-            CachingCompositionFeatures.TenantScopeRequired(
+                reason: "Catalog is scope-aware; register a scope provider such as TenancyModule or Gma.Framework.Tenancy.Infrastructure."),
+            CachingCompositionFeatures.ScopeContextRequired(
                 Provider(DefaultName),
-                "Catalog cache keys are tenant-owned; register Gma.Framework.Tenancy.Caching alongside Gma.Framework.Caching.Infrastructure or Gma.Framework.Caching.Cqrs."),
+                "Catalog cache keys are scope-aware; register a cache scope provider such as Gma.Framework.Tenancy.Caching alongside Gma.Framework.Caching.Infrastructure or Gma.Framework.Caching.Cqrs."),
             CachingCompositionFeatures.ApplicationRequired(
                 Provider(DefaultName),
                 "Catalog read handlers use explicit cache-aside; register Gma.Framework.Caching.Infrastructure or Gma.Framework.Caching.Cqrs."),
@@ -36,7 +36,7 @@ public static class CatalogProfiles
                 "Catalog publishes integration events through its module outbox; register Gma.Framework.Messaging.Infrastructure.")
         ],
         displayName: "Catalog default",
-        description: "Tenant-scoped catalog item management with explicit cache-aside and producer-owned outbox events.");
+        description: "Scope-aware catalog item management with explicit cache-aside and producer-owned outbox events.");
 
     private static string Provider(string profileName) => $"{CatalogModuleMetadata.Name}/{profileName}";
 }

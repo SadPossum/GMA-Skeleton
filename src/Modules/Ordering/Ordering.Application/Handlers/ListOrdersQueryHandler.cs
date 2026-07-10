@@ -7,14 +7,16 @@ using Ordering.Domain.Visibility;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Pagination;
 using Gma.Framework.Results;
+using Gma.Framework.Scoping;
 
 internal sealed class ListOrdersQueryHandler(
-    IOrderReadRepository repository)
+    IOrderReadRepository repository,
+    IScopeContext scopeContext)
     : IQueryHandler<ListOrdersQuery, OrderListResponse>
 {
     public async Task<Result<OrderListResponse>> HandleAsync(ListOrdersQuery query, CancellationToken cancellationToken)
     {
-        Result<UserOrdersScope> scopeResult = CreateUserOrdersScope(query);
+        Result<UserOrdersScope> scopeResult = this.CreateUserOrdersScope(query);
         if (scopeResult.IsFailure)
         {
             return Result.Failure<OrderListResponse>(scopeResult.Error);
@@ -27,9 +29,9 @@ internal sealed class ListOrdersQueryHandler(
         return Result.Success(response);
     }
 
-    private static Result<UserOrdersScope> CreateUserOrdersScope(ListOrdersQuery query)
+    private Result<UserOrdersScope> CreateUserOrdersScope(ListOrdersQuery query)
     {
-        Result<OrderViewer> viewerResult = OrderViewer.User(query.Subject.Id, query.Subject.TenantId);
+        Result<OrderViewer> viewerResult = OrderViewer.User(query.Subject.Id, scopeContext.ScopeId);
         return viewerResult.IsFailure
             ? Result.Failure<UserOrdersScope>(viewerResult.Error)
             : OrderingVisibilityPolicy.CanViewOwnOrders(viewerResult.Value);

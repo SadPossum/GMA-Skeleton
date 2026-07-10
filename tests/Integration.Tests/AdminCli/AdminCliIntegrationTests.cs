@@ -1,6 +1,6 @@
 namespace Integration.Tests;
 
-using Gma.Modules.Administration.Application;
+using Gma.Modules.AccessControl.Application;
 using Gma.Modules.Auth.Application;
 using Gma.Modules.Auth.Contracts;
 using Gma.Modules.Auth.Domain.Errors;
@@ -55,10 +55,10 @@ public sealed class AdminCliIntegrationTests
             "--actor", "owner",
             "--name", "support team");
         Assert.Equal(AdminExitCodes.Failed, invalidRole.ExitCode);
-        Assert.Contains("Admin role name is invalid.", invalidRole.Error, StringComparison.Ordinal);
+        Assert.Contains(AccessControlApplicationErrors.RoleNameInvalid.Message, invalidRole.Error, StringComparison.Ordinal);
         Assert.Equal(
             0,
-            await application.CountAuditEntriesContainingAsync(AdministrationApplicationErrors.RoleNameInvalid.Code).ConfigureAwait(false));
+            await application.CountAuditEntriesContainingAsync(AccessControlApplicationErrors.RoleNameInvalid.Code).ConfigureAwait(false));
 
         await AssertSuccess(application.ExecuteAsync("admin", "roles", "create", "--actor", "owner", "--name", "support"));
         AdminCliResult invalidPermission = await application.ExecuteAsync(
@@ -67,10 +67,10 @@ public sealed class AdminCliIntegrationTests
             "--role", "support",
             "--permission", "auth");
         Assert.Equal(AdminExitCodes.Failed, invalidPermission.ExitCode);
-        Assert.Contains("Admin permission code is invalid.", invalidPermission.Error, StringComparison.Ordinal);
+        Assert.Contains(AccessControlApplicationErrors.PermissionCodeInvalid.Message, invalidPermission.Error, StringComparison.Ordinal);
         Assert.Equal(
             0,
-            await application.CountAuditEntriesContainingAsync(AdministrationApplicationErrors.PermissionCodeInvalid.Code).ConfigureAwait(false));
+            await application.CountAuditEntriesContainingAsync(AccessControlApplicationErrors.PermissionCodeInvalid.Code).ConfigureAwait(false));
 
         await GrantAsync(application, AuthAdminPermissionCodes.MembersRead);
         await GrantAsync(application, AuthAdminPermissionCodes.MembersCreate);
@@ -83,7 +83,7 @@ public sealed class AdminCliIntegrationTests
             "--actor", "owner",
             "--target-actor", "support",
             "--role", "support",
-            "--tenant", "tenant-admin"));
+            "--scope", "tenant:tenant-admin"));
 
         AdminCliResult denied = await application.ExecuteAsync(
             "auth", "members", "list",

@@ -18,7 +18,7 @@ internal sealed class CatalogItemProjectionConfiguration : IEntityTypeConfigurat
         builder.Property(item => item.AvailableRegionCodes)
             .HasMaxLength(CatalogProjectionRegionStorageMaxLength)
             .IsRequired();
-        builder.HasIndex(item => new { item.TenantId, item.CatalogItemId }).IsUnique();
+        builder.HasIndex(item => new { item.ScopeId, item.CatalogItemId }).IsUnique();
     }
 
     private const int CatalogProjectionRegionStorageMaxLength =

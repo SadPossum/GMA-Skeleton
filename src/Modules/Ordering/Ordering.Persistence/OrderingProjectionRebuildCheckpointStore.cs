@@ -8,5 +8,5 @@ internal sealed class OrderingProjectionRebuildCheckpointStore(OrderingDbContext
     : EfProjectionRebuildCheckpointStore<OrderingDbContext, OrderingProjectionRebuildCheckpoint>(
         dbContext,
         OrderingModuleMetadata.Name,
-        tenantScoped: true,
+        scopeAware: true,
         OrderingProjectionRebuildCheckpoint.CreateEmpty);

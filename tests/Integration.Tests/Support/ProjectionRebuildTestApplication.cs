@@ -21,6 +21,7 @@ using Gma.Framework.Tasks;
 using Gma.Framework.Tasks.Infrastructure;
 using Gma.Framework.Tenancy;
 using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Framework.Tenancy.Scoping;
 using Gma.Framework.Tenancy.Tasks;
 using Gma.Modules.TaskRuntime.Application;
 using Gma.Modules.TaskRuntime.Persistence;
@@ -58,6 +59,7 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
 
         builder.AddRuntimeInfrastructure();
         builder.AddTenancyInfrastructure();
+        builder.AddTenantScoping();
         builder.AddTenantTaskExecutionContext();
         builder.Services.AddTaskRuntimeApplication();
         builder.AddTaskRuntimePersistence();
@@ -93,7 +95,7 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
     }
 
     public async Task AddCatalogItemAsync(
-        string tenantId,
+        string scopeId,
         Guid itemId,
         string sku,
         string name,
@@ -101,11 +103,11 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
         string currency)
     {
         using IServiceScope scope = this.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>().SetTenant(tenantId);
+        scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>().SetTenant(scopeId);
         CatalogDbContext dbContext = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
         Result<CatalogItem> result = CatalogItem.Create(
             itemId,
-            tenantId,
+            scopeId,
             sku,
             name,
             price,
@@ -125,7 +127,7 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
 
     public async Task EnqueueOrderingProjectionRebuildAsync(
         Guid runId,
-        string tenantId,
+        string scopeId,
         int batchSize,
         bool dryRun = false,
         string? cursor = null)
@@ -150,7 +152,7 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
                     now,
                     now,
                     OrderingModuleMetadata.ProjectionWorkerGroup,
-                    tenantId,
+                    scopeId,
                     requestedBy: "integration-test",
                     maxAttempts: 2,
                     payloadVersion: RebuildCatalogItemProjectionPayload.PayloadVersion,
@@ -159,16 +161,16 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
             .ConfigureAwait(false);
     }
 
-    public async Task<IReadOnlyList<OrderingCatalogProjectionSnapshot>> GetOrderingProjectionsAsync(string tenantId)
+    public async Task<IReadOnlyList<OrderingCatalogProjectionSnapshot>> GetOrderingProjectionsAsync(string scopeId)
     {
         using IServiceScope scope = this.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>().SetTenant(tenantId);
+        scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>().SetTenant(scopeId);
         OrderingDbContext dbContext = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
 
         return await dbContext.CatalogItemProjections
             .OrderBy(item => item.Sku)
             .Select(item => new OrderingCatalogProjectionSnapshot(
-                item.TenantId,
+                item.ScopeId,
                 item.CatalogItemId,
                 item.Sku,
                 item.Name,
@@ -179,10 +181,10 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
             .ConfigureAwait(false);
     }
 
-    public async Task<ProjectionRebuildCheckpointSnapshot?> GetCheckpointAsync(string tenantId, Guid runId)
+    public async Task<ProjectionRebuildCheckpointSnapshot?> GetCheckpointAsync(string scopeId, Guid runId)
     {
         using IServiceScope scope = this.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>().SetTenant(tenantId);
+        scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>().SetTenant(scopeId);
         OrderingDbContext dbContext = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
 
         return await dbContext.ProjectionRebuildCheckpoints
@@ -191,7 +193,7 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
                 checkpoint.ProjectionName == OrderingModuleMetadata.CatalogItemProjectionName)
             .Select(checkpoint => new ProjectionRebuildCheckpointSnapshot(
                 checkpoint.RunId,
-                checkpoint.TenantId,
+                checkpoint.ScopeId,
                 checkpoint.ProjectionName,
                 checkpoint.Cursor,
                 checkpoint.ProcessedCount,
@@ -261,7 +263,7 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
 }
 
 internal sealed record OrderingCatalogProjectionSnapshot(
-    string TenantId,
+    string ScopeId,
     Guid CatalogItemId,
     string Sku,
     string Name,
@@ -271,7 +273,7 @@ internal sealed record OrderingCatalogProjectionSnapshot(
 
 internal sealed record ProjectionRebuildCheckpointSnapshot(
     Guid RunId,
-    string TenantId,
+    string ScopeId,
     string ProjectionName,
     string? Cursor,
     long ProcessedCount,

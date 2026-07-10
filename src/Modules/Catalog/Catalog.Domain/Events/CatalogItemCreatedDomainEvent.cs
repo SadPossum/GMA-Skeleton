@@ -3,19 +3,19 @@ namespace Catalog.Domain.Events;
 using Catalog.Domain.Aggregates;
 using Gma.Framework.Domain;
 
-public sealed record CatalogItemCreatedDomainEvent : TenantDomainEvent
+public sealed record CatalogItemCreatedDomainEvent : ScopedDomainEvent
 {
     public CatalogItemCreatedDomainEvent(
         Guid eventId,
         DateTimeOffset occurredAtUtc,
         Guid itemId,
-        string tenantId,
+        string scopeId,
         string sku,
         string name,
         decimal price,
         string currency,
         IReadOnlyCollection<string>? availableRegions)
-        : base(eventId, occurredAtUtc, tenantId)
+        : base(eventId, occurredAtUtc, scopeId)
     {
         this.ItemId = DomainEventGuards.RequireId(itemId, nameof(itemId));
         this.Sku = NormalizeSku(sku);

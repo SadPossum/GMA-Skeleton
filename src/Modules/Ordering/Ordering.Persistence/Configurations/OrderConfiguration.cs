@@ -61,7 +61,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasPrecision(Order.AmountPrecision, Order.AmountScale)
             .IsRequired();
         builder.Property(order => order.Status).HasConversion<int>().IsRequired();
-        builder.HasIndex(order => new { order.TenantId, order.CatalogItemId });
-        builder.HasIndex(order => new { order.TenantId, order.UserId, order.CreatedAtUtc });
+        builder.HasIndex(order => new { order.ScopeId, order.CatalogItemId });
+        builder.HasIndex(order => new { order.ScopeId, order.UserId, order.CreatedAtUtc });
     }
 }

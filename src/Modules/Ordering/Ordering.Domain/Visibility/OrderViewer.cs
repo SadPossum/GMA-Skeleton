@@ -7,16 +7,16 @@ using Gma.Framework.Results;
 
 public sealed record OrderViewer
 {
-    private OrderViewer(OrderUserId userId, string tenantId)
+    private OrderViewer(OrderUserId userId, string scopeId)
     {
         this.UserId = userId;
-        this.TenantId = tenantId;
+        this.ScopeId = scopeId;
     }
 
     public OrderUserId UserId { get; }
-    public string TenantId { get; }
+    public string ScopeId { get; }
 
-    public static Result<OrderViewer> User(string? userId, string? tenantId)
+    public static Result<OrderViewer> User(string? userId, string? scopeId)
     {
         Result<OrderUserId> userIdResult = OrderUserId.Create(userId);
         if (userIdResult.IsFailure)
@@ -24,16 +24,16 @@ public sealed record OrderViewer
             return Result.Failure<OrderViewer>(OrderingDomainErrors.AccessDenied);
         }
 
-        if (string.IsNullOrWhiteSpace(tenantId))
+        if (string.IsNullOrWhiteSpace(scopeId))
         {
             return Result.Failure<OrderViewer>(OrderingDomainErrors.TenantRequired);
         }
 
-        if (!TenantIds.TryNormalize(tenantId, out string? normalizedTenantId))
+        if (!ScopeIds.TryNormalize(scopeId, out string? normalizedScopeId))
         {
             return Result.Failure<OrderViewer>(OrderingDomainErrors.TenantInvalid);
         }
 
-        return Result.Success(new OrderViewer(userIdResult.Value, normalizedTenantId));
+        return Result.Success(new OrderViewer(userIdResult.Value, normalizedScopeId));
     }
 }

@@ -17,7 +17,7 @@ public sealed class OrderingVisibilityPolicyTests
         Result<UserOrdersScope> result = OrderingVisibilityPolicy.CanViewOwnOrders(viewer);
 
         Assert.True(result.IsSuccess);
-        Assert.Equal("tenant-a", result.Value.TenantId);
+        Assert.Equal("tenant-a", result.Value.ScopeId);
         Assert.Equal(OrderUserId.Create("user-1").Value, result.Value.UserId);
     }
 
@@ -26,9 +26,9 @@ public sealed class OrderingVisibilityPolicyTests
     [InlineData("user 1", "tenant-a")]
     [InlineData("user-1", null)]
     [InlineData("user-1", "tenant a")]
-    public void Viewer_rejects_invalid_inputs(string? userId, string? tenantId)
+    public void Viewer_rejects_invalid_inputs(string? userId, string? scopeId)
     {
-        Result<OrderViewer> viewer = OrderViewer.User(userId, tenantId);
+        Result<OrderViewer> viewer = OrderViewer.User(userId, scopeId);
 
         Assert.True(viewer.IsFailure);
         Error[] expectedErrors =

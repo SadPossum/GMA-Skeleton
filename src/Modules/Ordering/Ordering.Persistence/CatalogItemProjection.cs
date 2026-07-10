@@ -5,20 +5,20 @@ using Ordering.Domain.Aggregates;
 using Gma.Framework.Domain.Models;
 using Gma.Framework.Results;
 
-public sealed class CatalogItemProjection : TenantEntity<Guid>
+public sealed class CatalogItemProjection : ScopedEntity<Guid>
 {
     private CatalogItemProjection() { }
 
     private CatalogItemProjection(
         Guid id,
-        string tenantId,
+        string scopeId,
         Guid catalogItemId,
         string sku,
         string name,
         decimal price,
         string currency,
         CatalogItemStatus status)
-        : base(id, tenantId)
+        : base(id, scopeId)
     {
         this.CatalogItemId = catalogItemId;
         this.Apply(sku, name, price, currency, status);
@@ -26,9 +26,9 @@ public sealed class CatalogItemProjection : TenantEntity<Guid>
 
     private CatalogItemProjection(
         Guid id,
-        string tenantId,
+        string scopeId,
         Guid catalogItemId)
-        : base(id, tenantId)
+        : base(id, scopeId)
     {
         this.CatalogItemId = catalogItemId;
         this.Sku = string.Empty;
@@ -48,7 +48,7 @@ public sealed class CatalogItemProjection : TenantEntity<Guid>
 
     public static CatalogItemProjection Create(
         Guid id,
-        string tenantId,
+        string scopeId,
         Guid catalogItemId,
         string sku,
         string name,
@@ -56,16 +56,16 @@ public sealed class CatalogItemProjection : TenantEntity<Guid>
         string currency,
         CatalogItemStatus status,
         IReadOnlyCollection<string>? availableRegions = null) =>
-        new(id, tenantId, catalogItemId, sku, name, price, currency, status)
+        new(id, scopeId, catalogItemId, sku, name, price, currency, status)
         {
             AvailableRegionCodes = EncodeAvailableRegions(availableRegions)
         };
 
     public static CatalogItemProjection CreateDiscontinuedPlaceholder(
         Guid id,
-        string tenantId,
+        string scopeId,
         Guid catalogItemId) =>
-        new(id, tenantId, catalogItemId);
+        new(id, scopeId, catalogItemId);
 
     public void Update(
         string sku,

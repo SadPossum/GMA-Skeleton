@@ -189,14 +189,14 @@ public sealed class NotificationsApiIntegrationTests
 
     private static HttpClient CreateAuthenticatedClient(
         NotificationsApiTestApplication application,
-        string tenantId,
+        string scopeId,
         string userId)
     {
         HttpClient client = application.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            NotificationsApiTestApplication.CreateAccessToken(tenantId, userId));
-        client.DefaultRequestHeaders.Add("X-Tenant-Id", tenantId);
+            NotificationsApiTestApplication.CreateAccessToken(scopeId, userId));
+        client.DefaultRequestHeaders.Add("X-Tenant-Id", scopeId);
         return client;
     }
 

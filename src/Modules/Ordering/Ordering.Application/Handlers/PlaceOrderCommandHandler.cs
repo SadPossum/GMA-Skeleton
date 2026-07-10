@@ -9,27 +9,26 @@ using Ordering.Domain.Errors;
 using Gma.Framework.AccessControl;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Runtime.Identity;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 using Gma.Framework.Runtime.Time;
 using Gma.Framework.Results;
 
 internal sealed class PlaceOrderCommandHandler(
     IOrderRepository orderRepository,
     ICatalogItemProjectionRepository catalogProjectionRepository,
-    ITenantContext tenantContext,
+    IScopeContext scopeContext,
     IIdGenerator idGenerator,
     ISystemClock clock)
     : ICommandHandler<PlaceOrderCommand, OrderDto>
 {
     public async Task<Result<OrderDto>> HandleAsync(PlaceOrderCommand command, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(tenantContext.TenantId))
+        if (string.IsNullOrWhiteSpace(scopeContext.ScopeId))
         {
             return Result.Failure<OrderDto>(OrderingDomainErrors.TenantRequired);
         }
 
-        if (command.Subject.Kind != AccessSubjectKind.User ||
-            !string.Equals(command.Subject.TenantId, tenantContext.TenantId, StringComparison.Ordinal))
+        if (command.Subject.Kind != AccessSubjectKind.User)
         {
             return Result.Failure<OrderDto>(OrderingApplicationErrors.AccessDenied);
         }
@@ -60,7 +59,7 @@ internal sealed class PlaceOrderCommandHandler(
 
         Result<Order> orderResult = Order.Create(
             idGenerator.NewId(),
-            tenantContext.TenantId,
+            scopeContext.ScopeId,
             command.Subject.Id,
             catalogItem.CatalogItemId,
             catalogItem.Sku,

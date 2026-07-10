@@ -7,8 +7,8 @@ public static class OrderingDomainErrors
     public static readonly Error OrderIdRequired = new("Ordering.OrderIdRequired", "An order id is required.");
     public static readonly Error UserIdRequired = new("Ordering.UserIdRequired", "A user id is required.");
     public static readonly Error UserIdInvalid = new("Ordering.UserIdInvalid", "The user id is not valid.");
-    public static readonly Error TenantRequired = new("Ordering.TenantRequired", "A tenant id is required.");
-    public static readonly Error TenantInvalid = new("Ordering.TenantInvalid", "The tenant id is not valid.");
+    public static readonly Error TenantRequired = new("Ordering.TenantRequired", "A scope id is required.");
+    public static readonly Error TenantInvalid = new("Ordering.TenantInvalid", "The scope id is not valid.");
     public static readonly Error RegionInvalid = new("Ordering.RegionInvalid", "The region code is not valid.");
     public static readonly Error CatalogItemRequired = new("Ordering.CatalogItemRequired", "A catalog item id is required.");
     public static readonly Error CatalogSkuRequired = new("Ordering.CatalogSkuRequired", "A catalog item SKU is required.");

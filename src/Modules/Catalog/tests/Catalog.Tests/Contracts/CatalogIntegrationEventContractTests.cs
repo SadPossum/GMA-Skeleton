@@ -49,7 +49,7 @@ public sealed class CatalogIntegrationEventContractTests
             " usd ");
 
         Assert.Equal(EventId, integrationEvent.EventId);
-        Assert.Equal("tenant-a", integrationEvent.TenantId);
+        Assert.Equal("tenant-a", integrationEvent.ScopeId);
         Assert.Equal(OccurredAtUtc, integrationEvent.OccurredAtUtc);
         Assert.Equal(ItemId, integrationEvent.ItemId);
         Assert.Equal("SKU-1", integrationEvent.Sku);
@@ -125,8 +125,8 @@ public sealed class CatalogIntegrationEventContractTests
     public void Catalog_events_reject_invalid_metadata_and_item_snapshot()
     {
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(eventId: Guid.Empty));
-        Assert.Throws<ArgumentException>(() => CreateCreatedEvent(tenantId: " "));
-        Assert.Throws<ArgumentException>(() => CreateCreatedEvent(tenantId: new string('x', TenantIds.MaxLength + 1)));
+        Assert.Throws<ArgumentException>(() => CreateCreatedEvent(scopeId: " "));
+        Assert.Throws<ArgumentException>(() => CreateCreatedEvent(scopeId: new string('x', ScopeIds.MaxLength + 1)));
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(occurredAtUtc: default(DateTimeOffset)));
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(itemId: Guid.Empty));
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(sku: " "));
@@ -163,7 +163,7 @@ public sealed class CatalogIntegrationEventContractTests
             " usd ",
             (CatalogItemStatus)999);
 
-        Assert.Equal("tenant-a", export.TenantId);
+        Assert.Equal("tenant-a", export.ScopeId);
         Assert.Equal(ItemId, export.ItemId);
         Assert.Equal("SKU-1", export.Sku);
         Assert.Equal("Item name", export.Name);
@@ -175,8 +175,8 @@ public sealed class CatalogIntegrationEventContractTests
     [Fact]
     public void Projection_export_rejects_invalid_snapshot_data()
     {
-        Assert.Throws<ArgumentException>(() => CreateProjectionExport(tenantId: " "));
-        Assert.Throws<ArgumentException>(() => CreateProjectionExport(tenantId: new string('x', TenantIds.MaxLength + 1)));
+        Assert.Throws<ArgumentException>(() => CreateProjectionExport(scopeId: " "));
+        Assert.Throws<ArgumentException>(() => CreateProjectionExport(scopeId: new string('x', ScopeIds.MaxLength + 1)));
         Assert.Throws<ArgumentException>(() => CreateProjectionExport(itemId: Guid.Empty));
         Assert.Throws<ArgumentException>(() => CreateProjectionExport(sku: " "));
         Assert.Throws<ArgumentException>(() => CreateProjectionExport(sku: new string('x', CatalogContractLimits.SkuMaxLength + 1)));
@@ -189,7 +189,7 @@ public sealed class CatalogIntegrationEventContractTests
 
     private static CatalogItemCreatedIntegrationEvent CreateCreatedEvent(
         Guid? eventId = null,
-        string tenantId = "tenant-a",
+        string scopeId = "tenant-a",
         DateTimeOffset? occurredAtUtc = null,
         Guid? itemId = null,
         string sku = "SKU-1",
@@ -198,7 +198,7 @@ public sealed class CatalogIntegrationEventContractTests
         string currency = "USD") =>
         new(
             eventId ?? EventId,
-            tenantId,
+            scopeId,
             occurredAtUtc ?? OccurredAtUtc,
             itemId ?? ItemId,
             sku,
@@ -220,7 +220,7 @@ public sealed class CatalogIntegrationEventContractTests
             status);
 
     private static CatalogItemProjectionExport CreateProjectionExport(
-        string tenantId = "tenant-a",
+        string scopeId = "tenant-a",
         Guid? itemId = null,
         string sku = "SKU-1",
         string name = "Item name",
@@ -228,7 +228,7 @@ public sealed class CatalogIntegrationEventContractTests
         string currency = "USD",
         CatalogItemStatus status = CatalogItemStatus.Active) =>
         new(
-            tenantId,
+            scopeId,
             itemId ?? ItemId,
             sku,
             name,

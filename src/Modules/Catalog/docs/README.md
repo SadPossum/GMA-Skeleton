@@ -4,7 +4,7 @@ Catalog is a compiled optional example module. It is not registered in `Host.Api
 
 ## Purpose
 
-Catalog demonstrates stored tenant-scoped domain data, CQRS commands and queries, provider-split EF persistence, explicit cache-aside reads, admin CLI/API front doors, regional availability rules, and integration events through outbox.
+Catalog demonstrates stored scope-aware domain data, CQRS commands and queries, provider-split EF persistence, explicit cache-aside reads, admin CLI/API front doors, regional availability rules, and integration events through outbox.
 
 ## Projects
 
@@ -27,7 +27,7 @@ Catalog.AdminApi
 
 `CatalogItem` owns:
 
-- tenant id;
+- scope id;
 - SKU;
 - name;
 - price;
@@ -37,7 +37,7 @@ Catalog.AdminApi
 
 Core rules:
 
-- tenant id, SKU, name, price, and currency are required;
+- scope id, SKU, name, price, and currency are required;
 - price must be positive;
 - price must fit the module's mapped decimal precision without rounding;
 - SKU is normalized and unique per tenant;
@@ -83,7 +83,7 @@ Tags:
 
 - `catalog:items`
 
-Create/update/discontinue commands enqueue invalidation through `ICacheInvalidationQueue`. Cache data is non-authoritative and tenant-scoped, so the default Catalog profile requires the generic `caching.tenant-scope` composition feature. Hosts satisfy that through `Gma.Framework.Tenancy.Caching`.
+Create/update/discontinue commands enqueue invalidation through `ICacheInvalidationQueue`. Cache data is non-authoritative and scope-aware, so the default Catalog profile requires the generic `caching.scope-context` composition feature. Hosts satisfy that through `Gma.Framework.Tenancy.Caching`.
 
 ## Admin Permissions
 

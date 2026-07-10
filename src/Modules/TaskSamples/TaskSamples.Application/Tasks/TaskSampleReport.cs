@@ -4,5 +4,5 @@ public sealed record TaskSampleReport(
     string ReportName,
     int ExpectedRows,
     Guid RunId,
-    string TenantId,
+    string ScopeId,
     int Attempt);

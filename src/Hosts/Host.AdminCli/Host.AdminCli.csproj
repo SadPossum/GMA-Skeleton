@@ -10,6 +10,9 @@
     <PackageReference Include="System.CommandLine" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.AdminCli\Gma.Modules.AccessControl.AdminCli.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations\Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Persistence.SqlServerMigrations\Gma.Modules.AccessControl.Persistence.SqlServerMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.AdminCli\Gma.Modules.Administration.AdminCli.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.Persistence.PostgreSqlMigrations\Gma.Modules.Administration.Persistence.PostgreSqlMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.Persistence.SqlServerMigrations\Gma.Modules.Administration.Persistence.SqlServerMigrations.csproj" />

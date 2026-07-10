@@ -17,10 +17,10 @@ public sealed class CatalogItemAggregateTests
     {
         Result<CatalogItem> normalized = CreateItem(" tenant-a ");
         Result<CatalogItem> missing = CreateItem(" ");
-        Result<CatalogItem> invalid = CreateItem(new string('x', TenantIds.MaxLength + 1));
+        Result<CatalogItem> invalid = CreateItem(new string('x', ScopeIds.MaxLength + 1));
 
         Assert.True(normalized.IsSuccess);
-        Assert.Equal("tenant-a", normalized.Value.TenantId);
+        Assert.Equal("tenant-a", normalized.Value.ScopeId);
         Assert.True(missing.IsFailure);
         Assert.Equal(CatalogDomainErrors.TenantRequired, missing.Error);
         Assert.True(invalid.IsFailure);
@@ -152,7 +152,7 @@ public sealed class CatalogItemAggregateTests
     }
 
     private static Result<CatalogItem> CreateItem(
-        string tenantId,
+        string scopeId,
         string sku = "SKU-1",
         string name = "Catalog item",
         string currency = "USD",
@@ -162,7 +162,7 @@ public sealed class CatalogItemAggregateTests
         Guid? eventId = null) =>
         CatalogItem.Create(
             itemId ?? Guid.NewGuid(),
-            tenantId,
+            scopeId,
             sku,
             name,
             price,

@@ -7,6 +7,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 | Package | Source repository docs | Local checkout path |
 | --- | --- | --- |
 | GMA Framework | [Docs](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/README.md) | `gma/framework/docs/README.md` |
+| AccessControl | Local source-first package; remote docs link pending `GMA-Module-AccessControl` packaging | `gma/modules/access-control/docs/README.md` |
 | Administration | [Docs](https://github.com/SadPossum/GMA-Module-Administration/blob/dev/docs/README.md) | `gma/modules/administration/docs/README.md` |
 | Auth | [Docs](https://github.com/SadPossum/GMA-Module-Auth/blob/dev/docs/README.md) | `gma/modules/auth/docs/README.md` |
 | Files | [Docs](https://github.com/SadPossum/GMA-Module-Files/blob/dev/docs/README.md) | `gma/modules/files/docs/README.md` |

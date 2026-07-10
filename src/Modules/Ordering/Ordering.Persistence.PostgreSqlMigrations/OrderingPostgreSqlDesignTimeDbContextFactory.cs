@@ -14,6 +14,6 @@ public sealed class OrderingPostgreSqlDesignTimeDbContextFactory : IDesignTimeDb
                 OrderingMigrations.PostgreSqlAssembly,
                 OrderingMigrations.Schema,
                 OrderingMigrations.HistoryTable),
-            new DesignTimeTenantContext());
+            new DesignTimeScopeContext());
     }
 }

@@ -11,7 +11,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "TenantId",
+                name: "ScopeId",
                 schema: "ordering",
                 table: "inbox_messages",
                 type: "nvarchar(128)",
@@ -26,7 +26,7 @@ namespace Ordering.Persistence.SqlServerMigrations.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "TenantId",
+                name: "ScopeId",
                 schema: "ordering",
                 table: "inbox_messages",
                 type: "nvarchar(128)",

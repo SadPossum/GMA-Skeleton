@@ -1,6 +1,11 @@
 namespace Architecture.Tests;
 
 using System.Reflection;
+using Gma.Modules.AccessControl.Admin.Contracts;
+using Gma.Modules.AccessControl.AdminCli;
+using Gma.Modules.AccessControl.AdminApi;
+using Gma.Modules.AccessControl.Contracts;
+using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Administration.AdminCli;
 using Gma.Modules.Administration.AdminApi;
 using Gma.Modules.Administration.Application;
@@ -52,6 +57,13 @@ internal static class ArchitectureCatalog
 {
     public static IReadOnlyList<ModuleProject> ModuleProjects { get; } =
     [
+        new("AccessControl", "Gma.Modules.AccessControl.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(AccessControlAdminPermissions).Assembly),
+        new("AccessControl", "Gma.Modules.AccessControl.AdminCli", ModuleProjectKind.AdminCli, typeof(AccessControlAdminCliModule).Assembly),
+        new("AccessControl", "Gma.Modules.AccessControl.AdminApi", ModuleProjectKind.AdminApi, typeof(AccessControlAdminApiModule).Assembly),
+        new("AccessControl", "Gma.Modules.AccessControl.Application", ModuleProjectKind.Application, typeof(Gma.Modules.AccessControl.Application.DependencyInjection).Assembly),
+        new("AccessControl", "Gma.Modules.AccessControl.Contracts", ModuleProjectKind.Contracts, typeof(AccessControlModuleMetadata).Assembly),
+        new("AccessControl", "Gma.Modules.AccessControl.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.AccessControl.Persistence.DependencyInjection).Assembly),
+
         new("Administration", "Gma.Modules.Administration.AdminCli", ModuleProjectKind.AdminCli, typeof(AdministrationAdminCliModule).Assembly),
         new("Administration", "Gma.Modules.Administration.AdminApi", ModuleProjectKind.AdminApi, typeof(AdministrationAdminApiModule).Assembly),
         new("Administration", "Gma.Modules.Administration.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Administration.Application.DependencyInjection).Assembly),
@@ -112,6 +124,7 @@ internal static class ArchitectureCatalog
 
     public static IReadOnlyList<ModuleDescriptor> ModuleDescriptors { get; } =
     [
+        AccessControlModuleMetadata.Descriptor,
         AuthModuleMetadata.Descriptor,
         AdministrationModuleMetadata.Descriptor,
         CatalogModuleMetadata.Descriptor,
@@ -147,6 +160,7 @@ internal static class ArchitectureCatalog
 
     public static IReadOnlyList<Assembly> CommandLineAllowedAssemblies { get; } =
     [
+        typeof(AccessControlAdminCliModule).Assembly,
         typeof(AdministrationAdminCliModule).Assembly,
         typeof(AuthAdminCliModule).Assembly,
         typeof(CatalogAdminCliModule).Assembly,

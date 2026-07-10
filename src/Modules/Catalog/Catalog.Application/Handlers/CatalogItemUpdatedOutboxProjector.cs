@@ -13,7 +13,7 @@ internal sealed class CatalogItemUpdatedOutboxProjector(IOutboxWriterRegistry ou
         outboxWriters.GetRequired(CatalogModuleMetadata.Name).EnqueueAsync(
             new CatalogItemUpdatedIntegrationEvent(
                 domainEvent.EventId,
-                domainEvent.TenantId,
+                domainEvent.ScopeId,
                 domainEvent.OccurredAtUtc,
                 domainEvent.ItemId,
                 domainEvent.Sku,

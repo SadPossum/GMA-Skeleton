@@ -11,7 +11,7 @@ internal static class OrderAccessScopeExtensions
         ArgumentNullException.ThrowIfNull(scope);
 
         return query.Where(order =>
-            order.TenantId == scope.TenantId &&
+            order.ScopeId == scope.ScopeId &&
             order.UserId == scope.UserId.Value);
     }
 }

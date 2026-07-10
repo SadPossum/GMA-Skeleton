@@ -60,7 +60,7 @@ namespace Catalog.Persistence.PostgreSqlMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
@@ -70,7 +70,7 @@ namespace Catalog.Persistence.PostgreSqlMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId", "Sku")
+                    b.HasIndex("ScopeId", "Sku")
                         .IsUnique();
 
                     b.ToTable("items", "catalog");
@@ -119,7 +119,7 @@ namespace Catalog.Persistence.PostgreSqlMigrations.Migrations
                     b.Property<string>("ScopeId")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
-                        .HasColumnName("TenantId");
+                        .HasColumnName("ScopeId");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -182,7 +182,7 @@ namespace Catalog.Persistence.PostgreSqlMigrations.Migrations
                     b.Property<string>("ScopeId")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
-                        .HasColumnName("TenantId");
+                        .HasColumnName("ScopeId");
 
                     b.Property<string>("Subject")
                         .IsRequired()

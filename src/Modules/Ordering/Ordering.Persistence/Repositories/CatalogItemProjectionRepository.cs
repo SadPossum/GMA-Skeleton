@@ -26,7 +26,7 @@ internal sealed class CatalogItemProjectionRepository(OrderingDbContext dbContex
     {
         CatalogItemProjection? projection = await dbContext.CatalogItemProjections
             .FirstOrDefaultAsync(
-                projection => projection.TenantId == item.TenantId && projection.CatalogItemId == item.CatalogItemId,
+                projection => projection.ScopeId == item.ScopeId && projection.CatalogItemId == item.CatalogItemId,
                 cancellationToken)
             .ConfigureAwait(false);
 
@@ -34,7 +34,7 @@ internal sealed class CatalogItemProjectionRepository(OrderingDbContext dbContex
         {
             dbContext.CatalogItemProjections.Add(CatalogItemProjection.Create(
                 idGenerator.NewId(),
-                item.TenantId,
+                item.ScopeId,
                 item.CatalogItemId,
                 item.Sku,
                 item.Name,
@@ -48,11 +48,11 @@ internal sealed class CatalogItemProjectionRepository(OrderingDbContext dbContex
         projection.Update(item.Sku, item.Name, item.Price, item.Currency, item.Status, item.AvailableRegions);
     }
 
-    public async Task MarkDiscontinuedAsync(string tenantId, Guid catalogItemId, CancellationToken cancellationToken)
+    public async Task MarkDiscontinuedAsync(string scopeId, Guid catalogItemId, CancellationToken cancellationToken)
     {
         CatalogItemProjection? projection = await dbContext.CatalogItemProjections
             .FirstOrDefaultAsync(
-                item => item.TenantId == tenantId && item.CatalogItemId == catalogItemId,
+                item => item.ScopeId == scopeId && item.CatalogItemId == catalogItemId,
                 cancellationToken)
             .ConfigureAwait(false);
 
@@ -60,7 +60,7 @@ internal sealed class CatalogItemProjectionRepository(OrderingDbContext dbContex
         {
             dbContext.CatalogItemProjections.Add(CatalogItemProjection.CreateDiscontinuedPlaceholder(
                 idGenerator.NewId(),
-                tenantId,
+                scopeId,
                 catalogItemId));
             return;
         }

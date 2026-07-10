@@ -12,12 +12,12 @@ internal sealed class OrderRepository(OrderingDbContext dbContext) : IOrderRepos
     }
 
     public async Task<IReadOnlyCollection<string>> ListDistinctUserIdsByCatalogItemAsync(
-        string tenantId,
+        string scopeId,
         Guid catalogItemId,
         CancellationToken cancellationToken) =>
         await dbContext.Orders
             .AsNoTracking()
-            .Where(order => order.TenantId == tenantId && order.CatalogItemId == catalogItemId)
+            .Where(order => order.ScopeId == scopeId && order.CatalogItemId == catalogItemId)
             .Select(order => order.UserId)
             .Distinct()
             .OrderBy(userId => userId)

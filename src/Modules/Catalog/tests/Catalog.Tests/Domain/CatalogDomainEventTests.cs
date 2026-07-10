@@ -30,7 +30,7 @@ public sealed class CatalogDomainEventTests
         Assert.Equal(EventId, domainEvent.EventId);
         Assert.Equal(OccurredAtUtc, domainEvent.OccurredAtUtc);
         Assert.Equal(ItemId, domainEvent.ItemId);
-        Assert.Equal("tenant-a", domainEvent.TenantId);
+        Assert.Equal("tenant-a", domainEvent.ScopeId);
         Assert.Equal("SKU-1", domainEvent.Sku);
         Assert.Equal("Catalog item", domainEvent.Name);
         Assert.Equal(10m, domainEvent.Price);
@@ -44,8 +44,8 @@ public sealed class CatalogDomainEventTests
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(eventId: Guid.Empty));
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(occurredAtUtc: default(DateTimeOffset)));
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(itemId: Guid.Empty));
-        Assert.Throws<ArgumentException>(() => CreateCreatedEvent(tenantId: " "));
-        Assert.Throws<ArgumentException>(() => CreateCreatedEvent(tenantId: new string('x', TenantIds.MaxLength + 1)));
+        Assert.Throws<ArgumentException>(() => CreateCreatedEvent(scopeId: " "));
+        Assert.Throws<ArgumentException>(() => CreateCreatedEvent(scopeId: new string('x', ScopeIds.MaxLength + 1)));
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(sku: " "));
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(sku: new string('x', CatalogItem.SkuMaxLength + 1)));
         Assert.Throws<ArgumentException>(() => CreateCreatedEvent(name: " "));
@@ -91,7 +91,7 @@ public sealed class CatalogDomainEventTests
         Guid? eventId = null,
         DateTimeOffset? occurredAtUtc = null,
         Guid? itemId = null,
-        string tenantId = "tenant-a",
+        string scopeId = "tenant-a",
         string sku = "SKU-1",
         string name = "Catalog item",
         decimal price = 10m,
@@ -100,7 +100,7 @@ public sealed class CatalogDomainEventTests
             eventId ?? EventId,
             occurredAtUtc ?? OccurredAtUtc,
             itemId ?? ItemId,
-            tenantId,
+            scopeId,
             sku,
             name,
             price,

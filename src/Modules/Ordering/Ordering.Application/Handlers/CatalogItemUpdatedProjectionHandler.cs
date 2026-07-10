@@ -15,7 +15,7 @@ internal sealed class CatalogItemUpdatedProjectionHandler(
     {
         await repository.UpsertAsync(
             new CatalogItemProjectionWriteModel(
-                integrationEvent.TenantId,
+                integrationEvent.ScopeId,
                 integrationEvent.ItemId,
                 integrationEvent.Sku,
                 integrationEvent.Name,
@@ -26,7 +26,7 @@ internal sealed class CatalogItemUpdatedProjectionHandler(
             cancellationToken).ConfigureAwait(false);
 
         await notifications.PublishAsync(
-            integrationEvent.TenantId,
+            integrationEvent.ScopeId,
             integrationEvent.ItemId,
             integrationEvent.Sku,
             integrationEvent.Name,

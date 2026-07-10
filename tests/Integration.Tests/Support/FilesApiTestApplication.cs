@@ -19,6 +19,7 @@ using Gma.Framework.ModuleComposition;
 using Gma.Framework.Runtime.Infrastructure;
 using Gma.Framework.Security;
 using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Framework.Tenancy.Scoping;
 using Gma.Modules.Tenancy.Api;
 
 internal sealed class FilesApiTestApplication : IAsyncDisposable
@@ -48,7 +49,7 @@ internal sealed class FilesApiTestApplication : IAsyncDisposable
         {
             ["ApplicationIdentity:Namespace"] = "test-app",
             ["Tenancy:Enabled"] = tenancyEnabled.ToString(),
-            ["Tenancy:LocalDefaultTenantId"] = "default",
+            ["Tenancy:LocalDefaultScopeId"] = "default",
             ["FileManagement:Enabled"] = "true",
             ["FileManagement:Provider"] = "LocalStorage",
             ["FileManagement:MaximumObjectBytes"] = "1048576",
@@ -57,6 +58,7 @@ internal sealed class FilesApiTestApplication : IAsyncDisposable
         });
 
         builder.AddTenancyInfrastructure();
+        builder.AddTenantScoping();
         builder.AddRuntimeInfrastructure();
         builder.AddCqrsInfrastructure();
         builder.AddLocalFileStorage();
@@ -97,7 +99,7 @@ internal sealed class FilesApiTestApplication : IAsyncDisposable
 
     public HttpClient CreateClient() => this.app.GetTestClient();
 
-    public static string CreateAccessToken(string tenantId, string userId)
+    public static string CreateAccessToken(string scopeId, string userId)
     {
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(JwtSigningKey));
         SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
@@ -105,7 +107,7 @@ internal sealed class FilesApiTestApplication : IAsyncDisposable
         List<Claim> claims =
         [
             new(ClaimTypes.NameIdentifier, userId),
-            new(ApplicationClaimNames.TenantId, tenantId),
+            new(ApplicationClaimNames.ScopeId, scopeId),
             new(ApplicationClaimNames.SessionId, Guid.NewGuid().ToString())
         ];
 

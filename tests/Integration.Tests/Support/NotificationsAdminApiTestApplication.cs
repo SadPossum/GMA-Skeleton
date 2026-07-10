@@ -3,6 +3,9 @@ namespace Integration.Tests.Support;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Gma.Modules.AccessControl.Application;
+using Gma.Modules.AccessControl.Application.Commands;
+using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Administration.Application;
 using Gma.Modules.Administration.Persistence;
 using Gma.Modules.Administration.Persistence.Entities;
@@ -20,14 +23,18 @@ using Gma.Modules.Notifications.Contracts;
 using Gma.Modules.Notifications.Domain.Aggregates;
 using Gma.Modules.Notifications.Persistence;
 using Gma.Framework.Administration;
+using Gma.Framework.Administration.AccessControl;
 using Gma.Framework.Administration.Api;
 using Gma.Framework.Application.Events.Infrastructure;
 using Gma.Framework.Api.Security;
+using Gma.Framework.Cqrs;
 using Gma.Framework.Cqrs.Infrastructure;
 using Gma.Framework.Runtime.Infrastructure;
 using Gma.Framework.Security;
 using Gma.Framework.Tenancy;
 using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Framework.Tenancy.Scoping;
+using Gma.Framework.Results;
 using DomainNotificationSeverity = Gma.Modules.Notifications.Domain.ValueObjects.NotificationSeverity;
 
 internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
@@ -55,17 +62,20 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
             ["Persistence:Provider"] = "SqlServer",
             ["ConnectionStrings:SqlServer"] = "Server=localhost;Database=notifications-admin-api-tests;Trusted_Connection=True;TrustServerCertificate=True",
             ["Tenancy:Enabled"] = "true",
-            ["Administration:Bootstrap:OwnerRoleName"] = "owner",
+            ["AccessControl:Bootstrap:OwnerRoleName"] = "owner",
             ["Notifications:DurableStreams:BatchSize"] = "10",
             ["Notifications:DurableStreams:PollInterval"] = "00:00:01",
             ["Caching:Enabled"] = "false"
         });
 
         builder.AddTenancyInfrastructure();
+        builder.AddTenantScoping();
         builder.AddRuntimeInfrastructure();
         builder.AddApplicationEventsInfrastructure();
         builder.AddCqrsInfrastructure();
         builder.Services.AddGmaAdministrationApi(builder.Configuration);
+        builder.Services.AddGmaAccessControlAdministrationAuthorization();
+        builder.Services.AddAccessControlApplication(builder.Configuration);
         builder.Services.AddAdministrationApplication(builder.Configuration);
         builder.Services.AddApiSecurityDefaults();
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -88,6 +98,9 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
         builder.Services.AddDbContext<AdminDbContext>(
             options => options.UseInMemoryDatabase(databaseName, databaseRoot));
         builder.AddAdministrationPersistence();
+        builder.Services.AddDbContext<AccessControlDbContext>(
+            options => options.UseInMemoryDatabase(databaseName, databaseRoot));
+        builder.AddAccessControlPersistence();
         builder.Services.AddDbContext<NotificationsDbContext>(
             options => options.UseInMemoryDatabase(databaseName, databaseRoot));
         builder.AddAdminApiModule<NotificationsAdminApiModule>();
@@ -103,7 +116,7 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
 
     public HttpClient CreateClient() => this.app.GetTestClient();
 
-    public static string CreateAccessToken(string actorId, string? tenantId)
+    public static string CreateAccessToken(string actorId, string? scopeId)
     {
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(JwtSigningKey));
         SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
@@ -113,9 +126,9 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
             new(ClaimTypes.NameIdentifier, actorId)
         ];
 
-        if (!string.IsNullOrWhiteSpace(tenantId))
+        if (!string.IsNullOrWhiteSpace(scopeId))
         {
-            claims.Add(new Claim(ApplicationClaimNames.TenantId, tenantId));
+            claims.Add(new Claim(ApplicationClaimNames.ScopeId, scopeId));
         }
 
         JwtSecurityToken token = new(
@@ -132,19 +145,20 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
     public async Task SeedOwnerAsync(string actorId, CancellationToken cancellationToken = default)
     {
         using IServiceScope scope = this.app.Services.CreateScope();
-        AdminDbContext dbContext = scope.ServiceProvider.GetRequiredService<AdminDbContext>();
-        DateTimeOffset nowUtc = DateTimeOffset.UtcNow;
-        AdminRole owner = new(Guid.NewGuid(), "owner", nowUtc);
+        IRequestDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
 
-        dbContext.Principals.Add(new AdminPrincipal(actorId, nowUtc));
-        dbContext.Roles.Add(owner);
-        dbContext.RolePermissions.Add(new AdminRolePermission(Guid.NewGuid(), owner.Id, AdminPermission.OwnerWildcard, nowUtc));
-        dbContext.PrincipalRoles.Add(new AdminPrincipalRole(Guid.NewGuid(), actorId, owner.Id, string.Empty, nowUtc));
-        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Unit> result = await dispatcher
+            .SendAsync(new BootstrapOwnerCommand(actorId, Confirmed: true), cancellationToken)
+            .ConfigureAwait(false);
+
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error.Message);
+        }
     }
 
     public async Task AddNotificationAsync(
-        string tenantId,
+        string scopeId,
         string userId,
         Guid notificationId,
         string title,
@@ -153,11 +167,11 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
     {
         using IServiceScope scope = this.app.Services.CreateScope();
         ITenantContextAccessor tenantContext = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
-        tenantContext.SetTenant(tenantId);
+        tenantContext.SetTenant(scopeId);
         NotificationsDbContext dbContext = scope.ServiceProvider.GetRequiredService<NotificationsDbContext>();
         UserNotification notification = UserNotification.Create(
             notificationId,
-            tenantId,
+            scopeId,
             userId,
             "catalog",
             "catalog.item-updated",

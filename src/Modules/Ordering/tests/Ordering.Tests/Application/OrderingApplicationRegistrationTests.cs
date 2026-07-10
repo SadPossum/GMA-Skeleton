@@ -9,8 +9,8 @@ using Ordering.Application.Validation;
 using Ordering.Contracts;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Messaging;
+using Gma.Framework.Scoping;
 using Gma.Framework.Tasks;
-using Gma.Framework.Tenancy;
 using Xunit;
 
 [Trait("Category", "Unit")]
@@ -54,7 +54,7 @@ public sealed class OrderingApplicationRegistrationTests
         Assert.Equal(OrderingModuleMetadata.ProjectionWorkerGroup, task.WorkerGroup);
         Assert.Equal(typeof(RebuildCatalogItemProjectionPayload), task.PayloadType);
         Assert.Equal(ModuleTaskKind.OneShot, task.Kind);
-        Assert.True(task.IsTenantScoped());
+        Assert.True(task.IsScopeAware());
         Assert.True(task.SupportsControlMessages);
         Assert.Equal(RebuildCatalogItemProjectionPayload.PayloadVersion, task.PayloadVersion);
     }

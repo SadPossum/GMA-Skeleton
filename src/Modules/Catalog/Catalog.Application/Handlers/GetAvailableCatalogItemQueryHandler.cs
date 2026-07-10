@@ -8,17 +8,19 @@ using Catalog.Domain.Errors;
 using Gma.Framework.Caching;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Results;
+using Gma.Framework.Scoping;
 
 internal sealed class GetAvailableCatalogItemQueryHandler(
     ICatalogItemReadRepository repository,
-    IApplicationCache cache)
+    IApplicationCache cache,
+    IScopeContext scopeContext)
     : IQueryHandler<GetAvailableCatalogItemQuery, CatalogItemDto>
 {
     public async Task<Result<CatalogItemDto>> HandleAsync(
         GetAvailableCatalogItemQuery query,
         CancellationToken cancellationToken)
     {
-        Result<AvailableCatalogItemsScope> scopeResult = CreateAvailableItemsScope(query);
+        Result<AvailableCatalogItemsScope> scopeResult = this.CreateAvailableItemsScope(query);
         if (scopeResult.IsFailure)
         {
             return Result.Failure<CatalogItemDto>(MapDeniedSingleResource(scopeResult.Error));
@@ -36,11 +38,11 @@ internal sealed class GetAvailableCatalogItemQueryHandler(
             : Result.Success(item);
     }
 
-    private static Result<AvailableCatalogItemsScope> CreateAvailableItemsScope(GetAvailableCatalogItemQuery query)
+    private Result<AvailableCatalogItemsScope> CreateAvailableItemsScope(GetAvailableCatalogItemQuery query)
     {
         Result<CatalogViewer> viewerResult = CatalogViewer.User(
             query.Subject.Id,
-            query.Subject.TenantId,
+            scopeContext.ScopeId,
             query.SubjectRegionCode);
         return viewerResult.IsFailure
             ? Result.Failure<AvailableCatalogItemsScope>(viewerResult.Error)

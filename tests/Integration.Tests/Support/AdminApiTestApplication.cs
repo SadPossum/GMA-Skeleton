@@ -3,8 +3,11 @@ namespace Integration.Tests.Support;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Gma.Framework.Cqrs;
 using Gma.Modules.Administration.Persistence;
 using Gma.Modules.Administration.Persistence.Entities;
+using Gma.Modules.AccessControl.Application.Commands;
+using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Auth.Domain.Services;
 using Gma.Modules.Auth.Domain.ValueObjects;
 using Gma.Modules.Auth.Persistence;
@@ -18,8 +21,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NATS.Client.Core;
+using Gma.Framework.Scoping;
 using Gma.Framework.Security;
-using Gma.Framework.Tenancy;
 using Gma.Framework.Persistence.EntityFrameworkCore;
 
 internal sealed class AdminApiTestApplication(
@@ -120,6 +123,16 @@ internal sealed class AdminApiTestApplication(
         await using AdminDbContext adminDbContext = new(adminOptions.Options);
         await adminDbContext.Database.MigrateAsync().ConfigureAwait(false);
 
+        DbContextOptionsBuilder<AccessControlDbContext> accessControlOptions = new();
+        accessControlOptions.UseConfiguredProvider(
+            configuration,
+            AccessControlMigrations.SqlServerAssembly,
+            AccessControlMigrations.PostgreSqlAssembly,
+            AccessControlMigrations.Schema,
+            AccessControlMigrations.HistoryTable);
+        await using AccessControlDbContext accessControlDbContext = new(accessControlOptions.Options);
+        await accessControlDbContext.Database.MigrateAsync().ConfigureAwait(false);
+
         DbContextOptionsBuilder<AuthDbContext> authOptions = new();
         authOptions.UseConfiguredProvider(
             configuration,
@@ -133,25 +146,17 @@ internal sealed class AdminApiTestApplication(
 
     public async Task SeedOwnerAsync(Guid actorId)
     {
-        IConfiguration configuration = this.CreatePersistenceConfiguration();
-        DbContextOptionsBuilder<AdminDbContext> options = new();
-        options.UseConfiguredProvider(
-            configuration,
-            AdminMigrations.SqlServerAssembly,
-            AdminMigrations.PostgreSqlAssembly,
-            AdminMigrations.Schema,
-            AdminMigrations.HistoryTable);
-        await using AdminDbContext dbContext = new(options.Options);
+        using IServiceScope scope = this.Services.CreateScope();
+        IRequestDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
 
-        DateTimeOffset nowUtc = DateTimeOffset.UtcNow;
-        AdminRole owner = new(Guid.NewGuid(), "owner", nowUtc);
-        string principalId = actorId.ToString();
+        var result = await dispatcher
+            .SendAsync(new BootstrapOwnerCommand(actorId.ToString(), Confirmed: true), CancellationToken.None)
+            .ConfigureAwait(false);
 
-        dbContext.Principals.Add(new AdminPrincipal(principalId, nowUtc));
-        dbContext.Roles.Add(owner);
-        dbContext.RolePermissions.Add(new AdminRolePermission(Guid.NewGuid(), owner.Id, "*", nowUtc));
-        dbContext.PrincipalRoles.Add(new AdminPrincipalRole(Guid.NewGuid(), principalId, owner.Id, string.Empty, nowUtc));
-        await dbContext.SaveChangesAsync().ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error.Message);
+        }
     }
 
     public async Task<int> CountAuditEntriesAsync(string operation, string? errorCode = null)
@@ -202,28 +207,28 @@ internal sealed class AdminApiTestApplication(
             .ConfigureAwait(false);
     }
 
-    public string CreateAccessToken(Guid actorId, string tenantId)
+    public string CreateAccessToken(Guid actorId, string scopeId)
     {
         using IServiceScope scope = this.Services.CreateScope();
         ITokenService tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
 
         return tokenService.GenerateAccessToken(
             new MemberId(actorId),
-            tenantId,
+            scopeId,
             new MemberSessionId(Guid.NewGuid()));
     }
 
     public static string CreateAccessTokenWithoutTenantClaim(Guid actorId)
     {
-        return CreateJwt(actorId, tenantId: null);
+        return CreateJwt(actorId, scopeId: null);
     }
 
-    public static string CreateAccessTokenWithTenantClaim(Guid actorId, string tenantId)
+    public static string CreateAccessTokenWithTenantClaim(Guid actorId, string scopeId)
     {
-        return CreateJwt(actorId, tenantId);
+        return CreateJwt(actorId, scopeId);
     }
 
-    public static string CreateAccessTokenWithActorClaim(string actorId, string? tenantId)
+    public static string CreateAccessTokenWithActorClaim(string actorId, string? scopeId)
     {
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(JwtSigningKey));
         SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha256);
@@ -233,9 +238,9 @@ internal sealed class AdminApiTestApplication(
             new(ClaimTypes.NameIdentifier, actorId)
         ];
 
-        if (tenantId is not null)
+        if (scopeId is not null)
         {
-            claims.Add(new Claim(GmaClaimNames.TenantId, tenantId));
+            claims.Add(new Claim(GmaClaimNames.ScopeId, scopeId));
         }
 
         JwtSecurityToken token = new(
@@ -249,7 +254,7 @@ internal sealed class AdminApiTestApplication(
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private static string CreateJwt(Guid actorId, string? tenantId)
+    private static string CreateJwt(Guid actorId, string? scopeId)
     {
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(JwtSigningKey));
         SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha256);
@@ -259,9 +264,9 @@ internal sealed class AdminApiTestApplication(
             new(ClaimTypes.NameIdentifier, actorId.ToString())
         ];
 
-        if (tenantId is not null)
+        if (scopeId is not null)
         {
-            claims.Add(new Claim(GmaClaimNames.TenantId, tenantId));
+            claims.Add(new Claim(GmaClaimNames.ScopeId, scopeId));
         }
 
         JwtSecurityToken token = new(
@@ -285,11 +290,11 @@ internal sealed class AdminApiTestApplication(
             })
             .Build();
 
-    private sealed class DisabledTenantContext : ITenantContext
+    private sealed class DisabledTenantContext : IScopeContext
     {
         public static readonly DisabledTenantContext Instance = new();
 
         public bool IsEnabled => false;
-        public string? TenantId => null;
+        public string? ScopeId => null;
     }
 }

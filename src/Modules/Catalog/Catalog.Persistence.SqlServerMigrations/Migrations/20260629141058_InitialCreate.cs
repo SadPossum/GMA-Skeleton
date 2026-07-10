@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -24,7 +24,7 @@ namespace Catalog.Persistence.SqlServerMigrations.Migrations
                     Subject = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     EventType = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ScopeId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Attempts = table.Column<int>(type: "int", nullable: false),
                     OccurredAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -46,7 +46,7 @@ namespace Catalog.Persistence.SqlServerMigrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ScopeId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     Sku = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -70,7 +70,7 @@ namespace Catalog.Persistence.SqlServerMigrations.Migrations
                     Subject = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     EventType = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ScopeId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     OccurredAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CreatedAtUtc = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Payload = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -93,10 +93,10 @@ namespace Catalog.Persistence.SqlServerMigrations.Migrations
                 columns: new[] { "Handler", "Status" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_items_TenantId_Sku",
+                name: "IX_items_ScopeId_Sku",
                 schema: "catalog",
                 table: "items",
-                columns: new[] { "TenantId", "Sku" },
+                columns: new[] { "ScopeId", "Sku" },
                 unique: true);
 
             migrationBuilder.CreateIndex(

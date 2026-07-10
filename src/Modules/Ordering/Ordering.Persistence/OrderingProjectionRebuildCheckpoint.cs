@@ -3,14 +3,14 @@ namespace Ordering.Persistence;
 using Gma.Framework.Domain;
 using Gma.Framework.ProjectionRebuild;
 
-public sealed class OrderingProjectionRebuildCheckpoint : ProjectionRebuildCheckpointState, ITenantScoped
+public sealed class OrderingProjectionRebuildCheckpoint : ProjectionRebuildCheckpointState, IScopedEntity
 {
     private OrderingProjectionRebuildCheckpoint() { }
 
     private OrderingProjectionRebuildCheckpoint(
         ProjectionRebuildCheckpointKey key,
         ProjectionRebuildCheckpoint checkpoint)
-        : base(key, checkpoint, tenantScoped: true)
+        : base(key, checkpoint, scopeAware: true)
     {
     }
 

@@ -66,7 +66,7 @@ The protected repository methods require `UserOrdersScope`, and `Ordering.Persis
 
 ## Projection Rebuild Task
 
-Ordering declares and registers a tenant-scoped task:
+Ordering declares and registers a scope-aware task:
 
 ```text
 ordering.rebuild-catalog-item-projections
@@ -85,7 +85,7 @@ CatalogItemProjectionExportSource
   -> ordering.projection_rebuild_checkpoints
 ```
 
-Retrying the same task run resumes from `ordering.projection_rebuild_checkpoints`. A cursor override starts from the supplied cursor instead of the saved checkpoint. The writer is idempotent because it upserts by the local projection repository's stable `(TenantId, CatalogItemId)` shape.
+Retrying the same task run resumes from `ordering.projection_rebuild_checkpoints`. A cursor override starts from the supplied cursor instead of the saved checkpoint. The writer is idempotent because it upserts by the local projection repository's stable `(ScopeId, CatalogItemId)` shape.
 
 To run the example end to end, explicitly compose Catalog persistence, Ordering application/persistence, TaskRuntime application/persistence, and the task worker runtime with:
 
@@ -104,7 +104,7 @@ The public API requires a user subject and a region code. The application reject
 
 ## Public API
 
-`Ordering.Api` maps tenant-scoped authenticated endpoints under `/api/orders`:
+`Ordering.Api` maps scope-aware authenticated endpoints under `/api/orders`:
 
 | Method | Route | Purpose |
 | --- | --- | --- |
@@ -150,4 +150,4 @@ builder.Services.AddIntegrationEventHandler<CatalogItemCreatedIntegrationEvent, 
     CatalogModuleMetadata.Name);
 ```
 
-Catalog event contracts carry `IntegrationEventNameAttribute`, `IntegrationEventVersionAttribute`, and `[TenantScoped]`, so Ordering metadata uses `WithSubscription<CatalogItemCreatedIntegrationEvent>(CatalogModuleMetadata.Name, ...)` while the application registration passes explicit consumer and producer module names. The NATS runtime invokes the handler. `OrderingInboxStore` records processing in the `ordering` schema.
+Catalog event contracts carry `IntegrationEventNameAttribute`, `IntegrationEventVersionAttribute`, and `[ScopeAware]`, so Ordering metadata uses `WithSubscription<CatalogItemCreatedIntegrationEvent>(CatalogModuleMetadata.Name, ...)` while the application registration passes explicit consumer and producer module names. The NATS runtime invokes the handler. `OrderingInboxStore` records processing in the `ordering` schema.

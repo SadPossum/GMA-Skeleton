@@ -48,6 +48,7 @@ function Get-GmaRootSourceRootsLines {
         '  <PropertyGroup>',
         '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)gma\framework\src\</GmaFrameworkRoot>',
         '    <GmaModulesRoot>$(MSBuildThisFileDirectory)gma\modules\</GmaModulesRoot>',
+        '    <GmaModuleAccessControlRoot>$(GmaModulesRoot)access-control\src\</GmaModuleAccessControlRoot>',
         '    <GmaModuleAdministrationRoot>$(GmaModulesRoot)administration\src\</GmaModuleAdministrationRoot>',
         '    <GmaModuleAuthRoot>$(GmaModulesRoot)auth\src\</GmaModuleAuthRoot>',
         '    <GmaModuleCatalogRoot>$(GmaRepositoryRoot)src\Modules\Catalog\</GmaModuleCatalogRoot>',
@@ -78,6 +79,7 @@ function Get-GmaModuleSourceRootsLines {
         '  <PropertyGroup>',
         '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)..\..\framework\src\</GmaFrameworkRoot>',
         '    <GmaModulesRoot>$(MSBuildThisFileDirectory)..\</GmaModulesRoot>',
+        '    <GmaModuleAccessControlRoot>$(GmaModulesRoot)access-control\src\</GmaModuleAccessControlRoot>',
         '    <GmaModuleAdministrationRoot>$(GmaModulesRoot)administration\src\</GmaModuleAdministrationRoot>',
         '    <GmaModuleAuthRoot>$(GmaModulesRoot)auth\src\</GmaModuleAuthRoot>',
         '    <GmaModuleCatalogRoot>$(MSBuildThisFileDirectory)..\..\..\src\Modules\Catalog\</GmaModuleCatalogRoot>',
@@ -115,6 +117,7 @@ if ($SourceLayout -eq 'Monorepo') {
 }
 
 $moduleAliases = @(
+    'access-control',
     'administration',
     'auth',
     'files',

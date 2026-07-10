@@ -76,7 +76,7 @@ internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled =
         }
     }
 
-    public static string CreateAccessToken(string? tenantId, string userId)
+    public static string CreateAccessToken(string? scopeId, string userId)
     {
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(JwtSigningKey));
         SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
@@ -85,9 +85,9 @@ internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled =
             new(ClaimTypes.NameIdentifier, userId),
             new(ApplicationClaimNames.SessionId, Guid.NewGuid().ToString())
         ];
-        if (!string.IsNullOrWhiteSpace(tenantId))
+        if (!string.IsNullOrWhiteSpace(scopeId))
         {
-            claims.Add(new Claim(ApplicationClaimNames.TenantId, tenantId));
+            claims.Add(new Claim(ApplicationClaimNames.ScopeId, scopeId));
         }
 
         JwtSecurityToken token = new(
@@ -102,7 +102,7 @@ internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled =
     }
 
     public async Task PublishAsync(
-        string tenantId,
+        string scopeId,
         string userId,
         string title,
         NotificationSeverity severity = NotificationSeverity.Info,
@@ -112,7 +112,7 @@ internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled =
         IUserNotificationPublisher publisher = scope.ServiceProvider.GetRequiredService<IUserNotificationPublisher>();
         await publisher.PublishAsync(
                 "test-module",
-                UserNotificationTarget.User(tenantId, userId),
+                UserNotificationTarget.User(scopeId, userId),
                 new StreamingTestNotificationPayload(title),
                 new NotificationPublishOptions(title, severity: severity),
                 cancellationToken)

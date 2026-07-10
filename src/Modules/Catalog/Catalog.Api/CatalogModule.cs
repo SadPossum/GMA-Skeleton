@@ -56,7 +56,7 @@ public sealed class CatalogModule : IModule
             IRequestDispatcher dispatcher,
             CancellationToken cancellationToken) =>
         {
-            if (!TryResolveUserSubject(httpContext, tenantContext, out AccessSubject? subject))
+            if (!TryResolveUserSubject(httpContext, out AccessSubject? subject))
             {
                 return Results.Unauthorized();
             }
@@ -96,7 +96,7 @@ public sealed class CatalogModule : IModule
             IRequestDispatcher dispatcher,
             CancellationToken cancellationToken) =>
         {
-            if (!TryResolveUserSubject(httpContext, tenantContext, out AccessSubject? subject))
+            if (!TryResolveUserSubject(httpContext, out AccessSubject? subject))
             {
                 return Results.Unauthorized();
             }
@@ -174,13 +174,12 @@ public sealed class CatalogModule : IModule
 
     private static bool TryResolveUserSubject(
         HttpContext httpContext,
-        ITenantContext tenantContext,
         [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out AccessSubject? subject)
     {
         subject = null;
         string? userId = CatalogUserClaims.GetCurrentUserId(httpContext);
         return !string.IsNullOrWhiteSpace(userId) &&
-               AccessSubject.TryCreate(AccessSubjectKind.User, userId, tenantContext.TenantId, out subject);
+               AccessSubject.TryCreate(AccessSubjectKind.User, userId, out subject);
     }
 
     public sealed record CatalogItemWriteRequest(

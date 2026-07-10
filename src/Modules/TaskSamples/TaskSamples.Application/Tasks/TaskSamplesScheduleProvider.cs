@@ -18,7 +18,7 @@ internal sealed class TaskSamplesScheduleProvider : ITaskScheduleProvider
                 PayloadJson,
                 TimeSpan.FromMinutes(5),
                 TaskSamplesModuleMetadata.WorkerGroup,
-                tenantId: "default",
+                scopeId: "default",
                 maxAttempts: 3,
                 payloadVersion: GenerateReportTaskPayload.PayloadVersion)
         ]);

@@ -85,15 +85,25 @@ function Get-GmaRelativePath {
 $packages = @(
     New-GmaSourcePackage `
         -Solution 'gma\framework\Gma.Framework.slnx' `
-        -AllowedFolders @('/docs/', '/eng/', '/src/', '/tests/') `
+        -AllowedFolders @('/.github/', '/Solution Items/', '/docs/', '/eng/', '/src/', '/tests/') `
         -RequiredPaths @(
             'gma\framework\docs\README.md',
             'gma\framework\eng\new-module.ps1',
             'gma\framework\tests\Gma.Framework.Tests\Gma.Framework.Tests.csproj'
         )
     New-GmaSourcePackage `
+        -Solution 'gma\modules\access-control\Gma.Modules.AccessControl.slnx' `
+        -AllowedFolders @('/.github/', '/Solution Items/', '/docs/', '/eng/', '/src/', '/tests/') `
+        -RequiredPaths @(
+            'gma\modules\access-control\docs\README.md',
+            'gma\modules\access-control\src\Gma.Modules.AccessControl.AdminApi\Gma.Modules.AccessControl.AdminApi.csproj',
+            'gma\modules\access-control\src\Gma.Modules.AccessControl.AdminCli\Gma.Modules.AccessControl.AdminCli.csproj',
+            'gma\modules\access-control\src\Gma.Modules.AccessControl.Application\Gma.Modules.AccessControl.Application.csproj',
+            'gma\modules\access-control\tests\Gma.Modules.AccessControl.Tests\Gma.Modules.AccessControl.Tests.csproj'
+        )
+    New-GmaSourcePackage `
         -Solution 'gma\modules\administration\Gma.Modules.Administration.slnx' `
-        -AllowedFolders @('/docs/', '/src/', '/tests/') `
+        -AllowedFolders @('/.github/', '/Solution Items/', '/docs/', '/eng/', '/src/', '/tests/') `
         -RequiredPaths @(
             'gma\modules\administration\docs\README.md',
             'gma\modules\administration\src\Gma.Modules.Administration.Application\Gma.Modules.Administration.Application.csproj',
@@ -101,7 +111,7 @@ $packages = @(
         )
     New-GmaSourcePackage `
         -Solution 'gma\modules\auth\Gma.Modules.Auth.slnx' `
-        -AllowedFolders @('/docs/', '/src/', '/tests/') `
+        -AllowedFolders @('/.github/', '/Solution Items/', '/docs/', '/eng/', '/src/', '/tests/') `
         -RequiredPaths @(
             'gma\modules\auth\docs\README.md',
             'gma\modules\auth\src\Gma.Modules.Auth.Application\Gma.Modules.Auth.Application.csproj',
@@ -109,14 +119,14 @@ $packages = @(
         )
     New-GmaSourcePackage `
         -Solution 'gma\modules\files\Gma.Modules.Files.slnx' `
-        -AllowedFolders @('/docs/', '/src/') `
+        -AllowedFolders @('/.github/', '/Solution Items/', '/docs/', '/eng/', '/src/', '/tests/') `
         -RequiredPaths @(
             'gma\modules\files\docs\README.md',
             'gma\modules\files\src\Gma.Modules.Files.Api\Gma.Modules.Files.Api.csproj'
         )
     New-GmaSourcePackage `
         -Solution 'gma\modules\notifications\Gma.Modules.Notifications.slnx' `
-        -AllowedFolders @('/docs/', '/src/', '/tests/') `
+        -AllowedFolders @('/.github/', '/Solution Items/', '/docs/', '/eng/', '/src/', '/tests/') `
         -RequiredPaths @(
             'gma\modules\notifications\docs\README.md',
             'gma\modules\notifications\src\Gma.Modules.Notifications.Application\Gma.Modules.Notifications.Application.csproj',
@@ -124,18 +134,31 @@ $packages = @(
         )
     New-GmaSourcePackage `
         -Solution 'gma\modules\task-runtime\Gma.Modules.TaskRuntime.slnx' `
-        -AllowedFolders @('/docs/', '/src/') `
+        -AllowedFolders @('/.github/', '/Solution Items/', '/docs/', '/eng/', '/src/', '/tests/') `
         -RequiredPaths @(
             'gma\modules\task-runtime\docs\README.md',
             'gma\modules\task-runtime\src\Gma.Modules.TaskRuntime.Application\Gma.Modules.TaskRuntime.Application.csproj'
         )
     New-GmaSourcePackage `
         -Solution 'gma\modules\tenancy\Gma.Modules.Tenancy.slnx' `
-        -AllowedFolders @('/docs/', '/src/') `
+        -AllowedFolders @('/.github/', '/Solution Items/', '/docs/', '/eng/', '/src/', '/tests/') `
         -RequiredPaths @(
             'gma\modules\tenancy\docs\README.md',
             'gma\modules\tenancy\src\Gma.Modules.Tenancy.Api\Gma.Modules.Tenancy.Api.csproj'
         )
+)
+
+$allowedPackageRootFiles = @(
+    '.editorconfig',
+    '.gitattributes',
+    '.gitignore',
+    'Directory.Build.props',
+    'Directory.Packages.props',
+    'global.json',
+    'Gma.SourceRoots.props.example',
+    'LICENSE',
+    'nuget.config',
+    'README.md'
 )
 
 $errors = [System.Collections.Generic.List[string]]::new()
@@ -172,6 +195,10 @@ foreach ($package in $packages) {
         if ($entryPath.StartsWith('../', [System.StringComparison]::Ordinal) -or
             $entryPath.StartsWith('/', [System.StringComparison]::Ordinal)) {
             $errors.Add("$($package.Solution) lists non-local entry '$entryPath'.")
+            continue
+        }
+
+        if ($allowedPackageRootFiles -contains $entryPath) {
             continue
         }
 

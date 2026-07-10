@@ -8,8 +8,8 @@ using Microsoft.Extensions.Hosting;
 using Ordering.Persistence;
 using Gma.Framework.Messaging;
 using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Scoping.Infrastructure;
 using Gma.Framework.Runtime.Infrastructure;
-using Gma.Framework.Tenancy.Infrastructure;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -164,7 +164,7 @@ public sealed class InboxStoreIntegrationTests
         builder.Configuration["ConnectionStrings:PostgreSql"] = connectionString;
         builder.Configuration["Tenancy:Enabled"] = "false";
         builder.AddRuntimeInfrastructure();
-        builder.AddTenancyInfrastructure();
+        builder.AddScopingInfrastructure();
         builder.AddOrderingPersistence();
 
         return builder.Services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });

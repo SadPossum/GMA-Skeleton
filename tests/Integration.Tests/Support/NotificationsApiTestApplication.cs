@@ -23,6 +23,7 @@ using Gma.Framework.Runtime.Infrastructure;
 using Gma.Framework.Security;
 using Gma.Framework.Tenancy;
 using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Framework.Tenancy.Scoping;
 using Gma.Modules.Tenancy.Api;
 using DomainBroadcastAudience = Gma.Modules.Notifications.Domain.ValueObjects.NotificationBroadcastAudience;
 using DomainNotificationSeverity = Gma.Modules.Notifications.Domain.ValueObjects.NotificationSeverity;
@@ -53,13 +54,14 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
             ["Persistence:Provider"] = "SqlServer",
             ["ConnectionStrings:SqlServer"] = "Server=localhost;Database=notifications-api-tests;Trusted_Connection=True;TrustServerCertificate=True",
             ["Tenancy:Enabled"] = tenancyEnabledValue,
-            ["Tenancy:LocalDefaultTenantId"] = "default",
+            ["Tenancy:LocalDefaultScopeId"] = "default",
             ["Notifications:DurableStreams:BatchSize"] = "10",
             ["Notifications:DurableStreams:PollInterval"] = "00:00:01",
             ["Caching:Enabled"] = "false"
         });
 
         builder.AddTenancyInfrastructure();
+        builder.AddTenantScoping();
         builder.AddRuntimeInfrastructure();
         builder.AddApplicationEventsInfrastructure();
         builder.AddCqrsInfrastructure();
@@ -102,7 +104,7 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
 
     public HttpClient CreateClient() => this.app.GetTestClient();
 
-    public static string CreateAccessToken(string tenantId, string userId)
+    public static string CreateAccessToken(string scopeId, string userId)
     {
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(JwtSigningKey));
         SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
@@ -110,7 +112,7 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
         List<Claim> claims =
         [
             new(ClaimTypes.NameIdentifier, userId),
-            new(ApplicationClaimNames.TenantId, tenantId),
+            new(ApplicationClaimNames.ScopeId, scopeId),
             new(ApplicationClaimNames.SessionId, Guid.NewGuid().ToString())
         ];
 
@@ -126,7 +128,7 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
     }
 
     public async Task AddNotificationAsync(
-        string tenantId,
+        string scopeId,
         string userId,
         Guid notificationId,
         string title,
@@ -135,11 +137,11 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
     {
         using IServiceScope scope = this.app.Services.CreateScope();
         ITenantContextAccessor tenantContext = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
-        tenantContext.SetTenant(tenantId);
+        tenantContext.SetTenant(scopeId);
         NotificationsDbContext dbContext = scope.ServiceProvider.GetRequiredService<NotificationsDbContext>();
         UserNotification notification = UserNotification.Create(
             notificationId,
-            tenantId,
+            scopeId,
             userId,
             "catalog",
             "catalog.item-updated",
@@ -156,7 +158,7 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
     }
 
     public async Task AddBroadcastAsync(
-        string? tenantId,
+        string? scopeId,
         DomainBroadcastAudience audience,
         Guid broadcastId,
         string title,
@@ -165,15 +167,15 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
     {
         using IServiceScope scope = this.app.Services.CreateScope();
         ITenantContextAccessor tenantContext = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
-        if (!string.IsNullOrWhiteSpace(tenantId))
+        if (!string.IsNullOrWhiteSpace(scopeId))
         {
-            tenantContext.SetTenant(tenantId);
+            tenantContext.SetTenant(scopeId);
         }
 
         NotificationsDbContext dbContext = scope.ServiceProvider.GetRequiredService<NotificationsDbContext>();
         NotificationBroadcast broadcast = NotificationBroadcast.Create(
             broadcastId,
-            tenantId,
+            scopeId,
             audience,
             "notifications",
             "system.notice",

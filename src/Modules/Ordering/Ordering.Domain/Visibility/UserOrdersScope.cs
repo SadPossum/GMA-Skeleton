@@ -2,4 +2,4 @@ namespace Ordering.Domain.Visibility;
 
 using Ordering.Domain.ValueObjects;
 
-public sealed record UserOrdersScope(string TenantId, OrderUserId UserId);
+public sealed record UserOrdersScope(string ScopeId, OrderUserId UserId);

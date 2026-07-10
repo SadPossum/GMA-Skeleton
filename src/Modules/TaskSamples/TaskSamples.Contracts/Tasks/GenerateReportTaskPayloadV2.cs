@@ -1,14 +1,14 @@
 namespace TaskSamples.Contracts;
 
 using Gma.Framework.Tasks;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 
 [TaskName(TaskName)]
 [TaskPayloadVersion(PayloadVersion)]
-[TaskDescription("Generate a sample tenant report through the task runtime using the v2 payload contract.")]
+[TaskDescription("Generate a sample scoped report through the task runtime using the v2 payload contract.")]
 [TaskKind(ModuleTaskKind.OneShot)]
 [TaskWorkerGroup(TaskSamplesModuleMetadata.WorkerGroup)]
-[TenantScoped]
+[ScopeAware]
 public sealed record GenerateReportTaskPayloadV2(
     string ReportName,
     int ExpectedRows,

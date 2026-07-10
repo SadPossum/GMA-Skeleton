@@ -41,7 +41,7 @@ internal sealed class CatalogItemProjectionExportSource(CatalogDbContext dbConte
 
     private static CatalogItemProjectionExport Map(CatalogItem item) =>
         new(
-            item.TenantId,
+            item.ScopeId,
             item.Id,
             item.Sku.Value,
             item.Name.Value,
