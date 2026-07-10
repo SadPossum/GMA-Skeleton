@@ -4,6 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Gma.Framework.Cqrs;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Results;
 using Gma.Modules.Administration.Persistence;
 using Gma.Modules.Administration.Persistence.Entities;
 using Gma.Modules.AccessControl.Application.Commands;
@@ -161,6 +163,20 @@ internal sealed class AdminApiTestApplication(
         {
             throw new InvalidOperationException(result.Error.Message);
         }
+    }
+
+    public async Task<Result<Unit>> UnassignGlobalAdminOwnerAsync(Guid actorId, string roleName)
+    {
+        using IServiceScope scope = this.Services.CreateScope();
+        IRequestDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
+
+        return await dispatcher.SendAsync(
+            new UnassignRoleCommand(
+                AccessSubjectKind.AdminActor,
+                actorId.ToString(),
+                roleName,
+                AccessScope.Global),
+            CancellationToken.None).ConfigureAwait(false);
     }
 
     public async Task<int> CountAuditEntriesAsync(string operation, string? errorCode = null)

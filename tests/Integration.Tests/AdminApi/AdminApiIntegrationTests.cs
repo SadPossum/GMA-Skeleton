@@ -17,6 +17,7 @@ using Integration.Tests.Support;
 using Gma.Framework.Administration;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Pagination;
+using Gma.Framework.Results;
 using Testcontainers.MsSql;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -163,6 +164,52 @@ public sealed class AdminApiIntegrationTests
         await AssertSuccess(ownerClient.PostAsJsonAsync(
             "/api/admin/roles/support/assignments",
             new { actorId = supportId.ToString(), scope = "tenant:tenant-admin" }));
+
+        Guid productUserId = Guid.NewGuid();
+        await AssertSuccess(ownerClient.PostAsJsonAsync("/api/admin/roles", new { name = "property-reader" }));
+        await AssertSuccess(ownerClient.PostAsJsonAsync(
+            "/api/admin/roles/property-reader/permissions",
+            new { permission = "properties.read" }));
+        await AssertSuccess(ownerClient.PostAsJsonAsync(
+            "/api/admin/roles/property-reader/assignments",
+            new
+            {
+                subjectKind = "user",
+                subjectId = productUserId.ToString(),
+                scope = "tenant:tenant-admin"
+            }));
+
+        using HttpResponseMessage assignmentsResponse = await ownerClient
+            .GetAsync("/api/admin/roles/property-reader/assignments")
+            .ConfigureAwait(false);
+        string assignmentsBody = await assignmentsResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.OK, assignmentsResponse.StatusCode);
+        Assert.Contains("\"subjectKind\":\"user\"", assignmentsBody, StringComparison.Ordinal);
+        Assert.Contains(productUserId.ToString(), assignmentsBody, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("\"scope\":\"tenant:tenant-admin\"", assignmentsBody, StringComparison.Ordinal);
+
+        string unassignUrl = "/api/admin/roles/property-reader/assignments" +
+                             $"?subjectKind=user&subjectId={productUserId}&scope=tenant%3Atenant-admin";
+        await AssertSuccess(ownerClient.DeleteAsync(unassignUrl));
+        using HttpResponseMessage missingAssignment = await ownerClient.DeleteAsync(unassignUrl).ConfigureAwait(false);
+        string missingAssignmentBody = await missingAssignment.Content.ReadAsStringAsync().ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.NotFound, missingAssignment.StatusCode);
+        Assert.Contains(AccessControlApplicationErrors.AssignmentNotFound.Code, missingAssignmentBody, StringComparison.Ordinal);
+
+        await AssertSuccess(ownerClient.DeleteAsync("/api/admin/roles/property-reader/permissions/properties.read"));
+        using HttpResponseMessage missingPermission = await ownerClient
+            .DeleteAsync("/api/admin/roles/property-reader/permissions/properties.read")
+            .ConfigureAwait(false);
+        string missingPermissionBody = await missingPermission.Content.ReadAsStringAsync().ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.NotFound, missingPermission.StatusCode);
+        Assert.Contains(AccessControlApplicationErrors.PermissionNotGranted.Code, missingPermissionBody, StringComparison.Ordinal);
+
+        string ownerUnassignUrl = "/api/admin/roles/owner/assignments" +
+                                  $"?subjectKind=admin-actor&subjectId={ownerId}&scope=global";
+        using HttpResponseMessage protectedOwner = await ownerClient.DeleteAsync(ownerUnassignUrl).ConfigureAwait(false);
+        string protectedOwnerBody = await protectedOwner.Content.ReadAsStringAsync().ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.Conflict, protectedOwner.StatusCode);
+        Assert.Contains(AccessControlApplicationErrors.LastOwnerProtected.Code, protectedOwnerBody, StringComparison.Ordinal);
 
         using HttpClient strangerClient = application.CreateClient();
         strangerClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
@@ -406,6 +453,28 @@ public sealed class AdminApiIntegrationTests
         string? generatedPassword = generatedPasswordJson.GetProperty("generatedPassword").GetString();
         Assert.False(string.IsNullOrWhiteSpace(generatedPassword));
         Assert.Equal(0, await generatedPasswordApplication.CountAuditEntriesContainingAsync(generatedPassword).ConfigureAwait(false));
+
+        Guid backupOwnerId = Guid.NewGuid();
+        await AssertSuccess(ownerClient.PostAsJsonAsync("/api/admin/roles", new { name = "backup-owner" }));
+        await AssertSuccess(ownerClient.PostAsJsonAsync(
+            "/api/admin/roles/backup-owner/permissions",
+            new { permission = "*" }));
+        await AssertSuccess(ownerClient.PostAsJsonAsync(
+            "/api/admin/roles/backup-owner/assignments",
+            new
+            {
+                subjectKind = "admin-actor",
+                subjectId = backupOwnerId.ToString(),
+                scope = "global"
+            }));
+
+        Result<Unit>[] concurrentOwnerRemovals = await Task.WhenAll(
+            application.UnassignGlobalAdminOwnerAsync(ownerId, "owner"),
+            application.UnassignGlobalAdminOwnerAsync(backupOwnerId, "backup-owner"));
+
+        Assert.Single(concurrentOwnerRemovals, result => result.IsSuccess);
+        Result<Unit> protectedRemoval = Assert.Single(concurrentOwnerRemovals, result => result.IsFailure);
+        Assert.Equal(AccessControlApplicationErrors.LastOwnerProtected, protectedRemoval.Error);
     }
 
     private static Task<HttpResponseMessage> GrantAsync(HttpClient client, string permission) =>

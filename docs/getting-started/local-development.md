@@ -87,7 +87,7 @@ Create and assign a tenant-scoped support role:
 .\eng\run-admin.ps1 -- admin roles create --actor owner --name support
 .\eng\run-admin.ps1 -- admin roles grant --actor owner --role support --permission auth.members.read
 .\eng\run-admin.ps1 -- admin roles grant --actor owner --role support --permission auth.members.create
-.\eng\run-admin.ps1 -- admin roles assign --actor owner --target-actor support --role support --tenant default
+.\eng\run-admin.ps1 -- admin roles assign --actor owner --target-kind admin-actor --target-id support --role support --scope tenant:default
 ```
 
 Create an Auth member with a generated password:

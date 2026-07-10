@@ -4839,6 +4839,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 ["Microsoft.Extensions.DependencyInjection.Abstractions"],
                 [],
                 [
+                    @"..\..\Modules\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
                     @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
                     @"..\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj"
                 ]),

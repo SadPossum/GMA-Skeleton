@@ -7,6 +7,8 @@ using Catalog.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Application.Events;
+using Gma.Framework.AccessControl;
+using Gma.Framework.Permissions;
 using Xunit;
 
 [Trait("Category", "Unit")]
@@ -34,6 +36,13 @@ public sealed class CatalogApplicationRegistrationTests
         Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IQueryValidator<GetAvailableCatalogItemQuery>));
         Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IQueryValidator<ListAvailableCatalogItemsQuery>));
         Assert.Equal(3, services.Count(descriptor => IsDomainEventHandler(descriptor.ServiceType)));
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        AccessScopeMatchOptions scopeOptions = provider
+            .GetRequiredService<IAccessScopeMatchOptionsResolver>()
+            .Resolve(PermissionCode.Create(CatalogAdminPermissionCodes.ItemsRead));
+        Assert.False(scopeOptions.AllowAncestorScopeGrants);
+        Assert.False(scopeOptions.AllowGlobalScopeGrant);
     }
 
     [Fact]
