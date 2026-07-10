@@ -31,6 +31,8 @@ public sealed partial class DeveloperExperienceGuardTests
 
         Assert.Equal(expected, NormalizeDirectorySeparators(@"alpha\beta"));
         Assert.Equal(expected, NormalizeDirectorySeparators("alpha/beta"));
+        Assert.Equal("Example.Project", GetProjectReferenceName(@"..\Example.Project\Example.Project.csproj"));
+        Assert.Equal("Example.Project", GetProjectReferenceName("../Example.Project/Example.Project.csproj"));
     }
 
     [Fact]
@@ -5507,7 +5509,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Descendants("ProjectReference")
                     .Select(element => element.Attribute("Include")?.Value)
                     .Where(reference => !string.IsNullOrWhiteSpace(reference))
-                    .Select(reference => Path.GetFileNameWithoutExtension(reference!))
+                    .Select(reference => GetProjectReferenceName(reference!))
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
                 return EnumerateSourceFiles(projectDirectory)
@@ -5573,7 +5575,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Descendants("ProjectReference")
                     .Select(element => element.Attribute("Include")?.Value)
                     .Where(reference => !string.IsNullOrWhiteSpace(reference))
-                    .Select(reference => Path.GetFileNameWithoutExtension(reference!))
+                    .Select(reference => GetProjectReferenceName(reference!))
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
                 return EnumerateSourceFiles(projectDirectory)
@@ -8453,6 +8455,9 @@ public sealed partial class DeveloperExperienceGuardTests
         path
             .Replace('\\', Path.DirectorySeparatorChar)
             .Replace('/', Path.DirectorySeparatorChar);
+
+    private static string GetProjectReferenceName(string referencePath) =>
+        Path.GetFileNameWithoutExtension(NormalizeDirectorySeparators(referencePath));
 
     private static bool SolutionXmlContainsPath(string solutionXml, string relativePath) =>
         solutionXml.Contains($"Path=\"{NormalizeSolutionXmlPath(relativePath)}\"", StringComparison.OrdinalIgnoreCase);
