@@ -350,7 +350,7 @@ internal sealed class GmaSourceLayout
 
     public bool TryResolveCanonicalPath(string canonicalPath, out string resolvedPath)
     {
-        string normalizedCanonicalPath = canonicalPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        string normalizedCanonicalPath = NormalizePathSeparators(canonicalPath);
         string repositoryFrameworkPrefix = Path.Combine("src", "Framework") + Path.DirectorySeparatorChar;
         if (normalizedCanonicalPath.StartsWith(repositoryFrameworkPrefix, StringComparison.OrdinalIgnoreCase))
         {

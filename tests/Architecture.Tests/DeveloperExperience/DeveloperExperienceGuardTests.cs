@@ -25,6 +25,15 @@ using Xunit;
 public sealed partial class DeveloperExperienceGuardTests
 {
     [Fact]
+    public void Path_normalization_accepts_both_directory_separator_styles()
+    {
+        string expected = $"alpha{Path.DirectorySeparatorChar}beta";
+
+        Assert.Equal(expected, NormalizeDirectorySeparators(@"alpha\beta"));
+        Assert.Equal(expected, NormalizeDirectorySeparators("alpha/beta"));
+    }
+
+    [Fact]
     public void Projects_under_src_and_tests_are_in_solution()
     {
         string repositoryRoot = FindRepositoryRoot();
@@ -8336,7 +8345,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
     private static string NormalizePath(string path)
     {
-        string normalized = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        string normalized = NormalizeDirectorySeparators(path);
 
         if (normalized.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
         {
@@ -8426,7 +8435,7 @@ public sealed partial class DeveloperExperienceGuardTests
 
             foreach (string legacyPrefix in legacyPrefixes)
             {
-                string normalizedPrefix = legacyPrefix.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                string normalizedPrefix = NormalizeDirectorySeparators(legacyPrefix);
                 if (normalized.StartsWith(normalizedPrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     return marker + normalized[normalizedPrefix.Length..];
@@ -8439,6 +8448,11 @@ public sealed partial class DeveloperExperienceGuardTests
 
     private static string NormalizeSolutionXmlPath(string path) =>
         NormalizePath(path).Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+    private static string NormalizeDirectorySeparators(string path) =>
+        path
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
 
     private static bool SolutionXmlContainsPath(string solutionXml, string relativePath) =>
         solutionXml.Contains($"Path=\"{NormalizeSolutionXmlPath(relativePath)}\"", StringComparison.OrdinalIgnoreCase);
