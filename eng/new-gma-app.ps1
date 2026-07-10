@@ -16,12 +16,24 @@ param(
 
 $script:GmaKnownModuleSpecs = @(
     [pscustomobject] @{
+        Alias = 'access-control'
+        Repository = 'GMA-Module-Access-Control'
+        SourceRootProperty = 'GmaModuleAccessControlRoot'
+        PublicApiProject = $null
+        PublicApiNamespace = $null
+        PublicApiModuleType = $null
+        MigrationProjectPrefix = 'Gma.Modules.AccessControl.Persistence'
+        DbContextType = $null
+    },
+    [pscustomobject] @{
         Alias = 'administration'
         Repository = 'GMA-Module-Administration'
         SourceRootProperty = 'GmaModuleAdministrationRoot'
         PublicApiProject = $null
         PublicApiNamespace = $null
         PublicApiModuleType = $null
+        MigrationProjectPrefix = 'Gma.Modules.Administration.Persistence'
+        DbContextType = $null
     },
     [pscustomobject] @{
         Alias = 'auth'
@@ -30,6 +42,8 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiProject = 'Gma.Modules.Auth.Api'
         PublicApiNamespace = 'Gma.Modules.Auth.Api'
         PublicApiModuleType = 'AuthModule'
+        MigrationProjectPrefix = 'Gma.Modules.Auth.Persistence'
+        DbContextType = 'Gma.Modules.Auth.Persistence.AuthDbContext'
     },
     [pscustomobject] @{
         Alias = 'files'
@@ -38,6 +52,8 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiProject = 'Gma.Modules.Files.Api'
         PublicApiNamespace = 'Gma.Modules.Files.Api'
         PublicApiModuleType = 'FilesModule'
+        MigrationProjectPrefix = $null
+        DbContextType = $null
     },
     [pscustomobject] @{
         Alias = 'notifications'
@@ -46,6 +62,8 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiProject = 'Gma.Modules.Notifications.Api'
         PublicApiNamespace = 'Gma.Modules.Notifications.Api'
         PublicApiModuleType = 'NotificationsModule'
+        MigrationProjectPrefix = 'Gma.Modules.Notifications.Persistence'
+        DbContextType = 'Gma.Modules.Notifications.Persistence.NotificationsDbContext'
     },
     [pscustomobject] @{
         Alias = 'task-runtime'
@@ -54,6 +72,8 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiProject = $null
         PublicApiNamespace = $null
         PublicApiModuleType = $null
+        MigrationProjectPrefix = 'Gma.Modules.TaskRuntime.Persistence'
+        DbContextType = $null
     },
     [pscustomobject] @{
         Alias = 'tenancy'
@@ -62,6 +82,8 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiProject = 'Gma.Modules.Tenancy.Api'
         PublicApiNamespace = 'Gma.Modules.Tenancy.Api'
         PublicApiModuleType = 'TenancyModule'
+        MigrationProjectPrefix = $null
+        DbContextType = $null
     }
 )
 
@@ -76,6 +98,17 @@ function Resolve-GmaTemplatePath {
     }
 
     return [System.IO.Path]::GetFullPath((Join-GmaPath $Path))
+}
+
+function ConvertTo-GmaKebabCase {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Value
+    )
+
+    $withAcronymBoundaries = [regex]::Replace($Value, '([A-Z]+)([A-Z][a-z])', '$1-$2')
+    $withWordBoundaries = [regex]::Replace($withAcronymBoundaries, '([a-z0-9])([A-Z])', '$1-$2')
+    return $withWordBoundaries.ToLowerInvariant()
 }
 
 function Get-GmaSelectedModuleSpecs {
@@ -160,7 +193,9 @@ function Write-GmaGeneratedBootstrap {
         '',
         'function Join-GmaPath {',
         '    param([Parameter(Mandatory = $true)][string] $Path)',
-        '    return Join-Path $script:RepositoryRoot $Path',
+        '    $normalizedPath = $Path.Replace(''\'', [System.IO.Path]::DirectorySeparatorChar)',
+        '    $normalizedPath = $normalizedPath.Replace(''/'', [System.IO.Path]::DirectorySeparatorChar)',
+        '    return Join-Path $script:RepositoryRoot $normalizedPath',
         '}',
         '',
         'function Resolve-GmaDotNet {',
@@ -270,10 +305,10 @@ function Write-GmaGeneratedBootstrap {
         '$moduleLines = $moduleLinesBuilder.ToArray()',
         '',
         'Write-GmaSourceRootsFile -Path (Join-GmaPath ''Gma.SourceRoots.props'') -Lines $rootLines -Description ''root source-root configuration''',
-        'Write-GmaSourceRootsFile -Path (Join-GmaPath ''gma\framework\Gma.SourceRoots.props'') -Lines $frameworkLines -Description ''framework source-root configuration''',
+        'Write-GmaSourceRootsFile -Path (Join-GmaPath ''gma/framework/Gma.SourceRoots.props'') -Lines $frameworkLines -Description ''framework source-root configuration''',
         '',
         'foreach ($moduleAlias in $selectedModuleAliases) {',
-        '    $moduleRoot = Join-GmaPath "gma\modules\$moduleAlias"',
+        '    $moduleRoot = Join-GmaPath "gma/modules/$moduleAlias"',
         '    if (Test-Path -LiteralPath $moduleRoot -PathType Container) {',
         '        Write-GmaSourceRootsFile -Path (Join-Path $moduleRoot ''Gma.SourceRoots.props'') -Lines $moduleLines -Description "$moduleAlias module source-root configuration"',
         '    }',
@@ -351,12 +386,15 @@ function Write-GmaGeneratedBootstrap {
         '',
         "`$solutionPath = Join-GmaPath '$Name.slnx'",
         'if (-not $SkipRestore) {',
+        '    Invoke-GmaDotNet -Arguments @(''tool'', ''restore'')',
         '    Invoke-GmaDotNet -Arguments @(''restore'', $solutionPath)',
         '}',
         '',
         'if (-not $SkipBuild) {',
         '    Invoke-GmaDotNet -Arguments @(''build'', $solutionPath, ''--no-restore'', ''-m:1'')',
-        '}'
+        '}',
+        '',
+        'Invoke-GmaDotNet -Arguments @(''test'', $solutionPath, ''--no-build'', ''--logger'', ''console;verbosity=minimal'', ''-m:1'', ''-nr:false'')'
     )
 }
 
@@ -379,17 +417,21 @@ function Write-GmaGeneratedWorkflow {
         '',
         'jobs:',
         '  validate:',
-        '    runs-on: windows-latest',
+        '    strategy:',
+        '      matrix:',
+        '        os: [windows-latest, ubuntu-latest]',
+        '    runs-on: ${{ matrix.os }}',
         '    steps:',
         '      - name: Checkout app',
-        '        uses: actions/checkout@v4',
+        '        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4',
         '        with:',
         '          fetch-depth: 0',
         '          submodules: recursive',
         '          token: ${{ secrets.GMA_CI_TOKEN || github.token }}',
+        '          persist-credentials: false',
         '',
         '      - name: Setup .NET',
-        '        uses: actions/setup-dotnet@v4',
+        '        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4',
         '        with:',
         '          dotnet-version: 10.0.x',
         '',
@@ -401,8 +443,113 @@ function Write-GmaGeneratedWorkflow {
         "        run: dotnet restore $Name.slnx",
         '',
         '      - name: Build',
-        "        run: dotnet build $Name.slnx --no-restore -m:1"
+        "        run: dotnet build $Name.slnx --no-restore -m:1",
+        '',
+        '      - name: Test',
+        "        run: dotnet test $Name.slnx --no-build --logger 'console;verbosity=minimal' -m:1 -nr:false"
     )
+}
+
+function Write-GmaGeneratedDeveloperTools {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Root,
+
+        [Parameter(Mandatory = $true)]
+        [string] $ApplicationName,
+
+        [object[]] $ModuleSpecs = @()
+    )
+
+    Write-GmaTemplateFile (Join-Path $Root 'eng\new-module.ps1') @(
+        'param(',
+        '    [Parameter(Mandatory = $true)]',
+        '    [ValidatePattern(''^[A-Z][A-Za-z0-9]*$'')]',
+        '    [string] $Name,',
+        '',
+        '    [switch] $Persistence,',
+        '    [switch] $SqlServerMigrations,',
+        '    [switch] $PostgreSqlMigrations,',
+        '    [switch] $AdminCli,',
+        '    [switch] $AdminApi,',
+        '    [switch] $Inbox,',
+        '    [switch] $Outbox,',
+        '    [switch] $Cache,',
+        '    [switch] $RegisterInHost',
+        ')',
+        '',
+        '. (Join-Path $PSScriptRoot ''common.ps1'')',
+        '',
+        '$repositoryRoot = Get-GmaRepositoryRoot',
+        '$implementation = Join-GmaPath ''gma/framework/eng/new-module.ps1''',
+        'if (-not (Test-Path -LiteralPath $implementation -PathType Leaf)) {',
+        '    throw ''GMA framework tooling is not mounted. Run eng/gma-update.ps1 -Init first.''',
+        '}',
+        '',
+        "& `$implementation @PSBoundParameters -RepositoryRoot `$repositoryRoot -CompositionSolution '$ApplicationName.slnx'",
+        'exit $LASTEXITCODE'
+    )
+
+    $migrationSpecs = @($ModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.MigrationProjectPrefix) })
+    $migrationMapLines = @()
+    foreach ($moduleSpec in $migrationSpecs) {
+        $projectPattern = "gma\modules\$($moduleSpec.Alias)\src\$($moduleSpec.MigrationProjectPrefix).{0}Migrations\$($moduleSpec.MigrationProjectPrefix).{0}Migrations.csproj"
+        $migrationMapLines += "    '$($moduleSpec.Alias)' = '$projectPattern'"
+    }
+
+    $migrationLines = @(
+        '[CmdletBinding()]',
+        'param(',
+        '    [Parameter(Mandatory = $true)]',
+        '    [ValidateSet(''SqlServer'', ''PostgreSql'')]',
+        '    [string] $Provider,',
+        '',
+        '    [Parameter(Mandatory = $true)]',
+        '    [string[]] $Module,',
+        '',
+        '    [string] $ConnectionString',
+        ')',
+        '',
+        '. (Join-Path $PSScriptRoot ''common.ps1'')',
+        '',
+        '$moduleProjects = [ordered]@{'
+    )
+    $migrationLines += $migrationMapLines
+    $migrationLines += @(
+        '}',
+        '',
+        '$aliases = @($Module | ForEach-Object { $_ -split '','' } | ForEach-Object { $_.Trim().ToLowerInvariant() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -Unique)',
+        'if ($aliases.Count -eq 0) {',
+        '    throw ''Provide at least one persisted module alias.''',
+        '}',
+        '$unknown = @($aliases | Where-Object { -not $moduleProjects.ContainsKey($_) })',
+        'if ($unknown.Count -gt 0) {',
+        '    throw "Unknown or migration-free module alias: $($unknown -join '', ''). Available persisted modules: $($moduleProjects.Keys -join '', '')."',
+        '}',
+        '',
+        'if ([string]::IsNullOrWhiteSpace($ConnectionString)) {',
+        '    $ConnectionString = [Environment]::GetEnvironmentVariable("ConnectionStrings__$Provider")',
+        '}',
+        'if ([string]::IsNullOrWhiteSpace($ConnectionString)) {',
+        '    throw "Provide -ConnectionString or set ConnectionStrings__$Provider. Migrations never use checked-in production credentials."',
+        '}',
+        '',
+        'Invoke-GmaDotNet -Arguments @(''tool'', ''restore'')',
+        'foreach ($alias in $aliases) {',
+        '    $relativeProject = [string]::Format($moduleProjects[$alias], $Provider)',
+        '    $project = Join-GmaPath $relativeProject',
+        '    if (-not (Test-Path -LiteralPath $project -PathType Leaf)) {',
+        '        throw "Migration project for module ''$alias'' is not mounted at ''$relativeProject''."',
+        '    }',
+        '',
+        '    Write-Host "Applying $Provider migrations for $alias..."',
+        '    Invoke-GmaDotNet -Arguments @(''ef'', ''database'', ''update'', ''--project'', $project, ''--'', ''--connection'', $ConnectionString)',
+        '}',
+        '',
+        'Write-Host ''Selected module migrations applied successfully.'''
+    )
+
+    Write-GmaTemplateFile (Join-Path $Root 'eng\migrate.ps1') $migrationLines
 }
 
 $resolvedOutputPath = Resolve-GmaTemplatePath $OutputPath
@@ -430,6 +577,19 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'global.json') @(
     '  "sdk": {',
     '    "version": "10.0.300",',
     '    "rollForward": "latestFeature"',
+    '  }',
+    '}'
+)
+
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath '.config\dotnet-tools.json') @(
+    '{',
+    '  "version": 1,',
+    '  "isRoot": true,',
+    '  "tools": {',
+    '    "dotnet-ef": {',
+    '      "version": "10.0.8",',
+    '      "commands": [ "dotnet-ef" ]',
+    '    }',
     '  }',
     '}'
 )
@@ -475,6 +635,13 @@ else {
 }
 
 $publicApiModuleSpecs = @($selectedModuleSpecArray | Where-Object { -not [string]::IsNullOrWhiteSpace($_.PublicApiProject) })
+$persistedPublicApiModuleSpecs = @($publicApiModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.MigrationProjectPrefix) })
+$readinessModuleSpecs = @($publicApiModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.DbContextType) })
+$selectedModuleAliases = @($selectedModuleSpecArray | ForEach-Object { $_.Alias })
+$hasAuth = $selectedModuleAliases -contains 'auth'
+$hasFiles = $selectedModuleAliases -contains 'files'
+$hasNotifications = $selectedModuleAliases -contains 'notifications'
+$hasTenancy = $selectedModuleAliases -contains 'tenancy'
 $publicApiModuleText = if ($publicApiModuleSpecs.Count -eq 0) {
     'none'
 }
@@ -517,6 +684,8 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '    <File Path="eng/gma-status.ps1" />',
     '    <File Path="eng/gma-update.ps1" />',
     '    <File Path="eng/gma-validate.ps1" />',
+    '    <File Path="eng/migrate.ps1" />',
+    '    <File Path="eng/new-module.ps1" />',
     '  </Folder>',
     '  <Folder Name="/.github/workflows/">',
     '    <File Path=".github/workflows/validate.yml" />',
@@ -526,6 +695,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '  </Folder>',
     '  <Folder Name="/Solution Items/">',
     '    <File Path=".gitignore" />',
+    '    <File Path=".config/dotnet-tools.json" />',
     '    <File Path="Directory.Build.props" />',
     '    <File Path="Directory.Packages.props" />',
     '    <File Path="global.json" />',
@@ -542,6 +712,9 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '  <Folder Name="/src/Shared/">',
     '    <File Path="src/Shared/README.md" />',
     "    <Project Path=`"src/Shared/$Name.SharedKernel/$Name.SharedKernel.csproj`" />",
+    '  </Folder>',
+    '  <Folder Name="/tests/">',
+    "    <Project Path=`"tests/$Name.Architecture.Tests/$Name.Architecture.Tests.csproj`" />",
     '  </Folder>',
     '</Solution>'
 )
@@ -633,7 +806,7 @@ $gmaSourceDocsLines += @(
     '',
     '## CI',
     '',
-    'Generated app shells include `.github/workflows/validate.yml` with recursive submodule checkout, source-root bootstrap, restore, and build steps.',
+    'Generated app shells include `.github/workflows/validate.yml` with recursive submodule checkout, source-root bootstrap, restore, build, and test steps.',
     '',
     'Set `GMA_CI_TOKEN` in GitHub Actions only when private GMA submodules need cross-repository read access. Public GMA repositories can use the default GitHub token.'
 )
@@ -642,6 +815,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'docs\gma-source.md') $gmaS
 
 Write-GmaGeneratedBootstrap -Root $resolvedOutputPath -ModuleSpecs $selectedModuleSpecArray
 Write-GmaGeneratedWorkflow $resolvedOutputPath
+Write-GmaGeneratedDeveloperTools -Root $resolvedOutputPath -ApplicationName $Name -ModuleSpecs $selectedModuleSpecArray
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'src\Hosts\README.md') @(
     '# Hosts',
@@ -685,13 +859,32 @@ $hostApiProjectLines = @(
     '  <ItemGroup>',
     "    <ProjectReference Include=`"..\..\Shared\$Name.SharedKernel\$Name.SharedKernel.csproj`" />",
     '    <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api\Gma.Framework.Api.csproj" />',
+    '    <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api.Production\Gma.Framework.Api.Production.csproj" />',
     '    <ProjectReference Include="$(GmaFrameworkRoot)Infrastructure\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />',
     '    <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />'
 )
 
+if ($readinessModuleSpecs.Count -gt 0) {
+    $hostApiProjectLines += '    <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api.Production.EntityFrameworkCore\Gma.Framework.Api.Production.EntityFrameworkCore.csproj" />'
+}
+
+if ($hasAuth) {
+    $hostApiProjectLines += '    <ProjectReference Include="$(GmaFrameworkRoot)Messaging\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />'
+}
+
 foreach ($moduleSpec in $publicApiModuleSpecs) {
     $sourceRootPropertyReference = '$(' + $moduleSpec.SourceRootProperty + ')'
     $hostApiProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.PublicApiProject)\$($moduleSpec.PublicApiProject).csproj`" />"
+}
+
+if ($hasFiles) {
+    $hostApiProjectLines += '    <ProjectReference Include="$(GmaFrameworkRoot)FileManagement\Gma.Framework.FileManagement.LocalStorage\Gma.Framework.FileManagement.LocalStorage.csproj" />'
+}
+
+foreach ($moduleSpec in $persistedPublicApiModuleSpecs) {
+    $sourceRootPropertyReference = '$(' + $moduleSpec.SourceRootProperty + ')'
+    $hostApiProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.MigrationProjectPrefix).SqlServerMigrations\$($moduleSpec.MigrationProjectPrefix).SqlServerMigrations.csproj`" />"
+    $hostApiProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.MigrationProjectPrefix).PostgreSqlMigrations\$($moduleSpec.MigrationProjectPrefix).PostgreSqlMigrations.csproj`" />"
 }
 
 $hostApiProjectLines += @(
@@ -703,13 +896,23 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\$
 
 $programUsingLines = @(
     'using Gma.Framework.Api.Modules;',
+    'using Gma.Framework.Api.Production;',
     'using Gma.Framework.Api.Security;',
     'using Gma.Framework.Infrastructure;',
     'using Gma.Framework.ModuleComposition;'
 )
 
-if ($selectedModuleSpecArray | Where-Object { $_.Alias -eq 'auth' }) {
+if ($readinessModuleSpecs.Count -gt 0) {
+    $programUsingLines += 'using Gma.Framework.Api.Production.EntityFrameworkCore;'
+}
+
+if ($hasAuth) {
+    $programUsingLines += 'using Gma.Framework.Messaging.Infrastructure;'
     $programUsingLines += 'using Gma.Modules.Auth.Contracts;'
+}
+
+if ($hasFiles) {
+    $programUsingLines += 'using Gma.Framework.FileManagement.LocalStorage;'
 }
 
 foreach ($moduleSpec in $publicApiModuleSpecs) {
@@ -719,12 +922,12 @@ foreach ($moduleSpec in $publicApiModuleSpecs) {
 $programUsingLines = @($programUsingLines | Select-Object -Unique)
 
 $moduleRegistrationLines = New-Object 'System.Collections.Generic.List[string]'
-if ($selectedModuleSpecArray | Where-Object { $_.Alias -eq 'tenancy' }) {
+if ($hasTenancy) {
     $moduleRegistrationLines.Add('builder.AddModule<TenancyModule>();')
 }
 
-if ($selectedModuleSpecArray | Where-Object { $_.Alias -eq 'auth' }) {
-    if ($selectedModuleSpecArray | Where-Object { $_.Alias -eq 'tenancy' }) {
+if ($hasAuth) {
+    if ($hasTenancy) {
         $moduleRegistrationLines.Add('builder.AddAuthModule(AuthProfile.ScopeAware());')
     }
     else {
@@ -742,12 +945,26 @@ $programLines += @(
     'WebApplicationBuilder builder = WebApplication.CreateBuilder(args);',
     '',
     'builder.AddGmaInfrastructure();',
-    'builder.Services.AddApiSecurityDefaults();'
+    'builder.Services.AddApiSecurityDefaults();',
+    'builder.AddGmaProductionHttp();'
 )
+
+if ($hasAuth) {
+    $programLines += 'builder.AddMessagingInfrastructure();'
+}
+
+if ($hasFiles) {
+    $programLines += 'builder.AddLocalFileStorage();'
+}
 
 if ($moduleRegistrationLines.Count -gt 0) {
     $programLines += ''
     $programLines += $moduleRegistrationLines.ToArray()
+}
+
+foreach ($moduleSpec in $readinessModuleSpecs) {
+    $databaseName = ConvertTo-GmaKebabCase $moduleSpec.Alias
+    $programLines += "builder.Services.AddGmaEntityFrameworkReadinessCheck<$($moduleSpec.DbContextType)>(`"$databaseName-database`");"
 }
 
 $programLines += @(
@@ -756,6 +973,7 @@ $programLines += @(
     '',
     'WebApplication app = builder.Build();',
     '',
+    'app.UseGmaProductionHttp();',
     'app.UseAuthentication();',
     'app.UseAuthorization();',
     '',
@@ -765,11 +983,300 @@ $programLines += @(
     '}));',
     '',
     'app.MapModules();',
+    'app.MapGmaHealthEndpoints();',
     '',
     'app.Run();'
 )
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\Program.cs") $programLines
+
+$baseSettings = [ordered]@{
+    ApplicationIdentity = [ordered]@{
+        DisplayName = $Name
+        Namespace = (ConvertTo-GmaKebabCase -Value $Name)
+    }
+    Http = [ordered]@{
+        AllowAnyHost = $false
+        HttpsRedirectionEnabled = $true
+        HstsEnabled = $true
+        SecurityHeadersEnabled = $true
+        ForwardedHeaders = [ordered]@{
+            Enabled = $false
+            AllowUnknownProxies = $false
+            ForwardLimit = 1
+            KnownProxies = @()
+        }
+        Cors = [ordered]@{
+            Enabled = $false
+            AllowCredentials = $false
+            AllowedOrigins = @()
+        }
+        RequestTimeouts = [ordered]@{
+            Enabled = $true
+            DefaultTimeoutSeconds = 30
+        }
+        RateLimiting = [ordered]@{
+            Enabled = $true
+            GlobalPermitLimit = 300
+            SensitivePermitLimit = 10
+            WindowSeconds = 60
+            SensitivePathPrefixes = @('/api/auth/register', '/api/auth/login', '/api/auth/refresh')
+        }
+        PrivateNetwork = [ordered]@{
+            Enabled = $false
+            AllowedNetworks = @()
+        }
+    }
+    AllowedHosts = 'CHANGE-ME.invalid'
+}
+
+$developmentSettings = [ordered]@{
+    Http = [ordered]@{
+        HttpsRedirectionEnabled = $false
+        RateLimiting = [ordered]@{
+            Enabled = $false
+        }
+        PrivateNetwork = [ordered]@{
+            Enabled = $false
+        }
+    }
+    AllowedHosts = '*'
+}
+
+$hasPersistedPublicModule = $persistedPublicApiModuleSpecs.Count -gt 0
+if ($hasPersistedPublicModule) {
+    $baseSettings.Persistence = [ordered]@{
+        Provider = 'SqlServer'
+    }
+    $baseSettings.ConnectionStrings = [ordered]@{
+        SqlServer = ''
+        PostgreSql = ''
+    }
+    $developmentSettings.Persistence = [ordered]@{
+        Provider = 'SqlServer'
+    }
+    $developmentSettings.ConnectionStrings = [ordered]@{
+        SqlServer = "Server=localhost,1433;Database=$Name;User Id=sa;Password=Pass@word1;TrustServerCertificate=True"
+        PostgreSql = "Host=localhost;Port=5432;Database=$($Name.ToLowerInvariant());Username=postgres;Password=postgres"
+    }
+}
+
+if ($hasAuth) {
+    $baseSettings.Auth = [ordered]@{
+        RefreshTokenLifetimeDays = 30
+        FailedLoginLimit = 5
+        FailedLoginWindowMinutes = 15
+        RefreshTokens = [ordered]@{
+            Pepper = ''
+        }
+        Jwt = [ordered]@{
+            SigningKey = ''
+            AccessTokenLifetimeMinutes = 15
+        }
+    }
+    $developmentSettings.Auth = [ordered]@{
+        RefreshTokens = [ordered]@{
+            Pepper = 'local-development-refresh-token-pepper-change-me-00000000000000000000'
+        }
+        Jwt = [ordered]@{
+            SigningKey = 'local-development-signing-key-change-me-00000000000000000000'
+        }
+    }
+}
+
+if ($hasTenancy) {
+    $baseSettings.Tenancy = [ordered]@{
+        Enabled = $true
+        HeaderName = 'X-Tenant-Id'
+        LocalDefaultTenantId = 'default'
+    }
+}
+
+if ($hasFiles) {
+    $baseSettings.FileManagement = [ordered]@{
+        Enabled = $false
+        Provider = 'Unknown'
+        MaximumObjectBytes = 10485760
+        RequireContentInspection = $true
+        AllowedContentTypes = @('image/jpeg', 'image/png', 'application/pdf')
+        LocalStorage = [ordered]@{
+            RootPath = 'data/files'
+        }
+    }
+    $developmentSettings.FileManagement = [ordered]@{
+        Enabled = $true
+        Provider = 'LocalStorage'
+        MaximumObjectBytes = 10485760
+        RequireContentInspection = $false
+        AllowedContentTypes = @('image/jpeg', 'image/png', 'application/pdf')
+        LocalStorage = [ordered]@{
+            RootPath = 'data/files'
+        }
+    }
+}
+
+if ($hasNotifications) {
+    $baseSettings.Notifications = [ordered]@{
+        Retention = [ordered]@{
+            Enabled = $false
+            ReadHistoryDays = 90
+            UnreadHistoryDays = 365
+            BroadcastDays = 365
+            BatchSize = 500
+            IntervalMinutes = 60
+        }
+    }
+}
+
+$baseSettingsJson = $baseSettings | ConvertTo-Json -Depth 10
+$developmentSettingsJson = $developmentSettings | ConvertTo-Json -Depth 10
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\appsettings.json") ($baseSettingsJson -split "`r?`n")
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\appsettings.Development.json") ($developmentSettingsJson -split "`r?`n")
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\Properties\launchSettings.json") @(
+    '{',
+    '  "$schema": "http://json.schemastore.org/launchsettings.json",',
+    '  "profiles": {',
+    "    `"$Name.Host.Api`": {",
+    '      "commandName": "Project",',
+    '      "dotnetRunMessages": true,',
+    '      "launchBrowser": false,',
+    '      "applicationUrl": "http://localhost:5080",',
+    '      "environmentVariables": {',
+    '        "ASPNETCORE_ENVIRONMENT": "Development"',
+    '      }',
+    '    }',
+    '  }',
+    '}'
+)
+
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "tests\$Name.Architecture.Tests\$Name.Architecture.Tests.csproj") @(
+    '<Project Sdk="Microsoft.NET.Sdk">',
+    '  <PropertyGroup>',
+    '    <IsTestProject>true</IsTestProject>',
+    '    <IsPackable>false</IsPackable>',
+    '  </PropertyGroup>',
+    '  <ItemGroup>',
+    '    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />',
+    '    <PackageReference Include="Microsoft.NET.Test.Sdk" />',
+    '    <PackageReference Include="xunit" />',
+    '    <PackageReference Include="xunit.runner.visualstudio">',
+    '      <PrivateAssets>all</PrivateAssets>',
+    '    </PackageReference>',
+    '  </ItemGroup>',
+    '  <ItemGroup>',
+    "    <ProjectReference Include=`"..\..\src\Hosts\$Name.Host.Api\$Name.Host.Api.csproj`" />",
+    '  </ItemGroup>',
+    '</Project>'
+)
+
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "tests\$Name.Architecture.Tests\HostStartupTests.cs") @(
+    "namespace $Name.Architecture.Tests;",
+    '',
+    'using System.Net;',
+    'using Microsoft.AspNetCore.Mvc.Testing;',
+    'using Xunit;',
+    '',
+    '[Trait("Category", "Architecture")]',
+    'public sealed class HostStartupTests',
+    '{',
+    '    [Fact]',
+    '    public async Task GeneratedHostBuildsAndMapsLiveness()',
+    '    {',
+    '        await using WebApplicationFactory<global::Program> factory = new();',
+    '        using HttpClient client = factory.CreateClient(new WebApplicationFactoryClientOptions',
+    '        {',
+    '            AllowAutoRedirect = false',
+    '        });',
+    '',
+    '        using HttpResponseMessage response = await client.GetAsync("/alive");',
+    '',
+    '        Assert.Equal(HttpStatusCode.OK, response.StatusCode);',
+    '    }',
+    '}'
+)
+
+Write-GmaTemplateFile (Join-Path $resolvedOutputPath "tests\$Name.Architecture.Tests\ModuleBoundaryTests.cs") @(
+    "namespace $Name.Architecture.Tests;",
+    '',
+    'using System.Xml.Linq;',
+    'using Xunit;',
+    '',
+    '[Trait("Category", "Architecture")]',
+    'public sealed class ModuleBoundaryTests',
+    '{',
+    '    [Fact]',
+    '    public void AppModulesKeepDomainApplicationAndCrossModuleBoundaries()',
+    '    {',
+    '        string repositoryRoot = FindRepositoryRoot();',
+    '        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");',
+    '        if (!Directory.Exists(modulesRoot))',
+    '        {',
+    '            return;',
+    '        }',
+    '',
+    '        List<string> offenders = [];',
+    '        foreach (string projectPath in Directory.EnumerateFiles(modulesRoot, "*.csproj", SearchOption.AllDirectories))',
+    '        {',
+    '            XDocument project = XDocument.Load(projectPath);',
+    '            string projectName = Path.GetFileNameWithoutExtension(projectPath);',
+    '            string owner = Path.GetRelativePath(modulesRoot, projectPath)',
+    '                .Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries)[0];',
+    '            string[] references = [.. project.Descendants("ProjectReference")',
+    '                .Select(reference => (string?)reference.Attribute("Include"))',
+    '                .Where(reference => !string.IsNullOrWhiteSpace(reference))',
+    '                .Select(reference => Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectPath)!, reference!)))];',
+    '',
+    '            if (projectName.EndsWith(".Domain", StringComparison.Ordinal))',
+    '            {',
+    '                offenders.AddRange(project.Descendants("PackageReference")',
+    '                    .Select(_ => $"{projectName}: Domain projects cannot reference NuGet packages."));',
+    '                offenders.AddRange(references',
+    '                    .Where(reference => !reference.StartsWith(Path.Combine(repositoryRoot, "src", "Shared"), StringComparison.OrdinalIgnoreCase))',
+    '                    .Select(reference => $"{projectName}: Domain references {Path.GetFileNameWithoutExtension(reference)}."));',
+    '            }',
+    '',
+    '            if (projectName.EndsWith(".Application", StringComparison.Ordinal))',
+    '            {',
+    '                string[] forbidden = [".Persistence", ".Infrastructure", ".Api", ".AdminApi", ".AdminCli"];',
+    '                offenders.AddRange(references',
+    '                    .Where(reference => forbidden.Any(token => Path.GetFileNameWithoutExtension(reference).Contains(token, StringComparison.Ordinal)))',
+    '                    .Select(reference => $"{projectName}: Application references adapter {Path.GetFileNameWithoutExtension(reference)}."));',
+    '            }',
+    '',
+    '            foreach (string reference in references.Where(reference => reference.StartsWith(modulesRoot, StringComparison.OrdinalIgnoreCase)))',
+    '            {',
+    '                string referencedOwner = Path.GetRelativePath(modulesRoot, reference)',
+    '                    .Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries)[0];',
+    '                string referencedProject = Path.GetFileNameWithoutExtension(reference);',
+    '                if (!string.Equals(owner, referencedOwner, StringComparison.OrdinalIgnoreCase) &&',
+    '                    !referencedProject.EndsWith(".Contracts", StringComparison.Ordinal) &&',
+    '                    !referencedProject.EndsWith(".Admin.Contracts", StringComparison.Ordinal))',
+    '                {',
+    '                    offenders.Add($"{projectName}: cross-module reference to {referencedProject} bypasses contracts.");',
+    '                }',
+    '            }',
+    '        }',
+    '',
+    '        Assert.Empty(offenders.Order(StringComparer.Ordinal));',
+    '    }',
+    '',
+    '    private static string FindRepositoryRoot()',
+    '    {',
+    '        DirectoryInfo? directory = new(AppContext.BaseDirectory);',
+    '        while (directory is not null)',
+    '        {',
+    "            if (File.Exists(Path.Combine(directory.FullName, `"$Name.slnx`")))",
+    '            {',
+    '                return directory.FullName;',
+    '            }',
+    '',
+    '            directory = directory.Parent;',
+    '        }',
+    '',
+    '        throw new InvalidOperationException("Could not locate application repository root.");',
+    '    }',
+    '}'
+)
 
 New-Item -ItemType Directory -Force -Path (Join-Path $resolvedOutputPath 'gma\modules') | Out-Null
 New-Item -ItemType File -Force -Path (Join-Path $resolvedOutputPath 'gma\.gitkeep') | Out-Null

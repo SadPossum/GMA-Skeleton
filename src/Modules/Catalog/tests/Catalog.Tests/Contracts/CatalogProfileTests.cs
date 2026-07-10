@@ -4,7 +4,7 @@ using Catalog.Contracts;
 using Gma.Framework.Caching;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
-using Gma.Framework.Tenancy;
+using Gma.Framework.Scoping;
 using Xunit;
 
 [Trait("Category", "Unit")]
@@ -18,7 +18,7 @@ public sealed class CatalogProfileTests
         Assert.Equal(CatalogModuleMetadata.Name, profile.ModuleName);
         Assert.Equal(CatalogProfiles.DefaultName, profile.ProfileName);
         Assert.Contains(profile.Provides, feature => feature.Id == CatalogCompositionFeatures.Items);
-        Assert.Contains(profile.Requires, feature => feature.Id == TenancyCompositionFeatures.Context);
+        Assert.Contains(profile.Requires, feature => feature.Id == ScopeCompositionFeatures.Context);
         Assert.Contains(profile.Requires, feature => feature.Id == CachingCompositionFeatures.Application);
         Assert.Contains(profile.Requires, feature => feature.Id == CachingCompositionFeatures.Invalidation);
         Assert.Contains(profile.Requires, feature => feature.Id == MessagingCompositionFeatures.Outbox);

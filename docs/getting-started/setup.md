@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Windows PowerShell.
+- PowerShell 7 on Windows, Linux, or macOS.
 - .NET 10 SDK. The repo pins SDK `10.0.300` in `global.json`.
 - Docker Desktop for SQL Server, PostgreSQL, NATS, Aspire resources, and Docker-backed integration tests.
 - An editor that understands `.slnx` files or plain C# projects.
@@ -14,7 +14,7 @@ The scripts resolve `dotnet` in this order:
 
 The resolved SDK must be .NET 10. If your .NET 10 SDK is not on `PATH`, set `GMA_DOTNET` to the full `dotnet.exe` path before running `eng/*.ps1`.
 
-Base `appsettings.json` files contain configuration shape and non-secret defaults only. Local disposable connection strings, JWT signing material, and refresh-token peppers live in `appsettings.Development.json`. Production and shared environments must provide `ConnectionStrings:*`, `Auth:Jwt:SigningKey`, and `Auth:RefreshTokens:Pepper` through environment variables, user secrets, a vault, or another secret provider.
+Base `appsettings.json` files contain configuration shape and non-secret defaults only. Local disposable connection strings, JWT signing material, and refresh-token peppers live in `appsettings.Development.json`. Production and shared environments must provide `ConnectionStrings:*` plus Auth signing/pepper keys through environment variables, user secrets, a vault, or another secret provider. Prefer the key-ring settings below so rotation does not invalidate every active access or refresh token; the single-key settings remain compatibility options.
 
 ## First Run
 
@@ -26,9 +26,9 @@ Base `appsettings.json` files contain configuration shape and non-secret default
 
 `restore.ps1` restores both local tools and NuGet packages.
 
-The root `.github\workflows\validate.yml` runs the same non-Docker path on `main`, `dev`, pull requests, and manual dispatch: verify GMA submodules point at each reusable repository's `dev` head, bootstrap source roots, restore, build, then `test-fast.ps1 -NoBuild`.
+The root `.github\workflows\validate.yml` runs the same non-Docker path on `main`, `dev`, pull requests, and manual dispatch: verify GMA submodules point at each reusable repository's `dev` head, bootstrap source roots, then run `verify.ps1` for restore, build, provider migration drift, and fast tests.
 
-The root `.github\workflows\docker-tests.yml` is manual-only. Run it when infrastructure behavior changes or before a release marker; it uses the same bootstrap path and then executes `test-docker.ps1 -NoBuild` with `GMA_REQUIRE_DOCKER_TESTS=true`.
+The root `.github\workflows\docker-tests.yml` runs automatically for relevant pull-request/main changes and weekly, and also supports manual dispatch. It uses the same bootstrap path and executes `test-docker.ps1 -NoBuild` with `GMA_REQUIRE_DOCKER_TESTS=true`.
 
 ## Run With Aspire
 
@@ -161,10 +161,12 @@ Core runtime keys:
 - `Observability:Otlp:ExportTraces`
 - `Observability:Otlp:ExportLogs`
 - `Auth:RefreshTokenLifetimeDays`
-- `Auth:RefreshTokens:Pepper`
+- `Auth:RefreshTokens:ActivePepperId` and `Auth:RefreshTokens:Peppers:<id>` for rotation
+- `Auth:RefreshTokens:Pepper` for one-key compatibility
 - `Auth:Jwt:Issuer` optional override; defaults to `ApplicationIdentity:DisplayName`
 - `Auth:Jwt:Audience` optional override; defaults to `ApplicationIdentity:DisplayName`
-- `Auth:Jwt:SigningKey`
+- `Auth:Jwt:ActiveSigningKeyId` and `Auth:Jwt:SigningKeys:<id>` for rotation
+- `Auth:Jwt:SigningKey` for one-key compatibility
 - `Auth:Jwt:AccessTokenLifetimeMinutes`
 - `AccessControl:Bootstrap:AllowWhenAssignmentsExist`
 - `AccessControl:Bootstrap:OwnerRoleName`
@@ -203,6 +205,7 @@ Use `GMA-Skeleton.slnx` for the full skeleton/composition repository. Use the fo
 
 ```text
 gma/framework/Gma.Framework.slnx
+gma/modules/access-control/Gma.Modules.AccessControl.slnx
 gma/modules/administration/Gma.Modules.Administration.slnx
 gma/modules/auth/Gma.Modules.Auth.slnx
 gma/modules/files/Gma.Modules.Files.slnx
@@ -237,7 +240,7 @@ The script verifies focused `.slnx` ownership, stale root docs/tests, package-lo
 
 ## Source-First GMA Development
 
-The skeleton repository consumes the framework and reusable modules as Git submodules under `gma/framework` and `gma/modules/<alias>`. AccessControl is currently the source-first local package exception until `GMA-Module-AccessControl` is created. Framework references go through `GmaFrameworkRoot`, and module references go through `GmaModule*Root` properties with checked-in defaults in `Directory.Build.props`.
+The skeleton repository consumes the framework and reusable modules as Git submodules under `gma/framework` and `gma/modules/<alias>`. Framework references go through `GmaFrameworkRoot`, and module references go through `GmaModule*Root` properties with checked-in defaults in `Directory.Build.props`.
 
 To create a local override file:
 

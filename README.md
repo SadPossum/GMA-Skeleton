@@ -86,9 +86,9 @@ To generate a new production app shell that consumes selected GMA source reposit
 
 ## GitHub Actions
 
-The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull requests, and manual dispatch. It checks submodule pointers against each reusable repository's `dev` head, bootstraps source roots, restores, builds, and runs fast tests.
+The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull requests, and manual dispatch. It checks submodule pointers against each reusable repository's `dev` head, bootstraps source roots, restores, builds, checks provider migration drift, and runs fast tests through `eng/verify.ps1`.
 
-The `Docker Tests` workflow is manual. Use it when infrastructure behavior changes or before a release marker; it runs Docker-backed integration tests with `GMA_REQUIRE_DOCKER_TESTS=true`.
+The `Docker Tests` workflow runs for relevant pull-request/main changes, on a weekly schedule, and by manual dispatch. It runs Docker-backed integration tests with `GMA_REQUIRE_DOCKER_TESTS=true`.
 
 ## Documentation
 
@@ -104,8 +104,10 @@ Useful entry points:
 - [Administration Architecture](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/administration.md)
 - [Messaging and Outbox](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/messaging-and-outbox.md)
 - [Tasks and Daemons](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/tasks-and-daemons.md)
+- [AccessControl Module](https://github.com/SadPossum/GMA-Module-Access-Control/blob/dev/docs/README.md)
 - [Auth Module](https://github.com/SadPossum/GMA-Module-Auth/blob/dev/docs/README.md)
 - [Administration Module](https://github.com/SadPossum/GMA-Module-Administration/blob/dev/docs/README.md)
+- [Files Module](https://github.com/SadPossum/GMA-Module-Files/blob/dev/docs/README.md)
 - [Tenancy Module](https://github.com/SadPossum/GMA-Module-Tenancy/blob/dev/docs/README.md)
 - [Naming Conventions](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/guidelines/naming-conventions.md)
 - [Development Guidelines](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/guidelines/development-guidelines.md)
@@ -117,5 +119,5 @@ HTTP examples live in [requests/auth.http](requests/auth.http) and [requests/adm
 
 ## Project Status
 
-This is a work-in-progress skeleton. The current reusable modules are Auth, Tenancy, Administration, Notifications, and TaskRuntime.
+This is a work-in-progress skeleton. The current reusable modules are AccessControl, Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy.
 Catalog, Ordering, and TaskSamples are compiled optional example modules used to prove stored data, admin surfaces, caching, cross-module integration, notifications, and task execution without being registered in default hosts.

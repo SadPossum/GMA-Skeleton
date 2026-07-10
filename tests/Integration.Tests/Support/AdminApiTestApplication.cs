@@ -59,6 +59,8 @@ internal sealed class AdminApiTestApplication(
             "Administration:Api:AllowGeneratedPasswordResponses",
             allowGeneratedPasswordResponses.ToString(System.Globalization.CultureInfo.InvariantCulture));
         builder.UseSetting("Caching:Enabled", "false");
+        builder.UseSetting("Http:PrivateNetwork:Enabled", "false");
+        builder.UseSetting("Http:RateLimiting:Enabled", "false");
 
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
@@ -79,7 +81,9 @@ internal sealed class AdminApiTestApplication(
                 ["Auth:Jwt:SigningKey"] = JwtSigningKey,
                 ["Auth:Jwt:AccessTokenLifetimeMinutes"] = "15",
                 ["Administration:Api:AllowGeneratedPasswordResponses"] = allowGeneratedPasswordResponses.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                ["Caching:Enabled"] = "false"
+                ["Caching:Enabled"] = "false",
+                ["Http:PrivateNetwork:Enabled"] = "false",
+                ["Http:RateLimiting:Enabled"] = "false"
             };
 
             configuration.AddInMemoryCollection(values);

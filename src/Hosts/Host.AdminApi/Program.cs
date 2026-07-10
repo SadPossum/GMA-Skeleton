@@ -5,6 +5,8 @@ using Gma.Modules.Auth.Contracts;
 using ServiceDefaults;
 using Gma.Framework.Administration.Api;
 using Gma.Framework.Api.OpenApi;
+using Gma.Framework.Api.Production;
+using Gma.Framework.Api.Production.EntityFrameworkCore;
 using Gma.Framework.Api.Security;
 using Gma.Framework.Api.Serilog;
 using Gma.Framework.Caching.Cqrs;
@@ -17,6 +19,9 @@ using Gma.Framework.ModuleComposition;
 using Gma.Framework.Tenancy.Api.Serilog;
 using Gma.Framework.Tenancy.Caching;
 using Gma.Framework.Tenancy.Messaging.Infrastructure;
+using Gma.Modules.AccessControl.Persistence;
+using Gma.Modules.Administration.Persistence;
+using Gma.Modules.Auth.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -38,14 +43,18 @@ builder.AddAdminApiModule<AccessControlAdminApiModule>();
 builder.AddAuthAdminApiModule(AuthProfile.ScopeAware());
 
 builder.AddServiceDefaults();
+builder.AddGmaProductionHttp();
+builder.Services.AddGmaEntityFrameworkReadinessCheck<AdminDbContext>("administration-database");
+builder.Services.AddGmaEntityFrameworkReadinessCheck<AccessControlDbContext>("access-control-database");
+builder.Services.AddGmaEntityFrameworkReadinessCheck<AuthDbContext>("auth-database");
 builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
 
 WebApplication app = builder.Build();
 
 app.UseGmaOpenApi();
+app.UseGmaProductionHttp();
 app.UseGmaSerilogRequestLogging();
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

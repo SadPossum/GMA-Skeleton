@@ -22,19 +22,24 @@ env:
 
 jobs:
   fast:
-    name: Fast validation
-    runs-on: windows-latest
+    name: Fast validation (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
       - name: Checkout skeleton
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           submodules: recursive
           token: ${{ secrets.GMA_CI_TOKEN || github.token }}
+          persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: 10.0.x
 
@@ -46,14 +51,6 @@ jobs:
         shell: pwsh
         run: ./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force
 
-      - name: Restore
+      - name: Verify
         shell: pwsh
-        run: ./eng/restore.ps1
-
-      - name: Build
-        shell: pwsh
-        run: ./eng/build.ps1 -NoRestore
-
-      - name: Test
-        shell: pwsh
-        run: ./eng/test-fast.ps1 -NoBuild
+        run: ./eng/verify.ps1

@@ -4,8 +4,8 @@ using Catalog.Contracts;
 using Ordering.Contracts;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
+using Gma.Framework.Scoping;
 using Gma.Framework.Tasks;
-using Gma.Framework.Tenancy;
 using Xunit;
 
 [Trait("Category", "Unit")]
@@ -20,7 +20,7 @@ public sealed class OrderingProfileTests
         Assert.Equal(OrderingProfiles.DefaultName, profile.ProfileName);
         Assert.Contains(profile.Provides, feature => feature.Id == OrderingCompositionFeatures.Orders);
         Assert.Contains(profile.Provides, feature => feature.Id == OrderingCompositionFeatures.CatalogItemProjections);
-        Assert.Contains(profile.Requires, feature => feature.Id == TenancyCompositionFeatures.Context && !feature.Optional);
+        Assert.Contains(profile.Requires, feature => feature.Id == ScopeCompositionFeatures.Context && !feature.Optional);
         Assert.Contains(profile.Requires, feature => feature.Id == CatalogCompositionFeatures.Items && !feature.Optional);
         Assert.Contains(profile.Requires, feature => feature.Id == MessagingCompositionFeatures.NatsConsumers && feature.Optional);
         Assert.Contains(profile.Requires, feature => feature.Id == TasksCompositionFeatures.Worker && feature.Optional);

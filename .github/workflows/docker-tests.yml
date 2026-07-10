@@ -1,6 +1,28 @@
 name: Docker Tests
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/docker-tests.yml'
+      - 'docker-compose.yml'
+      - 'eng/test-docker.ps1'
+      - 'tests/Integration.Tests/**'
+      - 'src/**'
+      - 'gma/framework'
+      - 'gma/modules/**'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/docker-tests.yml'
+      - 'docker-compose.yml'
+      - 'eng/test-docker.ps1'
+      - 'tests/Integration.Tests/**'
+      - 'src/**'
+      - 'gma/framework'
+      - 'gma/modules/**'
+  schedule:
+    - cron: '17 3 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -23,14 +45,15 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout skeleton
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           submodules: recursive
           token: ${{ secrets.GMA_CI_TOKEN || github.token }}
+          persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: 10.0.x
 

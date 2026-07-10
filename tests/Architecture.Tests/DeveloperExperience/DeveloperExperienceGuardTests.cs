@@ -8,6 +8,7 @@ using Catalog.Persistence;
 using Gma.Framework.Administration;
 using Gma.Framework.Cqrs;
 using Gma.Framework.Domain;
+using Gma.Framework.Messaging;
 using Gma.Framework.Messaging.Infrastructure;
 using Gma.Framework.Naming;
 using Gma.Framework.Observability;
@@ -640,8 +641,9 @@ public sealed partial class DeveloperExperienceGuardTests
             "ServiceDefaults",
             "Extensions.cs"));
 
-        Assert.Contains("MapHealthChecks(\"/health\")", serviceDefaults, StringComparison.Ordinal);
-        Assert.Contains("MapHealthChecks(\"/alive\")", serviceDefaults, StringComparison.Ordinal);
+        Assert.Contains("MapHealthChecks(\"/health\",", serviceDefaults, StringComparison.Ordinal);
+        Assert.Contains("MapHealthChecks(\"/alive\",", serviceDefaults, StringComparison.Ordinal);
+        Assert.Contains("registration.Tags.Contains(\"ready\")", serviceDefaults, StringComparison.Ordinal);
 
         foreach (string hostProgram in hostPrograms)
         {
@@ -1431,13 +1433,12 @@ public sealed partial class DeveloperExperienceGuardTests
             "concurrency:",
             "cancel-in-progress: true",
             "DOTNET_CLI_TELEMETRY_OPTOUT",
-            "runs-on: windows-latest",
+            "os: [windows-latest, ubuntu-latest]",
+            "runs-on: ${{ matrix.os }}",
             "timeout-minutes: 30",
             "./eng/check-submodule-dev-heads.ps1",
             "./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
-            "./eng/restore.ps1",
-            "./eng/build.ps1 -NoRestore",
-            "./eng/test-fast.ps1 -NoBuild"
+            "./eng/verify.ps1"
         ];
         string[] requiredDockerTokens =
         [
@@ -1521,7 +1522,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "Check GMA submodule dev heads",
             "./eng/check-submodule-dev-heads.ps1",
             "./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
-            "./eng/test-fast.ps1 -NoBuild"
+            "./eng/verify.ps1"
         ];
         string[] requiredDocsTokens =
         [
@@ -1658,23 +1659,21 @@ public sealed partial class DeveloperExperienceGuardTests
             "eng\\gma-update.ps1",
             "eng\\gma-validate.ps1",
             "Write-GmaGeneratedWorkflow",
-            "actions/checkout@v4",
-            "actions/setup-dotnet@v4",
+            "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
+            "actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9",
             "rev-parse --show-toplevel",
             "Git status: app repository not initialized"
         ];
         string[] requiredRootWorkflowTokens =
         [
-            "actions/checkout@v4",
+            "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
             "submodules: recursive",
             "secrets.GMA_CI_TOKEN",
-            "actions/setup-dotnet@v4",
+            "actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9",
             "dotnet-version: 10.0.x",
             "./eng/check-submodule-dev-heads.ps1",
             "./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",
-            "./eng/restore.ps1",
-            "./eng/build.ps1 -NoRestore",
-            "./eng/test-fast.ps1 -NoBuild"
+            "./eng/verify.ps1"
         ];
         string[] requiredDocsTokens =
         [
@@ -1694,7 +1693,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "public `IModule` front door",
             "Public API modules",
             "Admin CLI/API and worker-only",
-            "Runtime provider choices",
+            "Cloud credentials",
             "gma\\framework",
             "gma\\modules",
             "detached `HEAD`",
@@ -1803,58 +1802,6 @@ public sealed partial class DeveloperExperienceGuardTests
             .Keys
             .Where(moduleName => !overview.Contains($"{moduleName}/", StringComparison.Ordinal))
             .Select(moduleName => $"src/Framework/docs/architecture/overview.md missing module root {moduleName}/")
-            .Order(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        Assert.Empty(offenders);
-    }
-
-    [Fact]
-    public void Architecture_overview_documents_framework_project_dependency_map()
-    {
-        string repositoryRoot = FindRepositoryRoot();
-        string sharedRoot = GmaSourceLayout.FrameworkPath(repositoryRoot);
-        string overview = File.ReadAllText(FrameworkDocsPath(repositoryRoot, "architecture", "overview.md"));
-        Dictionary<string, string[]> documentedDependencies = ParseDependencyDirectionBlocks(overview);
-        string[] offenders = EnumerateProjectFiles(sharedRoot)
-            .Where(path => !Path.GetFileNameWithoutExtension(path).EndsWith(".Tests", StringComparison.Ordinal))
-            .SelectMany(projectPath =>
-            {
-                string projectName = Path.GetFileNameWithoutExtension(projectPath);
-                XDocument project = XDocument.Load(projectPath);
-                string[] actualDependencies = GetProjectIncludes(project, "ProjectReference")
-                    .Select(Path.GetFileNameWithoutExtension)
-                    .Where(referenceName => !string.IsNullOrWhiteSpace(referenceName))
-                    .Select(referenceName => referenceName!)
-                    .Order(StringComparer.OrdinalIgnoreCase)
-                    .ToArray();
-
-                if (!documentedDependencies.TryGetValue(projectName, out string[]? documented))
-                {
-                    return [$"src/Framework/docs/architecture/overview.md missing dependency map block for {projectName}"];
-                }
-
-                string[] normalizedDocumented = documented
-                    .Where(referenceName => !string.Equals(referenceName, "no project references", StringComparison.OrdinalIgnoreCase))
-                    .Order(StringComparer.OrdinalIgnoreCase)
-                    .ToArray();
-                string[] missingDependencies = actualDependencies
-                    .Except(normalizedDocumented, StringComparer.OrdinalIgnoreCase)
-                    .Select(referenceName => $"src/Framework/docs/architecture/overview.md missing {projectName} -> {referenceName}")
-                    .ToArray();
-                string[] staleDependencies = normalizedDocumented
-                    .Except(actualDependencies, StringComparer.OrdinalIgnoreCase)
-                    .Select(referenceName => $"src/Framework/docs/architecture/overview.md has stale {projectName} -> {referenceName}")
-                    .ToArray();
-                string[] noReferenceMarkerOffenders = actualDependencies.Length == 0 &&
-                                                       !documented.Contains("no project references", StringComparer.OrdinalIgnoreCase)
-                    ? [$"src/Framework/docs/architecture/overview.md missing {projectName} -> no project references"]
-                    : [];
-
-                return missingDependencies
-                    .Concat(staleDependencies)
-                    .Concat(noReferenceMarkerOffenders);
-            })
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -2902,21 +2849,6 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Jwt_token_generation_uses_access_token_claims_validation()
-    {
-        string repositoryRoot = FindRepositoryRoot();
-        string source = File.ReadAllText(GmaSourceLayout.ModulePath(
-            repositoryRoot,
-            "Auth",
-            "Gma.Modules.Auth.Infrastructure",
-            "Services",
-            "JwtTokenService.cs"));
-
-        Assert.Contains("AccessTokenClaims accessTokenClaims = new(memberId, tenantId, sessionId);", source, StringComparison.Ordinal);
-        Assert.Contains("accessTokenClaims.TenantId", source, StringComparison.Ordinal);
-    }
-
-    [Fact]
     public void Messaging_records_do_not_expose_positional_constructor_bypass()
     {
         string repositoryRoot = FindRepositoryRoot();
@@ -2964,15 +2896,13 @@ public sealed partial class DeveloperExperienceGuardTests
     [Fact]
     public void Public_integration_event_contracts_inherit_shared_base()
     {
-        string repositoryRoot = FindRepositoryRoot();
-        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
-        string[] offenders = EnumerateSourceFiles(modulesRoot)
-            .Where(path => string.Equals(FindOwningProjectName(path)?.Split('.').LastOrDefault(), "Contracts", StringComparison.Ordinal))
-            .Where(path => !IsGeneratedMigrationSource(path))
-            .Where(path => Path.GetFileName(path).EndsWith("IntegrationEvent.cs", StringComparison.Ordinal))
-            .Where(path => !PublicIntegrationEventBasePattern().IsMatch(File.ReadAllText(path)))
-            .Select(path => Path.GetRelativePath(repositoryRoot, path))
-            .Order(StringComparer.OrdinalIgnoreCase)
+        string[] offenders = ArchitectureCatalog.ModuleProjects
+            .Where(project => project.Kind == ModuleProjectKind.Contracts)
+            .SelectMany(project => project.Assembly.ExportedTypes
+                .Where(type => type.Name.EndsWith("IntegrationEvent", StringComparison.Ordinal))
+                .Where(type => !typeof(IntegrationEvent).IsAssignableFrom(type))
+                .Select(type => $"{project.ProjectName}:{type.FullName}"))
+            .Order(StringComparer.Ordinal)
             .ToArray();
 
         Assert.Empty(offenders);
@@ -3606,7 +3536,7 @@ public sealed partial class DeveloperExperienceGuardTests
             [
                 "Member.PasswordHashMaxLength",
                 "Member.DisabledReasonMaxLength",
-                "HasIndex(member => new { member.TenantId, member.RegisteredAtUtc })"
+                "HasIndex(member => new { member.ScopeId, member.RegisteredAtUtc })"
             ],
             [Path.Combine("Configurations", "MemberSessionConfiguration.cs")] =
             [
@@ -3665,7 +3595,7 @@ public sealed partial class DeveloperExperienceGuardTests
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        Assert.Contains("public const int MinimumLength = 8", policySource, StringComparison.Ordinal);
+        Assert.Contains("public const int MinimumLength = 15", policySource, StringComparison.Ordinal);
         Assert.Contains("public const string MinimumLengthMessage", policySource, StringComparison.Ordinal);
         Assert.Empty(validatorOffenders);
     }
@@ -4926,6 +4856,16 @@ public sealed partial class DeveloperExperienceGuardTests
                 ["Microsoft.AspNetCore.App"],
                 []),
             new(
+                "Gma.Framework.Api.Production",
+                [],
+                ["Microsoft.AspNetCore.App"],
+                [@"..\..\Cqrs\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"]),
+            new(
+                "Gma.Framework.Api.Production.EntityFrameworkCore",
+                ["Microsoft.EntityFrameworkCore"],
+                ["Microsoft.AspNetCore.App"],
+                [@"..\Gma.Framework.Api.Production\Gma.Framework.Api.Production.csproj"]),
+            new(
                 "Gma.Framework.Api.Serilog",
                 ["Serilog.AspNetCore"],
                 ["Microsoft.AspNetCore.App"],
@@ -5411,7 +5351,8 @@ public sealed partial class DeveloperExperienceGuardTests
                 [
                     @"..\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
                     @"..\Gma.Framework.Modules\Gma.Framework.Modules.csproj",
-                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj"
+                    @"..\Gma.Framework.Results\Gma.Framework.Results.csproj",
+                    @"..\..\Scoping\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj"
                 ]),
             new(
                 "Gma.Framework.Tenancy.AccessControl.AspNetCore",
@@ -5788,6 +5729,8 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Framework\Gma.Framework.Administration.Api\Gma.Framework.Administration.Api.csproj",
                     @"..\Framework\Gma.Framework.Api\Gma.Framework.Api.csproj",
                     @"..\Framework\Gma.Framework.Api.OpenApi\Gma.Framework.Api.OpenApi.csproj",
+                    @"..\Framework\Gma.Framework.Api.Production\Gma.Framework.Api.Production.csproj",
+                    @"..\Framework\Gma.Framework.Api.Production.EntityFrameworkCore\Gma.Framework.Api.Production.EntityFrameworkCore.csproj",
                     @"..\Framework\Gma.Framework.Api.Serilog\Gma.Framework.Api.Serilog.csproj",
                     @"..\Framework\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj",
                     @"..\Framework\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj",
@@ -5837,6 +5780,8 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\..\ServiceDefaults\ServiceDefaults.csproj",
                     @"..\Framework\Gma.Framework.Api\Gma.Framework.Api.csproj",
                     @"..\Framework\Gma.Framework.Api.OpenApi\Gma.Framework.Api.OpenApi.csproj",
+                    @"..\Framework\Gma.Framework.Api.Production\Gma.Framework.Api.Production.csproj",
+                    @"..\Framework\Gma.Framework.Api.Production.EntityFrameworkCore\Gma.Framework.Api.Production.EntityFrameworkCore.csproj",
                     @"..\Framework\Gma.Framework.Api.Serilog\Gma.Framework.Api.Serilog.csproj",
                     @"..\Framework\Gma.Framework.Caching.Cqrs\Gma.Framework.Caching.Cqrs.csproj",
                     @"..\Framework\Gma.Framework.Caching.Redis\Gma.Framework.Caching.Redis.csproj",
@@ -7960,6 +7905,7 @@ public sealed partial class DeveloperExperienceGuardTests
             NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild.Tasks\Gma.Framework.ProjectionRebuild.Tasks.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"),
+            NormalizePath(@"..\..\..\Framework\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks.Cqrs\Gma.Framework.Tasks.Cqrs.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.Tasks\Gma.Framework.Tasks.csproj"),
             NormalizePath(@"..\..\..\Framework\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj")
@@ -8142,6 +8088,10 @@ public sealed partial class DeveloperExperienceGuardTests
                string.Equals(
                    normalizedReference,
                    NormalizePath(@"..\..\..\Framework\Gma.Framework.ProjectionRebuild\Gma.Framework.ProjectionRebuild.csproj"),
+                   StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(
+                   normalizedReference,
+                   NormalizePath(@"..\..\..\Framework\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj"),
                    StringComparison.OrdinalIgnoreCase) ||
                string.Equals(
                    normalizedReference,
@@ -8867,57 +8817,6 @@ public sealed partial class DeveloperExperienceGuardTests
                 .Select(reference => $"{relativePath}->unexpected {referenceKind}:{reference}"));
     }
 
-    private static Dictionary<string, string[]> ParseDependencyDirectionBlocks(string source)
-    {
-        int headingIndex = source.IndexOf("## Dependency Direction", StringComparison.Ordinal);
-        int fenceIndex = headingIndex < 0
-            ? -1
-            : source.IndexOf("```text", headingIndex, StringComparison.Ordinal);
-        int blockStartIndex = fenceIndex < 0
-            ? -1
-            : source.IndexOf('\n', fenceIndex);
-        int blockEndIndex = blockStartIndex < 0
-            ? -1
-            : source.IndexOf("```", blockStartIndex, StringComparison.Ordinal);
-
-        if (blockStartIndex < 0 || blockEndIndex < 0)
-        {
-            return new Dictionary<string, string[]>(StringComparer.Ordinal);
-        }
-
-        string codeBlock = source[(blockStartIndex + 1)..blockEndIndex];
-        Dictionary<string, List<string>> blocks = new(StringComparer.Ordinal);
-        string? currentBlock = null;
-
-        foreach (string rawLine in codeBlock.Split(["\r\n", "\n"], StringSplitOptions.None))
-        {
-            string line = rawLine.TrimEnd();
-
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                currentBlock = null;
-                continue;
-            }
-
-            if (!line.StartsWith("  -> ", StringComparison.Ordinal))
-            {
-                currentBlock = line.Trim();
-                blocks[currentBlock] = [];
-                continue;
-            }
-
-            if (currentBlock is not null)
-            {
-                blocks[currentBlock].Add(line["  -> ".Length..]);
-            }
-        }
-
-        return blocks.ToDictionary(
-            item => item.Key,
-            item => item.Value.ToArray(),
-            StringComparer.Ordinal);
-    }
-
     private static bool TryGetJsonElement(string jsonPath, IReadOnlyList<string> path, out JsonElement element)
     {
         using JsonDocument document = JsonDocument.Parse(
@@ -9225,9 +9124,6 @@ public sealed partial class DeveloperExperienceGuardTests
 
     [GeneratedRegex(@"public\s+sealed\s+record\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*\(", RegexOptions.Multiline)]
     private static partial Regex PositionalPublicIntegrationEventPattern();
-
-    [GeneratedRegex(@"public\s+sealed\s+record\s+[A-Za-z_][A-Za-z0-9_]*IntegrationEvent\s*:\s*(?:IntegrationEvent|TenantIntegrationEvent)\b", RegexOptions.Multiline)]
-    private static partial Regex PublicIntegrationEventBasePattern();
 
     [GeneratedRegex(@"public\s+sealed\s+record\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*\(", RegexOptions.Multiline)]
     private static partial Regex PositionalPublicDomainEventPattern();

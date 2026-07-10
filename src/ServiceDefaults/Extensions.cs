@@ -1,6 +1,7 @@
 namespace ServiceDefaults;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -91,8 +92,14 @@ public static class Extensions
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapHealthChecks("/health");
-        endpoints.MapHealthChecks("/alive");
+        endpoints.MapHealthChecks("/alive", new HealthCheckOptions
+        {
+            Predicate = _ => false
+        });
+        endpoints.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            Predicate = registration => registration.Tags.Contains("ready")
+        });
 
         ObservabilityOptions observability = endpoints.ServiceProvider
             .GetRequiredService<IOptions<ObservabilityOptions>>()

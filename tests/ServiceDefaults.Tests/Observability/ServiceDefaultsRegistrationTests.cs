@@ -21,8 +21,10 @@ public sealed class ServiceDefaultsRegistrationTests
         string repositoryRoot = FindRepositoryRoot();
         string source = File.ReadAllText(Path.Combine(repositoryRoot, "src", "ServiceDefaults", "Extensions.cs"));
 
-        Assert.Contains("MapHealthChecks(\"/health\")", source, StringComparison.Ordinal);
-        Assert.Contains("MapHealthChecks(\"/alive\")", source, StringComparison.Ordinal);
+        Assert.Contains("MapHealthChecks(\"/health\",", source, StringComparison.Ordinal);
+        Assert.Contains("MapHealthChecks(\"/alive\",", source, StringComparison.Ordinal);
+        Assert.Contains("registration.Tags.Contains(\"ready\")", source, StringComparison.Ordinal);
+        Assert.Contains("Predicate = _ => false", source, StringComparison.Ordinal);
     }
 
     [Fact]

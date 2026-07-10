@@ -3,6 +3,8 @@ using Gma.Modules.Auth.Contracts;
 using ServiceDefaults;
 using Gma.Framework.Api.Modules;
 using Gma.Framework.Api.OpenApi;
+using Gma.Framework.Api.Production;
+using Gma.Framework.Api.Production.EntityFrameworkCore;
 using Gma.Framework.Api.Security;
 using Gma.Framework.Api.Serilog;
 using Gma.Framework.Caching.Cqrs;
@@ -20,6 +22,7 @@ using Gma.Framework.Tenancy.Api.Serilog;
 using Gma.Framework.Tenancy.Caching;
 using Gma.Framework.Tenancy.Messaging.Infrastructure;
 using Gma.Modules.Tenancy.Api;
+using Gma.Modules.Auth.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -44,14 +47,16 @@ builder.AddAuthModule(AuthProfile.ScopeAware());
 // module-scaffold:public-api-modules
 
 builder.AddServiceDefaults();
+builder.AddGmaProductionHttp();
+builder.Services.AddGmaEntityFrameworkReadinessCheck<AuthDbContext>("auth-database");
 builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
 
 WebApplication app = builder.Build();
 
 app.UseGmaOpenApi();
+app.UseGmaProductionHttp();
 app.UseGmaSerilogRequestLogging();
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -15,6 +15,8 @@ internal sealed class GmaSourceLayout
             ["Gma.Framework.Administration.Cli"] = "Administration",
             ["Gma.Framework.Api"] = "Api",
             ["Gma.Framework.Api.OpenApi"] = "Api",
+            ["Gma.Framework.Api.Production"] = "Api",
+            ["Gma.Framework.Api.Production.EntityFrameworkCore"] = "Api",
             ["Gma.Framework.Api.Serilog"] = "Api",
             ["Gma.Framework.Application.Composition"] = "Application",
             ["Gma.Framework.Application.Events"] = "Application",

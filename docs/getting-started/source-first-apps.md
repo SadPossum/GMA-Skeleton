@@ -18,6 +18,7 @@ MyProduct/
   gma/
     framework/              # submodule: SadPossum/GMA-Framework
     modules/
+      access-control/       # submodule: SadPossum/GMA-Module-Access-Control
       auth/                 # submodule: SadPossum/GMA-Module-Auth
       administration/       # submodule: SadPossum/GMA-Module-Administration
       notifications/        # submodule: SadPossum/GMA-Module-Notifications
@@ -33,9 +34,9 @@ Generate a source-first shell:
 .\eng\new-gma-app.ps1 -Name MyProduct -OutputPath ..\MyProduct -Modules auth,notifications
 ```
 
-Omit `-Modules` for a framework-only app shell. Use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. For selected modules that expose a public `IModule` front door, the generated API host adds the project reference and explicit module registration. Admin CLI/API and worker-only surfaces remain app-specific; add those hosts deliberately when the product needs them.
+Omit `-Modules` for a framework-only app shell. Use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. For selected modules that expose a public `IModule` front door, the generated API host adds the project reference and explicit module registration. AccessControl, Administration, TaskRuntime, and other admin/worker-only selections are mounted without silently adding those surfaces to the public API; add their hosts deliberately when the product needs them.
 
-The generated shell is still a composition starting point. Runtime provider choices such as JWT/identity setup, storage adapters, messaging, production connection strings, migrations, admin hosts, and workers remain app-owned decisions.
+The generated shell is runnable and startup-tested. It includes production HTTP policy, liveness/readiness endpoints, local development settings, explicit SQL-provider migration tooling, an app-module scaffold wrapper, and architecture/startup tests. Selected Auth/Notifications databases contribute readiness checks; Files gets local storage for development and requires a content-inspection adapter in production. Cloud credentials, trusted proxy addresses, real secrets, messaging topology, external identity providers, admin hosts, workers, and retention policy remain deliberate app/deployment choices.
 
 The generated `Directory.Packages.props` is seeded from the skeleton catalog so app-owned modules created later can restore immediately. Treat it as product-owned after generation: prune unused versions when convenient and add app-specific package versions deliberately.
 
@@ -107,6 +108,10 @@ CI for private submodules needs credentials that can read the selected GMA repos
 - run `eng/gma-bootstrap.ps1`;
 - restore and build the app `.slnx`;
 - run app tests plus any selected integration checks.
+
+Checkout actions are commit-pinned and use `persist-credentials: false`. Keep those properties when updating the generated workflow.
+
+Before releasing this skeleton source set, run `eng/export-source-set.ps1 -RequireClean` (or use its release-tag workflow) to capture the exact skeleton/framework/module commits, SDK, and central package hash. Generated applications can adopt the same manifest pattern in their own release workflow when they need an independently archived source bill of materials.
 
 Generated app shells include `.github/workflows/validate.yml`. Set a repository secret named `GMA_CI_TOKEN` when the app consumes private GMA repositories from another repository boundary; the default `GITHUB_TOKEN` normally only has access to the current repository.
 
