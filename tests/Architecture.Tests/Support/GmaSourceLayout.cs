@@ -152,7 +152,8 @@ internal sealed class GmaSourceLayout
                     continue;
                 }
 
-                properties[propertyName] = EnsureTrailingSeparator(ExpandMsBuildProperties(rawValue.Trim(), properties));
+                properties[propertyName] = EnsureTrailingSeparator(NormalizePathSeparators(
+                    ExpandMsBuildProperties(rawValue.Trim(), properties)));
             }
         }
 
@@ -464,4 +465,9 @@ internal sealed class GmaSourceLayout
 
     private static string EnsureTrailingSeparator(string path) =>
         Path.EndsInDirectorySeparator(path) ? path : path + Path.DirectorySeparatorChar;
+
+    private static string NormalizePathSeparators(string path) =>
+        path
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
 }

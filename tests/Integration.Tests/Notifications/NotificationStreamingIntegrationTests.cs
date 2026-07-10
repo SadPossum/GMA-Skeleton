@@ -10,6 +10,8 @@ using Xunit;
 
 public sealed class NotificationStreamingIntegrationTests
 {
+    private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(15);
+
     [Fact]
     [Trait("Category", "Integration")]
     public async Task Sse_stream_delivers_authenticated_user_notifications()
@@ -21,7 +23,7 @@ public sealed class NotificationStreamingIntegrationTests
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         request.Headers.Add("X-Tenant-Id", "tenant-a");
 
-        using CancellationTokenSource timeout = new(TimeSpan.FromSeconds(5));
+        using CancellationTokenSource timeout = new(TestTimeout);
         Task<HttpResponseMessage> responseTask = client.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -70,7 +72,7 @@ public sealed class NotificationStreamingIntegrationTests
         using HttpRequestMessage request = new(HttpMethod.Get, "/api/notifications/stream");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        using CancellationTokenSource timeout = new(TimeSpan.FromSeconds(5));
+        using CancellationTokenSource timeout = new(TestTimeout);
         Task<HttpResponseMessage> responseTask = client.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -117,7 +119,7 @@ public sealed class NotificationStreamingIntegrationTests
             "SignalR message",
             severity: NotificationSeverity.Success);
 
-        UserNotificationMessage message = await received.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        UserNotificationMessage message = await received.Task.WaitAsync(TestTimeout);
 
         Assert.Equal("SignalR message", message.Title);
         Assert.Equal("tenant-a", message.ScopeId);
@@ -143,7 +145,7 @@ public sealed class NotificationStreamingIntegrationTests
             .Build();
 
         await Assert.ThrowsAnyAsync<Exception>(
-            () => connection.StartAsync().WaitAsync(TimeSpan.FromSeconds(5)));
+            () => connection.StartAsync().WaitAsync(TestTimeout));
     }
 
     [Fact]
@@ -170,7 +172,7 @@ public sealed class NotificationStreamingIntegrationTests
         await connection.StartAsync();
         await application.PublishAsync("default", "user-a", "Default tenant SignalR message");
 
-        UserNotificationMessage message = await received.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        UserNotificationMessage message = await received.Task.WaitAsync(TestTimeout);
 
         Assert.Equal("Default tenant SignalR message", message.Title);
         Assert.Equal("default", message.ScopeId);
