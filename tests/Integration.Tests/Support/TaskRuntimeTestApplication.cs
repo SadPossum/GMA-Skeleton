@@ -75,6 +75,10 @@ internal sealed class TaskRuntimeTestApplication : IAsyncDisposable
         builder.Services.AddSingleton(this.Sink);
         builder.Services.AddSingleton<ITaskSampleReportSink>(this.Sink);
         builder.Services.AddTaskSamplesApplication();
+        if (workerEnabled)
+        {
+            builder.Services.AddTaskSamplesTaskHandlers();
+        }
 
         this.host = builder.Build();
     }

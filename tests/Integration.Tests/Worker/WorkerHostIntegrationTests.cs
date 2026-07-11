@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Ordering.Contracts;
 using Ordering.Persistence;
 using Gma.Framework.Messaging;
 using Gma.Framework.Messaging.Nats;
@@ -203,10 +204,15 @@ public sealed class WorkerHostIntegrationTests
         Assert.Contains("ordering", outboxStores);
         Assert.Contains("catalog", inboxStores);
         Assert.Contains("ordering", inboxStores);
-        Assert.NotNull(worker.Services.GetRequiredService<ITaskHandlerRegistry>().Find(
+        ITaskHandlerRegistry taskHandlers = worker.Services.GetRequiredService<ITaskHandlerRegistry>();
+        Assert.NotNull(taskHandlers.Find(
             TaskSamplesModuleMetadata.Name,
             GenerateReportTaskPayload.TaskName,
             GenerateReportTaskPayload.PayloadVersion));
+        Assert.NotNull(taskHandlers.Find(
+            OrderingModuleMetadata.Name,
+            RebuildCatalogItemProjectionPayload.TaskName,
+            RebuildCatalogItemProjectionPayload.PayloadVersion));
     }
 
     private static async Task<TaskRunSnapshot> WaitForStatusAsync(

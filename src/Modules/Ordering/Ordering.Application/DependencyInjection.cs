@@ -18,7 +18,6 @@ public static class DependencyInjection
 
         services.AddApplicationServicesFromAssembly(typeof(DependencyInjection).Assembly);
         services.AddScoped<CatalogItemChangeNotificationPublisher>();
-        services.AddProjectionRebuildTasks();
         services.AddIntegrationEventHandler<CatalogItemCreatedIntegrationEvent, CatalogItemCreatedProjectionHandler>(
             OrderingModuleMetadata.Name,
             CatalogModuleMetadata.Name);
@@ -28,7 +27,17 @@ public static class DependencyInjection
         services.AddIntegrationEventHandler<CatalogItemDiscontinuedIntegrationEvent, CatalogItemDiscontinuedProjectionHandler>(
             OrderingModuleMetadata.Name,
             CatalogModuleMetadata.Name);
-        services.AddTaskHandler<RebuildCatalogItemProjectionPayload, RebuildCatalogItemProjectionTaskHandler>(OrderingModuleMetadata.Name);
+
+        return services;
+    }
+
+    public static IServiceCollection AddOrderingTaskHandlers(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.AddProjectionRebuildTasks();
+        services.AddTaskHandler<RebuildCatalogItemProjectionPayload, RebuildCatalogItemProjectionTaskHandler>(
+            OrderingModuleMetadata.Name);
 
         return services;
     }

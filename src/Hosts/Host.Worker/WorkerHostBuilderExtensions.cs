@@ -104,6 +104,10 @@ public static class WorkerHostBuilderExtensions
         {
             builder.SelectModuleProfile(OrderingProfiles.Default, "Host.Worker/Ordering");
             builder.Services.AddOrderingApplication();
+            if (workerOptions.TaskWorkerEnabled)
+            {
+                builder.Services.AddOrderingTaskHandlers();
+            }
             builder.AddOrderingPersistence();
         }
 
@@ -118,6 +122,10 @@ public static class WorkerHostBuilderExtensions
         {
             builder.AddTaskCqrs();
             builder.Services.AddTaskSamplesApplication();
+            if (workerOptions.TaskWorkerEnabled)
+            {
+                builder.Services.AddTaskSamplesTaskHandlers();
+            }
         }
     }
 }

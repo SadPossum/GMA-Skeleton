@@ -11,7 +11,7 @@ The module is intentionally not registered in `Host.Api`, `Host.AdminCli`, or `H
 
 ## Runtime Flow
 
-1. A host explicitly composes `Gma.Modules.TaskRuntime.Persistence`, `AddTaskWorkerRuntime()`, and `AddTaskSamplesApplication()`.
+1. A host explicitly composes `Gma.Modules.TaskRuntime.Persistence`, `AddTaskWorkerRuntime()`, `AddTaskSamplesApplication()`, and `AddTaskSamplesTaskHandlers()`.
 2. Code enqueues a `TaskRunRequest` for module `task-samples`, task `generate-report`, worker group `samples`, and payload version `1` or `2`.
 3. The worker claims the run from the `tasks.task_runs` table.
 4. The runtime deserializes `GenerateReportTaskPayload`.

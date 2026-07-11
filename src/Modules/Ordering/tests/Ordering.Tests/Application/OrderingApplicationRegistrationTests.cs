@@ -23,6 +23,8 @@ public sealed class OrderingApplicationRegistrationTests
 
         services.AddOrderingApplication();
         services.AddOrderingApplication();
+        services.AddOrderingTaskHandlers();
+        services.AddOrderingTaskHandlers();
 
         Assert.Single(services, descriptor => descriptor.ServiceType == typeof(ICommandHandler<PlaceOrderCommand, OrderDto>));
         Assert.Single(services, descriptor => descriptor.ServiceType == typeof(ICommandValidator<PlaceOrderCommand>));
@@ -63,6 +65,18 @@ public sealed class OrderingApplicationRegistrationTests
     public void Ordering_application_registration_rejects_null_arguments()
     {
         Assert.Throws<ArgumentNullException>(() => DependencyInjection.AddOrderingApplication(null!));
+        Assert.Throws<ArgumentNullException>(() => DependencyInjection.AddOrderingTaskHandlers(null!));
+    }
+
+    [Fact]
+    public void Ordering_application_registration_does_not_require_task_runtime_services()
+    {
+        ServiceCollection services = new();
+
+        services.AddOrderingApplication();
+
+        Assert.DoesNotContain(services, descriptor => descriptor.ServiceType == typeof(TaskHandlerRegistration));
+        Assert.DoesNotContain(services, descriptor => descriptor.ServiceType == typeof(ITaskHandlerRegistry));
     }
 
     private static bool IsProjectionHandler(ServiceDescriptor descriptor, string handlerTypeName) =>

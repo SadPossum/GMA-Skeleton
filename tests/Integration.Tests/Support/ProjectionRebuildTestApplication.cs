@@ -67,6 +67,7 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
         builder.Services.AddCatalogApplication();
         builder.AddCatalogPersistence();
         builder.Services.AddOrderingApplication();
+        builder.Services.AddOrderingTaskHandlers();
         builder.AddOrderingPersistence();
 
         this.host = builder.Build();

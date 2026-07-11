@@ -14,12 +14,20 @@ public static class DependencyInjection
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddApplicationServicesFromAssembly(typeof(DependencyInjection).Assembly);
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ITaskScheduleProvider, TaskSamplesScheduleProvider>());
+        services.TryAddSingleton<ITaskSampleReportSink, NullTaskSampleReportSink>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddTaskSamplesTaskHandlers(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
         services.AddTaskHandler<GenerateReportTaskPayload, GenerateReportTaskHandler>(TaskSamplesModuleMetadata.Name);
         services.AddTaskHandler<GenerateReportTaskPayloadV2, GenerateReportTaskV2Handler>(TaskSamplesModuleMetadata.Name);
         services.AddTaskHandler<FlakyReportTaskPayload, FlakyReportTaskHandler>(TaskSamplesModuleMetadata.Name);
         services.AddTaskHandler<SlowReportTaskPayload, SlowReportTaskHandler>(TaskSamplesModuleMetadata.Name);
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<ITaskScheduleProvider, TaskSamplesScheduleProvider>());
-        services.TryAddSingleton<ITaskSampleReportSink, NullTaskSampleReportSink>();
 
         return services;
     }

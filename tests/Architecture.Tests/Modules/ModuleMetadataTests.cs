@@ -521,7 +521,7 @@ public sealed partial class ModuleMetadataTests
     }
 
     [Fact]
-    public void Module_task_metadata_matches_application_registrations()
+    public void Module_task_metadata_matches_explicit_task_registrations()
     {
         ServiceCollection services = new();
         IConfiguration configuration = new ConfigurationBuilder().Build();
@@ -532,8 +532,17 @@ public sealed partial class ModuleMetadataTests
             .Select(offender => offender!)
             .Order(StringComparer.Ordinal)
             .ToArray();
+        string[] taskRegistrationOffenders = ArchitectureCatalog.ModuleProjects
+            .Where(project => project.Kind == ModuleProjectKind.Application)
+            .Select(project => RegisterModuleTaskHandlers(services, project))
+            .Where(offender => offender is not null)
+            .Select(offender => offender!)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
 
-        Assert.Empty(registrationOffenders);
+        Assert.Empty(registrationOffenders
+            .Concat(taskRegistrationOffenders)
+            .Order(StringComparer.Ordinal));
 
         using ServiceProvider provider = services.BuildServiceProvider();
 
@@ -930,6 +939,33 @@ public sealed partial class ModuleMetadataTests
         }
 
         registrationMethod.Invoke(null, arguments);
+        return null;
+    }
+
+    private static string? RegisterModuleTaskHandlers(
+        IServiceCollection services,
+        ModuleProject project)
+    {
+        Type? dependencyInjection = project.Assembly.GetType($"{project.ProjectName}.DependencyInjection");
+        MethodInfo? registrationMethod = dependencyInjection
+            ?.GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .SingleOrDefault(method => string.Equals(
+                method.Name,
+                $"Add{project.ModulePrefix}TaskHandlers",
+                StringComparison.Ordinal));
+
+        if (registrationMethod is null)
+        {
+            return null;
+        }
+
+        ParameterInfo[] parameters = registrationMethod.GetParameters();
+        if (parameters.Length != 1 || parameters[0].ParameterType != typeof(IServiceCollection))
+        {
+            return $"{project.ProjectName}.{registrationMethod.Name} must accept only IServiceCollection.";
+        }
+
+        registrationMethod.Invoke(null, [services]);
         return null;
     }
 
