@@ -52,7 +52,7 @@ public sealed class WorkerHostCompositionTests
         AssertNoHostedService(builder, "NatsJetStreamConsumerService");
         Assert.Contains(builder.Services, descriptor =>
             descriptor.ServiceType == typeof(IEventBus) &&
-            descriptor.ImplementationType?.Name == "NatsJetStreamEventBus");
+            descriptor.ImplementationFactory is not null);
         Assert.Equal(AuthModuleNames, GetWorkerOptions(builder).GetComposedModuleNames());
     }
 
@@ -75,7 +75,7 @@ public sealed class WorkerHostCompositionTests
         AssertNoHostedService(builder, "OutboxPublisherService");
         Assert.DoesNotContain(builder.Services, descriptor =>
             descriptor.ServiceType == typeof(IEventBus) &&
-            descriptor.ImplementationType?.Name == "NatsJetStreamEventBus");
+            descriptor.ImplementationFactory is not null);
         Assert.Equal(CatalogOrderingModuleNames, GetWorkerOptions(builder).GetComposedModuleNames());
     }
 

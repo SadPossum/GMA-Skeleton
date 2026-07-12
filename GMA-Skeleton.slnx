@@ -92,6 +92,7 @@
     <File Path="gma/framework/docs/architecture/generic-access-control-rbac-task.md" />
     <File Path="gma/framework/docs/architecture/messaging-and-outbox.md" />
     <File Path="gma/framework/docs/architecture/messaging-consumers.md" />
+    <File Path="gma/framework/docs/architecture/durable-runtime-hardening-task.md" />
     <File Path="gma/framework/docs/architecture/metadata-attribute-pipeline-task.md" />
     <File Path="gma/framework/docs/architecture/metadata-attributes-refactor-notes.md" />
     <File Path="gma/framework/docs/architecture/module-composition-features-task.md" />
