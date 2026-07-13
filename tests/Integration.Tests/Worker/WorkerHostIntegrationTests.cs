@@ -108,6 +108,7 @@ public sealed class WorkerHostIntegrationTests
         builder.Configuration["Tasks:Worker:MaxConcurrency"] = "1";
         builder.Configuration["Tasks:Worker:PollInterval"] = "00:00:00.100";
         builder.Configuration["Tasks:Worker:LeaseDuration"] = "00:00:05";
+        builder.Configuration["Tasks:Worker:HeartbeatInterval"] = "00:00:01";
         builder.Configuration["Tasks:Worker:HandlerTimeout"] = "00:00:05";
         builder.Configuration["Tasks:Worker:RetryBaseDelay"] = "00:00:00.100";
         builder.Configuration["Tasks:Worker:RetryMaxDelay"] = "00:00:01";

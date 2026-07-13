@@ -49,6 +49,7 @@ internal sealed class ProjectionRebuildTestApplication : IAsyncDisposable
             ["Tasks:Worker:BatchSize"] = "5",
             ["Tasks:Worker:PollInterval"] = "00:00:00.100",
             ["Tasks:Worker:LeaseDuration"] = "00:00:10",
+            ["Tasks:Worker:HeartbeatInterval"] = "00:00:03",
             ["Tasks:Worker:HandlerTimeout"] = "00:00:20",
             ["Tasks:Worker:RetryBaseDelay"] = "00:00:00.100",
             ["Tasks:Worker:RetryMaxDelay"] = "00:00:01",
