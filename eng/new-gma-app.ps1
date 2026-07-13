@@ -982,7 +982,7 @@ $gmaSourceDocsLines = @(
     "- Generated host surfaces: $selectedHostText.",
     "- Service defaults generated: $([bool]$ServiceDefaults).",
     '- Generated admin and worker hosts are composition shells; add only the reusable or product modules each process owns.',
-    '- Runtime provider choices such as authentication schemes, storage adapters, messaging, and production connection strings remain app-owned composition work.',
+    '- Selected Auth and Notifications adapters are composed explicitly by the API host; credentials, enabled providers, shared Data Protection storage for multi-replica OIDC callbacks, email transport, messaging, and production connection strings remain app-owned deployment choices.',
     '- `Directory.Packages.props` is seeded from the skeleton catalog so app-owned generated modules can restore immediately; prune or add versions as the product evolves.',
     '',
     '## Add Source Repositories',
@@ -1141,6 +1141,15 @@ if ($readinessModuleSpecs.Count -gt 0) {
 
 if ($hasAuth) {
     $hostApiProjectLines += '    <ProjectReference Include="$(GmaFrameworkRoot)Messaging\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />'
+    $hostApiProjectLines += '    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Providers.OpenIdConnect\Gma.Modules.Auth.Providers.OpenIdConnect.csproj" />'
+}
+
+if ($hasNotifications) {
+    $hostApiProjectLines += '    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Adapters.Email\Gma.Modules.Notifications.Adapters.Email.csproj" />'
+}
+
+if ($hasAuth -and $hasNotifications) {
+    $hostApiProjectLines += '    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Integrations.Auth\Gma.Modules.Notifications.Integrations.Auth.csproj" />'
 }
 
 foreach ($moduleSpec in $publicApiModuleSpecs) {
@@ -1184,6 +1193,15 @@ if ($readinessModuleSpecs.Count -gt 0) {
 if ($hasAuth) {
     $programUsingLines += 'using Gma.Framework.Messaging.Infrastructure;'
     $programUsingLines += 'using Gma.Modules.Auth.Contracts;'
+    $programUsingLines += 'using Gma.Modules.Auth.Providers.OpenIdConnect;'
+}
+
+if ($hasNotifications) {
+    $programUsingLines += 'using Gma.Modules.Notifications.Adapters.Email;'
+}
+
+if ($hasAuth -and $hasNotifications) {
+    $programUsingLines += 'using Gma.Modules.Notifications.Integrations.Auth;'
 }
 
 if ($hasFiles) {
@@ -1241,6 +1259,18 @@ if ($hasFiles) {
 if ($moduleRegistrationLines.Count -gt 0) {
     $programLines += ''
     $programLines += $moduleRegistrationLines.ToArray()
+}
+
+if ($hasAuth) {
+    $programLines += 'builder.AddAuthOpenIdConnectProviders();'
+}
+
+if ($hasAuth -and $hasNotifications) {
+    $programLines += 'builder.Services.AddAuthNotificationIntegration();'
+}
+
+if ($hasNotifications) {
+    $programLines += 'builder.Services.AddNotificationEmailAdapter(builder.Configuration);'
 }
 
 foreach ($moduleSpec in $readinessModuleSpecs) {
@@ -1307,7 +1337,15 @@ $baseSettings = [ordered]@{
             GlobalPermitLimit = 300
             SensitivePermitLimit = 10
             WindowSeconds = 60
-            SensitivePathPrefixes = @('/api/auth/register', '/api/auth/login', '/api/auth/refresh')
+            SensitivePathPrefixes = @(
+                '/api/auth/register',
+                '/api/auth/login',
+                '/api/auth/refresh',
+                '/api/auth/browser',
+                '/api/auth/password',
+                '/api/auth/external',
+                '/api/auth/email-verification'
+            )
         }
         PrivateNetwork = [ordered]@{
             Enabled = $false
@@ -1353,12 +1391,50 @@ if ($hasAuth) {
         RefreshTokenLifetimeDays = 30
         FailedLoginLimit = 5
         FailedLoginWindowMinutes = 15
+        ExternalExchangeLifetimeMinutes = 5
+        ExternalLinkSessionFreshnessMinutes = 10
+        EmailVerificationLifetimeMinutes = 1440
+        EmailVerificationRequestCooldownSeconds = 60
+        Retention = [ordered]@{
+            Enabled = $false
+            ExpiredExchangeHistoryHours = 24
+            SessionHistoryDays = 365
+            BatchSize = 500
+            MaxBatchesPerCategoryPerCycle = 4
+            IntervalMinutes = 60
+        }
         RefreshTokens = [ordered]@{
             Pepper = ''
         }
         Jwt = [ordered]@{
             SigningKey = ''
             AccessTokenLifetimeMinutes = 15
+        }
+        OpenIdConnect = [ordered]@{
+            Enabled = $false
+            AllowedReturnUrls = @()
+            Providers = [ordered]@{
+                google = [ordered]@{
+                    Enabled = $false
+                    Authority = 'https://accounts.google.com'
+                    ClientId = ''
+                    ClientSecret = ''
+                    Scopes = @('openid', 'email', 'profile')
+                    EmailClaim = 'email'
+                    EmailVerifiedClaim = 'email_verified'
+                    TreatEmailAsVerified = $false
+                }
+                microsoft = [ordered]@{
+                    Enabled = $false
+                    Authority = 'https://login.microsoftonline.com/common/v2.0'
+                    ClientId = ''
+                    ClientSecret = ''
+                    Scopes = @('openid', 'email', 'profile')
+                    EmailClaim = 'email'
+                    EmailVerifiedClaim = 'email_verified'
+                    TreatEmailAsVerified = $false
+                }
+            }
         }
     }
     $developmentSettings.Auth = [ordered]@{
@@ -1404,13 +1480,34 @@ if ($hasFiles) {
 
 if ($hasNotifications) {
     $baseSettings.Notifications = [ordered]@{
+        Delivery = [ordered]@{
+            Enabled = $true
+            BatchSize = 50
+            MaxConcurrency = 8
+            PollIntervalSeconds = 5
+            LeaseSeconds = 60
+            MaxAttempts = 8
+            RetryBaseSeconds = 5
+            RetryMaxMinutes = 30
+            AttemptRetentionDays = 90
+        }
         Retention = [ordered]@{
             Enabled = $false
             ReadHistoryDays = 90
             UnreadHistoryDays = 365
             BroadcastDays = 365
             BatchSize = 500
+            MaxBatchesPerCategoryPerCycle = 4
             IntervalMinutes = 60
+        }
+        Adapters = [ordered]@{
+            Email = [ordered]@{
+                Enabled = $false
+                ProviderName = 'email'
+                SenderAddress = $null
+                SenderName = $null
+                SubjectPrefix = $null
+            }
         }
     }
 }

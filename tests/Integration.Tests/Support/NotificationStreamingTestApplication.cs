@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Gma.Framework.Notifications;
 using Gma.Framework.Realtime.Notifications;
@@ -69,11 +70,18 @@ internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled =
             });
         });
 
-        if (!tenancyEnabled)
+        builder.ConfigureTestServices(services =>
         {
-            builder.ConfigureTestServices(services =>
-                services.PostConfigure<TenantOptions>(options => options.Enabled = false));
-        }
+            // This fixture exercises the in-process streaming transports without a database.
+            // Durable history and routing policy behavior is covered by the Notifications module tests.
+            services.RemoveAll<IUserNotificationHistoryWriter>();
+            services.RemoveAll<IUserNotificationDeliveryPolicyEvaluator>();
+
+            if (!tenancyEnabled)
+            {
+                services.PostConfigure<TenantOptions>(options => options.Enabled = false);
+            }
+        });
     }
 
     public static string CreateAccessToken(string? scopeId, string userId)

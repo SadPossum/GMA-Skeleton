@@ -27,6 +27,11 @@ using Gma.Modules.TaskRuntime.Application;
 using Gma.Modules.TaskRuntime.Contracts;
 using Gma.Modules.TaskRuntime.Persistence;
 using TaskSamples.Application;
+using Gma.Modules.Notifications.Adapters.Email;
+using Gma.Modules.Notifications.Application;
+using Gma.Modules.Notifications.Contracts;
+using Gma.Modules.Notifications.Integrations.Auth;
+using Gma.Modules.Notifications.Persistence;
 
 public static class WorkerHostBuilderExtensions
 {
@@ -98,6 +103,18 @@ public static class WorkerHostBuilderExtensions
             builder.SelectModuleProfile(CatalogProfiles.Default, "Host.Worker/Catalog");
             builder.Services.AddCatalogApplication();
             builder.AddCatalogPersistence();
+        }
+
+        if (workerOptions.Modules.Notifications)
+        {
+            builder.SelectModuleProfile(NotificationsProfiles.Default, "Host.Worker/Notifications");
+            builder.Services.AddNotificationsApplication(builder.Configuration);
+            builder.AddNotificationsPersistence();
+            builder.Services.AddNotificationEmailAdapter(builder.Configuration);
+            if (workerOptions.Modules.Auth)
+            {
+                builder.Services.AddAuthNotificationIntegration();
+            }
         }
 
         if (workerOptions.Modules.Ordering)

@@ -23,6 +23,11 @@ using Gma.Framework.Tenancy.Caching;
 using Gma.Framework.Tenancy.Messaging.Infrastructure;
 using Gma.Modules.Tenancy.Api;
 using Gma.Modules.Auth.Persistence;
+using Gma.Modules.Auth.Providers.OpenIdConnect;
+using Gma.Modules.Notifications.Adapters.Email;
+using Gma.Modules.Notifications.Api;
+using Gma.Modules.Notifications.Integrations.Auth;
+using Gma.Modules.Notifications.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -44,11 +49,16 @@ builder.Services.AddApiSecurityDefaults();
 
 builder.AddModule<TenancyModule>();
 builder.AddAuthModule(AuthProfile.ScopeAware());
+builder.AddAuthOpenIdConnectProviders();
+builder.AddModule<NotificationsModule>();
+builder.Services.AddAuthNotificationIntegration();
+builder.Services.AddNotificationEmailAdapter(builder.Configuration);
 // module-scaffold:public-api-modules
 
 builder.AddServiceDefaults();
 builder.AddGmaProductionHttp();
 builder.Services.AddGmaEntityFrameworkReadinessCheck<AuthDbContext>("auth-database");
+builder.Services.AddGmaEntityFrameworkReadinessCheck<NotificationsDbContext>("notifications-database");
 builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
 

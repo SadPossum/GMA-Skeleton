@@ -249,6 +249,9 @@
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Infrastructure.JwtBearer/Gma.Modules.Auth.Infrastructure.JwtBearer.csproj" />
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Infrastructure/Gma.Modules.Auth.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/gma/modules/auth/src/OpenIdConnect/">
+    <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Providers.OpenIdConnect/Gma.Modules.Auth.Providers.OpenIdConnect.csproj" />
+  </Folder>
   <Folder Name="/gma/modules/auth/src/Persistence/">
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Persistence.PostgreSqlMigrations/Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj" />
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Persistence.SqlServerMigrations/Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj" />
@@ -275,6 +278,9 @@
   </Folder>
   <Folder Name="/gma/modules/notifications/src/Application/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Application/Gma.Modules.Notifications.Application.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/notifications/src/Auth/">
+    <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Integrations.Auth/Gma.Modules.Notifications.Integrations.Auth.csproj" />
   </Folder>
   <Folder Name="/gma/modules/notifications/src/Contracts/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Contracts/Gma.Modules.Notifications.Contracts.csproj" />

@@ -71,6 +71,30 @@ public sealed class SourceFirstGeneratorGuardTests
     }
 
     [Fact]
+    public void App_generator_composes_optional_auth_and_notification_adapters()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string generator = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-gma-app.ps1"));
+        string[] requiredTokens =
+        [
+            "Gma.Modules.Auth.Providers.OpenIdConnect.csproj",
+            "builder.AddAuthOpenIdConnectProviders();",
+            "ExternalExchangeLifetimeMinutes = 5",
+            "EmailVerificationRequestCooldownSeconds = 60",
+            "'/api/auth/browser'",
+            "OpenIdConnect = [ordered]@{",
+            "Gma.Modules.Notifications.Adapters.Email.csproj",
+            "builder.Services.AddNotificationEmailAdapter(builder.Configuration);",
+            "Gma.Modules.Notifications.Integrations.Auth.csproj",
+            "builder.Services.AddAuthNotificationIntegration();",
+            "Delivery = [ordered]@{",
+            "MaxBatchesPerCategoryPerCycle = 4",
+        ];
+
+        Assert.DoesNotContain(requiredTokens, token => !generator.Contains(token, StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void Generated_ci_uses_immutable_actions_and_release_source_set_evidence()
     {
         string repositoryRoot = FindRepositoryRoot();

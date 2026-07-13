@@ -4,6 +4,9 @@
 @password = Passw0rd!local
 @accessToken =
 @refreshToken =
+@externalCode =
+@externalIdentityId = 00000000-0000-0000-0000-000000000000
+@verificationCode =
 
 ### Register
 POST {{host}}/api/auth/register
@@ -50,3 +53,76 @@ X-Tenant-Id: {{tenant}}
 POST {{host}}/api/auth/sign-out-all
 Authorization: Bearer {{accessToken}}
 X-Tenant-Id: {{tenant}}
+
+### Authentication methods
+GET {{host}}/api/auth/methods
+Authorization: Bearer {{accessToken}}
+X-Tenant-Id: {{tenant}}
+
+### Add or change password
+PUT {{host}}/api/auth/password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "newPassword": "{{password}}",
+  "currentPassword": "{{password}}"
+}
+
+### Remove password (another sign-in method must remain)
+POST {{host}}/api/auth/password/remove
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "currentPassword": "{{password}}"
+}
+
+### Request email verification
+POST {{host}}/api/auth/email-verification
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "emailId": null
+}
+
+### Confirm email verification
+POST {{host}}/api/auth/email-verification/confirm
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "code": "{{verificationCode}}"
+}
+
+### Begin Google sign-in (open in a browser; provider must be enabled)
+GET {{host}}/api/auth/external/google/sign-in?returnUrl=https%3A%2F%2Flocalhost%3A7293%2Fauth%2Fcomplete
+X-Tenant-Id: {{tenant}}
+
+### Begin authenticated Google link (open in a browser; provider must be enabled)
+GET {{host}}/api/auth/external/google/link?returnUrl=https%3A%2F%2Flocalhost%3A7293%2Fauth%2Fcomplete
+Authorization: Bearer {{accessToken}}
+X-Tenant-Id: {{tenant}}
+
+### Exchange one-time external callback code
+POST {{host}}/api/auth/external/exchange
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "code": "{{externalCode}}"
+}
+
+### Unlink external identity (alternate authentication proof must remain)
+POST {{host}}/api/auth/external-identities/{{externalIdentityId}}/unlink
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "currentPassword": "{{password}}"
+}

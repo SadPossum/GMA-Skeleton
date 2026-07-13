@@ -28,6 +28,7 @@ using Gma.Modules.Auth.Domain.Aggregates;
 using Gma.Modules.Auth.Infrastructure;
 using Gma.Modules.Auth.Infrastructure.JwtBearer;
 using Gma.Modules.Auth.Persistence;
+using Gma.Modules.Auth.Providers.OpenIdConnect;
 using Gma.Modules.Files.Api;
 using Gma.Modules.Files.Application;
 using Gma.Modules.Files.Contracts;
@@ -36,6 +37,7 @@ using Gma.Modules.Notifications.Admin.Contracts;
 using Gma.Modules.Notifications.AdminApi;
 using Gma.Modules.Notifications.Api;
 using Gma.Modules.Notifications.Contracts;
+using Gma.Modules.Notifications.Integrations.Auth;
 using Gma.Modules.Notifications.Domain.Aggregates;
 using Gma.Modules.Notifications.Persistence;
 using Gma.Modules.TaskRuntime.Admin.Contracts;
@@ -80,6 +82,7 @@ internal static class ArchitectureCatalog
         new("Auth", "Gma.Modules.Auth.Domain", ModuleProjectKind.Domain, typeof(Member).Assembly),
         new("Auth", "Gma.Modules.Auth.Infrastructure", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Infrastructure.DependencyInjection).Assembly),
         new("Auth", "Gma.Modules.Auth.Infrastructure.JwtBearer", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Infrastructure.JwtBearer.DependencyInjection).Assembly),
+        new("Auth", "Gma.Modules.Auth.Providers.OpenIdConnect", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Providers.OpenIdConnect.DependencyInjection).Assembly),
         new("Auth", "Gma.Modules.Auth.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.Auth.Persistence.DependencyInjection).Assembly),
 
         new("Catalog", "Catalog.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(CatalogAdminPermissions).Assembly),
@@ -99,6 +102,7 @@ internal static class ArchitectureCatalog
         new("Notifications", "Gma.Modules.Notifications.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(NotificationsAdminPermissions).Assembly),
         new("Notifications", "Gma.Modules.Notifications.AdminApi", ModuleProjectKind.AdminApi, typeof(NotificationsAdminApiModule).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Adapters.Email", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Notifications.Adapters.Email.DependencyInjection).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.Integrations.Auth", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Notifications.Integrations.Auth.DependencyInjection).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Notifications.Application.DependencyInjection).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Contracts", ModuleProjectKind.Contracts, typeof(NotificationsModuleMetadata).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Domain", ModuleProjectKind.Domain, typeof(UserNotification).Assembly),
