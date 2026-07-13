@@ -96,6 +96,7 @@ public sealed class WorkerHostIntegrationTests
         builder.Configuration["NatsConsumers:FetchBatchSize"] = "1";
         builder.Configuration["NatsConsumers:PollInterval"] = "00:00:00.100";
         builder.Configuration["NatsConsumers:AckWait"] = "00:00:05";
+        builder.Configuration["NatsConsumers:AckProgressInterval"] = "00:00:01";
         builder.Configuration["NatsConsumers:HandlerTimeout"] = "00:00:05";
         builder.Configuration["NatsConsumers:NakDelay"] = "00:00:00.100";
         builder.Configuration["Outbox:BatchSize"] = "5";

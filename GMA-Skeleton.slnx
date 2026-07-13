@@ -7,9 +7,26 @@
     <File Path=".github/workflows/release-source-set.yml" />
     <File Path=".github/workflows/validate.yml" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".github/dependabot.yml" />
+    <File Path=".gitignore" />
+    <File Path=".gitmodules" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="Gma.SourceRoots.props.example" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="global.json" />
+    <File Path="gma/README.md" />
+    <File Path="gma/modules/README.md" />
+    <File Path="nuget.config" />
+  </Folder>
   <Folder Name="/docs/">
-    <File Path="docs/production-readiness.md" />
     <File Path="docs/README.md" />
+    <File Path="docs/production-readiness.md" />
   </Folder>
   <Folder Name="/docs/architecture/">
     <File Path="docs/architecture/composition-tooling-alignment-task.md" />
@@ -39,8 +56,8 @@
     <File Path="eng/new-gma-app.ps1" />
     <File Path="eng/new-module.ps1" />
     <File Path="eng/restore.ps1" />
-    <File Path="eng/run-admin.ps1" />
     <File Path="eng/run-admin-api.ps1" />
+    <File Path="eng/run-admin.ps1" />
     <File Path="eng/run-api.ps1" />
     <File Path="eng/run-aspire.ps1" />
     <File Path="eng/run-worker.ps1" />
@@ -249,23 +266,6 @@
   <Folder Name="/requests/">
     <File Path="requests/admin-api.http" />
     <File Path="requests/auth.http" />
-  </Folder>
-  <Folder Name="/Solution Items/">
-    <File Path=".config/dotnet-tools.json" />
-    <File Path=".editorconfig" />
-    <File Path=".gitattributes" />
-    <File Path=".github/dependabot.yml" />
-    <File Path=".gitignore" />
-    <File Path=".gitmodules" />
-    <File Path="Directory.Build.props" />
-    <File Path="Directory.Packages.props" />
-    <File Path="global.json" />
-    <File Path="Gma.SourceRoots.props.example" />
-    <File Path="gma/modules/README.md" />
-    <File Path="gma/README.md" />
-    <File Path="LICENSE" />
-    <File Path="nuget.config" />
-    <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ServiceDefaults/ServiceDefaults.csproj" />
