@@ -44,6 +44,7 @@
   <Folder Name="/eng/">
     <File Path="eng/add-migration.ps1" />
     <File Path="eng/build.ps1" />
+    <File Path="eng/check-generated-app-selections.ps1" />
     <File Path="eng/check-migrations.ps1" />
     <File Path="eng/check-source-packages.ps1" />
     <File Path="eng/check-submodule-dev-heads.ps1" />
@@ -65,6 +66,12 @@
     <File Path="eng/test-docker.ps1" />
     <File Path="eng/test-fast.ps1" />
     <File Path="eng/verify.ps1" />
+  </Folder>
+  <Folder Name="/gma/extensions/src/">
+    <Project Path="gma/extensions/src/Gma.Extensions.Auth.Notifications/Gma.Extensions.Auth.Notifications.csproj" />
+  </Folder>
+  <Folder Name="/gma/extensions/tests/">
+    <Project Path="gma/extensions/tests/Gma.Extensions.Auth.Notifications.Tests/Gma.Extensions.Auth.Notifications.Tests.csproj" />
   </Folder>
   <Folder Name="/gma/framework/src/Administration/">
     <Project Path="gma/framework/src/Administration/Gma.Framework.Administration.AccessControl/Gma.Framework.Administration.AccessControl.csproj" />
@@ -278,9 +285,6 @@
   </Folder>
   <Folder Name="/gma/modules/notifications/src/Application/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Application/Gma.Modules.Notifications.Application.csproj" />
-  </Folder>
-  <Folder Name="/gma/modules/notifications/src/Auth/">
-    <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Integrations.Auth/Gma.Modules.Notifications.Integrations.Auth.csproj" />
   </Folder>
   <Folder Name="/gma/modules/notifications/src/Contracts/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Contracts/Gma.Modules.Notifications.Contracts.csproj" />

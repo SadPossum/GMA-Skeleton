@@ -28,7 +28,9 @@ public sealed class NotificationStreamingIntegrationTests
             request,
             HttpCompletionOption.ResponseHeadersRead,
             timeout.Token);
-        await Task.Delay(150, timeout.Token);
+
+        using HttpResponseMessage response = await responseTask.WaitAsync(timeout.Token);
+        response.EnsureSuccessStatusCode();
         await application.PublishAsync(
             "tenant-a",
             "user-a",
@@ -36,9 +38,7 @@ public sealed class NotificationStreamingIntegrationTests
             NotificationSeverity.Warning,
             timeout.Token);
 
-        using HttpResponseMessage response = await responseTask.WaitAsync(timeout.Token);
-        response.EnsureSuccessStatusCode();
-        string dataLine = await ReadDataLineAsync(response, timeout.Token);
+        string dataLine = await ReadDataLineContainingAsync(response, "SSE message", timeout.Token);
 
         Assert.Contains("SSE message", dataLine, StringComparison.Ordinal);
         Assert.Contains("streaming.test", dataLine, StringComparison.Ordinal);
@@ -77,16 +77,19 @@ public sealed class NotificationStreamingIntegrationTests
             request,
             HttpCompletionOption.ResponseHeadersRead,
             timeout.Token);
-        await Task.Delay(150, timeout.Token);
+
+        using HttpResponseMessage response = await responseTask.WaitAsync(timeout.Token);
+        response.EnsureSuccessStatusCode();
         await application.PublishAsync(
             "default",
             "user-a",
             "Default tenant SSE message",
             cancellationToken: timeout.Token);
 
-        using HttpResponseMessage response = await responseTask.WaitAsync(timeout.Token);
-        response.EnsureSuccessStatusCode();
-        string dataLine = await ReadDataLineAsync(response, timeout.Token);
+        string dataLine = await ReadDataLineContainingAsync(
+            response,
+            "Default tenant SSE message",
+            timeout.Token);
 
         Assert.Contains("Default tenant SSE message", dataLine, StringComparison.Ordinal);
     }
@@ -179,7 +182,10 @@ public sealed class NotificationStreamingIntegrationTests
         Assert.Equal("user-a", message.UserId);
     }
 
-    private static async Task<string> ReadDataLineAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    private static async Task<string> ReadDataLineContainingAsync(
+        HttpResponseMessage response,
+        string expectedContent,
+        CancellationToken cancellationToken)
     {
         await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
         using StreamReader reader = new(stream);
@@ -192,12 +198,14 @@ public sealed class NotificationStreamingIntegrationTests
                 break;
             }
 
-            if (line.StartsWith("data:", StringComparison.Ordinal))
+            if (line.StartsWith("data:", StringComparison.Ordinal) &&
+                line.Contains(expectedContent, StringComparison.Ordinal))
             {
                 return line;
             }
         }
 
-        throw new InvalidOperationException("No SSE data line was received.");
+        throw new InvalidOperationException(
+            $"No SSE data line containing '{expectedContent}' was received.");
     }
 }

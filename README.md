@@ -8,6 +8,7 @@ GMA-Skeleton is a .NET 10 modular monolith skeleton for building projects from o
 The repo is intentionally small and explicit:
 
 - modules are registered by the host, not discovered by assembly scanning;
+- reusable modules remain independently buildable; optional cross-module bridges live in `GMA-Extensions` and are composed by the host;
 - cross-module communication goes through contracts and integration events;
 - EF Core is the practical unit of work;
 - tenant support starts with shared-database isolation through `TenantId`;
@@ -72,6 +73,7 @@ Standalone source-repo entrypoints are available for focused framework/module wo
 
 ```powershell
 dotnet build gma\framework\Gma.Framework.slnx --no-restore
+dotnet build gma\extensions\Gma.Extensions.slnx --no-restore
 dotnet build gma\modules\auth\Gma.Modules.Auth.slnx --no-restore
 dotnet build gma\modules\notifications\Gma.Modules.Notifications.slnx --no-restore
 ```
@@ -100,6 +102,7 @@ Useful entry points:
 - [Source-First Apps](docs/getting-started/source-first-apps.md)
 - [Architecture Overview](docs/architecture/overview.md)
 - [GMA Framework Docs](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/README.md)
+- [GMA Extensions](https://github.com/SadPossum/GMA-Extensions/blob/dev/docs/README.md)
 - [Module System](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/module-system.md)
 - [Administration Architecture](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/administration.md)
 - [Messaging and Outbox](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/architecture/messaging-and-outbox.md)
@@ -119,5 +122,5 @@ HTTP examples live in [requests/auth.http](requests/auth.http) and [requests/adm
 
 ## Project Status
 
-This is a work-in-progress skeleton. The current reusable modules are AccessControl, Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy.
+This is a work-in-progress skeleton. The current reusable modules are AccessControl, Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy. Optional reusable cross-module composition lives in GMA Extensions.
 Catalog, Ordering, and TaskSamples are compiled optional example modules used to prove stored data, admin surfaces, caching, cross-module integration, notifications, and task execution without being registered in default hosts.

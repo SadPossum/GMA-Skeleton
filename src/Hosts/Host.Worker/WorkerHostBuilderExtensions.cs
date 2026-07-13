@@ -30,7 +30,7 @@ using TaskSamples.Application;
 using Gma.Modules.Notifications.Adapters.Email;
 using Gma.Modules.Notifications.Application;
 using Gma.Modules.Notifications.Contracts;
-using Gma.Modules.Notifications.Integrations.Auth;
+using Gma.Extensions.Auth.Notifications;
 using Gma.Modules.Notifications.Persistence;
 
 public static class WorkerHostBuilderExtensions
@@ -113,7 +113,7 @@ public static class WorkerHostBuilderExtensions
             builder.Services.AddNotificationEmailAdapter(builder.Configuration);
             if (workerOptions.Modules.Auth)
             {
-                builder.Services.AddAuthNotificationIntegration();
+                builder.Services.AddAuthNotificationsExtension();
             }
         }
 

@@ -17,6 +17,7 @@ MyProduct/
       MyProduct.SharedKernel/
   gma/
     framework/              # submodule: SadPossum/GMA-Framework
+    extensions/             # optional submodule: SadPossum/GMA-Extensions
     modules/
       access-control/       # submodule: SadPossum/GMA-Module-Access-Control
       auth/                 # submodule: SadPossum/GMA-Module-Auth
@@ -24,7 +25,7 @@ MyProduct/
       notifications/        # submodule: SadPossum/GMA-Module-Notifications
 ```
 
-`src/Hosts` contains process entrypoints, `src/Modules` contains app-owned domain modules, and `src/Shared` contains the app-owned shared kernel. GMA framework code remains under `gma/framework`, and reusable GMA modules remain under `gma/modules/<alias>`. Do not put app-specific shared code inside GMA repositories just because the code is convenient today.
+`src/Hosts` contains process entrypoints, `src/Modules` contains app-owned domain modules, and `src/Shared` contains the app-owned shared kernel. GMA framework code remains under `gma/framework`, reusable GMA modules remain under `gma/modules/<alias>`, and optional bridges that intentionally know multiple modules live under `gma/extensions`. Do not put app-specific shared code inside GMA repositories just because the code is convenient today.
 
 ## Create An App
 
@@ -36,7 +37,7 @@ Generate a source-first shell:
 
 Omit `-Modules` for a framework-only app shell. Use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. For selected modules that expose a public `IModule` front door, the generated API host adds the project reference and explicit module registration. AccessControl, Administration, TaskRuntime, and other admin/worker-only selections are mounted without silently adding those surfaces to the public API; add their hosts deliberately when the product needs them.
 
-The generated shell is runnable and startup-tested. It includes production HTTP policy, liveness/readiness endpoints, local development settings, explicit SQL-provider migration tooling, an app-module scaffold wrapper, and architecture/startup tests. Selected Auth/Notifications databases contribute readiness checks; Auth composes the generic OpenID Connect adapter; Notifications composes the transport-neutral email adapter; and selecting both adds the narrow Auth notification bridge. Every adapter is disabled or inert until the app supplies explicit provider credentials and transport configuration. Files gets local storage for development and requires a content-inspection adapter in production. Cloud credentials, trusted proxy addresses, real secrets, shared Data Protection storage for multi-replica OIDC callbacks, messaging topology, enabled external identity providers, email transport, admin hosts, workers, and retention policy remain deliberate app/deployment choices.
+The generated shell is runnable and startup-tested. It includes production HTTP policy, liveness/readiness endpoints, local development settings, explicit SQL-provider migration tooling, an app-module scaffold wrapper, and architecture/startup tests. Selected Auth/Notifications databases contribute readiness checks; Auth composes the generic OpenID Connect adapter; Notifications composes the transport-neutral email adapter; and selecting both mounts the composition-owned `Gma.Extensions.Auth.Notifications` bridge. Selecting either module alone does not mount or reference that bridge, so both modules remain independently buildable. Every adapter is disabled or inert until the app supplies explicit provider credentials and transport configuration. Files gets local storage for development and requires a content-inspection adapter in production. Cloud credentials, trusted proxy addresses, real secrets, shared Data Protection storage for multi-replica OIDC callbacks, messaging topology, enabled external identity providers, email transport, admin hosts, workers, and retention policy remain deliberate app/deployment choices.
 
 The generated `Directory.Packages.props` is seeded from the skeleton catalog so app-owned modules created later can restore immediately. Treat it as product-owned after generation: prune unused versions when convenient and add app-specific package versions deliberately.
 
@@ -50,6 +51,7 @@ For a real app, add source repositories at the same mount paths as Git submodule
 ```powershell
 git submodule add https://github.com/SadPossum/GMA-Framework.git gma/framework
 git submodule add https://github.com/SadPossum/GMA-Module-Auth.git gma/modules/auth
+git submodule add https://github.com/SadPossum/GMA-Extensions.git gma/extensions
 .\eng\gma-update.ps1 -Init
 .\eng\gma-bootstrap.ps1
 .\eng\gma-validate.ps1

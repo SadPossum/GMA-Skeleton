@@ -97,11 +97,13 @@ internal sealed class GmaSourceLayout
     private GmaSourceLayout(
         string repositoryRoot,
         string frameworkRoot,
+        string extensionsRoot,
         string modulesRoot,
         IReadOnlyDictionary<string, string> moduleRoots)
     {
         this.RepositoryRoot = EnsureTrailingSeparator(Path.GetFullPath(repositoryRoot));
         this.FrameworkRoot = EnsureTrailingSeparator(Path.GetFullPath(frameworkRoot));
+        this.ExtensionsRoot = EnsureTrailingSeparator(Path.GetFullPath(extensionsRoot));
         this.ModulesRoot = EnsureTrailingSeparator(Path.GetFullPath(modulesRoot));
         this.ModuleRoots = moduleRoots
             .ToDictionary(
@@ -114,12 +116,15 @@ internal sealed class GmaSourceLayout
 
     public string FrameworkRoot { get; }
 
+    public string ExtensionsRoot { get; }
+
     public string ModulesRoot { get; }
 
     public IReadOnlyDictionary<string, string> ModuleRoots { get; }
 
     public bool UsesExternalSourceRoots =>
         !IsUnder(this.FrameworkRoot, Path.Combine(this.RepositoryRoot, "src", "Framework")) ||
+        !IsUnder(this.ExtensionsRoot, Path.Combine(this.RepositoryRoot, "gma", "extensions")) ||
         this.ModuleRoots.Values.Any(root => !IsUnder(root, Path.Combine(this.RepositoryRoot, "src", "Modules")));
 
     public static GmaSourceLayout FromRepositoryRoot(string repositoryRoot)
@@ -130,6 +135,7 @@ internal sealed class GmaSourceLayout
             ["MSBuildThisFileDirectory"] = normalizedRepositoryRoot,
             ["GmaRepositoryRoot"] = normalizedRepositoryRoot,
             ["GmaFrameworkRoot"] = Path.Combine(normalizedRepositoryRoot, "src", "Framework") + Path.DirectorySeparatorChar,
+            ["GmaExtensionsRoot"] = Path.Combine(normalizedRepositoryRoot, "gma", "extensions", "src") + Path.DirectorySeparatorChar,
             ["GmaModulesRoot"] = Path.Combine(normalizedRepositoryRoot, "src", "Modules") + Path.DirectorySeparatorChar,
         };
 
@@ -161,6 +167,7 @@ internal sealed class GmaSourceLayout
         return new GmaSourceLayout(
             normalizedRepositoryRoot,
             properties["GmaFrameworkRoot"],
+            properties["GmaExtensionsRoot"],
             properties["GmaModulesRoot"],
             ModulePropertyNames.ToDictionary(
                 pair => pair.Key,
@@ -182,6 +189,8 @@ internal sealed class GmaSourceLayout
             ? Path.GetDirectoryName(this.FrameworkRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)) ?? this.FrameworkRoot
             : this.FrameworkRoot;
 
+    public string ExtensionsRepositoryRoot => GetPackageRoot(this.ExtensionsRoot);
+
     public IEnumerable<string> DocumentationRoots()
     {
         string rootDocs = Path.Combine(this.RepositoryRoot, "docs");
@@ -194,6 +203,12 @@ internal sealed class GmaSourceLayout
         if (Directory.Exists(frameworkDocs))
         {
             yield return frameworkDocs;
+        }
+
+        string extensionsDocs = Path.Combine(this.ExtensionsRepositoryRoot, "docs");
+        if (Directory.Exists(extensionsDocs))
+        {
+            yield return extensionsDocs;
         }
 
         foreach (string moduleRoot in this.ModuleRoots.Values.Order(StringComparer.OrdinalIgnoreCase))

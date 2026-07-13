@@ -12,6 +12,7 @@ else {
 
 $gmaSourceRootChecks = @(
     @{ Name = 'framework'; Path = 'gma\framework\Gma.SourceRoots.props' },
+    @{ Name = 'extensions'; Path = 'gma\extensions\Gma.SourceRoots.props' },
     @{ Name = 'administration'; Path = 'gma\modules\administration\Gma.SourceRoots.props' },
     @{ Name = 'auth'; Path = 'gma\modules\auth\Gma.SourceRoots.props' },
     @{ Name = 'files'; Path = 'gma\modules\files\Gma.SourceRoots.props' },

@@ -8,6 +8,7 @@
 
   <PropertyGroup>
     <GmaFrameworkRoot Condition="'$(GmaFrameworkRoot)' == ''">$(GmaRepositoryRoot)src\Framework\</GmaFrameworkRoot>
+    <GmaExtensionsRoot Condition="'$(GmaExtensionsRoot)' == ''">$(GmaRepositoryRoot)gma\extensions\src\</GmaExtensionsRoot>
     <GmaModulesRoot Condition="'$(GmaModulesRoot)' == ''">$(GmaRepositoryRoot)src\Modules\</GmaModulesRoot>
     <GmaModuleAccessControlRoot Condition="'$(GmaModuleAccessControlRoot)' == ''">$(GmaModulesRoot)AccessControl\</GmaModuleAccessControlRoot>
     <GmaModuleAdministrationRoot Condition="'$(GmaModuleAdministrationRoot)' == ''">$(GmaModulesRoot)Administration\</GmaModuleAdministrationRoot>

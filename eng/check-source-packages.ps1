@@ -11,4 +11,6 @@ if (-not (Test-Path -LiteralPath $implementation -PathType Leaf)) {
     throw 'GMA framework tooling is not mounted. Run eng/gma-update.ps1 -Init first.'
 }
 
-& $implementation @PSBoundParameters -RepositoryRoot $repositoryRoot
+& $implementation @PSBoundParameters `
+    -RepositoryRoot $repositoryRoot `
+    -PathPrefix @('gma/framework', 'gma/extensions', 'gma/modules/')

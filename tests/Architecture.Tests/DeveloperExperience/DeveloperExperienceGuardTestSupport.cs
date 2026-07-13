@@ -736,6 +736,14 @@ public sealed partial class DeveloperExperienceGuardTests
             return frameworkPath;
         }
 
+        string? extensionsPath = NormalizeSourceRoot(
+            "GmaExtensionsRoot",
+            [@"..\Extensions\", @"..\..\gma\extensions\src\"]);
+        if (extensionsPath is not null)
+        {
+            return extensionsPath;
+        }
+
         (string PropertyName, string FolderName)[] moduleRoots =
         [
             ("GmaModuleAccessControlRoot", "AccessControl"),

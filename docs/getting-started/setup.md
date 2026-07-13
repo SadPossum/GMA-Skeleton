@@ -205,6 +205,7 @@ Use `GMA-Skeleton.slnx` for the full skeleton/composition repository. Use the fo
 
 ```text
 gma/framework/Gma.Framework.slnx
+gma/extensions/Gma.Extensions.slnx
 gma/modules/access-control/Gma.Modules.AccessControl.slnx
 gma/modules/administration/Gma.Modules.Administration.slnx
 gma/modules/auth/Gma.Modules.Auth.slnx
@@ -218,6 +219,7 @@ Those focused solutions live inside the mounted source repositories. Their paths
 
 ```text
 gma/framework/Gma.Framework.slnx
+gma/extensions/Gma.Extensions.slnx
 gma/modules/auth/Gma.Modules.Auth.slnx
 gma/modules/notifications/Gma.Modules.Notifications.slnx
 ```
@@ -240,7 +242,7 @@ The script verifies focused `.slnx` ownership, stale root docs/tests, package-lo
 
 ## Source-First GMA Development
 
-The skeleton repository consumes the framework and reusable modules as Git submodules under `gma/framework` and `gma/modules/<alias>`. Framework references go through `GmaFrameworkRoot`, and module references go through `GmaModule*Root` properties with checked-in defaults in `Directory.Build.props`.
+The skeleton repository consumes the framework, optional cross-module extensions, and reusable modules as Git submodules under `gma/framework`, `gma/extensions`, and `gma/modules/<alias>`. Framework references go through `GmaFrameworkRoot`, extensions through `GmaExtensionsRoot`, and module references through `GmaModule*Root` properties with checked-in defaults in `Directory.Build.props`.
 
 To create a local override file:
 
@@ -248,15 +250,15 @@ To create a local override file:
 .\eng\gma-bootstrap.ps1
 ```
 
-This copies `Gma.SourceRoots.props.example` to ignored `Gma.SourceRoots.props`. Edit that local file when a production app stores the framework or reusable modules outside the default `gma/framework` and `gma/modules` layout.
+This copies `Gma.SourceRoots.props.example` to ignored `Gma.SourceRoots.props`. Edit that local file when a production app stores the framework, extensions, or reusable modules outside the default `gma/` layout.
 
-For an app-style checkout that already has flattened GMA source repositories mounted under `gma/framework` and `gma/modules/<alias>`, bootstrap the root, framework, and module-local source-root files with:
+For an app-style checkout that already has flattened GMA source repositories mounted under `gma/framework`, `gma/extensions`, and `gma/modules/<alias>`, bootstrap the root and every mounted repository's local source-root file with:
 
 ```powershell
 .\eng\gma-bootstrap.ps1 -SourceLayout GmaSubmodules
 ```
 
-That command writes ignored `Gma.SourceRoots.props` files at the skeleton root, `gma/framework`, and each mounted reusable module root. The module-local files are required because each source repository imports its own `Directory.Build.props`; the skeleton root props file does not flow into projects inside a mounted source repository. Use `-WhatIf` to preview writes and `-Force` to refresh existing local files.
+That command writes ignored `Gma.SourceRoots.props` files at the skeleton root, `gma/framework`, `gma/extensions`, and each mounted reusable module root. Repository-local files are required because each source repository imports its own `Directory.Build.props`; the skeleton root props file does not flow into mounted repositories. Use `-WhatIf` to preview writes and `-Force` to refresh existing local files.
 
 The one-off Stage 8/Stage 9 source-split automation is no longer part of the live `eng/` workflow. The decisions and command history remain in [the rebrand/source-split architecture note](../architecture/gma-rebrand-and-source-repo-split.md), but day-to-day work should use the source-first scripts listed below.
 
@@ -269,7 +271,7 @@ cd .tmp\SampleApp
 .\eng\gma-validate.ps1
 ```
 
-The generated app keeps process entrypoints under `src\Hosts`, app-owned modules under `src\Modules`, and app-owned shared code in `src\Shared\SampleApp.SharedKernel`. It mounts GMA framework and explicitly selected reusable modules under `gma\...`, composes selected public API modules in the generated API host, and validates through its own `.slnx`. Use `-Modules auth,notifications` or another explicit list for the reusable modules the app wants; omit `-Modules` for a framework-only shell, or use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. The root README stays app-facing, while generated GMA operating notes live in `docs\gma-source.md`. Admin CLI/API and worker-only module surfaces stay explicit app-owned host work. The template also includes `.github\workflows\validate.yml`; set `GMA_CI_TOKEN` only when private GMA submodules need cross-repository read access in GitHub Actions.
+The generated app keeps process entrypoints under `src\Hosts`, app-owned modules under `src\Modules`, and app-owned shared code in `src\Shared\SampleApp.SharedKernel`. It mounts GMA framework and explicitly selected reusable modules under `gma\...`, composes selected public API modules in the generated API host, and validates through its own `.slnx`. Selecting both Auth and Notifications also mounts `gma/extensions` and composes `Gma.Extensions.Auth.Notifications`; selecting either module alone keeps that extension absent. Use `-Modules auth,notifications` or another explicit list for the reusable modules the app wants; omit `-Modules` for a framework-only shell, or use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. The root README stays app-facing, while generated GMA operating notes live in `docs\gma-source.md`. Admin CLI/API and worker-only module surfaces stay explicit app-owned host work. The template also includes `.github\workflows\validate.yml`; set `GMA_CI_TOKEN` only when private GMA submodules need cross-repository read access in GitHub Actions.
 
 See [Source-first apps](source-first-apps.md) for the app layout, patch/update workflow, upstream-vs-app-local guidance, and submodule detached-HEAD warning.
 

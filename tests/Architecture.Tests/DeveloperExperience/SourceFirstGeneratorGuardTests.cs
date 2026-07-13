@@ -85,13 +85,34 @@ public sealed class SourceFirstGeneratorGuardTests
             "OpenIdConnect = [ordered]@{",
             "Gma.Modules.Notifications.Adapters.Email.csproj",
             "builder.Services.AddNotificationEmailAdapter(builder.Configuration);",
-            "Gma.Modules.Notifications.Integrations.Auth.csproj",
-            "builder.Services.AddAuthNotificationIntegration();",
+            "GMA-Extensions.git",
+            "GmaExtensionsRoot",
+            "Gma.Extensions.Auth.Notifications.csproj",
+            "builder.Services.AddAuthNotificationsExtension();",
             "Delivery = [ordered]@{",
             "MaxBatchesPerCategoryPerCycle = 4",
         ];
 
         Assert.DoesNotContain(requiredTokens, token => !generator.Contains(token, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void App_generator_selection_matrix_guards_optional_extension_composition()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string script = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "check-generated-app-selections.ps1"));
+        string[] requiredTokens =
+        [
+            "AuthOnly",
+            "NotificationsOnly",
+            "AuthNotifications",
+            "HasExtension = $false",
+            "HasExtension = $true",
+            "Gma.Extensions.Auth.Notifications",
+            "AddAuthNotificationsExtension",
+        ];
+
+        Assert.DoesNotContain(requiredTokens, token => !script.Contains(token, StringComparison.Ordinal));
     }
 
     [Fact]

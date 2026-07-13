@@ -26,7 +26,7 @@ using Gma.Modules.Auth.Persistence;
 using Gma.Modules.Auth.Providers.OpenIdConnect;
 using Gma.Modules.Notifications.Adapters.Email;
 using Gma.Modules.Notifications.Api;
-using Gma.Modules.Notifications.Integrations.Auth;
+using Gma.Extensions.Auth.Notifications;
 using Gma.Modules.Notifications.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -51,7 +51,7 @@ builder.AddModule<TenancyModule>();
 builder.AddAuthModule(AuthProfile.ScopeAware());
 builder.AddAuthOpenIdConnectProviders();
 builder.AddModule<NotificationsModule>();
-builder.Services.AddAuthNotificationIntegration();
+builder.Services.AddAuthNotificationsExtension();
 builder.Services.AddNotificationEmailAdapter(builder.Configuration);
 // module-scaffold:public-api-modules
 

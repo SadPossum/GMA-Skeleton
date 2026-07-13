@@ -47,6 +47,7 @@ function Get-GmaRootSourceRootsLines {
         '<Project>',
         '  <PropertyGroup>',
         '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)gma\framework\src\</GmaFrameworkRoot>',
+        '    <GmaExtensionsRoot>$(MSBuildThisFileDirectory)gma\extensions\src\</GmaExtensionsRoot>',
         '    <GmaModulesRoot>$(MSBuildThisFileDirectory)gma\modules\</GmaModulesRoot>',
         '    <GmaModuleAccessControlRoot>$(GmaModulesRoot)access-control\src\</GmaModuleAccessControlRoot>',
         '    <GmaModuleAdministrationRoot>$(GmaModulesRoot)administration\src\</GmaModuleAdministrationRoot>',
@@ -68,6 +69,19 @@ function Get-GmaFrameworkSourceRootsLines {
         '<Project>',
         '  <PropertyGroup>',
         '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)src\</GmaFrameworkRoot>',
+        '  </PropertyGroup>',
+        '</Project>'
+    )
+}
+
+function Get-GmaExtensionsSourceRootsLines {
+    return @(
+        '<Project>',
+        '  <PropertyGroup>',
+        '    <GmaExtensionsRoot>$(MSBuildThisFileDirectory)src\</GmaExtensionsRoot>',
+        '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)..\framework\src\</GmaFrameworkRoot>',
+        '    <GmaModuleAuthRoot>$(MSBuildThisFileDirectory)..\modules\auth\src\</GmaModuleAuthRoot>',
+        '    <GmaModuleNotificationsRoot>$(MSBuildThisFileDirectory)..\modules\notifications\src\</GmaModuleNotificationsRoot>',
         '  </PropertyGroup>',
         '</Project>'
     )
@@ -136,6 +150,11 @@ $sourceRootTargets.Add([pscustomobject] @{
     Path = Join-GmaPath 'gma\framework\Gma.SourceRoots.props'
     Lines = Get-GmaFrameworkSourceRootsLines
     Description = 'framework source-root configuration'
+})
+$sourceRootTargets.Add([pscustomobject] @{
+    Path = Join-GmaPath 'gma\extensions\Gma.SourceRoots.props'
+    Lines = Get-GmaExtensionsSourceRootsLines
+    Description = 'extensions source-root configuration'
 })
 
 foreach ($moduleAlias in $moduleAliases) {

@@ -7,6 +7,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 | Package | Source repository docs | Local checkout path |
 | --- | --- | --- |
 | GMA Framework | [Docs](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/README.md) | `gma/framework/docs/README.md` |
+| GMA Extensions | [Docs](https://github.com/SadPossum/GMA-Extensions/blob/dev/docs/README.md) | `gma/extensions/docs/README.md` |
 | AccessControl | [Docs](https://github.com/SadPossum/GMA-Module-Access-Control/blob/dev/docs/README.md) | `gma/modules/access-control/docs/README.md` |
 | Administration | [Docs](https://github.com/SadPossum/GMA-Module-Administration/blob/dev/docs/README.md) | `gma/modules/administration/docs/README.md` |
 | Auth | [Docs](https://github.com/SadPossum/GMA-Module-Auth/blob/dev/docs/README.md) | `gma/modules/auth/docs/README.md` |
@@ -36,6 +37,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 
 - Keep skeleton docs in `docs/`.
 - Keep reusable framework docs in the framework repository's root `docs/` folder.
+- Keep reusable cross-module bridge docs in the extensions repository's root `docs/` folder.
 - Keep reusable module docs in the module repository's root `docs/` folder.
 - Mention local mounted paths such as `gma/framework/docs/` when useful for local development, but do not make skeleton Markdown links point deep into `gma/...` submodule files.
 - Keep example-module docs in the example module folder; examples are skeleton-owned and do not get reusable package `.slnx` entrypoints.

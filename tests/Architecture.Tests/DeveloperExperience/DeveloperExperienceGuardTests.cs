@@ -1364,6 +1364,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] requiredProperties =
         [
             "GmaFrameworkRoot",
+            "GmaExtensionsRoot",
             "GmaModulesRoot",
             "GmaModuleAccessControlRoot",
             "GmaModuleAdministrationRoot",
@@ -1402,10 +1403,12 @@ public sealed partial class DeveloperExperienceGuardTests
             "SourceLayout",
             "GmaSubmodules",
             @"gma\framework\src\",
+            @"gma\extensions\src\",
             @"gma\modules\",
             @"$(GmaModulesRoot)access-control\src\",
             @"$(GmaModulesRoot)auth\src\",
             @"..\..\framework\src\",
+            @"gma\extensions\Gma.SourceRoots.props",
             @"gma\modules\$moduleAlias\Gma.SourceRoots.props",
             "task-runtime"
         ];
@@ -1413,14 +1416,16 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             "GMA source package roots:",
             "eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules",
+            @"gma\extensions\Gma.SourceRoots.props",
             @"gma\modules\auth\Gma.SourceRoots.props"
         ];
         string[] requiredDocsTokens =
         [
             "gma-bootstrap.ps1 -SourceLayout GmaSubmodules",
+            "gma/extensions",
             "gma/framework",
             "gma/modules/<alias>",
-            "module-local files are required"
+            "Repository-local files are required"
         ];
         string[] offenders = requiredBootstrapTokens
             .Where(token => !bootstrapScript.Contains(token, StringComparison.Ordinal))
@@ -1537,6 +1542,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] submodulePaths =
         [
             "gma/framework",
+            "gma/extensions",
             "gma/modules/administration",
             "gma/modules/auth",
             "gma/modules/files",
@@ -1693,7 +1699,12 @@ public sealed partial class DeveloperExperienceGuardTests
             "AddAuthModule(AuthProfile.Global())",
             "AddAuthModule(AuthProfile.ScopeAware())",
             "Gma.SourceRoots.props.example",
+            "GMA-Extensions.git",
+            "GmaExtensionsRoot",
+            "Gma.Extensions.Auth.Notifications",
+            "AddAuthNotificationsExtension",
             "gma\\framework",
+            "gma\\extensions",
             "gma\\modules",
             "eng\\gma-bootstrap.ps1",
             "eng\\gma-update.ps1",
@@ -1735,6 +1746,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "Admin CLI/API and worker-only",
             "Cloud credentials",
             "gma\\framework",
+            "gma/extensions",
             "gma\\modules",
             "detached `HEAD`",
             "Upstream Or App-Local"
@@ -1892,6 +1904,18 @@ public sealed partial class DeveloperExperienceGuardTests
                     "eng/bootstrap-source-roots.ps1",
                     "eng/new-module.ps1"
                 ]),
+            ["Gma.Extensions.slnx"] = (
+                Path.Combine(sourceLayout.ExtensionsRepositoryRoot, "Gma.Extensions.slnx"),
+                [
+                    "src/Gma.Extensions.Auth.Notifications/Gma.Extensions.Auth.Notifications.csproj",
+                    "tests/Gma.Extensions.Auth.Notifications.Tests/Gma.Extensions.Auth.Notifications.Tests.csproj"
+                ],
+                [
+                    ".github/workflows/validate.yml",
+                    "docs/README.md",
+                    "eng/bootstrap-source-roots.ps1",
+                    "README.md"
+                ]),
             ["Gma.Modules.AccessControl.slnx"] = (
                 Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"),
                 [
@@ -2015,6 +2039,7 @@ public sealed partial class DeveloperExperienceGuardTests
         Dictionary<string, (string SolutionPath, string[] AllowedFolders)> packages = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Gma.Framework.slnx"] = (Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
+            ["Gma.Extensions.slnx"] = (Path.Combine(sourceLayout.ExtensionsRepositoryRoot, "Gma.Extensions.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
             ["Gma.Modules.AccessControl.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
             ["Gma.Modules.Administration.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
             ["Gma.Modules.Auth.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
@@ -2118,6 +2143,7 @@ public sealed partial class DeveloperExperienceGuardTests
         Dictionary<string, string> packages = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Gma.Framework.slnx"] = Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"),
+            ["Gma.Extensions.slnx"] = Path.Combine(sourceLayout.ExtensionsRepositoryRoot, "Gma.Extensions.slnx"),
             ["Gma.Modules.AccessControl.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"),
             ["Gma.Modules.Administration.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"),
             ["Gma.Modules.Auth.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"),
@@ -2211,6 +2237,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] focusedSolutions =
         [
             "Gma.Framework.slnx",
+            "Gma.Extensions.slnx",
             "Gma.Modules.AccessControl.slnx",
             "Gma.Modules.Administration.slnx",
             "Gma.Modules.Auth.slnx",
@@ -5850,7 +5877,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\Auth\Gma.Modules.Auth.Providers.OpenIdConnect\Gma.Modules.Auth.Providers.OpenIdConnect.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Adapters.Email\Gma.Modules.Notifications.Adapters.Email.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Api\Gma.Modules.Notifications.Api.csproj",
-                    @"..\Modules\Notifications\Gma.Modules.Notifications.Integrations.Auth\Gma.Modules.Notifications.Integrations.Auth.csproj",
+                    @"..\Extensions\Gma.Extensions.Auth.Notifications\Gma.Extensions.Auth.Notifications.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Persistence.SqlServerMigrations\Gma.Modules.Notifications.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\Tenancy\Gma.Modules.Tenancy.Api\Gma.Modules.Tenancy.Api.csproj",
@@ -5887,7 +5914,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Adapters.Email\Gma.Modules.Notifications.Adapters.Email.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Application\Gma.Modules.Notifications.Application.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj",
-                    @"..\Modules\Notifications\Gma.Modules.Notifications.Integrations.Auth\Gma.Modules.Notifications.Integrations.Auth.csproj",
+                    @"..\Extensions\Gma.Extensions.Auth.Notifications\Gma.Extensions.Auth.Notifications.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Persistence\Gma.Modules.Notifications.Persistence.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Persistence.SqlServerMigrations\Gma.Modules.Notifications.Persistence.SqlServerMigrations.csproj",

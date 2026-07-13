@@ -104,6 +104,98 @@ public sealed class ModuleBoundaryTests
     }
 
     [Fact]
+    public void Reusable_module_repositories_do_not_reference_other_reusable_modules()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string reusableModulesRoot = Path.Combine(repositoryRoot, "gma", "modules");
+        Dictionary<string, string> sourceRootPropertyByAlias = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["access-control"] = "GmaModuleAccessControlRoot",
+            ["administration"] = "GmaModuleAdministrationRoot",
+            ["auth"] = "GmaModuleAuthRoot",
+            ["files"] = "GmaModuleFilesRoot",
+            ["notifications"] = "GmaModuleNotificationsRoot",
+            ["task-runtime"] = "GmaModuleTaskRuntimeRoot",
+            ["tenancy"] = "GmaModuleTenancyRoot",
+        };
+        Dictionary<string, string> moduleRootByAlias = sourceRootPropertyByAlias.Keys.ToDictionary(
+            alias => alias,
+            alias => Path.GetFullPath(Path.Combine(reusableModulesRoot, alias)) + Path.DirectorySeparatorChar,
+            StringComparer.OrdinalIgnoreCase);
+        var offenders = new List<string>();
+
+        foreach (string alias in sourceRootPropertyByAlias.Keys)
+        {
+            string moduleRoot = moduleRootByAlias[alias];
+            foreach (string projectPath in Directory.EnumerateFiles(moduleRoot, "*.csproj", SearchOption.AllDirectories)
+                         .Where(path => !HasIgnoredPathSegment(path)))
+            {
+                string source = File.ReadAllText(projectPath);
+                foreach ((string otherAlias, string otherSourceRootProperty) in sourceRootPropertyByAlias
+                             .Where(item => !string.Equals(item.Key, alias, StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (source.Contains($"$({otherSourceRootProperty})", StringComparison.Ordinal))
+                    {
+                        offenders.Add($"{Path.GetRelativePath(repositoryRoot, projectPath)} references {otherAlias} through $({otherSourceRootProperty})");
+                    }
+                }
+
+                foreach (Match match in Regex.Matches(source, "<ProjectReference\\s+Include=\\\"(?<path>[^\\\"]+)\\\""))
+                {
+                    string include = match.Groups["path"].Value;
+                    if (include.Contains("$(", StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    string normalizedInclude = include
+                        .Replace('\\', Path.DirectorySeparatorChar)
+                        .Replace('/', Path.DirectorySeparatorChar);
+                    string resolvedReference = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectPath)!, normalizedInclude));
+                    foreach ((string otherAlias, string otherModuleRoot) in moduleRootByAlias
+                                 .Where(item => !string.Equals(item.Key, alias, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        if (resolvedReference.StartsWith(otherModuleRoot, StringComparison.OrdinalIgnoreCase))
+                        {
+                            offenders.Add($"{Path.GetRelativePath(repositoryRoot, projectPath)} physically references {otherAlias}: {include}");
+                        }
+                    }
+                }
+            }
+        }
+
+        Assert.Empty(offenders.Order(StringComparer.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Auth_notifications_bridge_is_owned_by_extensions_not_a_module()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string extensionProject = Path.Combine(
+            repositoryRoot,
+            "gma",
+            "extensions",
+            "src",
+            "Gma.Extensions.Auth.Notifications",
+            "Gma.Extensions.Auth.Notifications.csproj");
+        Assert.True(File.Exists(extensionProject), $"Missing composition extension: {extensionProject}");
+
+        string extensionSource = File.ReadAllText(extensionProject);
+        Assert.Contains("$(GmaModuleAuthRoot)", extensionSource, StringComparison.Ordinal);
+        Assert.Contains("$(GmaModuleNotificationsRoot)", extensionSource, StringComparison.Ordinal);
+
+        string[] moduleOffenders = Directory
+            .EnumerateFiles(Path.Combine(repositoryRoot, "gma", "modules"), "*.csproj", SearchOption.AllDirectories)
+            .Where(path => !HasIgnoredPathSegment(path))
+            .Where(path => File.ReadAllText(path).Contains("Gma.Extensions.Auth.Notifications", StringComparison.Ordinal))
+            .Select(path => Path.GetRelativePath(repositoryRoot, path))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(moduleOffenders);
+    }
+
+    [Fact]
     public void Modules_do_not_depend_on_observability_backends()
     {
         string[] backendPrefixes = ["OpenTelemetry", "Prometheus", "Serilog.Sinks.Grafana.Loki"];

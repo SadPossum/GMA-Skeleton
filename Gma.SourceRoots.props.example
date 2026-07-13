@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
     <GmaFrameworkRoot>$(MSBuildThisFileDirectory)gma\framework\src\</GmaFrameworkRoot>
+    <GmaExtensionsRoot>$(MSBuildThisFileDirectory)gma\extensions\src\</GmaExtensionsRoot>
     <GmaModulesRoot>$(MSBuildThisFileDirectory)gma\modules\</GmaModulesRoot>
     <GmaModuleAccessControlRoot>$(GmaModulesRoot)access-control\src\</GmaModuleAccessControlRoot>
     <GmaModuleAdministrationRoot>$(GmaModulesRoot)administration\src\</GmaModuleAdministrationRoot>

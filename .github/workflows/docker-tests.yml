@@ -9,6 +9,7 @@ on:
       - 'tests/Integration.Tests/**'
       - 'src/**'
       - 'gma/framework'
+      - 'gma/extensions'
       - 'gma/modules/**'
   push:
     branches:
@@ -20,6 +21,7 @@ on:
       - 'tests/Integration.Tests/**'
       - 'src/**'
       - 'gma/framework'
+      - 'gma/extensions'
       - 'gma/modules/**'
   schedule:
     - cron: '17 3 * * 1'
