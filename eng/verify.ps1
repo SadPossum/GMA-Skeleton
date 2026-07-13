@@ -6,6 +6,8 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
+& (Join-Path $PSScriptRoot 'sync-solution.ps1') -Check
+
 if (-not $SkipRestore) {
     & (Join-Path $PSScriptRoot 'restore.ps1')
 

@@ -22,6 +22,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 - [Source-First Apps](getting-started/source-first-apps.md)
 - [Production Readiness Boundary](production-readiness.md)
 - [Skeleton Overview](architecture/overview.md)
+- [Composition Tooling Alignment Task](architecture/composition-tooling-alignment-task.md)
 - [GMA Rebrand And Source Repo Split Plan](architecture/gma-rebrand-and-source-repo-split.md)
 
 ## Examples

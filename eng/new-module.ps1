@@ -20,4 +20,3 @@ $repositoryRoot = Get-GmaRepositoryRoot
 $implementation = Join-Path $repositoryRoot 'gma\framework\eng\new-module.ps1'
 
 & $implementation @PSBoundParameters -RepositoryRoot $repositoryRoot -CompositionSolution 'GMA-Skeleton.slnx'
-exit $LASTEXITCODE
