@@ -31,6 +31,8 @@ public sealed partial class DeveloperExperienceGuardTests
 
         Assert.Equal(expected, NormalizeDirectorySeparators(@"alpha\beta"));
         Assert.Equal(expected, NormalizeDirectorySeparators("alpha/beta"));
+        Assert.Equal("alpha/beta", NormalizeSolutionXmlPath(@"alpha\beta"));
+        Assert.Equal("alpha/beta", NormalizeSolutionXmlPath("alpha/beta"));
         Assert.Equal("Example.Project", GetProjectReferenceName(@"..\Example.Project\Example.Project.csproj"));
         Assert.Equal("Example.Project", GetProjectReferenceName("../Example.Project/Example.Project.csproj"));
     }
@@ -1251,7 +1253,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Select(project => new
                     {
                         FolderName = folderName,
-                        ProjectPath = NormalizePath(project.Attribute("Path")?.Value ?? string.Empty)
+                        ProjectPath = NormalizeSolutionXmlPath(project.Attribute("Path")?.Value ?? string.Empty)
                     });
             })
             .Where(project => project.ProjectPath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase) &&
@@ -1281,7 +1283,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Select(project => new
                     {
                         FolderName = folderName,
-                        ProjectPath = NormalizePath(project.Attribute("Path")?.Value ?? string.Empty)
+                        ProjectPath = NormalizeSolutionXmlPath(project.Attribute("Path")?.Value ?? string.Empty)
                     });
             })
             .Where(project => project.ProjectPath.StartsWith("gma/framework/src/", StringComparison.OrdinalIgnoreCase) &&
@@ -1312,7 +1314,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Select(project => new
                     {
                         FolderName = folderName,
-                        ProjectPath = NormalizePath(project.Attribute("Path")?.Value ?? string.Empty)
+                        ProjectPath = NormalizeSolutionXmlPath(project.Attribute("Path")?.Value ?? string.Empty)
                     });
             })
             .Where(project =>
