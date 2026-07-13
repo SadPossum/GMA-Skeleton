@@ -29,6 +29,7 @@ internal sealed class GmaSourceLayout
             ["Gma.Framework.Cqrs"] = "Cqrs",
             ["Gma.Framework.Cqrs.Infrastructure"] = "Cqrs",
             ["Gma.Framework.Domain"] = "Domain",
+            ["Gma.Framework.Email"] = "Email",
             ["Gma.Framework.FileManagement"] = "FileManagement",
             ["Gma.Framework.FileManagement.LocalStorage"] = "FileManagement",
             ["Gma.Framework.FileManagement.Minio"] = "FileManagement",

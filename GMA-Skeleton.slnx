@@ -97,6 +97,9 @@
   <Folder Name="/gma/framework/src/Domain/">
     <Project Path="gma/framework/src/Domain/Gma.Framework.Domain/Gma.Framework.Domain.csproj" />
   </Folder>
+  <Folder Name="/gma/framework/src/Email/">
+    <Project Path="gma/framework/src/Email/Gma.Framework.Email/Gma.Framework.Email.csproj" />
+  </Folder>
   <Folder Name="/gma/framework/src/FileManagement/">
     <Project Path="gma/framework/src/FileManagement/Gma.Framework.FileManagement.LocalStorage/Gma.Framework.FileManagement.LocalStorage.csproj" />
     <Project Path="gma/framework/src/FileManagement/Gma.Framework.FileManagement.Minio/Gma.Framework.FileManagement.Minio.csproj" />
@@ -278,6 +281,9 @@
   </Folder>
   <Folder Name="/gma/modules/notifications/src/Domain/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Domain/Gma.Modules.Notifications.Domain.csproj" />
+  </Folder>
+  <Folder Name="/gma/modules/notifications/src/Email/">
+    <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Adapters.Email/Gma.Modules.Notifications.Adapters.Email.csproj" />
   </Folder>
   <Folder Name="/gma/modules/notifications/src/Persistence/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Persistence.PostgreSqlMigrations/Gma.Modules.Notifications.Persistence.PostgreSqlMigrations.csproj" />

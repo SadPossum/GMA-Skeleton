@@ -3,13 +3,47 @@ namespace Integration.Tests;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Integration.Tests.Support;
 using Gma.Modules.Notifications.Contracts;
+using Integration.Tests.Support;
 using Xunit;
 using DomainBroadcastAudience = Gma.Modules.Notifications.Domain.ValueObjects.NotificationBroadcastAudience;
+using DomainTagKind = Gma.Modules.Notifications.Domain.ValueObjects.NotificationTagKind;
 
 public sealed class NotificationsApiIntegrationTests
 {
+    [Fact]
+    [Trait("Category", "Integration")]
+    public async Task User_preferences_are_tenant_and_user_scoped_and_default_to_enabled()
+    {
+        await using NotificationsApiTestApplication application = await NotificationsApiTestApplication
+            .CreateAsync();
+        await application.AddTagDefinitionAsync("tenant-a", "domain:security", DomainTagKind.Domain);
+        using HttpClient userA = CreateAuthenticatedClient(application, "tenant-a", "user-a");
+        using HttpClient userB = CreateAuthenticatedClient(application, "tenant-a", "user-b");
+
+        NotificationPreferenceListResponse initial = await GetJsonAsync<NotificationPreferenceListResponse>(
+            userA,
+            "/api/notifications/preferences");
+        using HttpResponseMessage updateResponse = await userA.PutAsJsonAsync(
+            "/api/notifications/preferences/domain:security",
+            new SetNotificationPreferenceRequest(Enabled: false));
+        updateResponse.EnsureSuccessStatusCode();
+        NotificationPreferenceItem? updated = await updateResponse.Content
+            .ReadFromJsonAsync<NotificationPreferenceItem>();
+        NotificationPreferenceListResponse userAAfter = await GetJsonAsync<NotificationPreferenceListResponse>(
+            userA,
+            "/api/notifications/preferences");
+        NotificationPreferenceListResponse userBList = await GetJsonAsync<NotificationPreferenceListResponse>(
+            userB,
+            "/api/notifications/preferences");
+
+        Assert.True(Assert.Single(initial.Items).Enabled);
+        Assert.NotNull(updated);
+        Assert.False(updated.Enabled);
+        Assert.False(Assert.Single(userAAfter.Items).Enabled);
+        Assert.True(Assert.Single(userBList.Items).Enabled);
+    }
+
     [Fact]
     [Trait("Category", "Integration")]
     public async Task User_history_api_enforces_tenant_and_user_scope_and_marks_read()
@@ -224,4 +258,3 @@ public sealed class NotificationsApiIntegrationTests
         return result;
     }
 }
-

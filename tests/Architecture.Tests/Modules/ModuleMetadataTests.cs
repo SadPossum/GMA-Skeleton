@@ -4,18 +4,18 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Gma.Framework.Administration;
-using Gma.Framework.Permissions;
 using Gma.Framework.Caching;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
 using Gma.Framework.Modules;
 using Gma.Framework.Notifications;
+using Gma.Framework.Permissions;
 using Gma.Framework.Tasks;
 using Gma.Framework.Tenancy;
 using Gma.Modules.TaskRuntime.Contracts;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 [Trait("Category", "Architecture")]
@@ -1055,6 +1055,15 @@ public sealed partial class ModuleMetadataTests
             return SampleStringCollection;
         }
 
+        if (effectiveType == typeof(IReadOnlyCollection<Gma.Modules.Notifications.Contracts.NotificationTag>) ||
+            effectiveType == typeof(IReadOnlyList<Gma.Modules.Notifications.Contracts.NotificationTag>))
+        {
+            return new Gma.Modules.Notifications.Contracts.NotificationTag[]
+            {
+                new("delivery:web", Gma.Modules.Notifications.Contracts.NotificationTagKind.Delivery)
+            };
+        }
+
         if (effectiveType.IsEnum)
         {
             Array values = Enum.GetValues(effectiveType);
@@ -1082,7 +1091,7 @@ public sealed partial class ModuleMetadataTests
     private static string? FindStringConstantName(IEnumerable<string> sourceFiles, string value) =>
         sourceFiles
             .SelectMany(path => StringConstantPattern().Matches(File.ReadAllText(path)))
-            .Cast<System.Text.RegularExpressions.Match>()
+            .Cast<Match>()
             .Where(match => string.Equals(match.Groups["value"].Value, value, StringComparison.Ordinal))
             .Select(match => match.Groups["name"].Value)
             .FirstOrDefault();
@@ -1259,12 +1268,12 @@ public sealed partial class ModuleMetadataTests
                     field,
                     (AdminPermission)field.GetValue(null)!)));
 
-    [System.Text.RegularExpressions.GeneratedRegex(@"public\s+const\s+string\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*""(?<value>[^""]+)""")]
-    private static partial System.Text.RegularExpressions.Regex StringConstantPattern();
+    [GeneratedRegex(@"public\s+const\s+string\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*""(?<value>[^""]+)""")]
+    private static partial Regex StringConstantPattern();
 
-    [System.Text.RegularExpressions.GeneratedRegex(@"([A-Z]+)([A-Z][a-z])")]
-    private static partial System.Text.RegularExpressions.Regex AcronymBoundaryPattern();
+    [GeneratedRegex(@"([A-Z]+)([A-Z][a-z])")]
+    private static partial Regex AcronymBoundaryPattern();
 
-    [System.Text.RegularExpressions.GeneratedRegex(@"([a-z0-9])([A-Z])")]
-    private static partial System.Text.RegularExpressions.Regex WordBoundaryPattern();
+    [GeneratedRegex(@"([a-z0-9])([A-Z])")]
+    private static partial Regex WordBoundaryPattern();
 }

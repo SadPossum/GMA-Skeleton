@@ -5065,6 +5065,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
                     @"..\Gma.Framework.Numerics\Gma.Framework.Numerics.csproj"
                 ]),
+            new("Gma.Framework.Email", [], [], []),
             new(
                 "Gma.Framework.FileManagement",
                 [],

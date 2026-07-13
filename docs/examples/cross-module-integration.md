@@ -58,7 +58,7 @@ flowchart LR
     C --> D["Ordering consumer"]
     D --> E["Ordering CatalogItemProjection"]
     D --> F["Ordering orders by catalog item"]
-    F --> G["UserNotificationRequestedIntegrationEvent"]
+    F --> G["UserNotificationRequestedIntegrationEventV2"]
     G --> H["Ordering outbox"]
     H --> I["Notifications consumer"]
     I --> J["notifications.user_notifications"]
@@ -69,7 +69,7 @@ This is the same shape a private chat or PMS policy module should use:
 - chat membership and message visibility belong to the chat module;
 - property/user-management policies belong to the PMS module;
 - catalog regional availability belongs to Catalog or the module that owns regional market rules;
-- Notifications receives explicit user targets only, never business-specific visibility rules.
+- Notifications receives explicit user targets, delivery/domain tags, and policy only; it never derives business-specific visibility rules.
 
 ## Compatibility
 

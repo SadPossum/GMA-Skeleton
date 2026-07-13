@@ -2,12 +2,12 @@ namespace Ordering.Application.Handlers;
 
 using System.Text.Json;
 using Catalog.Contracts;
-using Gma.Modules.Notifications.Contracts;
-using Ordering.Application.Ports;
-using Ordering.Contracts;
 using Gma.Framework.Messaging;
 using Gma.Framework.Runtime.Identity;
 using Gma.Framework.Runtime.Time;
+using Gma.Modules.Notifications.Contracts;
+using Ordering.Application.Ports;
+using Ordering.Contracts;
 
 internal sealed class CatalogItemChangeNotificationPublisher(
     IOrderRepository orderRepository,
@@ -42,7 +42,7 @@ internal sealed class CatalogItemChangeNotificationPublisher(
                 JsonOptions);
 
             await outbox.EnqueueAsync(
-                new UserNotificationRequestedIntegrationEvent(
+                new UserNotificationRequestedIntegrationEventV2(
                     idGenerator.NewId(),
                     scopeId,
                     clock.UtcNow,
@@ -53,7 +53,15 @@ internal sealed class CatalogItemChangeNotificationPublisher(
                     "Ordered item changed",
                     $"Item {sku} in one of your orders changed.",
                     NotificationSeverity.Info,
-                    payloadJson),
+                    payloadJson,
+                    [
+                        new NotificationTag("delivery:web", NotificationTagKind.Delivery),
+                        new NotificationTag(
+                            "domain:order-updates",
+                            NotificationTagKind.Domain,
+                            "Order updates",
+                            "Changes to catalog items referenced by the recipient's orders.")
+                    ]),
                 cancellationToken).ConfigureAwait(false);
         }
     }

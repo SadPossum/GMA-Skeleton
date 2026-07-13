@@ -1,11 +1,11 @@
 namespace Ordering.Contracts;
 
 using Catalog.Contracts;
-using Gma.Modules.Notifications.Contracts;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
 using Gma.Framework.Modules;
 using Gma.Framework.Tasks;
+using Gma.Modules.Notifications.Contracts;
 
 public static class OrderingModuleMetadata
 {
@@ -25,6 +25,7 @@ public static class OrderingModuleMetadata
         .WithSubscription<CatalogItemUpdatedIntegrationEvent>(CatalogModuleMetadata.Name, CatalogItemUpdatedProjectionHandlerName)
         .WithSubscription<CatalogItemDiscontinuedIntegrationEvent>(CatalogModuleMetadata.Name, CatalogItemDiscontinuedProjectionHandlerName)
         .WithPublishedEvent<UserNotificationRequestedIntegrationEvent>()
+        .WithPublishedEvent<UserNotificationRequestedIntegrationEventV2>()
         .WithTask<RebuildCatalogItemProjectionPayload>()
         .WithProfile(OrderingProfiles.Default)
         .Build();

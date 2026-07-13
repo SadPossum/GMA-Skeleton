@@ -3,12 +3,30 @@ namespace Integration.Tests.Support;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Gma.Framework.Administration;
+using Gma.Framework.Administration.AccessControl;
+using Gma.Framework.Administration.Api;
+using Gma.Framework.Api.Security;
+using Gma.Framework.Application.Events.Infrastructure;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Cqrs.Infrastructure;
+using Gma.Framework.Notifications;
+using Gma.Framework.Results;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Security;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Framework.Tenancy.Scoping;
 using Gma.Modules.AccessControl.Application;
 using Gma.Modules.AccessControl.Application.Commands;
 using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Administration.Application;
 using Gma.Modules.Administration.Persistence;
 using Gma.Modules.Administration.Persistence.Entities;
+using Gma.Modules.Notifications.AdminApi;
+using Gma.Modules.Notifications.Contracts;
+using Gma.Modules.Notifications.Domain.Aggregates;
+using Gma.Modules.Notifications.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,23 +36,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Gma.Modules.Notifications.AdminApi;
-using Gma.Modules.Notifications.Contracts;
-using Gma.Modules.Notifications.Domain.Aggregates;
-using Gma.Modules.Notifications.Persistence;
-using Gma.Framework.Administration;
-using Gma.Framework.Administration.AccessControl;
-using Gma.Framework.Administration.Api;
-using Gma.Framework.Application.Events.Infrastructure;
-using Gma.Framework.Api.Security;
-using Gma.Framework.Cqrs;
-using Gma.Framework.Cqrs.Infrastructure;
-using Gma.Framework.Runtime.Infrastructure;
-using Gma.Framework.Security;
-using Gma.Framework.Tenancy;
-using Gma.Framework.Tenancy.Infrastructure;
-using Gma.Framework.Tenancy.Scoping;
-using Gma.Framework.Results;
+using DomainDeliveryStatus = Gma.Modules.Notifications.Domain.ValueObjects.NotificationDeliveryStatus;
 using DomainNotificationSeverity = Gma.Modules.Notifications.Domain.ValueObjects.NotificationSeverity;
 
 internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
@@ -65,6 +67,7 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
             ["AccessControl:Bootstrap:OwnerRoleName"] = "owner",
             ["Notifications:DurableStreams:BatchSize"] = "10",
             ["Notifications:DurableStreams:PollInterval"] = "00:00:01",
+            ["Notifications:Delivery:Enabled"] = "false",
             ["Caching:Enabled"] = "false"
         });
 
@@ -94,6 +97,7 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
                 };
             });
         builder.Services.AddAuthorization();
+        builder.Services.AddSingleton<IUserNotificationSink, TestEmailNotificationSink>();
 
         builder.Services.AddDbContext<AdminDbContext>(
             options => options.UseInMemoryDatabase(databaseName, databaseRoot));
@@ -190,6 +194,38 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
         await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task AddUnroutableDeliveryAsync(
+        string scopeId,
+        string userId,
+        Guid notificationId,
+        Guid deliveryId,
+        CancellationToken cancellationToken = default)
+    {
+        await this.AddNotificationAsync(
+            scopeId,
+            userId,
+            notificationId,
+            "Delivery test",
+            streamSequence: 50,
+            cancellationToken).ConfigureAwait(false);
+
+        using IServiceScope scope = this.app.Services.CreateScope();
+        ITenantContextAccessor tenantContext = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
+        tenantContext.SetTenant(scopeId);
+        NotificationsDbContext dbContext = scope.ServiceProvider.GetRequiredService<NotificationsDbContext>();
+        NotificationDelivery delivery = NotificationDelivery.CreateTerminal(
+            deliveryId,
+            scopeId,
+            notificationId,
+            NotificationTags.Email,
+            TestEmailNotificationSink.Provider,
+            DomainDeliveryStatus.Unroutable,
+            "route-missing",
+            DateTimeOffset.UtcNow).Value;
+        dbContext.NotificationDeliveries.Add(delivery);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task<int> CountAuditEntriesAsync(string operation, string? errorCode = null)
     {
         using IServiceScope scope = this.app.Services.CreateScope();
@@ -207,4 +243,18 @@ internal sealed class NotificationsAdminApiTestApplication : IAsyncDisposable
     }
 
     public ValueTask DisposeAsync() => this.app.DisposeAsync();
+
+    private sealed class TestEmailNotificationSink : IUserNotificationSink
+    {
+        public const string Provider = "email-test";
+
+        public string ProviderName => Provider;
+        public IReadOnlyCollection<string> DeliveryTags => [NotificationTags.Email];
+        public NotificationSinkDeliveryMode DeliveryModes => NotificationSinkDeliveryMode.Durable;
+
+        public ValueTask<NotificationSinkDeliveryResult> DeliverAsync(
+            NotificationSinkDeliveryRequest request,
+            CancellationToken cancellationToken) =>
+            ValueTask.FromResult(NotificationSinkDeliveryResult.Delivered($"test-{request.DeliveryId:N}"));
+    }
 }

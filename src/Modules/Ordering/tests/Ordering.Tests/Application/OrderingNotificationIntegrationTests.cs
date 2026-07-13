@@ -1,16 +1,16 @@
 namespace Ordering.Tests;
 
 using Catalog.Contracts;
-using Microsoft.Extensions.DependencyInjection;
-using Gma.Modules.Notifications.Contracts;
-using Ordering.Application;
-using Ordering.Application.Ports;
-using Ordering.Contracts;
-using Ordering.Domain.Aggregates;
 using Gma.Framework.Messaging;
 using Gma.Framework.Messaging.Infrastructure;
 using Gma.Framework.Runtime.Identity;
 using Gma.Framework.Runtime.Time;
+using Gma.Modules.Notifications.Contracts;
+using Microsoft.Extensions.DependencyInjection;
+using Ordering.Application;
+using Ordering.Application.Ports;
+using Ordering.Contracts;
+using Ordering.Domain.Aggregates;
 using Xunit;
 
 [Trait("Category", "Unit")]
@@ -60,18 +60,20 @@ public sealed class OrderingNotificationIntegrationTests
         Assert.Equal(CatalogItemId, projection.CatalogItemId);
         Assert.Equal(["US"], projection.AvailableRegions);
         Assert.Equal(["user-1", "user-2"], outbox.Events
-            .OfType<UserNotificationRequestedIntegrationEvent>()
+            .OfType<UserNotificationRequestedIntegrationEventV2>()
             .Select(integrationEvent => integrationEvent.UserId)
             .Order(StringComparer.Ordinal)
             .ToArray());
         Assert.All(
-            outbox.Events.OfType<UserNotificationRequestedIntegrationEvent>(),
+            outbox.Events.OfType<UserNotificationRequestedIntegrationEventV2>(),
             integrationEvent =>
             {
                 Assert.Equal("tenant-a", integrationEvent.ScopeId);
                 Assert.Equal(OrderingModuleMetadata.Name, integrationEvent.SourceModule);
                 Assert.Equal(OrderingNotificationNames.CatalogItemChanged, integrationEvent.NotificationName);
                 Assert.Equal(OrderingNotificationNames.CatalogItemChangedVersion, integrationEvent.NotificationVersion);
+                Assert.Contains(integrationEvent.Tags, tag => tag.Key == "delivery:web");
+                Assert.Contains(integrationEvent.Tags, tag => tag.Key == "domain:order-updates");
             });
     }
 

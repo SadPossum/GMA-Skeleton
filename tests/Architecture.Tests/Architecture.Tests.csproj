@@ -49,6 +49,7 @@
     <ProjectReference Include="$(GmaModuleFilesRoot)Gma.Modules.Files.Contracts\Gma.Modules.Files.Contracts.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Admin.Contracts\Gma.Modules.Notifications.Admin.Contracts.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.AdminApi\Gma.Modules.Notifications.AdminApi.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Adapters.Email\Gma.Modules.Notifications.Adapters.Email.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Api\Gma.Modules.Notifications.Api.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Application\Gma.Modules.Notifications.Application.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />

@@ -45,6 +45,8 @@
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Contracts\Gma.Modules.Notifications.Contracts.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Domain\Gma.Modules.Notifications.Domain.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Persistence\Gma.Modules.Notifications.Persistence.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Persistence.PostgreSqlMigrations\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations.csproj" />
+    <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Persistence.SqlServerMigrations\Gma.Modules.Notifications.Persistence.SqlServerMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleCatalogRoot)Catalog.Application\Catalog.Application.csproj" />
     <ProjectReference Include="$(GmaModuleCatalogRoot)Catalog.Contracts\Catalog.Contracts.csproj" />
     <ProjectReference Include="$(GmaModuleCatalogRoot)Catalog.Domain\Catalog.Domain.csproj" />

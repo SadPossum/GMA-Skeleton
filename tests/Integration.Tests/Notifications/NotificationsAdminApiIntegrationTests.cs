@@ -3,14 +3,82 @@ namespace Integration.Tests;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Integration.Tests.Support;
+using Gma.Framework.Administration;
 using Gma.Modules.Notifications.Admin.Contracts;
 using Gma.Modules.Notifications.Contracts;
-using Gma.Framework.Administration;
+using Integration.Tests.Support;
 using Xunit;
 
 public sealed class NotificationsAdminApiIntegrationTests
 {
+    [Fact]
+    [Trait("Category", "Integration")]
+    public async Task Admin_configuration_and_delivery_api_manage_routes_and_retry_terminal_jobs()
+    {
+        await using NotificationsAdminApiTestApplication application =
+            await NotificationsAdminApiTestApplication.CreateAsync();
+        const string ownerActor = "owner-actor";
+        await application.SeedOwnerAsync(ownerActor);
+        using HttpClient client = CreateAuthenticatedClient(application, ownerActor, "tenant-a", "tenant-a");
+
+        AdminNotificationTagDefinitionItem tag = await PostJsonAsync<AdminNotificationTagDefinitionItem>(
+            client,
+            "/api/admin/notifications/tags",
+            new AdminCreateNotificationTagDefinitionRequest(
+                "delivery:email",
+                NotificationTagKind.Delivery,
+                "Email",
+                "Delivers notifications by email."));
+        AdminNotificationDeliveryRouteItem route = await PutJsonAsync<AdminNotificationDeliveryRouteItem>(
+            client,
+            "/api/admin/notifications/routes/delivery:email",
+            new AdminSetNotificationDeliveryRouteRequest(
+                new NotificationDeliveryProviderCode("email-test"),
+                IsActive: true));
+
+        Guid notificationId = Guid.CreateVersion7();
+        Guid deliveryId = Guid.CreateVersion7();
+        await application.AddUnroutableDeliveryAsync("tenant-a", "user-a", notificationId, deliveryId);
+        AdminNotificationDeliveryListResponse terminal = await GetJsonAsync<AdminNotificationDeliveryListResponse>(
+            client,
+            "/api/admin/notifications/deliveries?status=unroutable&userId=user-a");
+        using HttpResponseMessage retry = await client.PostAsync(
+            $"/api/admin/notifications/deliveries/{deliveryId}/retry",
+            content: null);
+        AdminNotificationDeliveryItem pending = await GetJsonAsync<AdminNotificationDeliveryItem>(
+            client,
+            $"/api/admin/notifications/deliveries/{deliveryId}");
+
+        await PutJsonAsync<AdminNotificationDeliveryRouteItem>(
+            client,
+            "/api/admin/notifications/routes/delivery:email",
+            new AdminSetNotificationDeliveryRouteRequest(
+                new NotificationDeliveryProviderCode("email-test"),
+                IsActive: false));
+        Guid fallbackNotificationId = Guid.CreateVersion7();
+        Guid fallbackDeliveryId = Guid.CreateVersion7();
+        await application.AddUnroutableDeliveryAsync(
+            "tenant-a",
+            "user-a",
+            fallbackNotificationId,
+            fallbackDeliveryId);
+        using HttpResponseMessage retryWithUniqueAdapter = await client.PostAsync(
+            $"/api/admin/notifications/deliveries/{fallbackDeliveryId}/retry",
+            content: null);
+        AdminNotificationDeliveryItem fallbackPending = await GetJsonAsync<AdminNotificationDeliveryItem>(
+            client,
+            $"/api/admin/notifications/deliveries/{fallbackDeliveryId}");
+
+        Assert.Equal("delivery:email", tag.Key);
+        Assert.Equal("email-test", route.Provider.Value);
+        Assert.Equal(deliveryId, Assert.Single(terminal.Items).Id);
+        Assert.Equal(HttpStatusCode.NoContent, retry.StatusCode);
+        Assert.Equal(NotificationDeliveryStatus.Pending, pending.Status);
+        Assert.Equal(HttpStatusCode.NoContent, retryWithUniqueAdapter.StatusCode);
+        Assert.Equal(NotificationDeliveryStatus.Pending, fallbackPending.Status);
+        Assert.Equal("email-test", fallbackPending.Provider.Value);
+    }
+
     [Fact]
     [Trait("Category", "Integration")]
     public async Task Admin_api_enforces_rbac_tenant_history_and_broadcast_inbox_scope()
@@ -179,6 +247,18 @@ public sealed class NotificationsAdminApiIntegrationTests
     private static async Task<T> PostJsonAsync<T>(HttpClient client, string requestUri, object value)
     {
         using HttpResponseMessage response = await client.PostAsJsonAsync(requestUri, value);
+        string body = await response.Content.ReadAsStringAsync();
+        Assert.True(
+            response.IsSuccessStatusCode,
+            $"Status={(int)response.StatusCode} {response.StatusCode}{Environment.NewLine}{body}");
+        T? result = await response.Content.ReadFromJsonAsync<T>();
+        Assert.NotNull(result);
+        return result;
+    }
+
+    private static async Task<T> PutJsonAsync<T>(HttpClient client, string requestUri, object value)
+    {
+        using HttpResponseMessage response = await client.PutAsJsonAsync(requestUri, value);
         string body = await response.Content.ReadAsStringAsync();
         Assert.True(
             response.IsSuccessStatusCode,

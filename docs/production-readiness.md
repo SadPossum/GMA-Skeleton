@@ -8,18 +8,18 @@ The skeleton provides a hardened, explicit foundation; it cannot choose deployme
 - dependency-free `/alive` and explicitly composed `/health` readiness checks;
 - provider-explicit migrations, generated startup/architecture tests, Windows/Linux CI, automatic Docker validation, dependency updates, immutable action pins, and release source-set manifests;
 - Auth password/blocklist/throttling/rehash behavior, key-ring rotation, refresh reuse revocation, and optimistic concurrency;
-- atomic first-owner bootstrap, outbox backlog metrics, disabled-by-default bounded message-journal and task-history retention, lease heartbeats, managed/external JetStream ownership with finite limits, in-progress consumer acknowledgements, bounded notification retention, and a fail-closed file inspection seam.
+- atomic first-owner bootstrap, outbox backlog metrics, disabled-by-default bounded message-journal and task-history retention, lease heartbeats, managed/external JetStream ownership with finite limits, in-progress consumer acknowledgements, tagged notification preferences/routing, leased at-least-once notification delivery with bounded retries/receipts/retention, and a fail-closed file inspection seam.
 
 ## Deployment Must Supply
 
 - concrete `AllowedHosts`, trusted proxy IPs, production connection strings, secret-store values, TLS/ingress, observability exporters, alert thresholds, backups/restores, and capacity/connection-pool tuning;
 - a distributed `IAuthenticationAttemptLimiter` for multi-replica Auth, a real `IPasswordBlocklist`, and an `IFileContentInspector` when Files is enabled;
-- optional Redis/NATS/MinIO credentials and topology, JetStream management ownership and replica count, retention windows aligned with broker replay, external scheduler/backplane adapters, and deployment-specific readiness for those selected adapters.
+- optional Redis/NATS/MinIO credentials and topology, notification provider credentials/rate limits, JetStream management ownership and replica count, retention windows aligned with broker replay, external scheduler/backplane adapters, and deployment-specific readiness for those selected adapters.
 
 ## Product Must Decide
 
 - external OIDC providers and account linking, email verification/recovery delivery, MFA and recovery policy;
-- notification preferences/retention, file ownership/retention/legal holds, API deprecation/versioning windows, and which admin surfaces exist.
+- notification taxonomy/policy/retention, destination resolvers, email/push/SMS providers and templates, file ownership/retention/legal holds, API deprecation/versioning windows, and which admin surfaces exist.
 
 Keep these as app-owned adapters/modules. A generic default that silently accepts identity assertions, sends email, scans nothing, or exposes an admin API would weaken the boundary.
 

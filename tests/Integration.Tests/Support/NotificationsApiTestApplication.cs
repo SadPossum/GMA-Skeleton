@@ -3,6 +3,19 @@ namespace Integration.Tests.Support;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Gma.Framework.Api.Modules;
+using Gma.Framework.Api.Security;
+using Gma.Framework.Application.Events.Infrastructure;
+using Gma.Framework.Cqrs.Infrastructure;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Security;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Tenancy.Infrastructure;
+using Gma.Framework.Tenancy.Scoping;
+using Gma.Modules.Notifications.Api;
+using Gma.Modules.Notifications.Domain.Aggregates;
+using Gma.Modules.Notifications.Persistence;
+using Gma.Modules.Tenancy.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,21 +25,10 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Gma.Modules.Notifications.Api;
-using Gma.Modules.Notifications.Domain.Aggregates;
-using Gma.Modules.Notifications.Persistence;
-using Gma.Framework.Application.Events.Infrastructure;
-using Gma.Framework.Api.Modules;
-using Gma.Framework.Api.Security;
-using Gma.Framework.Cqrs.Infrastructure;
-using Gma.Framework.Runtime.Infrastructure;
-using Gma.Framework.Security;
-using Gma.Framework.Tenancy;
-using Gma.Framework.Tenancy.Infrastructure;
-using Gma.Framework.Tenancy.Scoping;
-using Gma.Modules.Tenancy.Api;
 using DomainBroadcastAudience = Gma.Modules.Notifications.Domain.ValueObjects.NotificationBroadcastAudience;
 using DomainNotificationSeverity = Gma.Modules.Notifications.Domain.ValueObjects.NotificationSeverity;
+using DomainTagKind = Gma.Modules.Notifications.Domain.ValueObjects.NotificationTagKind;
+using DomainTagOrigin = Gma.Modules.Notifications.Domain.ValueObjects.NotificationTagOrigin;
 
 internal sealed class NotificationsApiTestApplication : IAsyncDisposable
 {
@@ -57,6 +59,7 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
             ["Tenancy:LocalDefaultScopeId"] = "default",
             ["Notifications:DurableStreams:BatchSize"] = "10",
             ["Notifications:DurableStreams:PollInterval"] = "00:00:01",
+            ["Notifications:Delivery:Enabled"] = "false",
             ["Caching:Enabled"] = "false"
         });
 
@@ -154,6 +157,31 @@ internal sealed class NotificationsApiTestApplication : IAsyncDisposable
             $$"""{"title":"{{title}}"}""").Value;
         SetStreamSequence(notification, streamSequence);
         dbContext.UserNotifications.Add(notification);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task AddTagDefinitionAsync(
+        string scopeId,
+        string key,
+        DomainTagKind kind,
+        CancellationToken cancellationToken = default)
+    {
+        using IServiceScope scope = this.app.Services.CreateScope();
+        ITenantContextAccessor tenantContext = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
+        tenantContext.SetTenant(scopeId);
+        NotificationsDbContext dbContext = scope.ServiceProvider.GetRequiredService<NotificationsDbContext>();
+        NotificationTagDefinition definition = NotificationTagDefinition.Create(
+            Guid.CreateVersion7(),
+            scopeId,
+            key,
+            kind,
+            "Security alerts",
+            "Security-related account activity.",
+            DomainTagOrigin.Module,
+            "auth",
+            "integration-test",
+            DateTimeOffset.UtcNow).Value;
+        dbContext.NotificationTagDefinitions.Add(definition);
         await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 

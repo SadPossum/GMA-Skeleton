@@ -1,57 +1,58 @@
 namespace Architecture.Tests;
 
 using System.Reflection;
+using Catalog.Admin.Contracts;
+using Catalog.AdminApi;
+using Catalog.AdminCli;
+using Catalog.Api;
+using Catalog.Contracts;
+using Catalog.Domain.Aggregates;
+using Catalog.Persistence;
+using Gma.Framework.Modules;
 using Gma.Modules.AccessControl.Admin.Contracts;
-using Gma.Modules.AccessControl.AdminCli;
 using Gma.Modules.AccessControl.AdminApi;
+using Gma.Modules.AccessControl.AdminCli;
 using Gma.Modules.AccessControl.Contracts;
 using Gma.Modules.AccessControl.Persistence;
-using Gma.Modules.Administration.AdminCli;
 using Gma.Modules.Administration.AdminApi;
+using Gma.Modules.Administration.AdminCli;
 using Gma.Modules.Administration.Application;
 using Gma.Modules.Administration.Contracts;
 using Gma.Modules.Administration.Persistence;
 using Gma.Modules.Auth.Admin.Contracts;
-using Gma.Modules.Auth.AdminCli;
 using Gma.Modules.Auth.AdminApi;
+using Gma.Modules.Auth.AdminCli;
 using Gma.Modules.Auth.Api;
 using Gma.Modules.Auth.Contracts;
 using Gma.Modules.Auth.Domain.Aggregates;
 using Gma.Modules.Auth.Infrastructure;
 using Gma.Modules.Auth.Infrastructure.JwtBearer;
 using Gma.Modules.Auth.Persistence;
-using Catalog.AdminCli;
-using Catalog.Admin.Contracts;
-using Catalog.AdminApi;
-using Catalog.Api;
-using Catalog.Contracts;
-using Catalog.Domain.Aggregates;
-using Catalog.Persistence;
 using Gma.Modules.Files.Api;
 using Gma.Modules.Files.Application;
 using Gma.Modules.Files.Contracts;
+using Gma.Modules.Notifications.Adapters.Email;
 using Gma.Modules.Notifications.Admin.Contracts;
 using Gma.Modules.Notifications.AdminApi;
 using Gma.Modules.Notifications.Api;
 using Gma.Modules.Notifications.Contracts;
 using Gma.Modules.Notifications.Domain.Aggregates;
 using Gma.Modules.Notifications.Persistence;
+using Gma.Modules.TaskRuntime.Admin.Contracts;
+using Gma.Modules.TaskRuntime.AdminApi;
+using Gma.Modules.TaskRuntime.AdminCli;
+using Gma.Modules.TaskRuntime.Contracts;
+using Gma.Modules.TaskRuntime.Persistence;
+using Gma.Modules.Tenancy.Api;
+using Gma.Modules.Tenancy.Contracts;
 using Host.AdminApi;
 using Host.AdminCli;
 using Ordering.Api;
 using Ordering.Contracts;
 using Ordering.Domain.Aggregates;
 using Ordering.Persistence;
-using Gma.Framework.Modules;
-using Gma.Modules.TaskRuntime.Admin.Contracts;
-using Gma.Modules.TaskRuntime.AdminCli;
-using Gma.Modules.TaskRuntime.AdminApi;
-using Gma.Modules.TaskRuntime.Contracts;
-using Gma.Modules.TaskRuntime.Persistence;
 using TaskSamples.Application;
 using TaskSamples.Contracts;
-using Gma.Modules.Tenancy.Api;
-using Gma.Modules.Tenancy.Contracts;
 
 internal static class ArchitectureCatalog
 {
@@ -97,6 +98,7 @@ internal static class ArchitectureCatalog
         new("Notifications", "Gma.Modules.Notifications.Api", ModuleProjectKind.Api, typeof(NotificationsModule).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(NotificationsAdminPermissions).Assembly),
         new("Notifications", "Gma.Modules.Notifications.AdminApi", ModuleProjectKind.AdminApi, typeof(NotificationsAdminApiModule).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.Adapters.Email", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Notifications.Adapters.Email.DependencyInjection).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Notifications.Application.DependencyInjection).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Contracts", ModuleProjectKind.Contracts, typeof(NotificationsModuleMetadata).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Domain", ModuleProjectKind.Domain, typeof(UserNotification).Assembly),
