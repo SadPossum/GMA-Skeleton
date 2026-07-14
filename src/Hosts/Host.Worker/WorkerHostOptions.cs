@@ -31,6 +31,7 @@ public sealed class WorkerHostOptions
         WorkerModuleOptions moduleOptions = new(
             GetBoolean(modules, nameof(WorkerModuleOptions.Auth), defaultValue: false),
             GetBoolean(modules, nameof(WorkerModuleOptions.Notifications), defaultValue: false),
+            GetBoolean(modules, nameof(WorkerModuleOptions.Organizations), defaultValue: false),
             GetBoolean(modules, nameof(WorkerModuleOptions.Catalog), defaultValue: false),
             GetBoolean(modules, nameof(WorkerModuleOptions.Ordering), defaultValue: false),
             GetBoolean(modules, nameof(WorkerModuleOptions.TaskRuntime), defaultValue: false),
@@ -60,6 +61,11 @@ public sealed class WorkerHostOptions
         if (this.Modules.Notifications)
         {
             modules.Add("notifications");
+        }
+
+        if (this.Modules.Organizations)
+        {
+            modules.Add("organizations");
         }
 
         if (this.Modules.Ordering)
@@ -92,6 +98,7 @@ public sealed class WorkerHostOptions
 public sealed record WorkerModuleOptions(
     bool Auth,
     bool Notifications,
+    bool Organizations,
     bool Catalog,
     bool Ordering,
     bool TaskRuntime,

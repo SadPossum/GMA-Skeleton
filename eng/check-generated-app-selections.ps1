@@ -15,18 +15,22 @@ if (Test-Path -LiteralPath $resolvedMatrixRoot) {
 }
 
 $cases = @(
-    [pscustomobject] @{ Name = 'AuthOnly'; Modules = @('auth'); HasExtension = $false },
-    [pscustomobject] @{ Name = 'NotificationsOnly'; Modules = @('notifications'); HasExtension = $false },
-    [pscustomobject] @{ Name = 'AuthNotifications'; Modules = @('auth', 'notifications'); HasExtension = $true }
+    [pscustomobject] @{ Name = 'AuthOnly'; Modules = @('auth'); Extensions = @() },
+    [pscustomobject] @{ Name = 'NotificationsOnly'; Modules = @('notifications'); Extensions = @() },
+    [pscustomobject] @{ Name = 'OrganizationsOnly'; Modules = @('organizations'); Extensions = @() },
+    [pscustomobject] @{ Name = 'AuthNotifications'; Modules = @('auth', 'notifications'); Extensions = @('Auth.Notifications') },
+    [pscustomobject] @{ Name = 'AuthOrganizations'; Modules = @('auth', 'organizations'); Extensions = @('Auth.Organizations') }
 )
 
-$extensionTokens = @(
+$sharedExtensionTokens = @(
     'GMA-Extensions',
     'GmaExtensionsRoot',
-    'Gma.Extensions.Auth.Notifications',
-    'AddAuthNotificationsExtension',
     'gma/extensions/Gma.SourceRoots.props'
 )
+$extensionTokens = @{
+    'Auth.Notifications' = @('Gma.Extensions.Auth.Notifications', 'AddAuthNotificationsExtension')
+    'Auth.Organizations' = @('Gma.Extensions.Auth.Organizations', 'AddAuthOrganizationsExtension')
+}
 
 foreach ($case in $cases) {
     $outputPath = Join-Path $resolvedMatrixRoot $case.Name
@@ -48,31 +52,36 @@ foreach ($case in $cases) {
     $surface = $surfacePaths | ForEach-Object { [System.IO.File]::ReadAllText($_) }
     $combinedSurface = $surface -join "`n"
     $conditionalSurface = ($conditionalSurfacePaths | ForEach-Object { [System.IO.File]::ReadAllText($_) }) -join "`n"
-    $missingTokens = @($extensionTokens | Where-Object {
+    $expectedTokens = @($case.Extensions | ForEach-Object { $extensionTokens[$_] })
+    $unexpectedExtensionTokens = @($extensionTokens.Keys |
+        Where-Object { $case.Extensions -notcontains $_ } |
+        ForEach-Object { $extensionTokens[$_] })
+    $missingTokens = @(($sharedExtensionTokens + $expectedTokens) | Where-Object {
         $combinedSurface.IndexOf($_, [System.StringComparison]::Ordinal) -lt 0
     })
-    $unexpectedTokens = @($extensionTokens | Where-Object {
+    $unexpectedTokens = @($unexpectedExtensionTokens | Where-Object {
         $conditionalSurface.IndexOf($_, [System.StringComparison]::Ordinal) -ge 0
     })
 
-    if ($case.HasExtension -and $missingTokens.Count -gt 0) {
+    if ($case.Extensions.Count -gt 0 -and $missingTokens.Count -gt 0) {
         throw "$($case.Name) is missing extension composition tokens: $($missingTokens -join ', ')"
     }
 
-    if (-not $case.HasExtension -and $unexpectedTokens.Count -gt 0) {
-        throw "$($case.Name) unexpectedly composes the Auth + Notifications extension: $($unexpectedTokens -join ', ')"
+    if ($unexpectedTokens.Count -gt 0) {
+        throw "$($case.Name) unexpectedly composes extension tokens: $($unexpectedTokens -join ', ')"
     }
 
-    $expectedBootstrapFlag = if ($case.HasExtension) {
-        '$includeAuthNotificationsExtension = $true'
-    }
-    else {
-        '$includeAuthNotificationsExtension = $false'
-    }
+    $expectedBootstrapFlags = @(
+        ('$includeAuthNotificationsExtension = $' + ($case.Extensions -contains 'Auth.Notifications').ToString().ToLowerInvariant())
+        ('$includeAuthOrganizationsExtension = $' + ($case.Extensions -contains 'Auth.Organizations').ToString().ToLowerInvariant())
+        ('$includeExtensions = $' + ($case.Extensions.Count -gt 0).ToString().ToLowerInvariant())
+    )
     $bootstrap = [System.IO.File]::ReadAllText((Join-Path $outputPath 'eng\gma-bootstrap.ps1'))
-    if ($bootstrap.IndexOf($expectedBootstrapFlag, [System.StringComparison]::Ordinal) -lt 0) {
-        throw "$($case.Name) generated an incorrect extension bootstrap flag."
+    foreach ($expectedBootstrapFlag in $expectedBootstrapFlags) {
+        if ($bootstrap.IndexOf($expectedBootstrapFlag, [System.StringComparison]::Ordinal) -lt 0) {
+            throw "$($case.Name) generated an incorrect extension bootstrap flag: $expectedBootstrapFlag"
+        }
     }
 }
 
-Write-Host 'Generated app selection matrix passed: Auth-only, Notifications-only, and Auth+Notifications.'
+Write-Host 'Generated app selection matrix passed for Auth, Notifications, Organizations, and their opt-in extensions.'

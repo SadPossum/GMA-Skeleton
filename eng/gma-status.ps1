@@ -17,6 +17,7 @@ $gmaSourceRootChecks = @(
     @{ Name = 'auth'; Path = 'gma\modules\auth\Gma.SourceRoots.props' },
     @{ Name = 'files'; Path = 'gma\modules\files\Gma.SourceRoots.props' },
     @{ Name = 'notifications'; Path = 'gma\modules\notifications\Gma.SourceRoots.props' },
+    @{ Name = 'organizations'; Path = 'gma\modules\organizations\Gma.SourceRoots.props' },
     @{ Name = 'task-runtime'; Path = 'gma\modules\task-runtime\Gma.SourceRoots.props' },
     @{ Name = 'tenancy'; Path = 'gma\modules\tenancy\Gma.SourceRoots.props' }
 )

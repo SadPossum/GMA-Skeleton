@@ -211,6 +211,7 @@ gma/modules/administration/Gma.Modules.Administration.slnx
 gma/modules/auth/Gma.Modules.Auth.slnx
 gma/modules/files/Gma.Modules.Files.slnx
 gma/modules/notifications/Gma.Modules.Notifications.slnx
+gma/modules/organizations/Gma.Modules.Organizations.slnx
 gma/modules/task-runtime/Gma.Modules.TaskRuntime.slnx
 gma/modules/tenancy/Gma.Modules.Tenancy.slnx
 ```

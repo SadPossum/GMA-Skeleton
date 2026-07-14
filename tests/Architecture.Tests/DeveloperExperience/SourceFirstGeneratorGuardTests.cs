@@ -71,7 +71,7 @@ public sealed class SourceFirstGeneratorGuardTests
     }
 
     [Fact]
-    public void App_generator_composes_optional_auth_and_notification_adapters()
+    public void App_generator_composes_optional_auth_notification_and_organization_adapters()
     {
         string repositoryRoot = FindRepositoryRoot();
         string generator = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-gma-app.ps1"));
@@ -89,6 +89,8 @@ public sealed class SourceFirstGeneratorGuardTests
             "GmaExtensionsRoot",
             "Gma.Extensions.Auth.Notifications.csproj",
             "builder.Services.AddAuthNotificationsExtension();",
+            "Gma.Extensions.Auth.Organizations.csproj",
+            "builder.Services.AddAuthOrganizationsExtension();",
             "Delivery = [ordered]@{",
             "MaxBatchesPerCategoryPerCycle = 4",
         ];
@@ -106,10 +108,13 @@ public sealed class SourceFirstGeneratorGuardTests
             "AuthOnly",
             "NotificationsOnly",
             "AuthNotifications",
-            "HasExtension = $false",
-            "HasExtension = $true",
+            "AuthOrganizations",
+            "OrganizationsOnly",
+            "Extensions = @()",
             "Gma.Extensions.Auth.Notifications",
             "AddAuthNotificationsExtension",
+            "Gma.Extensions.Auth.Organizations",
+            "AddAuthOrganizationsExtension",
         ];
 
         Assert.DoesNotContain(requiredTokens, token => !script.Contains(token, StringComparison.Ordinal));

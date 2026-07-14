@@ -9,5 +9,6 @@ This folder contains reusable GMA module repositories mounted as Git submodules.
 | Auth | [Auth docs](https://github.com/SadPossum/GMA-Module-Auth/blob/dev/docs/README.md) |
 | Files | [Files docs](https://github.com/SadPossum/GMA-Module-Files/blob/dev/docs/README.md) |
 | Notifications | [Notifications docs](https://github.com/SadPossum/GMA-Module-Notifications/blob/dev/docs/README.md) |
+| Organizations | [Organizations docs](https://github.com/SadPossum/GMA-Module-Organizations/blob/dev/docs/README.md) |
 | TaskRuntime | [TaskRuntime docs](https://github.com/SadPossum/GMA-Module-Task-Runtime/blob/dev/docs/README.md) |
 | Tenancy | [Tenancy docs](https://github.com/SadPossum/GMA-Module-Tenancy/blob/dev/docs/README.md) |

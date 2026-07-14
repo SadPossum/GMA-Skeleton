@@ -31,7 +31,10 @@ using Gma.Modules.Notifications.Adapters.Email;
 using Gma.Modules.Notifications.Application;
 using Gma.Modules.Notifications.Contracts;
 using Gma.Extensions.Auth.Notifications;
+using Gma.Extensions.Auth.Organizations;
 using Gma.Modules.Notifications.Persistence;
+using Gma.Modules.Organizations.Application;
+using Gma.Modules.Organizations.Persistence;
 
 public static class WorkerHostBuilderExtensions
 {
@@ -94,7 +97,7 @@ public static class WorkerHostBuilderExtensions
     {
         if (workerOptions.Modules.Auth)
         {
-            builder.SelectModuleProfile(AuthProfile.ScopeAware().Descriptor, "Host.Worker/Auth");
+            builder.SelectModuleProfile(AuthProfile.Global().Descriptor, "Host.Worker/Auth");
             builder.AddAuthPersistence();
         }
 
@@ -114,6 +117,16 @@ public static class WorkerHostBuilderExtensions
             if (workerOptions.Modules.Auth)
             {
                 builder.Services.AddAuthNotificationsExtension();
+            }
+        }
+
+        if (workerOptions.Modules.Organizations)
+        {
+            builder.Services.AddOrganizationsApplication(builder.Configuration);
+            builder.AddOrganizationsPersistence();
+            if (workerOptions.Modules.Auth)
+            {
+                builder.Services.AddAuthOrganizationsExtension();
             }
         }
 

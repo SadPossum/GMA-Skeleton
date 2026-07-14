@@ -1,6 +1,7 @@
 using Gma.Modules.Administration.AdminApi;
 using Gma.Modules.AccessControl.AdminApi;
 using Gma.Modules.Auth.AdminApi;
+using Gma.Modules.Organizations.AdminApi;
 using Gma.Modules.Auth.Contracts;
 using ServiceDefaults;
 using Gma.Framework.Administration.Api;
@@ -22,6 +23,7 @@ using Gma.Framework.Tenancy.Messaging.Infrastructure;
 using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Administration.Persistence;
 using Gma.Modules.Auth.Persistence;
+using Gma.Modules.Organizations.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -40,13 +42,15 @@ builder.Services.AddApiSecurityDefaults();
 
 builder.AddAdminApiModule<AdministrationAdminApiModule>();
 builder.AddAdminApiModule<AccessControlAdminApiModule>();
-builder.AddAuthAdminApiModule(AuthProfile.ScopeAware());
+builder.AddAuthAdminApiModule(AuthProfile.Global());
+builder.AddAdminApiModule<OrganizationsAdminApiModule>();
 
 builder.AddServiceDefaults();
 builder.AddGmaProductionHttp();
 builder.Services.AddGmaEntityFrameworkReadinessCheck<AdminDbContext>("administration-database");
 builder.Services.AddGmaEntityFrameworkReadinessCheck<AccessControlDbContext>("access-control-database");
 builder.Services.AddGmaEntityFrameworkReadinessCheck<AuthDbContext>("auth-database");
+builder.Services.AddGmaEntityFrameworkReadinessCheck<OrganizationsDbContext>("organizations-database");
 builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
 

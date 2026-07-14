@@ -27,7 +27,10 @@ using Gma.Modules.Auth.Providers.OpenIdConnect;
 using Gma.Modules.Notifications.Adapters.Email;
 using Gma.Modules.Notifications.Api;
 using Gma.Extensions.Auth.Notifications;
+using Gma.Extensions.Auth.Organizations;
 using Gma.Modules.Notifications.Persistence;
+using Gma.Modules.Organizations.Api;
+using Gma.Modules.Organizations.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -48,9 +51,11 @@ builder.AddUserNotificationSignalR();
 builder.Services.AddApiSecurityDefaults();
 
 builder.AddModule<TenancyModule>();
-builder.AddAuthModule(AuthProfile.ScopeAware());
+builder.AddAuthModule(AuthProfile.Global());
 builder.AddAuthOpenIdConnectProviders();
+builder.AddModule<OrganizationsModule>();
 builder.AddModule<NotificationsModule>();
+builder.Services.AddAuthOrganizationsExtension();
 builder.Services.AddAuthNotificationsExtension();
 builder.Services.AddNotificationEmailAdapter(builder.Configuration);
 // module-scaffold:public-api-modules
@@ -59,6 +64,7 @@ builder.AddServiceDefaults();
 builder.AddGmaProductionHttp();
 builder.Services.AddGmaEntityFrameworkReadinessCheck<AuthDbContext>("auth-database");
 builder.Services.AddGmaEntityFrameworkReadinessCheck<NotificationsDbContext>("notifications-database");
+builder.Services.AddGmaEntityFrameworkReadinessCheck<OrganizationsDbContext>("organizations-database");
 builder.AddGmaOpenApi();
 builder.ValidateModuleComposition();
 

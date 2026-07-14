@@ -55,6 +55,7 @@ function Get-GmaRootSourceRootsLines {
         '    <GmaModuleCatalogRoot>$(GmaRepositoryRoot)src\Modules\Catalog\</GmaModuleCatalogRoot>',
         '    <GmaModuleFilesRoot>$(GmaModulesRoot)files\src\</GmaModuleFilesRoot>',
         '    <GmaModuleNotificationsRoot>$(GmaModulesRoot)notifications\src\</GmaModuleNotificationsRoot>',
+        '    <GmaModuleOrganizationsRoot>$(GmaModulesRoot)organizations\src\</GmaModuleOrganizationsRoot>',
         '    <GmaModuleOrderingRoot>$(GmaRepositoryRoot)src\Modules\Ordering\</GmaModuleOrderingRoot>',
         '    <GmaModuleTaskRuntimeRoot>$(GmaModulesRoot)task-runtime\src\</GmaModuleTaskRuntimeRoot>',
         '    <GmaModuleTaskSamplesRoot>$(GmaRepositoryRoot)src\Modules\TaskSamples\</GmaModuleTaskSamplesRoot>',
@@ -82,6 +83,7 @@ function Get-GmaExtensionsSourceRootsLines {
         '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)..\framework\src\</GmaFrameworkRoot>',
         '    <GmaModuleAuthRoot>$(MSBuildThisFileDirectory)..\modules\auth\src\</GmaModuleAuthRoot>',
         '    <GmaModuleNotificationsRoot>$(MSBuildThisFileDirectory)..\modules\notifications\src\</GmaModuleNotificationsRoot>',
+        '    <GmaModuleOrganizationsRoot>$(MSBuildThisFileDirectory)..\modules\organizations\src\</GmaModuleOrganizationsRoot>',
         '  </PropertyGroup>',
         '</Project>'
     )
@@ -99,6 +101,7 @@ function Get-GmaModuleSourceRootsLines {
         '    <GmaModuleCatalogRoot>$(MSBuildThisFileDirectory)..\..\..\src\Modules\Catalog\</GmaModuleCatalogRoot>',
         '    <GmaModuleFilesRoot>$(GmaModulesRoot)files\src\</GmaModuleFilesRoot>',
         '    <GmaModuleNotificationsRoot>$(GmaModulesRoot)notifications\src\</GmaModuleNotificationsRoot>',
+        '    <GmaModuleOrganizationsRoot>$(GmaModulesRoot)organizations\src\</GmaModuleOrganizationsRoot>',
         '    <GmaModuleOrderingRoot>$(MSBuildThisFileDirectory)..\..\..\src\Modules\Ordering\</GmaModuleOrderingRoot>',
         '    <GmaModuleTaskRuntimeRoot>$(GmaModulesRoot)task-runtime\src\</GmaModuleTaskRuntimeRoot>',
         '    <GmaModuleTaskSamplesRoot>$(MSBuildThisFileDirectory)..\..\..\src\Modules\TaskSamples\</GmaModuleTaskSamplesRoot>',
@@ -136,6 +139,7 @@ $moduleAliases = @(
     'auth',
     'files',
     'notifications',
+    'organizations',
     'task-runtime',
     'tenancy'
 )

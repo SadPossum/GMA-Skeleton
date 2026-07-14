@@ -2,6 +2,7 @@ using Gma.Modules.Administration.AdminCli;
 using Gma.Modules.AccessControl.AdminCli;
 using Gma.Modules.Auth.AdminCli;
 using Gma.Modules.Auth.Contracts;
+using Gma.Modules.Organizations.AdminCli;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -34,7 +35,8 @@ try
     builder.AddTenantAwareMessaging();
     builder.AddAdminModule<AdministrationAdminCliModule>();
     builder.AddAdminModule<AccessControlAdminCliModule>();
-    builder.AddAuthAdminModule(AuthProfile.ScopeAware());
+    builder.AddAuthAdminModule(AuthProfile.Global());
+    builder.AddAdminModule<OrganizationsAdminCliModule>();
     builder.ValidateModuleComposition();
 
     using IHost host = builder.Build();

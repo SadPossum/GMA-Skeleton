@@ -34,3 +34,7 @@
 	path = gma/extensions
 	url = https://github.com/SadPossum/GMA-Extensions.git
 	branch = dev
+[submodule "gma/modules/organizations"]
+	path = gma/modules/organizations
+	url = https://github.com/SadPossum/GMA-Module-Organizations.git
+	branch = dev

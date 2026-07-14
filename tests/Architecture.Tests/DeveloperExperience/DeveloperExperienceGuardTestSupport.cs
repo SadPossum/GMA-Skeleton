@@ -752,6 +752,7 @@ public sealed partial class DeveloperExperienceGuardTests
             ("GmaModuleCatalogRoot", "Catalog"),
             ("GmaModuleFilesRoot", "Files"),
             ("GmaModuleNotificationsRoot", "Notifications"),
+            ("GmaModuleOrganizationsRoot", "Organizations"),
             ("GmaModuleOrderingRoot", "Ordering"),
             ("GmaModuleTaskRuntimeRoot", "TaskRuntime"),
             ("GmaModuleTaskSamplesRoot", "TaskSamples"),
