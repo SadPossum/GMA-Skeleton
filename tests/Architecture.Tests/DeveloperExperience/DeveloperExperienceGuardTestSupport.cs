@@ -359,7 +359,7 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         using AuthDbContext auth = new(
             CreateTenantConventionOptions<AuthDbContext>(),
-            new DesignTimeScopeContext());
+            new DesignTimeAuthScopeContext());
         using CatalogDbContext catalog = new(
             CreateTenantConventionOptions<CatalogDbContext>(),
             new DesignTimeScopeContext());

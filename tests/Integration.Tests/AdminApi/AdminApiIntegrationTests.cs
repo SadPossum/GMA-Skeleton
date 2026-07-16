@@ -163,7 +163,7 @@ public sealed class AdminApiIntegrationTests
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersRevokeSessions);
         await AssertSuccess(ownerClient.PostAsJsonAsync(
             "/api/admin/roles/support/assignments",
-            new { actorId = supportId.ToString(), scope = "tenant:tenant-admin" }));
+            new { actorId = supportId.ToString(), scope = "global" }));
 
         Guid productUserId = Guid.NewGuid();
         await AssertSuccess(ownerClient.PostAsJsonAsync("/api/admin/roles", new { name = "property-reader" }));
@@ -249,42 +249,20 @@ public sealed class AdminApiIntegrationTests
             "Bearer",
             application.CreateAccessToken(supportId, "tenant-admin"));
         supportOtherTenantClient.DefaultRequestHeaders.Add("X-Tenant-Id", "tenant-other");
-        int tenantClaimMismatchAuditCountBefore = await application
-            .CountAuditEntriesAsync(AuthAdminOperationNames.MembersCreate, AdminErrors.TenantClaimMismatch.Code)
-            .ConfigureAwait(false);
-        using HttpResponseMessage crossTenantDenied = await supportOtherTenantClient.PostAsJsonAsync(
-            "/api/admin/auth/members",
-            new
-            {
-                username = $"{provider.ToLowerInvariant()}-other@example.com",
-                usernameType = UsernameType.Email,
-                generatePassword = true
-            }).ConfigureAwait(false);
-        string crossTenantDeniedBody = await crossTenantDenied.Content.ReadAsStringAsync().ConfigureAwait(false);
-        Assert.Equal(HttpStatusCode.BadRequest, crossTenantDenied.StatusCode);
-        Assert.Contains(AdminErrors.TenantClaimMismatch.Code, crossTenantDeniedBody, StringComparison.Ordinal);
-        Assert.DoesNotContain("GeneratedPasswordResponsesDisabled", crossTenantDeniedBody, StringComparison.Ordinal);
-        Assert.Equal(
-            tenantClaimMismatchAuditCountBefore + 1,
-            await application.CountAuditEntriesAsync(AuthAdminOperationNames.MembersCreate, AdminErrors.TenantClaimMismatch.Code).ConfigureAwait(false));
+        using HttpResponseMessage crossTenantAllowed = await AssertSuccess(
+            supportOtherTenantClient.GetAsync("/api/admin/auth/members")).ConfigureAwait(false);
+        JsonElement crossTenantJson = await ReadJsonAsync(crossTenantAllowed).ConfigureAwait(false);
+        Assert.Equal(PageRequest.DefaultPage, crossTenantJson.GetProperty("page").GetInt32());
 
         using HttpClient invalidTenantClaimClient = application.CreateClient();
         invalidTenantClaimClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
             AdminApiTestApplication.CreateAccessTokenWithTenantClaim(supportId, new string('x', ScopeIds.MaxLength + 1)));
         invalidTenantClaimClient.DefaultRequestHeaders.Add("X-Tenant-Id", "tenant-admin");
-        int invalidTenantClaimAuditCountBefore = await application
-            .CountAuditEntriesAsync(AuthAdminOperationNames.MembersList, AdminErrors.TenantClaimMismatch.Code)
-            .ConfigureAwait(false);
-        using HttpResponseMessage invalidTenantClaimDenied = await invalidTenantClaimClient
-            .GetAsync("/api/admin/auth/members")
-            .ConfigureAwait(false);
-        string invalidTenantClaimDeniedBody = await invalidTenantClaimDenied.Content.ReadAsStringAsync().ConfigureAwait(false);
-        Assert.Equal(HttpStatusCode.BadRequest, invalidTenantClaimDenied.StatusCode);
-        Assert.Contains(AdminErrors.TenantClaimMismatch.Code, invalidTenantClaimDeniedBody, StringComparison.Ordinal);
-        Assert.Equal(
-            invalidTenantClaimAuditCountBefore + 1,
-            await application.CountAuditEntriesAsync(AuthAdminOperationNames.MembersList, AdminErrors.TenantClaimMismatch.Code).ConfigureAwait(false));
+        using HttpResponseMessage invalidTenantClaimAllowed = await AssertSuccess(
+            invalidTenantClaimClient.GetAsync("/api/admin/auth/members")).ConfigureAwait(false);
+        JsonElement invalidTenantClaimJson = await ReadJsonAsync(invalidTenantClaimAllowed).ConfigureAwait(false);
+        Assert.Equal(PageRequest.DefaultPage, invalidTenantClaimJson.GetProperty("page").GetInt32());
 
         using HttpClient supportClient = application.CreateClient();
         supportClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
@@ -353,8 +331,8 @@ public sealed class AdminApiIntegrationTests
         supportWithoutTenantClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
             application.CreateAccessToken(supportId, "tenant-admin"));
-        int tenantAuditCountBefore = await application
-            .CountAuditEntriesAsync(AuthAdminOperationNames.MembersCreate, AdminErrors.TenantRequired.Code)
+        int generatedWithoutTenantAuditCountBefore = await application
+            .CountAuditEntriesAsync(AuthAdminOperationNames.MembersCreate, "Admin.GeneratedPasswordResponsesDisabled")
             .ConfigureAwait(false);
         using HttpResponseMessage missingTenant = await supportWithoutTenantClient.PostAsJsonAsync(
             "/api/admin/auth/members",
@@ -366,24 +344,18 @@ public sealed class AdminApiIntegrationTests
             }).ConfigureAwait(false);
         Assert.Equal(HttpStatusCode.BadRequest, missingTenant.StatusCode);
         Assert.Equal(
-            tenantAuditCountBefore + 1,
-            await application.CountAuditEntriesAsync(AuthAdminOperationNames.MembersCreate, AdminErrors.TenantRequired.Code).ConfigureAwait(false));
+            generatedWithoutTenantAuditCountBefore + 1,
+            await application.CountAuditEntriesAsync(AuthAdminOperationNames.MembersCreate, "Admin.GeneratedPasswordResponsesDisabled").ConfigureAwait(false));
 
         using HttpRequestMessage multipleTenantRequest = new(HttpMethod.Get, "/api/admin/auth/members");
         multipleTenantRequest.Headers.Authorization = new AuthenticationHeaderValue(
             "Bearer",
             application.CreateAccessToken(supportId, "tenant-admin"));
         multipleTenantRequest.Headers.Add("X-Tenant-Id", ["tenant-admin", "tenant-other"]);
-        int invalidTenantAuditCountBefore = await application
-            .CountAuditEntriesAsync(AuthAdminOperationNames.MembersList, AdminErrors.TenantInvalid.Code)
-            .ConfigureAwait(false);
-        using HttpResponseMessage multipleTenant = await supportClient.SendAsync(multipleTenantRequest).ConfigureAwait(false);
-        string multipleTenantBody = await multipleTenant.Content.ReadAsStringAsync().ConfigureAwait(false);
-        Assert.Equal(HttpStatusCode.BadRequest, multipleTenant.StatusCode);
-        Assert.Contains(AdminErrors.TenantInvalid.Code, multipleTenantBody, StringComparison.Ordinal);
-        Assert.Equal(
-            invalidTenantAuditCountBefore + 1,
-            await application.CountAuditEntriesAsync(AuthAdminOperationNames.MembersList, AdminErrors.TenantInvalid.Code).ConfigureAwait(false));
+        using HttpResponseMessage multipleTenant = await AssertSuccess(
+            supportClient.SendAsync(multipleTenantRequest)).ConfigureAwait(false);
+        JsonElement multipleTenantJson = await ReadJsonAsync(multipleTenant).ConfigureAwait(false);
+        Assert.Equal(PageRequest.DefaultPage, multipleTenantJson.GetProperty("page").GetInt32());
 
         string manualPassword = $"Manual-password-{provider}-1!";
         using HttpResponseMessage created = await AssertSuccess(supportClient.PostAsJsonAsync(

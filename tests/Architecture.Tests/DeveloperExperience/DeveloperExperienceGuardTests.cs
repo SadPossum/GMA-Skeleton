@@ -5885,6 +5885,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Api\Gma.Modules.Notifications.Api.csproj",
                     @"..\Extensions\Gma.Extensions.Auth.Notifications\Gma.Extensions.Auth.Notifications.csproj",
                     @"..\Extensions\Gma.Extensions.Auth.Organizations\Gma.Extensions.Auth.Organizations.csproj",
+                    @"..\Extensions\Gma.Extensions.Organizations.Tenancy\Gma.Extensions.Organizations.Tenancy.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Notifications\Gma.Modules.Notifications.Persistence.SqlServerMigrations\Gma.Modules.Notifications.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\Organizations\Gma.Modules.Organizations.Api\Gma.Modules.Organizations.Api.csproj",

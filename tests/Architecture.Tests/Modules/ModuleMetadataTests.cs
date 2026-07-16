@@ -908,7 +908,15 @@ public sealed partial class ModuleMetadataTests
         Type? dependencyInjection = project.Assembly.GetType($"{project.ProjectName}.DependencyInjection");
         MethodInfo? registrationMethod = dependencyInjection
             ?.GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .SingleOrDefault(method => string.Equals(method.Name, $"Add{project.ModulePrefix}Application", StringComparison.Ordinal));
+            .Where(method => string.Equals(method.Name, $"Add{project.ModulePrefix}Application", StringComparison.Ordinal))
+            .SingleOrDefault(method =>
+            {
+                ParameterInfo[] methodParameters = method.GetParameters();
+                return (methodParameters.Length == 1 && methodParameters[0].ParameterType == typeof(IServiceCollection)) ||
+                       (methodParameters.Length == 2 &&
+                        methodParameters[0].ParameterType == typeof(IServiceCollection) &&
+                        methodParameters[1].ParameterType == typeof(IConfiguration));
+            });
 
         if (registrationMethod is null)
         {

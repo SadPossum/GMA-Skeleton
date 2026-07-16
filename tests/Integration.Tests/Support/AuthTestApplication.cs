@@ -1,5 +1,6 @@
 namespace Integration.Tests.Support;
 
+using Gma.Modules.Auth.Application.Ports;
 using Gma.Modules.Auth.Persistence;
 using Host.Api;
 using Microsoft.AspNetCore.Hosting;
@@ -223,11 +224,12 @@ internal sealed class AuthTestApplication(
         return snapshot;
     }
 
-    private sealed class DisabledTenantContext : IScopeContext
+    private sealed class DisabledTenantContext : IAuthScopeContext
     {
         public static readonly DisabledTenantContext Instance = new();
 
         public bool IsEnabled => false;
         public string? ScopeId => null;
+        public bool TryRestoreScope(string? scopeId) => true;
     }
 }

@@ -18,8 +18,10 @@ $cases = @(
     [pscustomobject] @{ Name = 'AuthOnly'; Modules = @('auth'); Extensions = @() },
     [pscustomobject] @{ Name = 'NotificationsOnly'; Modules = @('notifications'); Extensions = @() },
     [pscustomobject] @{ Name = 'OrganizationsOnly'; Modules = @('organizations'); Extensions = @() },
+    [pscustomobject] @{ Name = 'OrganizationsTenancy'; Modules = @('organizations', 'tenancy'); Extensions = @('Organizations.Tenancy') },
     [pscustomobject] @{ Name = 'AuthNotifications'; Modules = @('auth', 'notifications'); Extensions = @('Auth.Notifications') },
-    [pscustomobject] @{ Name = 'AuthOrganizations'; Modules = @('auth', 'organizations'); Extensions = @('Auth.Organizations') }
+    [pscustomobject] @{ Name = 'AuthOrganizations'; Modules = @('auth', 'organizations'); Extensions = @('Auth.Organizations') },
+    [pscustomobject] @{ Name = 'AuthOrganizationsTenancy'; Modules = @('auth', 'organizations', 'tenancy'); Extensions = @('Auth.Organizations', 'Organizations.Tenancy') }
 )
 
 $sharedExtensionTokens = @(
@@ -30,6 +32,7 @@ $sharedExtensionTokens = @(
 $extensionTokens = @{
     'Auth.Notifications' = @('Gma.Extensions.Auth.Notifications', 'AddAuthNotificationsExtension')
     'Auth.Organizations' = @('Gma.Extensions.Auth.Organizations', 'AddAuthOrganizationsExtension')
+    'Organizations.Tenancy' = @('Gma.Extensions.Organizations.Tenancy', 'AddOrganizationsTenancyExtension')
 }
 
 foreach ($case in $cases) {
@@ -74,6 +77,7 @@ foreach ($case in $cases) {
     $expectedBootstrapFlags = @(
         ('$includeAuthNotificationsExtension = $' + ($case.Extensions -contains 'Auth.Notifications').ToString().ToLowerInvariant())
         ('$includeAuthOrganizationsExtension = $' + ($case.Extensions -contains 'Auth.Organizations').ToString().ToLowerInvariant())
+        ('$includeOrganizationsTenancyExtension = $' + ($case.Extensions -contains 'Organizations.Tenancy').ToString().ToLowerInvariant())
         ('$includeExtensions = $' + ($case.Extensions.Count -gt 0).ToString().ToLowerInvariant())
     )
     $bootstrap = [System.IO.File]::ReadAllText((Join-Path $outputPath 'eng\gma-bootstrap.ps1'))

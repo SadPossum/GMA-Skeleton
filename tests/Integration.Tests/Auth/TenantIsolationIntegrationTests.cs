@@ -1,7 +1,6 @@
 namespace Integration.Tests;
 
 using System.Net;
-using Gma.Modules.Auth.Application;
 using Gma.Modules.Auth.Contracts;
 using Gma.Modules.Auth.Domain.Errors;
 using DotNet.Testcontainers.Containers;
@@ -14,7 +13,7 @@ public sealed class TenantIsolationIntegrationTests
     [DockerFact]
     [Trait("Category", "Docker")]
     [Trait("Category", "Integration")]
-    public async Task Members_and_sessions_are_isolated_by_tenant()
+    public async Task Global_members_and_sessions_are_independent_of_product_tenant_headers()
     {
         await using IContainer nats = AuthTestContainers.CreateNatsContainer();
         await using MsSqlContainer sqlServer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
@@ -29,31 +28,26 @@ public sealed class TenantIsolationIntegrationTests
         await application.MigrateDatabaseAsync();
         using HttpClient client = application.CreateClient();
 
-        await AuthApiClient.RegisterAsync(client, "tenant-a", "shared@example.com");
+        AuthTokensResponse registeredTokens = await AuthApiClient.RegisterAsync(client, "tenant-a", "shared@example.com");
 
-        HttpResponseMessage isolatedLogin = await AuthApiClient.PostJsonAsync(
+        using HttpResponseMessage crossTenantLogin = await AuthApiClient.PostJsonAsync(
             client,
             "tenant-b",
             "/api/auth/login",
             new LoginMemberRequest("shared@example.com", AuthApiClient.Password));
 
-        string isolatedLoginBody = await isolatedLogin.Content.ReadAsStringAsync().ConfigureAwait(false);
-        Assert.Equal(HttpStatusCode.Unauthorized, isolatedLogin.StatusCode);
-        Assert.Contains(AuthDomainErrors.CredentialsNotValid.Code, isolatedLoginBody, StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.OK, crossTenantLogin.StatusCode);
 
-        AuthTokensResponse tenantBTokens = await AuthApiClient.RegisterAsync(client, "tenant-b", "shared@example.com");
-
-        Assert.False(string.IsNullOrWhiteSpace(tenantBTokens.AccessToken));
-
-        AuthTokensResponse tenantATokens = await AuthApiClient.LoginAsync(client, "tenant-a", "shared@example.com");
-        using HttpResponseMessage mismatchedRefresh = await AuthApiClient.PostJsonAsync(
+        using HttpResponseMessage duplicateRegistration = await AuthApiClient.PostJsonAsync(
             client,
             "tenant-b",
-            "/api/auth/refresh",
-            new RefreshTokenRequest(tenantATokens.AccessToken, tenantATokens.RefreshToken));
+            "/api/auth/register",
+            new RegisterMemberRequest("shared@example.com", UsernameType.Email, AuthApiClient.Password));
+        string duplicateRegistrationBody = await duplicateRegistration.Content.ReadAsStringAsync().ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.Conflict, duplicateRegistration.StatusCode);
+        Assert.Contains(AuthDomainErrors.UsernameAlreadyExists.Code, duplicateRegistrationBody, StringComparison.Ordinal);
 
-        string mismatchedRefreshBody = await mismatchedRefresh.Content.ReadAsStringAsync().ConfigureAwait(false);
-        Assert.Equal(HttpStatusCode.Forbidden, mismatchedRefresh.StatusCode);
-        Assert.Contains(AuthApplicationErrors.TenantMismatch.Code, mismatchedRefreshBody, StringComparison.Ordinal);
+        AuthTokensResponse refreshedTokens = await AuthApiClient.RefreshAsync(client, "tenant-b", registeredTokens);
+        Assert.False(string.IsNullOrWhiteSpace(refreshedTokens.AccessToken));
     }
 }

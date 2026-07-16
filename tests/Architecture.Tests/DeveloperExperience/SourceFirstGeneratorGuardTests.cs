@@ -91,6 +91,8 @@ public sealed class SourceFirstGeneratorGuardTests
             "builder.Services.AddAuthNotificationsExtension();",
             "Gma.Extensions.Auth.Organizations.csproj",
             "builder.Services.AddAuthOrganizationsExtension();",
+            "Gma.Extensions.Organizations.Tenancy.csproj",
+            "builder.Services.AddOrganizationsTenancyExtension();",
             "Delivery = [ordered]@{",
             "MaxBatchesPerCategoryPerCycle = 4",
         ];
@@ -109,12 +111,16 @@ public sealed class SourceFirstGeneratorGuardTests
             "NotificationsOnly",
             "AuthNotifications",
             "AuthOrganizations",
+            "OrganizationsTenancy",
+            "AuthOrganizationsTenancy",
             "OrganizationsOnly",
             "Extensions = @()",
             "Gma.Extensions.Auth.Notifications",
             "AddAuthNotificationsExtension",
             "Gma.Extensions.Auth.Organizations",
             "AddAuthOrganizationsExtension",
+            "Gma.Extensions.Organizations.Tenancy",
+            "AddOrganizationsTenancyExtension",
         ];
 
         Assert.DoesNotContain(requiredTokens, token => !script.Contains(token, StringComparison.Ordinal));

@@ -12,6 +12,7 @@ using Gma.Modules.AccessControl.Application.Commands;
 using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Auth.Domain.Services;
 using Gma.Modules.Auth.Domain.ValueObjects;
+using Gma.Modules.Auth.Application.Ports;
 using Gma.Modules.Auth.Persistence;
 using Host.AdminApi;
 using Microsoft.AspNetCore.Hosting;
@@ -310,11 +311,12 @@ internal sealed class AdminApiTestApplication(
             })
             .Build();
 
-    private sealed class DisabledTenantContext : IScopeContext
+    private sealed class DisabledTenantContext : IAuthScopeContext
     {
         public static readonly DisabledTenantContext Instance = new();
 
         public bool IsEnabled => false;
         public string? ScopeId => null;
+        public bool TryRestoreScope(string? scopeId) => true;
     }
 }

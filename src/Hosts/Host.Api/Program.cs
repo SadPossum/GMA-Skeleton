@@ -28,6 +28,7 @@ using Gma.Modules.Notifications.Adapters.Email;
 using Gma.Modules.Notifications.Api;
 using Gma.Extensions.Auth.Notifications;
 using Gma.Extensions.Auth.Organizations;
+using Gma.Extensions.Organizations.Tenancy;
 using Gma.Modules.Notifications.Persistence;
 using Gma.Modules.Organizations.Api;
 using Gma.Modules.Organizations.Persistence;
@@ -56,6 +57,7 @@ builder.AddAuthOpenIdConnectProviders();
 builder.AddModule<OrganizationsModule>();
 builder.AddModule<NotificationsModule>();
 builder.Services.AddAuthOrganizationsExtension();
+builder.Services.AddOrganizationsTenancyExtension();
 builder.Services.AddAuthNotificationsExtension();
 builder.Services.AddNotificationEmailAdapter(builder.Configuration);
 // module-scaffold:public-api-modules
