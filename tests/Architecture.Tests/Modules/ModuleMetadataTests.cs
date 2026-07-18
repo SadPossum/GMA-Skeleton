@@ -1043,7 +1043,10 @@ public sealed partial class ModuleMetadataTests
 
         if (effectiveType == typeof(DateTimeOffset))
         {
-            return new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            DateTimeOffset occurredAtUtc = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            return parameterName.Contains("expires", StringComparison.OrdinalIgnoreCase)
+                ? occurredAtUtc.AddDays(1)
+                : occurredAtUtc;
         }
 
         if (effectiveType == typeof(int))
