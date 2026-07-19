@@ -60,6 +60,21 @@ public sealed class DurableRuntimeConfigurationTests
         Assert.True(retention.GetProperty("MaxBatchesPerStatusPerCycle").GetInt32() > 0);
     }
 
+    [Fact]
+    public void Api_host_exposes_bounded_authentication_runtime_defaults()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        using JsonDocument document = ReadAppSettings(repositoryRoot, "Host.Api");
+        JsonElement auth = document.RootElement.GetProperty("Auth");
+        JsonElement retention = auth.GetProperty("Retention");
+
+        Assert.InRange(auth.GetProperty("MaximumActiveSessionsPerMember").GetInt32(), 1, 1000);
+        Assert.True(auth.GetProperty("FailedLoginLimit").GetInt32() > 0);
+        Assert.True(auth.GetProperty("FailedLoginWindowMinutes").GetInt32() > 0);
+        Assert.False(retention.GetProperty("Enabled").GetBoolean());
+        Assert.True(retention.GetProperty("AuthenticationFailureHistoryHours").GetInt32() > 0);
+    }
+
     private static JsonDocument ReadAppSettings(string repositoryRoot, string host) =>
         JsonDocument.Parse(File.ReadAllText(Path.Combine(
             repositoryRoot,

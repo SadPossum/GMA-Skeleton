@@ -282,6 +282,7 @@
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Authenticators.Totp/Gma.Modules.Auth.Authenticators.Totp.csproj" />
   </Folder>
   <Folder Name="/gma/modules/auth/tests/">
+    <Project Path="gma/modules/auth/tests/Gma.Modules.Auth.IntegrationTests/Gma.Modules.Auth.IntegrationTests.csproj" />
     <Project Path="gma/modules/auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj" />
   </Folder>
   <Folder Name="/gma/modules/files/src/Api/">

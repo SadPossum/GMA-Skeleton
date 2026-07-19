@@ -92,6 +92,24 @@ public sealed class AuthLifecycleIntegrationTests
             Assert.Contains(AuthApplicationErrors.UsernameTypeInvalid.Code, invalidUsernameTypeBody, StringComparison.Ordinal);
 
             AuthTokensResponse registered = await AuthApiClient.RegisterAsync(client, "tenant-auth", username).ConfigureAwait(false);
+            using HttpResponseMessage passwordAssurance = await AuthApiClient.GetAsync(
+                client,
+                "tenant-auth",
+                "/api/integration/authentication-assurance/password",
+                registered.AccessToken).ConfigureAwait(false);
+            Assert.Equal(HttpStatusCode.NoContent, passwordAssurance.StatusCode);
+
+            using HttpResponseMessage insufficientAssurance = await AuthApiClient.GetAsync(
+                client,
+                "tenant-auth",
+                "/api/integration/authentication-assurance/mfa",
+                registered.AccessToken).ConfigureAwait(false);
+            Assert.Equal(HttpStatusCode.Unauthorized, insufficientAssurance.StatusCode);
+            Assert.True(insufficientAssurance.Headers.TryGetValues("WWW-Authenticate", out IEnumerable<string>? challenges));
+            string challengeHeader = string.Join(", ", challenges ?? []);
+            Assert.Contains("insufficient_user_authentication", challengeHeader, StringComparison.Ordinal);
+            Assert.Contains("urn:gma:acr:mfa", challengeHeader, StringComparison.Ordinal);
+
             using HttpResponseMessage duplicateUsername = await AuthApiClient.PostJsonAsync(
                 client,
                 "tenant-auth",
@@ -215,6 +233,13 @@ public sealed class AuthLifecycleIntegrationTests
                 .ReadFromJsonAsync<AuthTokensResponse>()
                 .ConfigureAwait(false);
             Assert.NotNull(completedTokens);
+
+            using HttpResponseMessage multiFactorAssurance = await AuthApiClient.GetAsync(
+                client,
+                scopeId,
+                "/api/integration/authentication-assurance/mfa",
+                completedTokens.AccessToken).ConfigureAwait(false);
+            Assert.Equal(HttpStatusCode.NoContent, multiFactorAssurance.StatusCode);
 
             foreach (HttpResponseMessage response in completionResponses)
             {

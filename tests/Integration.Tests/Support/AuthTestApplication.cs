@@ -1,5 +1,6 @@
 namespace Integration.Tests.Support;
 
+using Gma.Framework.Api.Modules;
 using Gma.Framework.Messaging;
 using Gma.Framework.Persistence.EntityFrameworkCore;
 using Gma.Framework.Scoping;
@@ -80,6 +81,8 @@ internal sealed class AuthTestApplication(
 
         builder.ConfigureServices(services =>
         {
+            services.AddSingleton<IModule>(new AuthenticationAssuranceProbeModule());
+
             if (disableOutboxPublisher)
             {
                 ServiceDescriptor[] hostedServicesToRemove = services
