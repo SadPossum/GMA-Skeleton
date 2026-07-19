@@ -31,6 +31,7 @@
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.AdminApi\Gma.Modules.Auth.AdminApi.csproj" />
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Api\Gma.Modules.Auth.Api.csproj" />
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Application\Gma.Modules.Auth.Application.csproj" />
+    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Authenticators.Totp\Gma.Modules.Auth.Authenticators.Totp.csproj" />
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj" />
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Domain\Gma.Modules.Auth.Domain.csproj" />
     <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Infrastructure\Gma.Modules.Auth.Infrastructure.csproj" />

@@ -14,7 +14,9 @@ The scripts resolve `dotnet` in this order:
 
 The resolved SDK must be .NET 10. If your .NET 10 SDK is not on `PATH`, set `GMA_DOTNET` to the full `dotnet.exe` path before running `eng/*.ps1`.
 
-Base `appsettings.json` files contain configuration shape and non-secret defaults only. Local disposable connection strings, JWT signing material, and refresh-token peppers live in `appsettings.Development.json`. Production and shared environments must provide `ConnectionStrings:*` plus Auth signing/pepper keys through environment variables, user secrets, a vault, or another secret provider. Prefer the key-ring settings below so rotation does not invalidate every active access or refresh token; the single-key settings remain compatibility options.
+Base `appsettings.json` files contain configuration shape and non-secret defaults only. Local disposable connection strings, JWT signing material, refresh-token peppers, and a local Data Protection key-ring path live in `appsettings.Development.json`. Production and shared environments must provide `ConnectionStrings:*` plus Auth signing/pepper keys through environment variables, user secrets, a vault, or another secret provider. Prefer the key-ring settings below so rotation does not invalidate every active access or refresh token; the single-key settings remain compatibility options.
+
+The default API host explicitly composes the optional TOTP adapter. Production startup fails when `DataProtection:KeyRingPath` is empty: mount a persistent path shared by every API replica, keep `DataProtection:ApplicationName` stable across deployments, and protect the key ring at rest using deployment-appropriate platform, certificate, KMS, or HSM controls. Losing or isolating this key ring makes existing protected TOTP secrets and in-flight OIDC state unusable.
 
 ## First Run
 
@@ -168,6 +170,16 @@ Core runtime keys:
 - `Auth:Jwt:ActiveSigningKeyId` and `Auth:Jwt:SigningKeys:<id>` for rotation
 - `Auth:Jwt:SigningKey` for one-key compatibility
 - `Auth:Jwt:AccessTokenLifetimeMinutes`
+- `Auth:MultiFactor:EnrollmentLifetimeMinutes`
+- `Auth:MultiFactor:ChallengeLifetimeMinutes`
+- `Auth:MultiFactor:ChallengeMaximumAttempts`
+- `Auth:MultiFactor:RecoveryCodeCount`
+- `Auth:MultiFactor:SensitiveSessionFreshnessMinutes`
+- `Auth:MultiFactor:ManagementMaximumAttempts`
+- `Auth:MultiFactor:ManagementAttemptWindowMinutes`
+- `Auth:Totp:Issuer`
+- `DataProtection:ApplicationName`
+- `DataProtection:KeyRingPath`
 - `AccessControl:Bootstrap:AllowWhenAssignmentsExist`
 - `AccessControl:Bootstrap:OwnerRoleName`
 - `Administration:Api:ActorIdClaim`

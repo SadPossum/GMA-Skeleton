@@ -836,6 +836,57 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
+    public void Auth_totp_adapter_is_host_selected_and_uses_configured_data_protection()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string apiProgram = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "src",
+            "Hosts",
+            "Host.Api",
+            "Program.cs"));
+        string apiProject = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "src",
+            "Hosts",
+            "Host.Api",
+            "Host.Api.csproj"));
+        string dataProtectionComposition = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "src",
+            "Hosts",
+            "Host.Api",
+            "DataProtectionComposition.cs"));
+        string adminApiProgram = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "src",
+            "Hosts",
+            "Host.AdminApi",
+            "Program.cs"));
+
+        Assert.Contains("Gma.Modules.Auth.Authenticators.Totp.csproj", apiProject, StringComparison.Ordinal);
+        Assert.Contains("AddConfiguredDataProtection()", apiProgram, StringComparison.Ordinal);
+        Assert.Contains("AddAuthTotpAuthenticator()", apiProgram, StringComparison.Ordinal);
+        Assert.DoesNotContain("AddAuthTotpAuthenticator()", adminApiProgram, StringComparison.Ordinal);
+        Assert.Contains("SetApplicationName(applicationName)", dataProtectionComposition, StringComparison.Ordinal);
+        Assert.Contains("PersistKeysToFileSystem", dataProtectionComposition, StringComparison.Ordinal);
+        Assert.Contains("builder.Environment.IsProduction()", dataProtectionComposition, StringComparison.Ordinal);
+        Assert.Contains("DataProtection:KeyRingPath is required in Production", dataProtectionComposition, StringComparison.Ordinal);
+
+        string baseSettings = Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "appsettings.json");
+        string developmentSettings = Path.Combine(
+            repositoryRoot,
+            "src",
+            "Hosts",
+            "Host.Api",
+            "appsettings.Development.json");
+        Assert.Equal(string.Empty, GetJsonStringValue(baseSettings, ["DataProtection", "KeyRingPath"]));
+        Assert.Equal(
+            ".data/data-protection-keys",
+            GetJsonStringValue(developmentSettings, ["DataProtection", "KeyRingPath"]));
+    }
+
+    [Fact]
     public void Http_hosts_use_shared_request_logging_enrichment()
     {
         string repositoryRoot = FindRepositoryRoot();
@@ -5882,6 +5933,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 [],
                 [
                     @"..\Modules\Auth\Gma.Modules.Auth.Api\Gma.Modules.Auth.Api.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Authenticators.Totp\Gma.Modules.Auth.Authenticators.Totp.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj",

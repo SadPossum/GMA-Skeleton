@@ -1,6 +1,6 @@
-using Gma.Modules.Auth.Api;
-using Gma.Modules.Auth.Contracts;
-using ServiceDefaults;
+using Gma.Extensions.Auth.Notifications;
+using Gma.Extensions.Auth.Organizations;
+using Gma.Extensions.Organizations.Tenancy;
 using Gma.Framework.Api.Modules;
 using Gma.Framework.Api.OpenApi;
 using Gma.Framework.Api.Production;
@@ -21,17 +21,19 @@ using Gma.Framework.Realtime.Notifications;
 using Gma.Framework.Tenancy.Api.Serilog;
 using Gma.Framework.Tenancy.Caching;
 using Gma.Framework.Tenancy.Messaging.Infrastructure;
-using Gma.Modules.Tenancy.Api;
+using Gma.Modules.Auth.Api;
+using Gma.Modules.Auth.Authenticators.Totp;
+using Gma.Modules.Auth.Contracts;
 using Gma.Modules.Auth.Persistence;
 using Gma.Modules.Auth.Providers.OpenIdConnect;
 using Gma.Modules.Notifications.Adapters.Email;
 using Gma.Modules.Notifications.Api;
-using Gma.Extensions.Auth.Notifications;
-using Gma.Extensions.Auth.Organizations;
-using Gma.Extensions.Organizations.Tenancy;
 using Gma.Modules.Notifications.Persistence;
 using Gma.Modules.Organizations.Api;
 using Gma.Modules.Organizations.Persistence;
+using Gma.Modules.Tenancy.Api;
+using Host.Api;
+using ServiceDefaults;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -50,9 +52,11 @@ builder.AddConfiguredNatsJetStreamMessaging();
 builder.AddUserNotificationServerSentEvents();
 builder.AddUserNotificationSignalR();
 builder.Services.AddApiSecurityDefaults();
+builder.AddConfiguredDataProtection();
 
 builder.AddModule<TenancyModule>();
 builder.AddAuthModule(AuthProfile.Global());
+builder.AddAuthTotpAuthenticator();
 builder.AddAuthOpenIdConnectProviders();
 builder.AddModule<OrganizationsModule>();
 builder.AddModule<NotificationsModule>();

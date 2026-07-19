@@ -23,6 +23,7 @@ using Gma.Modules.Auth.Admin.Contracts;
 using Gma.Modules.Auth.AdminApi;
 using Gma.Modules.Auth.AdminCli;
 using Gma.Modules.Auth.Api;
+using Gma.Modules.Auth.Authenticators.Totp;
 using Gma.Modules.Auth.Contracts;
 using Gma.Modules.Auth.Domain.Aggregates;
 using Gma.Modules.Auth.Infrastructure;
@@ -77,6 +78,7 @@ internal static class ArchitectureCatalog
         new("Auth", "Gma.Modules.Auth.AdminApi", ModuleProjectKind.AdminApi, typeof(AuthAdminApiModule).Assembly),
         new("Auth", "Gma.Modules.Auth.Api", ModuleProjectKind.Api, typeof(AuthModule).Assembly),
         new("Auth", "Gma.Modules.Auth.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Auth.Application.DependencyInjection).Assembly),
+        new("Auth", "Gma.Modules.Auth.Authenticators.Totp", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Authenticators.Totp.DependencyInjection).Assembly),
         new("Auth", "Gma.Modules.Auth.Contracts", ModuleProjectKind.Contracts, typeof(AuthModuleMetadata).Assembly),
         new("Auth", "Gma.Modules.Auth.Domain", ModuleProjectKind.Domain, typeof(Member).Assembly),
         new("Auth", "Gma.Modules.Auth.Infrastructure", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Infrastructure.DependencyInjection).Assembly),

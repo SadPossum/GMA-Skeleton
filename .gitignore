@@ -14,6 +14,7 @@
 .agents/
 .codex/
 .tmp/
+.data/
 Gma.SourceRoots.props
 
 # User-specific files (MonoDevelop/Xamarin Studio)

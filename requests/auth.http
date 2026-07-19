@@ -7,6 +7,9 @@
 @externalCode =
 @externalIdentityId = 00000000-0000-0000-0000-000000000000
 @verificationCode =
+@totpCode =
+@mfaChallengeToken =
+@recoveryCode =
 
 ### Register
 POST {{host}}/api/auth/register
@@ -58,6 +61,62 @@ X-Tenant-Id: {{tenant}}
 GET {{host}}/api/auth/methods
 Authorization: Bearer {{accessToken}}
 X-Tenant-Id: {{tenant}}
+
+### MFA status
+GET {{host}}/api/auth/mfa
+Authorization: Bearer {{accessToken}}
+X-Tenant-Id: {{tenant}}
+
+### Begin TOTP enrollment
+POST {{host}}/api/auth/mfa/totp/enrollment
+Authorization: Bearer {{accessToken}}
+X-Tenant-Id: {{tenant}}
+
+### Activate TOTP and rotate the current session
+POST {{host}}/api/auth/mfa/totp/activate
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "code": "{{totpCode}}",
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Complete a login MFA challenge
+POST {{host}}/api/auth/mfa/challenges/complete
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "challengeToken": "{{mfaChallengeToken}}",
+  "codeType": "Totp",
+  "code": "{{totpCode}}"
+}
+
+### Regenerate recovery codes
+POST {{host}}/api/auth/mfa/recovery-codes/regenerate
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "codeType": "RecoveryCode",
+  "code": "{{recoveryCode}}",
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Disable TOTP and revoke every session
+POST {{host}}/api/auth/mfa/totp/disable
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+X-Tenant-Id: {{tenant}}
+
+{
+  "codeType": "RecoveryCode",
+  "code": "{{recoveryCode}}",
+  "refreshToken": "{{refreshToken}}"
+}
 
 ### Add or change password
 PUT {{host}}/api/auth/password

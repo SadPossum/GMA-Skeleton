@@ -1,13 +1,13 @@
 namespace Integration.Tests;
 
+using DotNet.Testcontainers.Containers;
+using Gma.Framework.Administration;
+using Gma.Framework.Administration.Cli;
 using Gma.Modules.AccessControl.Application;
 using Gma.Modules.Auth.Application;
 using Gma.Modules.Auth.Contracts;
 using Gma.Modules.Auth.Domain.Errors;
-using DotNet.Testcontainers.Containers;
 using Integration.Tests.Support;
-using Gma.Framework.Administration;
-using Gma.Framework.Administration.Cli;
 using Testcontainers.MsSql;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -76,6 +76,7 @@ public sealed class AdminCliIntegrationTests
         await GrantAsync(application, AuthAdminPermissionCodes.MembersCreate);
         await GrantAsync(application, AuthAdminPermissionCodes.MembersDisable);
         await GrantAsync(application, AuthAdminPermissionCodes.MembersEnable);
+        await GrantAsync(application, AuthAdminPermissionCodes.MembersResetMultiFactor);
         await GrantAsync(application, AuthAdminPermissionCodes.MembersResetPassword);
         await GrantAsync(application, AuthAdminPermissionCodes.MembersRevokeSessions);
         await AssertSuccess(application.ExecuteAsync(
@@ -201,11 +202,42 @@ public sealed class AdminCliIntegrationTests
             .LoginAsync("tenant-admin", $"{provider.ToLowerInvariant()}-member@example.com", password)
             .ConfigureAwait(false);
         Assert.True(loginBeforeDisable.IsSuccess);
+        Assert.True(await application.CountActiveSessionsAsync(memberId).ConfigureAwait(false) > 0);
+        await application.SeedActiveTotpAuthenticatorAsync(memberId, "global").ConfigureAwait(false);
+
+        AdminCliResult missingResetConfirmation = await application.ExecuteAsync(
+            "auth", "members", "reset-multi-factor",
+            "--actor", "support",
+            "--tenant", "tenant-admin",
+            "--member-id", memberId.ToString(),
+            "--reason", "verified account recovery");
+        Assert.Equal(AdminExitCodes.Failed, missingResetConfirmation.ExitCode);
+        Assert.Equal(
+            1,
+            await application.CountAuditEntriesContainingAsync(AdminErrors.ConfirmationRequired.Code).ConfigureAwait(false));
+
+        const string resetReason = "verified account recovery";
+        await AssertSuccess(application.ExecuteAsync(
+            "auth", "members", "reset-multi-factor",
+            "--actor", "support",
+            "--tenant", "tenant-admin",
+            "--member-id", memberId.ToString(),
+            "--reason", resetReason,
+            "--yes"));
+        Assert.Equal(0, await application.CountActiveSessionsAsync(memberId).ConfigureAwait(false));
+        Assert.Equal(
+            1,
+            await application
+                .CountMultiFactorResetEventsAsync(memberId, "global", resetReason)
+                .ConfigureAwait(false));
 
         await AssertSuccess(application.ExecuteAsync(
             "auth", "members", "list",
             "--actor", "support",
             "--tenant", "tenant-admin"));
+        int disableConfirmationAuditCountBefore = await application
+            .CountAuditEntriesContainingAsync(AdminErrors.ConfirmationRequired.Code)
+            .ConfigureAwait(false);
         AdminCliResult missingDisableConfirmation = await application.ExecuteAsync(
             "auth", "members", "disable",
             "--actor", "support",
@@ -213,7 +245,9 @@ public sealed class AdminCliIntegrationTests
             "--member-id", memberId.ToString(),
             "--reason", "support request");
         Assert.Equal(AdminExitCodes.Failed, missingDisableConfirmation.ExitCode);
-        Assert.Equal(1, await application.CountAuditEntriesContainingAsync(AdminErrors.ConfirmationRequired.Code).ConfigureAwait(false));
+        Assert.Equal(
+            disableConfirmationAuditCountBefore + 1,
+            await application.CountAuditEntriesContainingAsync(AdminErrors.ConfirmationRequired.Code).ConfigureAwait(false));
 
         await AssertSuccess(application.ExecuteAsync(
             "auth", "members", "disable",

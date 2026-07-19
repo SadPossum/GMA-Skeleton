@@ -838,6 +838,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath '.gitignore') @(
     '.vs/',
     '.idea/',
     '.tmp/',
+    '.data/',
     'artifacts/',
     'Gma.SourceRoots.props',
     '*.user',
@@ -1073,7 +1074,7 @@ $gmaSourceDocsLines = @(
     "- Generated host surfaces: $selectedHostText.",
     "- Service defaults generated: $([bool]$ServiceDefaults).",
     '- Generated admin and worker hosts are composition shells; add only the reusable or product modules each process owns.',
-    '- Selected Auth and Notifications adapters are composed explicitly by the API host; credentials, enabled providers, shared Data Protection storage for multi-replica OIDC callbacks, email transport, messaging, and production connection strings remain app-owned deployment choices.',
+    '- Selected Auth and Notifications adapters are composed explicitly by the API host; credentials, enabled providers, shared Data Protection storage for multi-replica OIDC callbacks and TOTP secrets, email transport, messaging, and production connection strings remain app-owned deployment choices.',
     '- `Directory.Packages.props` is seeded from the skeleton catalog so app-owned generated modules can restore immediately; prune or add versions as the product evolves.',
     '',
     '## Add Source Repositories',
@@ -1232,6 +1233,7 @@ if ($readinessModuleSpecs.Count -gt 0) {
 
 if ($hasAuth) {
     $hostApiProjectLines += '    <ProjectReference Include="$(GmaFrameworkRoot)Messaging\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj" />'
+    $hostApiProjectLines += '    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Authenticators.Totp\Gma.Modules.Auth.Authenticators.Totp.csproj" />'
     $hostApiProjectLines += '    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Providers.OpenIdConnect\Gma.Modules.Auth.Providers.OpenIdConnect.csproj" />'
 }
 
@@ -1290,7 +1292,9 @@ if ($readinessModuleSpecs.Count -gt 0) {
 }
 
 if ($hasAuth) {
+    $programUsingLines += "using $Name.Host.Api;"
     $programUsingLines += 'using Gma.Framework.Messaging.Infrastructure;'
+    $programUsingLines += 'using Gma.Modules.Auth.Authenticators.Totp;'
     $programUsingLines += 'using Gma.Modules.Auth.Contracts;'
     $programUsingLines += 'using Gma.Modules.Auth.Providers.OpenIdConnect;'
 }
@@ -1356,6 +1360,7 @@ if ($ServiceDefaults) {
 $programLines += @('', '// module-scaffold:public-api-modules')
 
 if ($hasAuth) {
+    $programLines += 'builder.AddConfiguredDataProtection();'
     $programLines += 'builder.AddMessagingInfrastructure();'
 }
 
@@ -1369,6 +1374,7 @@ if ($moduleRegistrationLines.Count -gt 0) {
 }
 
 if ($hasAuth) {
+    $programLines += 'builder.AddAuthTotpAuthenticator();'
     $programLines += 'builder.AddAuthOpenIdConnectProviders();'
 }
 
@@ -1422,6 +1428,57 @@ $programLines += @('', 'app.Run();')
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\Program.cs") $programLines
 
+if ($hasAuth) {
+    Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\DataProtectionComposition.cs") @(
+        "namespace $Name.Host.Api;",
+        '',
+        'using Microsoft.AspNetCore.DataProtection;',
+        'using Microsoft.Extensions.Configuration;',
+        'using Microsoft.Extensions.DependencyInjection;',
+        'using Microsoft.Extensions.Hosting;',
+        '',
+        'internal static class DataProtectionComposition',
+        '{',
+        '    public static IHostApplicationBuilder AddConfiguredDataProtection(this IHostApplicationBuilder builder)',
+        '    {',
+        '        ArgumentNullException.ThrowIfNull(builder);',
+        '',
+        '        string? configuredApplicationName = builder.Configuration["DataProtection:ApplicationName"];',
+        '        string? applicationNamespace = builder.Configuration["ApplicationIdentity:Namespace"];',
+        '        string applicationName = !string.IsNullOrWhiteSpace(configuredApplicationName)',
+        '            ? configuredApplicationName.Trim()',
+        '            : applicationNamespace?.Trim() ?? string.Empty;',
+        '        if (string.IsNullOrWhiteSpace(applicationName))',
+        '        {',
+        '            throw new InvalidOperationException(',
+        '                "DataProtection:ApplicationName or ApplicationIdentity:Namespace must provide a stable application name.");',
+        '        }',
+        '',
+        '        IDataProtectionBuilder dataProtection = builder.Services',
+        '            .AddDataProtection()',
+        '            .SetApplicationName(applicationName);',
+        '        string? configuredKeyRingPath = builder.Configuration["DataProtection:KeyRingPath"];',
+        '        if (string.IsNullOrWhiteSpace(configuredKeyRingPath))',
+        '        {',
+        '            if (builder.Environment.IsProduction())',
+        '            {',
+        '                throw new InvalidOperationException(',
+        '                    "DataProtection:KeyRingPath is required in Production so OIDC state and protected Auth secrets survive restarts and work across replicas.");',
+        '            }',
+        '',
+        '            return builder;',
+        '        }',
+        '',
+        '        string keyRingPath = Path.GetFullPath(',
+        '            configuredKeyRingPath.Trim(),',
+        '            builder.Environment.ContentRootPath);',
+        '        dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyRingPath));',
+        '        return builder;',
+        '    }',
+        '}'
+    )
+}
+
 $baseSettings = [ordered]@{
     ApplicationIdentity = [ordered]@{
         DisplayName = $Name
@@ -1459,7 +1516,8 @@ $baseSettings = [ordered]@{
                 '/api/auth/browser',
                 '/api/auth/password',
                 '/api/auth/external',
-                '/api/auth/email-verification'
+                '/api/auth/email-verification',
+                '/api/auth/mfa'
             )
         }
         PrivateNetwork = [ordered]@{
@@ -1502,6 +1560,14 @@ if ($hasPersistedPublicModule) {
 }
 
 if ($hasAuth) {
+    $baseSettings.DataProtection = [ordered]@{
+        ApplicationName = $Name
+        KeyRingPath = ''
+    }
+    $developmentSettings.DataProtection = [ordered]@{
+        ApplicationName = $Name
+        KeyRingPath = '.data/data-protection-keys'
+    }
     $baseSettings.Auth = [ordered]@{
         RefreshTokenLifetimeDays = 30
         FailedLoginLimit = 5
@@ -1510,10 +1576,29 @@ if ($hasAuth) {
         ExternalLinkSessionFreshnessMinutes = 10
         EmailVerificationLifetimeMinutes = 1440
         EmailVerificationRequestCooldownSeconds = 60
+        PasswordRecoveryLifetimeMinutes = 30
+        PasswordRecoveryRequestCooldownSeconds = 60
+        MultiFactor = [ordered]@{
+            EnrollmentLifetimeMinutes = 10
+            ChallengeLifetimeMinutes = 5
+            ChallengeMaximumAttempts = 5
+            RecoveryCodeCount = 10
+            SensitiveSessionFreshnessMinutes = 10
+            ManagementMaximumAttempts = 5
+            ManagementAttemptWindowMinutes = 15
+        }
+        Totp = [ordered]@{
+            Issuer = $Name
+        }
         Retention = [ordered]@{
             Enabled = $false
             ExpiredExchangeHistoryHours = 24
+            PasswordRecoveryHistoryHours = 24
             SessionHistoryDays = 365
+            AuthenticationChallengeHistoryHours = 24
+            ExpiredTotpEnrollmentHistoryHours = 24
+            DisabledTotpAuthenticatorHistoryDays = 365
+            MultiFactorFailureHistoryHours = 24
             BatchSize = 500
             MaxBatchesPerCategoryPerCycle = 4
             IntervalMinutes = 60

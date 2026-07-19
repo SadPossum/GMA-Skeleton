@@ -1,6 +1,10 @@
 namespace Integration.Tests.Support;
 
+using Gma.Framework.Messaging;
+using Gma.Framework.Persistence.EntityFrameworkCore;
+using Gma.Framework.Scoping;
 using Gma.Modules.Auth.Application.Ports;
+using Gma.Modules.Auth.Domain.Entities;
 using Gma.Modules.Auth.Persistence;
 using Host.Api;
 using Microsoft.AspNetCore.Hosting;
@@ -11,16 +15,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NATS.Client.Core;
-using Gma.Framework.Messaging;
-using Gma.Framework.Scoping;
-using Gma.Framework.Persistence.EntityFrameworkCore;
 
 internal sealed class AuthTestApplication(
     string provider,
     string providerConnectionString,
     string natsConnectionString,
     bool disableOutboxPublisher = true,
-    bool enablePrometheus = false)
+    bool enablePrometheus = false,
+    string? dataProtectionKeyRingPath = null)
     : WebApplicationFactory<ApiAssemblyReference>
 {
     private const string JwtIssuer = "GMA-Skeleton";
@@ -41,11 +43,14 @@ internal sealed class AuthTestApplication(
         builder.UseSetting("Outbox:LockDurationMilliseconds", "1000");
         builder.UseSetting("Observability:Prometheus:Enabled", enablePrometheus.ToString());
         builder.UseSetting("Caching:Enabled", "false");
+        builder.UseSetting("Http:RateLimiting:Enabled", "false");
         builder.UseSetting("Auth:Jwt:Issuer", JwtIssuer);
         builder.UseSetting("Auth:Jwt:Audience", JwtAudience);
         builder.UseSetting("Auth:Jwt:SigningKey", JwtSigningKey);
         builder.UseSetting("Auth:Jwt:AccessTokenLifetimeMinutes", "15");
         builder.UseSetting("Auth:RefreshTokens:Pepper", RefreshTokenPepper);
+        builder.UseSetting("DataProtection:ApplicationName", "GMA-Skeleton.IntegrationTests");
+        builder.UseSetting("DataProtection:KeyRingPath", dataProtectionKeyRingPath ?? string.Empty);
 
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
@@ -60,11 +65,14 @@ internal sealed class AuthTestApplication(
                 ["Auth:Jwt:Audience"] = JwtAudience,
                 ["Auth:Jwt:SigningKey"] = JwtSigningKey,
                 ["Auth:Jwt:AccessTokenLifetimeMinutes"] = "15",
+                ["DataProtection:ApplicationName"] = "GMA-Skeleton.IntegrationTests",
+                ["DataProtection:KeyRingPath"] = dataProtectionKeyRingPath,
                 ["NatsJetStream:Enabled"] = disableOutboxPublisher ? "false" : "true",
                 ["Tenancy:Enabled"] = "true",
                 ["Outbox:PollIntervalMilliseconds"] = "100",
                 ["Outbox:LockDurationMilliseconds"] = "1000",
                 ["Observability:Prometheus:Enabled"] = enablePrometheus.ToString(),
+                ["Http:RateLimiting:Enabled"] = "false",
             };
 
             configuration.AddInMemoryCollection(values);
@@ -77,7 +85,9 @@ internal sealed class AuthTestApplication(
                 ServiceDescriptor[] hostedServicesToRemove = services
                     .Where(descriptor =>
                         descriptor.ServiceType == typeof(IHostedService) &&
-                        descriptor.ImplementationType?.Name == "OutboxPublisherService")
+                        descriptor.ImplementationType?.Name is
+                            "NotificationDeliveryService" or
+                            "OutboxPublisherService")
                     .ToArray();
 
                 foreach (ServiceDescriptor hostedService in hostedServicesToRemove)
@@ -181,6 +191,19 @@ internal sealed class AuthTestApplication(
 
         return await dbContext.OutboxMessages
             .CountAsync(message => message.ProcessedAtUtc != null)
+            .ConfigureAwait(false);
+    }
+
+    public async Task<int> CountActiveSessionsAsync(string username)
+    {
+        using IServiceScope scope = this.Services.CreateScope();
+        AuthDbContext dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+        MemberUsername memberUsername = await dbContext.MemberUsernames
+            .SingleAsync(item => item.NormalizedValue == MemberUsername.Normalize(username))
+            .ConfigureAwait(false);
+
+        return await dbContext.MemberSessions
+            .CountAsync(session => session.MemberId == memberUsername.MemberId && session.IsActive)
             .ConfigureAwait(false);
     }
 

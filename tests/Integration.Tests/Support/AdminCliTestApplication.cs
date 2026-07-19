@@ -1,30 +1,33 @@
 namespace Integration.Tests.Support;
 
+using System.CommandLine;
+using System.CommandLine.Parsing;
+using System.Text.RegularExpressions;
+using Gma.Framework.Administration.Cli;
+using Gma.Framework.Caching.Cqrs;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Infrastructure;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Results;
+using Gma.Framework.Tenancy;
+using Gma.Framework.Tenancy.Caching;
+using Gma.Framework.Tenancy.Messaging.Infrastructure;
 using Gma.Modules.AccessControl.AdminCli;
+using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Administration.AdminCli;
 using Gma.Modules.Administration.Persistence;
-using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Auth.AdminCli;
+using Gma.Modules.Auth.Application;
 using Gma.Modules.Auth.Application.Commands;
 using Gma.Modules.Auth.Contracts;
+using Gma.Modules.Auth.Domain.Aggregates;
 using Gma.Modules.Auth.Domain.Errors;
+using Gma.Modules.Auth.Domain.ValueObjects;
 using Gma.Modules.Auth.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Gma.Framework.Administration.Cli;
-using Gma.Framework.Cqrs;
-using Gma.Framework.Tenancy;
-using Gma.Framework.Caching.Cqrs;
-using Gma.Framework.Results;
-using Gma.Framework.Infrastructure;
-using Gma.Framework.Messaging.Infrastructure;
-using Gma.Framework.Tenancy.Caching;
-using Gma.Framework.Tenancy.Messaging.Infrastructure;
-using System.CommandLine;
-using System.CommandLine.Parsing;
-using System.Text.RegularExpressions;
 
 internal sealed class AdminCliTestApplication : IAsyncDisposable
 {
@@ -59,7 +62,7 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
         builder.AddTenantAwareMessaging();
         builder.AddAdminModule<AdministrationAdminCliModule>();
         builder.AddAdminModule<AccessControlAdminCliModule>();
-        builder.AddAdminModule<AuthAdminCliModule>();
+        builder.AddAuthAdminModule(AuthProfile.Global());
 
         this.host = builder.Build();
         this.host.Services.ValidateAdminCliStartup();
@@ -107,8 +110,17 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
         tenantContext.SetTenant(scopeId);
         IRequestDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
 
-        return await dispatcher.SendAsync(new LoginMemberCommand(username, password), CancellationToken.None)
+        Result<PrimaryAuthenticationResult> result = await dispatcher
+            .SendAsync(new LoginMemberCommand(username, password), CancellationToken.None)
             .ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            return Result.Failure<AuthTokensResponse>(result.Error);
+        }
+
+        return result.Value.Tokens is { } tokens
+            ? Result.Success(tokens)
+            : Result.Failure<AuthTokensResponse>(AuthApplicationErrors.MultiFactorChallengeInvalid);
     }
 
     public async Task<int> CountAuditEntriesContainingAsync(string value)
@@ -122,6 +134,57 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
                 entry.Operation.Contains(value) ||
                 entry.Permission.Contains(value) ||
                 (entry.ErrorCode != null && entry.ErrorCode.Contains(value)))
+            .ConfigureAwait(false);
+    }
+
+    public async Task SeedActiveTotpAuthenticatorAsync(Guid memberId, string scopeId)
+    {
+        using IServiceScope scope = this.host.Services.CreateScope();
+        ITenantContextAccessor tenantContext = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
+        tenantContext.SetTenant(scopeId);
+        AuthDbContext dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+        DateTimeOffset nowUtc = DateTimeOffset.UtcNow;
+        Result<MemberTotpAuthenticator> created = MemberTotpAuthenticator.BeginEnrollment(
+            new MemberTotpAuthenticatorId(Guid.NewGuid()),
+            new MemberId(memberId),
+            scopeId,
+            "integration-test-protected-secret",
+            nowUtc.AddMinutes(10),
+            nowUtc);
+        Xunit.Assert.True(created.IsSuccess, created.Error.Message);
+        Result activated = created.Value.Activate(
+            acceptedTimeStep: 1,
+            [new TotpRecoveryCodeRegistration(new MemberTotpRecoveryCodeId(Guid.NewGuid()), "integration-test-recovery-hash")],
+            nowUtc);
+        Xunit.Assert.True(activated.IsSuccess, activated.Error.Message);
+
+        dbContext.MemberTotpAuthenticators.Add(created.Value);
+        await dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    public async Task<int> CountActiveSessionsAsync(Guid memberId)
+    {
+        using IServiceScope scope = this.host.Services.CreateScope();
+        AuthDbContext dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+        return await dbContext.MemberSessions
+            .IgnoreQueryFilters()
+            .CountAsync(session => session.MemberId == new MemberId(memberId) && session.IsActive)
+            .ConfigureAwait(false);
+    }
+
+    public async Task<int> CountMultiFactorResetEventsAsync(Guid memberId, string scopeId, string reason)
+    {
+        using IServiceScope scope = this.host.Services.CreateScope();
+        AuthDbContext dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+        string memberIdText = memberId.ToString();
+        string eventType = typeof(MemberMultiFactorAuthenticationResetIntegrationEvent).FullName!;
+        return await dbContext.OutboxMessages
+            .IgnoreQueryFilters()
+            .CountAsync(message =>
+                message.EventType == eventType &&
+                message.ScopeId == scopeId &&
+                message.Payload.Contains(memberIdText) &&
+                message.Payload.Contains(reason))
             .ConfigureAwait(false);
     }
 

@@ -77,11 +77,18 @@ public sealed class SourceFirstGeneratorGuardTests
         string generator = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-gma-app.ps1"));
         string[] requiredTokens =
         [
+            "Gma.Modules.Auth.Authenticators.Totp.csproj",
+            "builder.AddAuthTotpAuthenticator();",
+            "builder.AddConfiguredDataProtection();",
             "Gma.Modules.Auth.Providers.OpenIdConnect.csproj",
             "builder.AddAuthOpenIdConnectProviders();",
             "ExternalExchangeLifetimeMinutes = 5",
             "EmailVerificationRequestCooldownSeconds = 60",
+            "MultiFactor = [ordered]@{",
+            "ManagementAttemptWindowMinutes = 15",
+            "DataProtection:KeyRingPath",
             "'/api/auth/browser'",
+            "'/api/auth/mfa'",
             "OpenIdConnect = [ordered]@{",
             "Gma.Modules.Notifications.Adapters.Email.csproj",
             "builder.Services.AddNotificationEmailAdapter(builder.Configuration);",

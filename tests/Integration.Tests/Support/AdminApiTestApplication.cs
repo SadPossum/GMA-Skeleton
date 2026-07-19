@@ -3,16 +3,23 @@ namespace Integration.Tests.Support;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Gma.Framework.Cqrs;
 using Gma.Framework.AccessControl;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 using Gma.Framework.Results;
-using Gma.Modules.Administration.Persistence;
-using Gma.Modules.Administration.Persistence.Entities;
+using Gma.Framework.Scoping;
+using Gma.Framework.Security;
 using Gma.Modules.AccessControl.Application.Commands;
 using Gma.Modules.AccessControl.Persistence;
+using Gma.Modules.Administration.Persistence;
+using Gma.Modules.Administration.Persistence.Entities;
+using Gma.Modules.Auth.Application;
+using Gma.Modules.Auth.Application.Commands;
+using Gma.Modules.Auth.Application.Ports;
+using Gma.Modules.Auth.Contracts;
+using Gma.Modules.Auth.Domain.Aggregates;
 using Gma.Modules.Auth.Domain.Services;
 using Gma.Modules.Auth.Domain.ValueObjects;
-using Gma.Modules.Auth.Application.Ports;
 using Gma.Modules.Auth.Persistence;
 using Host.AdminApi;
 using Microsoft.AspNetCore.Hosting;
@@ -24,9 +31,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NATS.Client.Core;
-using Gma.Framework.Scoping;
-using Gma.Framework.Security;
-using Gma.Framework.Persistence.EntityFrameworkCore;
 
 internal sealed class AdminApiTestApplication(
     string provider,
@@ -180,6 +184,71 @@ internal sealed class AdminApiTestApplication(
             CancellationToken.None).ConfigureAwait(false);
     }
 
+    public async Task<Result<AuthTokensResponse>> LoginAsync(string scopeId, string username, string password)
+    {
+        using IServiceScope scope = this.Services.CreateScope();
+        Gma.Framework.Tenancy.ITenantContextAccessor tenantContext = scope.ServiceProvider
+            .GetRequiredService<Gma.Framework.Tenancy.ITenantContextAccessor>();
+        tenantContext.SetTenant(scopeId);
+        IRequestDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
+
+        Result<PrimaryAuthenticationResult> result = await dispatcher
+            .SendAsync(new LoginMemberCommand(username, password), CancellationToken.None)
+            .ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            return Result.Failure<AuthTokensResponse>(result.Error);
+        }
+
+        return result.Value.Tokens is { } tokens
+            ? Result.Success(tokens)
+            : Result.Failure<AuthTokensResponse>(AuthApplicationErrors.MultiFactorChallengeInvalid);
+    }
+
+    public async Task SeedActiveTotpAuthenticatorAsync(Guid memberId, string scopeId)
+    {
+        await using AuthDbContext dbContext = this.CreateAuthDbContext();
+        DateTimeOffset nowUtc = DateTimeOffset.UtcNow;
+        Result<MemberTotpAuthenticator> created = MemberTotpAuthenticator.BeginEnrollment(
+            new MemberTotpAuthenticatorId(Guid.NewGuid()),
+            new MemberId(memberId),
+            scopeId,
+            "integration-test-protected-secret",
+            nowUtc.AddMinutes(10),
+            nowUtc);
+        Xunit.Assert.True(created.IsSuccess, created.Error.Message);
+        Result activated = created.Value.Activate(
+            acceptedTimeStep: 1,
+            [new TotpRecoveryCodeRegistration(new MemberTotpRecoveryCodeId(Guid.NewGuid()), "integration-test-recovery-hash")],
+            nowUtc);
+        Xunit.Assert.True(activated.IsSuccess, activated.Error.Message);
+
+        dbContext.MemberTotpAuthenticators.Add(created.Value);
+        await dbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    public async Task<int> CountActiveSessionsAsync(Guid memberId)
+    {
+        await using AuthDbContext dbContext = this.CreateAuthDbContext();
+        return await dbContext.MemberSessions
+            .CountAsync(session => session.MemberId == new MemberId(memberId) && session.IsActive)
+            .ConfigureAwait(false);
+    }
+
+    public async Task<int> CountMultiFactorResetEventsAsync(Guid memberId, string scopeId, string reason)
+    {
+        await using AuthDbContext dbContext = this.CreateAuthDbContext();
+        string memberIdText = memberId.ToString();
+        string eventType = typeof(MemberMultiFactorAuthenticationResetIntegrationEvent).FullName!;
+        return await dbContext.OutboxMessages
+            .CountAsync(message =>
+                message.EventType == eventType &&
+                message.ScopeId == scopeId &&
+                message.Payload.Contains(memberIdText) &&
+                message.Payload.Contains(reason))
+            .ConfigureAwait(false);
+    }
+
     public async Task<int> CountAuditEntriesAsync(string operation, string? errorCode = null)
     {
         IConfiguration configuration = this.CreatePersistenceConfiguration();
@@ -311,6 +380,18 @@ internal sealed class AdminApiTestApplication(
                 ["ConnectionStrings:PostgreSql"] = provider == "PostgreSql" ? providerConnectionString : string.Empty,
             })
             .Build();
+
+    private AuthDbContext CreateAuthDbContext()
+    {
+        DbContextOptionsBuilder<AuthDbContext> options = new();
+        options.UseConfiguredProvider(
+            this.CreatePersistenceConfiguration(),
+            AuthMigrations.SqlServerAssembly,
+            AuthMigrations.PostgreSqlAssembly,
+            AuthMigrations.Schema,
+            AuthMigrations.HistoryTable);
+        return new AuthDbContext(options.Options, DisabledTenantContext.Instance);
+    }
 
     private sealed class DisabledTenantContext : IAuthScopeContext
     {

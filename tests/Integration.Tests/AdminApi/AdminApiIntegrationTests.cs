@@ -1,10 +1,15 @@
 namespace Integration.Tests;
 
-using Gma.Framework.Naming;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using DotNet.Testcontainers.Containers;
+using Gma.Framework.Administration;
+using Gma.Framework.Cqrs;
+using Gma.Framework.Naming;
+using Gma.Framework.Pagination;
+using Gma.Framework.Results;
 using Gma.Modules.AccessControl.Admin.Contracts;
 using Gma.Modules.AccessControl.Application;
 using Gma.Modules.Administration.Application;
@@ -12,12 +17,7 @@ using Gma.Modules.Auth.Admin.Contracts;
 using Gma.Modules.Auth.Application;
 using Gma.Modules.Auth.Contracts;
 using Gma.Modules.Auth.Domain.Errors;
-using DotNet.Testcontainers.Containers;
 using Integration.Tests.Support;
-using Gma.Framework.Administration;
-using Gma.Framework.Cqrs;
-using Gma.Framework.Pagination;
-using Gma.Framework.Results;
 using Testcontainers.MsSql;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -159,6 +159,7 @@ public sealed class AdminApiIntegrationTests
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersCreate);
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersDisable);
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersEnable);
+        await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersResetMultiFactor);
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersResetPassword);
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersRevokeSessions);
         await AssertSuccess(ownerClient.PostAsJsonAsync(
@@ -371,6 +372,39 @@ public sealed class AdminApiIntegrationTests
         Guid memberId = createdJson.GetProperty("memberId").GetGuid();
         Assert.Equal(JsonValueKind.Null, createdJson.GetProperty("generatedPassword").ValueKind);
         Assert.Equal(0, await application.CountAuditEntriesContainingAsync(manualPassword).ConfigureAwait(false));
+        Result<AuthTokensResponse> memberLogin = await application
+            .LoginAsync("tenant-admin", $"{provider.ToLowerInvariant()}-member@example.com", manualPassword)
+            .ConfigureAwait(false);
+        Assert.True(memberLogin.IsSuccess, memberLogin.Error.Message);
+        Assert.True(await application.CountActiveSessionsAsync(memberId).ConfigureAwait(false) > 0);
+        await application.SeedActiveTotpAuthenticatorAsync(memberId, "global").ConfigureAwait(false);
+
+        int resetConfirmationAuditCountBefore = await application
+            .CountAuditEntriesAsync(AuthAdminOperationNames.MembersResetMultiFactor, AdminErrors.ConfirmationRequired.Code)
+            .ConfigureAwait(false);
+        using HttpResponseMessage missingResetConfirmation = await supportClient.PostAsJsonAsync(
+            $"/api/admin/auth/members/{memberId}/reset-multi-factor",
+            new { reason = "verified account recovery", confirmed = false }).ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.BadRequest, missingResetConfirmation.StatusCode);
+        Assert.Equal(
+            resetConfirmationAuditCountBefore + 1,
+            await application
+                .CountAuditEntriesAsync(
+                    AuthAdminOperationNames.MembersResetMultiFactor,
+                    AdminErrors.ConfirmationRequired.Code)
+                .ConfigureAwait(false));
+
+        const string resetReason = "verified account recovery";
+        await AssertSuccess(supportClient.PostAsJsonAsync(
+            $"/api/admin/auth/members/{memberId}/reset-multi-factor",
+            new { reason = resetReason, confirmed = true }));
+        Assert.Equal(0, await application.CountActiveSessionsAsync(memberId).ConfigureAwait(false));
+        Assert.Equal(
+            1,
+            await application
+                .CountMultiFactorResetEventsAsync(memberId, "global", resetReason)
+                .ConfigureAwait(false));
+
         using HttpResponseMessage duplicateMember = await supportClient.PostAsJsonAsync(
             "/api/admin/auth/members",
             new

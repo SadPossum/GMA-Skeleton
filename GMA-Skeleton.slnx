@@ -269,6 +269,9 @@
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Persistence.SqlServerMigrations/Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj" />
     <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Persistence/Gma.Modules.Auth.Persistence.csproj" />
   </Folder>
+  <Folder Name="/gma/modules/auth/src/Totp/">
+    <Project Path="gma/modules/auth/src/Gma.Modules.Auth.Authenticators.Totp/Gma.Modules.Auth.Authenticators.Totp.csproj" />
+  </Folder>
   <Folder Name="/gma/modules/auth/tests/">
     <Project Path="gma/modules/auth/tests/Gma.Modules.Auth.Tests/Gma.Modules.Auth.Tests.csproj" />
   </Folder>
