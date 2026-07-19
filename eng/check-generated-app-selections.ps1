@@ -86,6 +86,24 @@ foreach ($case in $cases) {
             throw "$($case.Name) generated an incorrect extension bootstrap flag: $expectedBootstrapFlag"
         }
     }
+
+    $apiSettings = [System.IO.File]::ReadAllText(
+        (Join-Path $outputPath "src\Hosts\$($case.Name).Host.Api\appsettings.json"))
+    $organizationSettingsTokens = @(
+        '"Organizations"',
+        '"InvitationHistoryDays"',
+        '"/api/organization-invitations"',
+        '"/api/organization-enrollment"'
+    )
+    $expectsOrganizations = $case.Modules -contains 'organizations'
+    foreach ($organizationSettingsToken in $organizationSettingsTokens) {
+        $containsToken = $apiSettings.IndexOf(
+            $organizationSettingsToken,
+            [System.StringComparison]::Ordinal) -ge 0
+        if ($containsToken -ne $expectsOrganizations) {
+            throw "$($case.Name) generated incorrect Organizations settings for token: $organizationSettingsToken"
+        }
+    }
 }
 
 Write-Host 'Generated app selection matrix passed for Auth, Notifications, Organizations, and their opt-in extensions.'

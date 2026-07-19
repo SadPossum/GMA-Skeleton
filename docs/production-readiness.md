@@ -8,13 +8,13 @@ The skeleton provides a hardened, explicit foundation; it cannot choose deployme
 - dependency-free `/alive` and explicitly composed `/health` readiness checks;
 - provider-explicit migrations, generated startup/architecture tests, Windows/Linux CI, automatic Docker validation, dependency updates, immutable action pins, and release source-set manifests;
 - Auth password/blocklist/throttling/rehash behavior, key-ring rotation, refresh reuse revocation, optimistic concurrency, multi-provider external identities, safe explicit linking, hashed one-time OIDC handoffs, email-verification state, optional TOTP/recovery-code MFA, and security events;
-- atomic first-owner bootstrap, outbox backlog metrics, disabled-by-default bounded message-journal and task-history retention, lease heartbeats, managed/external JetStream ownership with finite limits, in-progress consumer acknowledgements, tagged notification preferences/routing, leased at-least-once notification delivery with bounded retries/receipts/retention, and a fail-closed file inspection seam.
+- atomic first-owner bootstrap, no-store organization token responses, sensitive-route throttling, disabled-by-default bounded organization-domain retention, outbox backlog metrics, disabled-by-default bounded message-journal and task-history retention, lease heartbeats, managed/external JetStream ownership with finite limits, in-progress consumer acknowledgements, tagged notification preferences/routing, leased at-least-once notification delivery with bounded retries/receipts/retention, and a fail-closed file inspection seam.
 
 ## Deployment Must Supply
 
 - concrete `AllowedHosts`, trusted proxy IPs, production connection strings, secret-store values, TLS/ingress, a persistent shared and at-rest-protected ASP.NET Core Data Protection key ring for OIDC callbacks and TOTP secrets, observability exporters, alert thresholds, backups/restores, and capacity/connection-pool tuning;
 - a distributed `IAuthenticationAttemptLimiter` for multi-replica Auth, a real `IPasswordBlocklist`, OIDC client credentials for enabled providers, an `IEmailSender` for enabled Auth/Notifications mail, and an `IFileContentInspector` when Files is enabled;
-- optional Redis/NATS/MinIO credentials and topology, notification provider credentials/rate limits, JetStream management ownership and replica count, retention windows aligned with broker replay, external scheduler/backplane adapters, and deployment-specific readiness for those selected adapters.
+- optional Redis/NATS/MinIO credentials and topology, notification provider credentials/rate limits, JetStream management ownership and replica count, organization retention enablement on the one host responsible for its maintenance, retention windows aligned with broker replay, external scheduler/backplane adapters, and deployment-specific readiness for those selected adapters.
 
 ## Product Must Decide
 

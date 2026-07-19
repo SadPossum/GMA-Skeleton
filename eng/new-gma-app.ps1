@@ -1479,6 +1479,26 @@ if ($hasAuth) {
     )
 }
 
+$sensitivePathPrefixes = @()
+if ($hasAuth) {
+    $sensitivePathPrefixes += @(
+        '/api/auth/register',
+        '/api/auth/login',
+        '/api/auth/refresh',
+        '/api/auth/browser',
+        '/api/auth/password',
+        '/api/auth/external',
+        '/api/auth/email-verification',
+        '/api/auth/mfa'
+    )
+}
+if ($hasOrganizations) {
+    $sensitivePathPrefixes += @(
+        '/api/organization-invitations',
+        '/api/organization-enrollment'
+    )
+}
+
 $baseSettings = [ordered]@{
     ApplicationIdentity = [ordered]@{
         DisplayName = $Name
@@ -1509,16 +1529,7 @@ $baseSettings = [ordered]@{
             GlobalPermitLimit = 300
             SensitivePermitLimit = 10
             WindowSeconds = 60
-            SensitivePathPrefixes = @(
-                '/api/auth/register',
-                '/api/auth/login',
-                '/api/auth/refresh',
-                '/api/auth/browser',
-                '/api/auth/password',
-                '/api/auth/external',
-                '/api/auth/email-verification',
-                '/api/auth/mfa'
-            )
+            SensitivePathPrefixes = @($sensitivePathPrefixes)
         }
         PrivateNetwork = [ordered]@{
             Enabled = $false
@@ -1652,6 +1663,25 @@ if ($hasTenancy) {
         Enabled = $true
         HeaderName = 'X-Tenant-Id'
         LocalDefaultTenantId = 'default'
+    }
+}
+
+if ($hasOrganizations) {
+    $baseSettings.Organizations = [ordered]@{
+        SelfServiceCreationEnabled = $false
+        InvitationDefaultLifetimeHours = 168
+        InvitationMaxLifetimeHours = 720
+        EnrollmentDefaultLifetimeHours = 24
+        EnrollmentMaxLifetimeHours = 720
+        EnrollmentMaxClaims = 1000
+        Retention = [ordered]@{
+            Enabled = $false
+            InvitationHistoryDays = 90
+            EnrollmentHistoryDays = 90
+            BatchSize = 500
+            MaxBatchesPerCategoryPerCycle = 4
+            IntervalMinutes = 60
+        }
     }
 }
 
