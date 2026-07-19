@@ -5443,6 +5443,11 @@ public sealed partial class DeveloperExperienceGuardTests
                 [@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"]),
             new("Gma.Framework.Security", [], [], []),
             new(
+                "Gma.Framework.Security.AspNetCore",
+                [],
+                ["Microsoft.AspNetCore.App"],
+                [@"..\Gma.Framework.Security\Gma.Framework.Security.csproj"]),
+            new(
                 "Gma.Framework.Tenancy",
                 [],
                 [],

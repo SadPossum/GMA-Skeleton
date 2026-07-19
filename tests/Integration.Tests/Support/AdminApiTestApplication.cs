@@ -233,10 +233,11 @@ internal sealed class AdminApiTestApplication(
         using IServiceScope scope = this.Services.CreateScope();
         ITokenService tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
 
-        return tokenService.GenerateAccessToken(
+        return tokenService.GenerateAccessToken(new AccessTokenClaims(
             new MemberId(actorId),
             scopeId,
-            new MemberSessionId(Guid.NewGuid()));
+            new MemberSessionId(Guid.NewGuid()),
+            SessionAuthenticationEvidence.Password(DateTimeOffset.UtcNow)));
     }
 
     public static string CreateAccessTokenWithoutTenantClaim(Guid actorId)

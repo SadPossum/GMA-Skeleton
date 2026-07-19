@@ -64,6 +64,7 @@ internal sealed class GmaSourceLayout
             ["Gma.Framework.Runtime"] = "Runtime",
             ["Gma.Framework.Runtime.Infrastructure"] = "Runtime",
             ["Gma.Framework.Security"] = "Security",
+            ["Gma.Framework.Security.AspNetCore"] = "Security",
             ["Gma.Framework.Tasks"] = "Tasks",
             ["Gma.Framework.Tasks.Cqrs"] = "Tasks",
             ["Gma.Framework.Tasks.Infrastructure"] = "Tasks",
