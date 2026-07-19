@@ -12,7 +12,9 @@ using Gma.Framework.Modules;
 using Gma.Modules.AccessControl.Admin.Contracts;
 using Gma.Modules.AccessControl.AdminApi;
 using Gma.Modules.AccessControl.AdminCli;
+using Gma.Modules.AccessControl.Api;
 using Gma.Modules.AccessControl.Contracts;
+using Gma.Modules.AccessControl.Domain.Aggregates;
 using Gma.Modules.AccessControl.Persistence;
 using Gma.Modules.Administration.AdminApi;
 using Gma.Modules.Administration.AdminCli;
@@ -63,8 +65,10 @@ internal static class ArchitectureCatalog
         new("AccessControl", "Gma.Modules.AccessControl.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(AccessControlAdminPermissions).Assembly),
         new("AccessControl", "Gma.Modules.AccessControl.AdminCli", ModuleProjectKind.AdminCli, typeof(AccessControlAdminCliModule).Assembly),
         new("AccessControl", "Gma.Modules.AccessControl.AdminApi", ModuleProjectKind.AdminApi, typeof(AccessControlAdminApiModule).Assembly),
+        new("AccessControl", "Gma.Modules.AccessControl.Api", ModuleProjectKind.Api, typeof(AccessControlApiModule).Assembly),
         new("AccessControl", "Gma.Modules.AccessControl.Application", ModuleProjectKind.Application, typeof(Gma.Modules.AccessControl.Application.DependencyInjection).Assembly),
         new("AccessControl", "Gma.Modules.AccessControl.Contracts", ModuleProjectKind.Contracts, typeof(AccessControlModuleMetadata).Assembly),
+        new("AccessControl", "Gma.Modules.AccessControl.Domain", ModuleProjectKind.Domain, typeof(AccessProfile).Assembly),
         new("AccessControl", "Gma.Modules.AccessControl.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.AccessControl.Persistence.DependencyInjection).Assembly),
 
         new("Administration", "Gma.Modules.Administration.AdminCli", ModuleProjectKind.AdminCli, typeof(AdministrationAdminCliModule).Assembly),

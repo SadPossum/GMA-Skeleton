@@ -4131,11 +4131,7 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Module_admin_surface_constants_match_operation_and_permission_code_prefixes()
     {
         string[] offenders = ArchitectureCatalog.ModuleProjects
-            .SelectMany(project => project.Assembly
-                .GetTypes()
-                .Where(type => type.IsAbstract && type.IsSealed)
-                .Where(type => type.Name.EndsWith("AdminOperationNames", StringComparison.Ordinal) ||
-                               type.Name.EndsWith("PermissionCodes", StringComparison.Ordinal))
+            .SelectMany(project => GetAdminSurfaceConstantTypes(project)
                 .Select(type => new
                 {
                     Project = project,
@@ -4161,6 +4157,25 @@ public sealed partial class DeveloperExperienceGuardTests
             .ToArray();
 
         Assert.Empty(offenders);
+    }
+
+    private static IEnumerable<Type> GetAdminSurfaceConstantTypes(ModuleProject project)
+    {
+        Type[] staticTypes = project.Assembly.GetTypes()
+            .Where(type => type.IsAbstract && type.IsSealed)
+            .ToArray();
+        Type[] operationTypes = staticTypes
+            .Where(type => type.Name.EndsWith("AdminOperationNames", StringComparison.Ordinal))
+            .ToArray();
+        Type[] permissionCodeTypes = staticTypes
+            .Where(type => type.Name.EndsWith("PermissionCodes", StringComparison.Ordinal))
+            .ToArray();
+        Type[] adminPermissionCodeTypes = permissionCodeTypes
+            .Where(type => type.Name.EndsWith("AdminPermissionCodes", StringComparison.Ordinal))
+            .ToArray();
+
+        return operationTypes.Concat(
+            adminPermissionCodeTypes.Length > 0 ? adminPermissionCodeTypes : permissionCodeTypes);
     }
 
     [Fact]
@@ -5932,6 +5947,9 @@ public sealed partial class DeveloperExperienceGuardTests
                 [],
                 [],
                 [
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.Api\Gma.Modules.AccessControl.Api.csproj",
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations\Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations.csproj",
+                    @"..\Modules\AccessControl\Gma.Modules.AccessControl.Persistence.SqlServerMigrations\Gma.Modules.AccessControl.Persistence.SqlServerMigrations.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Api\Gma.Modules.Auth.Api.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Authenticators.Totp\Gma.Modules.Auth.Authenticators.Totp.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",

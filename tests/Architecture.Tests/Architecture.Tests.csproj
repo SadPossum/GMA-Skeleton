@@ -18,8 +18,10 @@
     <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Admin.Contracts\Gma.Modules.AccessControl.Admin.Contracts.csproj" />
     <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.AdminCli\Gma.Modules.AccessControl.AdminCli.csproj" />
     <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.AdminApi\Gma.Modules.AccessControl.AdminApi.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Api\Gma.Modules.AccessControl.Api.csproj" />
     <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Application\Gma.Modules.AccessControl.Application.csproj" />
     <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Contracts\Gma.Modules.AccessControl.Contracts.csproj" />
+    <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Domain\Gma.Modules.AccessControl.Domain.csproj" />
     <ProjectReference Include="$(GmaModuleAccessControlRoot)Gma.Modules.AccessControl.Persistence\Gma.Modules.AccessControl.Persistence.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.AdminCli\Gma.Modules.Administration.AdminCli.csproj" />
     <ProjectReference Include="$(GmaModuleAdministrationRoot)Gma.Modules.Administration.AdminApi\Gma.Modules.Administration.AdminApi.csproj" />

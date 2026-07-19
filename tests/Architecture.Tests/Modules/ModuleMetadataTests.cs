@@ -236,7 +236,6 @@ public sealed partial class ModuleMetadataTests
         foreach (ModuleDescriptor descriptor in descriptors)
         {
             Assert.Equal(descriptor.Name, IntegrationEventNaming.NormalizeModuleName(descriptor.Name));
-            string permissionPrefix = descriptor.AdminSurfaceName ?? descriptor.Name;
 
             if (descriptor.Schema is not null)
             {
@@ -245,7 +244,11 @@ public sealed partial class ModuleMetadataTests
 
             Assert.All(
                 descriptor.GetPermissions(),
-                permission => Assert.StartsWith($"{permissionPrefix}.", permission.Code, StringComparison.Ordinal));
+                permission => Assert.True(
+                    permission.Code.StartsWith($"{descriptor.Name}.", StringComparison.Ordinal) ||
+                    (descriptor.AdminSurfaceName is not null &&
+                     permission.Code.StartsWith($"{descriptor.AdminSurfaceName}.", StringComparison.Ordinal)),
+                    $"{descriptor.Name} permission '{permission.Code}' must use the module or admin-surface prefix."));
             Assert.All(
                 descriptor.GetPublishedEvents(),
                 integrationEvent =>
@@ -422,7 +425,7 @@ public sealed partial class ModuleMetadataTests
     {
         ModulePermissionCode[] permissionCodes = ArchitectureCatalog.ModuleProjects
             .Where(project => project.Kind == ModuleProjectKind.Contracts)
-            .SelectMany(GetPermissionCodes)
+            .SelectMany(GetAdminPermissionCodes)
             .ToArray();
         ModuleAdminPermission[] adminPermissions = ArchitectureCatalog.ModuleProjects
             .SelectMany(GetAdminPermissions)
@@ -1252,11 +1255,28 @@ public sealed partial class ModuleMetadataTests
     }
 
     private static IEnumerable<ModulePermissionCode> GetPermissionCodes(ModuleProject project) =>
-        project.Assembly
+        GetPermissionCodes(project, adminOnly: false);
+
+    private static IEnumerable<ModulePermissionCode> GetAdminPermissionCodes(ModuleProject project) =>
+        GetPermissionCodes(project, adminOnly: true);
+
+    private static IEnumerable<ModulePermissionCode> GetPermissionCodes(
+        ModuleProject project,
+        bool adminOnly)
+    {
+        Type[] permissionCodeTypes = project.Assembly
             .GetTypes()
             .Where(type => type is { IsAbstract: true, IsSealed: true } &&
                            type.Name.EndsWith("PermissionCodes", StringComparison.Ordinal))
-            .SelectMany(type => type
+            .ToArray();
+        Type[] adminPermissionCodeTypes = permissionCodeTypes
+            .Where(type => type.Name.EndsWith("AdminPermissionCodes", StringComparison.Ordinal))
+            .ToArray();
+        IEnumerable<Type> selectedTypes = adminOnly && adminPermissionCodeTypes.Length > 0
+            ? adminPermissionCodeTypes
+            : permissionCodeTypes;
+
+        return selectedTypes.SelectMany(type => type
                 .GetFields(BindingFlags.Public | BindingFlags.Static)
                 .Where(field => field is { IsLiteral: true, IsInitOnly: false } && field.FieldType == typeof(string))
                 .Select(field => new ModulePermissionCode(
@@ -1264,6 +1284,7 @@ public sealed partial class ModuleMetadataTests
                     type,
                     field,
                     field.GetRawConstantValue() as string)));
+    }
 
     private static IEnumerable<ModuleAdminPermission> GetAdminPermissions(ModuleProject project) =>
         project.Assembly
