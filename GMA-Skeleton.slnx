@@ -322,6 +322,7 @@
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Persistence/Gma.Modules.Notifications.Persistence.csproj" />
   </Folder>
   <Folder Name="/gma/modules/notifications/tests/">
+    <Project Path="gma/modules/notifications/tests/Gma.Modules.Notifications.IntegrationTests/Gma.Modules.Notifications.IntegrationTests.csproj" />
     <Project Path="gma/modules/notifications/tests/Gma.Modules.Notifications.Tests/Gma.Modules.Notifications.Tests.csproj" />
   </Folder>
   <Folder Name="/gma/modules/organizations/src/Admin/">
