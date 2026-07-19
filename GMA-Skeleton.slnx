@@ -369,6 +369,9 @@
   <Folder Name="/gma/modules/tenancy/src/Contracts/">
     <Project Path="gma/modules/tenancy/src/Gma.Modules.Tenancy.Contracts/Gma.Modules.Tenancy.Contracts.csproj" />
   </Folder>
+  <Folder Name="/gma/modules/tenancy/tests/">
+    <Project Path="gma/modules/tenancy/tests/Gma.Modules.Tenancy.Tests/Gma.Modules.Tenancy.Tests.csproj" />
+  </Folder>
   <Folder Name="/requests/">
     <File Path="requests/admin-api.http" />
     <File Path="requests/auth.http" />
