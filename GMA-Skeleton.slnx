@@ -294,6 +294,9 @@
   <Folder Name="/gma/modules/files/src/Contracts/">
     <Project Path="gma/modules/files/src/Gma.Modules.Files.Contracts/Gma.Modules.Files.Contracts.csproj" />
   </Folder>
+  <Folder Name="/gma/modules/files/tests/">
+    <Project Path="gma/modules/files/tests/Gma.Modules.Files.Tests/Gma.Modules.Files.Tests.csproj" />
+  </Folder>
   <Folder Name="/gma/modules/notifications/src/Admin/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Admin.Contracts/Gma.Modules.Notifications.Admin.Contracts.csproj" />
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.AdminApi/Gma.Modules.Notifications.AdminApi.csproj" />
