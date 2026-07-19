@@ -12,6 +12,7 @@ using Gma.Framework.Pagination;
 using Gma.Framework.Results;
 using Gma.Modules.AccessControl.Admin.Contracts;
 using Gma.Modules.AccessControl.Application;
+using Gma.Modules.Administration.Admin.Contracts;
 using Gma.Modules.Administration.Application;
 using Gma.Modules.Auth.Admin.Contracts;
 using Gma.Modules.Auth.Application;
@@ -89,6 +90,11 @@ public sealed class AdminApiIntegrationTests
         await application.MigrateAsync().ConfigureAwait(false);
 
         using HttpClient anonymousClient = application.CreateClient();
+        using HttpResponseMessage anonymousAudit = await anonymousClient
+            .GetAsync("/api/admin/audit")
+            .ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.Unauthorized, anonymousAudit.StatusCode);
+
         using HttpResponseMessage bootstrapResponse = await anonymousClient.PostAsJsonAsync(
             "/api/admin/bootstrap",
             new { confirmed = true }).ConfigureAwait(false);
@@ -162,9 +168,27 @@ public sealed class AdminApiIntegrationTests
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersResetMultiFactor);
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersResetPassword);
         await GrantAsync(ownerClient, AuthAdminPermissionCodes.MembersRevokeSessions);
+        await GrantAsync(ownerClient, AdministrationAdminPermissions.AuditRead.Code);
         await AssertSuccess(ownerClient.PostAsJsonAsync(
             "/api/admin/roles/support/assignments",
             new { actorId = supportId.ToString(), scope = "global" }));
+
+        Guid tenantAuditReaderId = Guid.NewGuid();
+        await AssertSuccess(ownerClient.PostAsJsonAsync("/api/admin/roles", new { name = "tenant-audit-reader" }));
+        await AssertSuccess(ownerClient.PostAsJsonAsync(
+            "/api/admin/roles/tenant-audit-reader/permissions",
+            new { permission = AdministrationAdminPermissions.AuditRead.Code }));
+        await AssertSuccess(ownerClient.PostAsJsonAsync(
+            "/api/admin/roles/tenant-audit-reader/assignments",
+            new { actorId = tenantAuditReaderId.ToString(), scope = "tenant:tenant-admin" }));
+        using HttpClient tenantAuditReader = application.CreateClient();
+        tenantAuditReader.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            application.CreateAccessToken(tenantAuditReaderId, "tenant-admin"));
+        using HttpResponseMessage tenantScopedAuditDenied = await tenantAuditReader
+            .GetAsync("/api/admin/audit?tenant=tenant-admin")
+            .ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.Forbidden, tenantScopedAuditDenied.StatusCode);
 
         Guid productUserId = Guid.NewGuid();
         await AssertSuccess(ownerClient.PostAsJsonAsync("/api/admin/roles", new { name = "property-reader" }));
@@ -219,6 +243,10 @@ public sealed class AdminApiIntegrationTests
         strangerClient.DefaultRequestHeaders.Add("X-Tenant-Id", "tenant-admin");
         using HttpResponseMessage denied = await strangerClient.GetAsync("/api/admin/auth/members").ConfigureAwait(false);
         Assert.Equal(HttpStatusCode.Forbidden, denied.StatusCode);
+        using HttpResponseMessage deniedAudit = await strangerClient
+            .GetAsync("/api/admin/audit?cursor=bad!")
+            .ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.Forbidden, deniedAudit.StatusCode);
 
         using HttpClient invalidActorClient = application.CreateClient();
         const string invalidActorId = "invalid actor";
@@ -421,6 +449,52 @@ public sealed class AdminApiIntegrationTests
         using HttpResponseMessage listed = await AssertSuccess(supportClient.GetAsync("/api/admin/auth/members")).ConfigureAwait(false);
         JsonElement listJson = await ReadJsonAsync(listed).ConfigureAwait(false);
         Assert.True(listJson.GetProperty("totalCount").GetInt32() >= 1);
+
+        int auditListCountBefore = await application
+            .CountAuditEntriesAsync(AdministrationAdminOperationNames.AuditList)
+            .ConfigureAwait(false);
+        using HttpResponseMessage auditPage = await AssertSuccess(supportClient.GetAsync(
+            $"/api/admin/audit?operation={AuthAdminOperationNames.MembersList}&limit=1"))
+            .ConfigureAwait(false);
+        JsonElement auditPageJson = await ReadJsonAsync(auditPage).ConfigureAwait(false);
+        Assert.Equal(1, auditPageJson.GetProperty("limit").GetInt32());
+        JsonElement auditEntry = Assert.Single(auditPageJson.GetProperty("items").EnumerateArray());
+        Assert.Equal(AuthAdminOperationNames.MembersList, auditEntry.GetProperty("operation").GetString());
+        Assert.Equal(JsonValueKind.Null, auditEntry.GetProperty("tenantId").ValueKind);
+        Assert.Equal(
+            auditListCountBefore + 1,
+            await application.CountAuditEntriesAsync(AdministrationAdminOperationNames.AuditList).ConfigureAwait(false));
+
+        using HttpResponseMessage tenantFilteredAuditPage = await AssertSuccess(supportClient.GetAsync(
+            $"/api/admin/audit?tenant=tenant-admin&operation={AuthAdminOperationNames.MembersList}&limit=1"))
+            .ConfigureAwait(false);
+        JsonElement tenantFilteredAuditPageJson = await ReadJsonAsync(tenantFilteredAuditPage).ConfigureAwait(false);
+        Assert.Empty(tenantFilteredAuditPageJson.GetProperty("items").EnumerateArray());
+
+        using HttpResponseMessage invalidAuditCursor = await supportClient
+            .GetAsync("/api/admin/audit?cursor=bad!")
+            .ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.BadRequest, invalidAuditCursor.StatusCode);
+
+        using HttpResponseMessage purgeDenied = await supportClient.PostAsJsonAsync(
+            "/api/admin/audit/purge",
+            new { beforeUtc = DateTimeOffset.UtcNow.AddDays(-1), confirmed = true }).ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.Forbidden, purgeDenied.StatusCode);
+
+        await GrantAsync(ownerClient, AdministrationAdminPermissions.AuditPurge.Code);
+        using HttpResponseMessage missingPurgeCutoff = await supportClient.PostAsJsonAsync(
+            "/api/admin/audit/purge",
+            new { confirmed = true }).ConfigureAwait(false);
+        string missingPurgeCutoffBody = await missingPurgeCutoff.Content.ReadAsStringAsync().ConfigureAwait(false);
+        Assert.Equal(HttpStatusCode.BadRequest, missingPurgeCutoff.StatusCode);
+        Assert.Contains(AdministrationApplicationErrors.AuditPurgeCutoffInvalid.Code, missingPurgeCutoffBody, StringComparison.Ordinal);
+
+        using HttpResponseMessage purge = await AssertSuccess(supportClient.PostAsJsonAsync(
+            "/api/admin/audit/purge",
+            new { beforeUtc = DateTimeOffset.UtcNow.AddDays(-1), batchSize = 10, confirmed = true }))
+            .ConfigureAwait(false);
+        JsonElement purgeJson = await ReadJsonAsync(purge).ConfigureAwait(false);
+        Assert.Equal(0, purgeJson.GetProperty("deletedCount").GetInt32());
 
         int confirmationAuditCountBefore = await application
             .CountAuditEntriesAsync(AuthAdminOperationNames.MembersDisable, AdminErrors.ConfirmationRequired.Code)

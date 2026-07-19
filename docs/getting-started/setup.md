@@ -186,6 +186,10 @@ Core runtime keys:
 - `Administration:Api:TenantIdClaim`
 - `Administration:Api:RequireTenantClaimMatch`
 - `Administration:Api:AllowGeneratedPasswordResponses`
+- `Administration:Audit:DefaultPageSize`
+- `Administration:Audit:MaxPageSize`
+- `Administration:Audit:DefaultPurgeBatchSize`
+- `Administration:Audit:MaxPurgeBatchSize`
 
 Development enables the Prometheus scrape endpoint at `/metrics`. OTLP export remains disabled until explicitly configured.
 

@@ -4,6 +4,7 @@ using DotNet.Testcontainers.Containers;
 using Gma.Framework.Administration;
 using Gma.Framework.Administration.Cli;
 using Gma.Modules.AccessControl.Application;
+using Gma.Modules.Administration.Admin.Contracts;
 using Gma.Modules.Auth.Application;
 using Gma.Modules.Auth.Contracts;
 using Gma.Modules.Auth.Domain.Errors;
@@ -79,12 +80,59 @@ public sealed class AdminCliIntegrationTests
         await GrantAsync(application, AuthAdminPermissionCodes.MembersResetMultiFactor);
         await GrantAsync(application, AuthAdminPermissionCodes.MembersResetPassword);
         await GrantAsync(application, AuthAdminPermissionCodes.MembersRevokeSessions);
+        await GrantAsync(application, AdministrationAdminPermissions.AuditRead.Code);
         await AssertSuccess(application.ExecuteAsync(
             "admin", "roles", "assign",
             "--actor", "owner",
             "--target-actor", "support",
             "--role", "support",
             "--scope", "tenant:tenant-admin"));
+
+        AdminCliResult tenantScopedAuditDenied = await application.ExecuteAsync(
+            "administration", "audit", "list",
+            "--actor", "support",
+            "--tenant", "tenant-admin");
+        Assert.Equal(AdminExitCodes.Unauthorized, tenantScopedAuditDenied.ExitCode);
+
+        await AssertSuccess(application.ExecuteAsync(
+            "admin", "roles", "assign",
+            "--actor", "owner",
+            "--target-actor", "support",
+            "--role", "support"));
+        AdminCliResult auditList = await AssertSuccess(application.ExecuteAsync(
+            "administration", "audit", "list",
+            "--actor", "support",
+            "--operation", AdministrationAdminOperationNames.AuditList,
+            "--limit", "1",
+            "--output", "json"));
+        Assert.Contains(AdministrationAdminOperationNames.AuditList, auditList.Output, StringComparison.Ordinal);
+        await AssertSuccess(application.ExecuteAsync(
+            "administration", "audit", "list",
+            "--actor", "support",
+            "--tenant", "tenant-admin",
+            "--limit", "1"));
+
+        AdminCliResult purgeDenied = await application.ExecuteAsync(
+            "administration", "audit", "purge",
+            "--actor", "support",
+            "--before", "2020-01-01T00:00:00Z",
+            "--yes");
+        Assert.Equal(AdminExitCodes.Unauthorized, purgeDenied.ExitCode);
+
+        await GrantAsync(application, AdministrationAdminPermissions.AuditPurge.Code);
+        AdminCliResult unconfirmedPurge = await application.ExecuteAsync(
+            "administration", "audit", "purge",
+            "--actor", "support",
+            "--before", "2020-01-01T00:00:00Z");
+        Assert.Equal(AdminExitCodes.Failed, unconfirmedPurge.ExitCode);
+        Assert.Contains(AdminErrors.ConfirmationRequired.Message, unconfirmedPurge.Error, StringComparison.Ordinal);
+        AdminCliResult purge = await AssertSuccess(application.ExecuteAsync(
+            "administration", "audit", "purge",
+            "--actor", "support",
+            "--before", "2020-01-01T00:00:00Z",
+            "--batch-size", "10",
+            "--yes"));
+        Assert.Contains("Deleted 0 audit record(s).", purge.Output, StringComparison.Ordinal);
 
         await AssertSuccess(application.ExecuteAsync(
             "admin", "roles", "create",
@@ -205,6 +253,9 @@ public sealed class AdminCliIntegrationTests
         Assert.True(await application.CountActiveSessionsAsync(memberId).ConfigureAwait(false) > 0);
         await application.SeedActiveTotpAuthenticatorAsync(memberId, "global").ConfigureAwait(false);
 
+        int resetConfirmationAuditCountBefore = await application
+            .CountAuditEntriesContainingAsync(AdminErrors.ConfirmationRequired.Code)
+            .ConfigureAwait(false);
         AdminCliResult missingResetConfirmation = await application.ExecuteAsync(
             "auth", "members", "reset-multi-factor",
             "--actor", "support",
@@ -213,7 +264,7 @@ public sealed class AdminCliIntegrationTests
             "--reason", "verified account recovery");
         Assert.Equal(AdminExitCodes.Failed, missingResetConfirmation.ExitCode);
         Assert.Equal(
-            1,
+            resetConfirmationAuditCountBefore + 1,
             await application.CountAuditEntriesContainingAsync(AdminErrors.ConfirmationRequired.Code).ConfigureAwait(false));
 
         const string resetReason = "verified account recovery";
