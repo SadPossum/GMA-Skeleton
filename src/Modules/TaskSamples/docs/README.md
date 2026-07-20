@@ -33,20 +33,9 @@ The module is intentionally not registered in `Host.Api`, `Host.AdminCli`, or `H
 
 ## Tests
 
-`TaskRuntimeIntegrationTests` proves:
+`TaskRuntimeIntegrationTests` proves the Skeleton-owned composition boundary:
 
-- SQL Server and PostgreSQL migrations create the runtime schema.
-- Lease claims are exclusive.
-- expired locks are reclaimable.
-- wrong-worker status updates do not mutate a run.
-- retry scheduling blocks claims until due.
-- requester metadata is persisted.
-- queued cancellation and reclaimed running cancellation finish as terminal canceled runs.
-- application-level enqueue rejects invalid JSON.
-- dedupe keys prevent duplicate active runs.
-- scheduled dedupe keys include module, task, schedule, payload version, and occurrence so v1/v2 payloads do not suppress each other.
-- payload version `2` claims route to the v2 handler registration.
-- stale running tasks can be marked timed out and retried through the application command path.
-- application-level stats count task runs by status.
-- application-level control commands enqueue persisted control messages for non-terminal runs.
-- the hosted worker processes the sample task through persisted runtime state.
+- the hosted worker processes a sample module task through persisted runtime state;
+- a sample handler can cooperatively consume a persisted control message.
+
+Provider migrations, lease fencing, claims, retries, deduplication, retention, pagination, and concurrency races are owned and tested by the standalone TaskRuntime module. The Skeleton does not duplicate that provider-level suite.

@@ -367,6 +367,10 @@
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations/Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations.csproj" />
     <Project Path="gma/modules/task-runtime/src/Gma.Modules.TaskRuntime.Persistence/Gma.Modules.TaskRuntime.Persistence.csproj" />
   </Folder>
+  <Folder Name="/gma/modules/task-runtime/tests/">
+    <Project Path="gma/modules/task-runtime/tests/Gma.Modules.TaskRuntime.IntegrationTests/Gma.Modules.TaskRuntime.IntegrationTests.csproj" />
+    <Project Path="gma/modules/task-runtime/tests/Gma.Modules.TaskRuntime.Tests/Gma.Modules.TaskRuntime.Tests.csproj" />
+  </Folder>
   <Folder Name="/gma/modules/tenancy/src/Api/">
     <Project Path="gma/modules/tenancy/src/Gma.Modules.Tenancy.Api/Gma.Modules.Tenancy.Api.csproj" />
   </Folder>

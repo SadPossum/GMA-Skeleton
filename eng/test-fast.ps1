@@ -13,7 +13,9 @@ $arguments = @(
     '--filter',
     'Category!=Docker',
     '--logger',
-    'console;verbosity=minimal'
+    'console;verbosity=minimal',
+    '-m:1',
+    '-nr:false'
 )
 
 if ($NoBuild) {
