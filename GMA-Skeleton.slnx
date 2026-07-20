@@ -31,6 +31,7 @@
   <Folder Name="/docs/architecture/">
     <File Path="docs/architecture/composition-tooling-alignment-task.md" />
     <File Path="docs/architecture/gma-production-completion-audit-task.md" />
+    <File Path="docs/architecture/gma-production-completion-summary.md" />
     <File Path="docs/architecture/gma-rebrand-and-source-repo-split.md" />
     <File Path="docs/architecture/overview.md" />
   </Folder>

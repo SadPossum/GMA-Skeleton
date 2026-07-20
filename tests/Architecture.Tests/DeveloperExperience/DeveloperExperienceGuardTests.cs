@@ -133,6 +133,7 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             "composition-tooling-alignment-task.md",
             "gma-production-completion-audit-task.md",
+            "gma-production-completion-summary.md",
             "gma-rebrand-and-source-repo-split.md",
             "overview.md"
         ];

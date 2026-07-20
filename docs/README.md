@@ -25,6 +25,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 - [Production Readiness Boundary](production-readiness.md)
 - [Skeleton Overview](architecture/overview.md)
 - [Composition Tooling Alignment Task](architecture/composition-tooling-alignment-task.md)
+- [GMA Production Completion Summary](architecture/gma-production-completion-summary.md)
 - [GMA Production Completion Audit](architecture/gma-production-completion-audit-task.md)
 - [GMA Rebrand And Source Repo Split Plan](architecture/gma-rebrand-and-source-repo-split.md)
 
