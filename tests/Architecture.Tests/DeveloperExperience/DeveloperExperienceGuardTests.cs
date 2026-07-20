@@ -1457,6 +1457,7 @@ public sealed partial class DeveloperExperienceGuardTests
             @"gma\extensions\src\",
             @"gma\modules\",
             @"$(GmaModulesRoot)access-control\src\",
+            @"..\modules\access-control\src\",
             @"$(GmaModulesRoot)auth\src\",
             @"..\..\framework\src\",
             @"gma\extensions\Gma.SourceRoots.props",

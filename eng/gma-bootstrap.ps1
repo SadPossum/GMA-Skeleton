@@ -81,6 +81,7 @@ function Get-GmaExtensionsSourceRootsLines {
         '  <PropertyGroup>',
         '    <GmaExtensionsRoot>$(MSBuildThisFileDirectory)src\</GmaExtensionsRoot>',
         '    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)..\framework\src\</GmaFrameworkRoot>',
+        '    <GmaModuleAccessControlRoot>$(MSBuildThisFileDirectory)..\modules\access-control\src\</GmaModuleAccessControlRoot>',
         '    <GmaModuleAuthRoot>$(MSBuildThisFileDirectory)..\modules\auth\src\</GmaModuleAuthRoot>',
         '    <GmaModuleNotificationsRoot>$(MSBuildThisFileDirectory)..\modules\notifications\src\</GmaModuleNotificationsRoot>',
         '    <GmaModuleOrganizationsRoot>$(MSBuildThisFileDirectory)..\modules\organizations\src\</GmaModuleOrganizationsRoot>',

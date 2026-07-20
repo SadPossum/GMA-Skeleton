@@ -15,9 +15,11 @@ if (Test-Path -LiteralPath $resolvedMatrixRoot) {
 }
 
 $cases = @(
+    [pscustomobject] @{ Name = 'AccessControlOnly'; Modules = @('access-control'); Extensions = @() },
     [pscustomobject] @{ Name = 'AuthOnly'; Modules = @('auth'); Extensions = @() },
     [pscustomobject] @{ Name = 'NotificationsOnly'; Modules = @('notifications'); Extensions = @() },
     [pscustomobject] @{ Name = 'OrganizationsOnly'; Modules = @('organizations'); Extensions = @() },
+    [pscustomobject] @{ Name = 'OrganizationsAccessControl'; Modules = @('organizations', 'access-control'); Extensions = @('Organizations.AccessControl') },
     [pscustomobject] @{ Name = 'OrganizationsTenancy'; Modules = @('organizations', 'tenancy'); Extensions = @('Organizations.Tenancy') },
     [pscustomobject] @{ Name = 'AuthNotifications'; Modules = @('auth', 'notifications'); Extensions = @('Auth.Notifications') },
     [pscustomobject] @{ Name = 'AuthOrganizations'; Modules = @('auth', 'organizations'); Extensions = @('Auth.Organizations') },
@@ -27,11 +29,13 @@ $cases = @(
 $sharedExtensionTokens = @(
     'GMA-Extensions',
     'GmaExtensionsRoot',
+    'GmaModuleAccessControlRoot',
     'gma/extensions/Gma.SourceRoots.props'
 )
 $extensionTokens = @{
     'Auth.Notifications' = @('Gma.Extensions.Auth.Notifications', 'AddAuthNotificationsExtension')
     'Auth.Organizations' = @('Gma.Extensions.Auth.Organizations', 'AddAuthOrganizationsExtension')
+    'Organizations.AccessControl' = @('Gma.Extensions.Organizations.AccessControl', 'AddOrganizationsAccessControlExtension')
     'Organizations.Tenancy' = @('Gma.Extensions.Organizations.Tenancy', 'AddOrganizationsTenancyExtension')
 }
 
@@ -77,6 +81,7 @@ foreach ($case in $cases) {
     $expectedBootstrapFlags = @(
         ('$includeAuthNotificationsExtension = $' + ($case.Extensions -contains 'Auth.Notifications').ToString().ToLowerInvariant())
         ('$includeAuthOrganizationsExtension = $' + ($case.Extensions -contains 'Auth.Organizations').ToString().ToLowerInvariant())
+        ('$includeOrganizationsAccessControlExtension = $' + ($case.Extensions -contains 'Organizations.AccessControl').ToString().ToLowerInvariant())
         ('$includeOrganizationsTenancyExtension = $' + ($case.Extensions -contains 'Organizations.Tenancy').ToString().ToLowerInvariant())
         ('$includeExtensions = $' + ($case.Extensions.Count -gt 0).ToString().ToLowerInvariant())
     )
@@ -106,4 +111,4 @@ foreach ($case in $cases) {
     }
 }
 
-Write-Host 'Generated app selection matrix passed for Auth, Notifications, Organizations, and their opt-in extensions.'
+Write-Host 'Generated app selection matrix passed for AccessControl, Auth, Notifications, Organizations, and their opt-in extensions.'

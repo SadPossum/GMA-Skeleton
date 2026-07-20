@@ -26,11 +26,11 @@ $script:GmaKnownModuleSpecs = @(
         Alias = 'access-control'
         Repository = 'GMA-Module-Access-Control'
         SourceRootProperty = 'GmaModuleAccessControlRoot'
-        PublicApiProject = $null
-        PublicApiNamespace = $null
-        PublicApiModuleType = $null
+        PublicApiProject = 'Gma.Modules.AccessControl.Api'
+        PublicApiNamespace = 'Gma.Modules.AccessControl.Api'
+        PublicApiModuleType = 'AccessControlApiModule'
         MigrationProjectPrefix = 'Gma.Modules.AccessControl.Persistence'
-        DbContextType = $null
+        DbContextType = 'Gma.Modules.AccessControl.Persistence.AccessControlDbContext'
     },
     [pscustomobject] @{
         Alias = 'administration'
@@ -193,15 +193,20 @@ function Write-GmaGeneratedBootstrap {
     $includeAuthOrganizationsExtension =
         ($selectedModuleSpecArray.Alias -contains 'auth') -and
         ($selectedModuleSpecArray.Alias -contains 'organizations')
+    $includeOrganizationsAccessControlExtension =
+        ($selectedModuleSpecArray.Alias -contains 'organizations') -and
+        ($selectedModuleSpecArray.Alias -contains 'access-control')
     $includeOrganizationsTenancyExtension =
         ($selectedModuleSpecArray.Alias -contains 'organizations') -and
         ($selectedModuleSpecArray.Alias -contains 'tenancy')
     $includeExtensions =
         $includeAuthNotificationsExtension -or
         $includeAuthOrganizationsExtension -or
+        $includeOrganizationsAccessControlExtension -or
         $includeOrganizationsTenancyExtension
     $includeAuthNotificationsExtensionLiteral = if ($includeAuthNotificationsExtension) { '$true' } else { '$false' }
     $includeAuthOrganizationsExtensionLiteral = if ($includeAuthOrganizationsExtension) { '$true' } else { '$false' }
+    $includeOrganizationsAccessControlExtensionLiteral = if ($includeOrganizationsAccessControlExtension) { '$true' } else { '$false' }
     $includeOrganizationsTenancyExtensionLiteral = if ($includeOrganizationsTenancyExtension) { '$true' } else { '$false' }
     $includeExtensionsLiteral = if ($includeExtensions) { '$true' } else { '$false' }
     $selectedModuleAliasesLiteral = if ($selectedModuleSpecArray.Count -eq 0) {
@@ -299,6 +304,7 @@ function Write-GmaGeneratedBootstrap {
         "`$selectedModuleAliases = $selectedModuleAliasesLiteral",
         "`$includeAuthNotificationsExtension = $includeAuthNotificationsExtensionLiteral",
         "`$includeAuthOrganizationsExtension = $includeAuthOrganizationsExtensionLiteral",
+        "`$includeOrganizationsAccessControlExtension = $includeOrganizationsAccessControlExtensionLiteral",
         "`$includeOrganizationsTenancyExtension = $includeOrganizationsTenancyExtensionLiteral",
         "`$includeExtensions = $includeExtensionsLiteral",
         '$moduleRootProperties = @{'
@@ -337,6 +343,7 @@ function Write-GmaGeneratedBootstrap {
         '    ''  <PropertyGroup>'',',
         '    ''    <GmaExtensionsRoot>$(MSBuildThisFileDirectory)src\</GmaExtensionsRoot>'',',
         '    ''    <GmaFrameworkRoot>$(MSBuildThisFileDirectory)..\framework\src\</GmaFrameworkRoot>'',',
+        '    ''    <GmaModuleAccessControlRoot>$(MSBuildThisFileDirectory)..\modules\access-control\src\</GmaModuleAccessControlRoot>'',',
         '    ''    <GmaModuleAuthRoot>$(MSBuildThisFileDirectory)..\modules\auth\src\</GmaModuleAuthRoot>'',',
         '    ''    <GmaModuleNotificationsRoot>$(MSBuildThisFileDirectory)..\modules\notifications\src\</GmaModuleNotificationsRoot>'',',
         '    ''    <GmaModuleOrganizationsRoot>$(MSBuildThisFileDirectory)..\modules\organizations\src\</GmaModuleOrganizationsRoot>'',',
@@ -648,6 +655,8 @@ function Write-GmaGeneratedDeveloperTools {
         ($moduleAliases -contains 'auth') -and ($moduleAliases -contains 'notifications')
     $includeAuthOrganizationsExtension =
         ($moduleAliases -contains 'auth') -and ($moduleAliases -contains 'organizations')
+    $includeOrganizationsAccessControlExtension =
+        ($moduleAliases -contains 'organizations') -and ($moduleAliases -contains 'access-control')
     $includeOrganizationsTenancyExtension =
         ($moduleAliases -contains 'organizations') -and ($moduleAliases -contains 'tenancy')
     $solutionProjectRoots = [System.Collections.Generic.List[string]]::new()
@@ -664,6 +673,10 @@ function Write-GmaGeneratedDeveloperTools {
     if ($includeAuthOrganizationsExtension) {
         $solutionProjectRoots.Add('gma/extensions/src/Gma.Extensions.Auth.Organizations')
         $solutionProjectRoots.Add('gma/extensions/tests/Gma.Extensions.Auth.Organizations.Tests')
+    }
+    if ($includeOrganizationsAccessControlExtension) {
+        $solutionProjectRoots.Add('gma/extensions/src/Gma.Extensions.Organizations.AccessControl')
+        $solutionProjectRoots.Add('gma/extensions/tests/Gma.Extensions.Organizations.AccessControl.Tests')
     }
     if ($includeOrganizationsTenancyExtension) {
         $solutionProjectRoots.Add('gma/extensions/src/Gma.Extensions.Organizations.Tenancy')
@@ -933,12 +946,14 @@ $persistedPublicApiModuleSpecs = @($publicApiModuleSpecs | Where-Object { -not [
 $readinessModuleSpecs = @($publicApiModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.DbContextType) })
 $selectedModuleAliases = @($selectedModuleSpecArray | ForEach-Object { $_.Alias })
 $hasAuth = $selectedModuleAliases -contains 'auth'
+$hasAccessControl = $selectedModuleAliases -contains 'access-control'
 $hasFiles = $selectedModuleAliases -contains 'files'
 $hasNotifications = $selectedModuleAliases -contains 'notifications'
 $hasOrganizations = $selectedModuleAliases -contains 'organizations'
 $hasTenancy = $selectedModuleAliases -contains 'tenancy'
 $hasExtensions =
     ($hasAuth -and ($hasNotifications -or $hasOrganizations)) -or
+    ($hasOrganizations -and $hasAccessControl) -or
     ($hasOrganizations -and $hasTenancy)
 $publicApiModuleText = if ($publicApiModuleSpecs.Count -eq 0) {
     'none'
@@ -1249,6 +1264,10 @@ if ($hasAuth -and $hasOrganizations) {
     $hostApiProjectLines += '    <ProjectReference Include="$(GmaExtensionsRoot)Gma.Extensions.Auth.Organizations\Gma.Extensions.Auth.Organizations.csproj" />'
 }
 
+if ($hasOrganizations -and $hasAccessControl) {
+    $hostApiProjectLines += '    <ProjectReference Include="$(GmaExtensionsRoot)Gma.Extensions.Organizations.AccessControl\Gma.Extensions.Organizations.AccessControl.csproj" />'
+}
+
 if ($hasOrganizations -and $hasTenancy) {
     $hostApiProjectLines += '    <ProjectReference Include="$(GmaExtensionsRoot)Gma.Extensions.Organizations.Tenancy\Gma.Extensions.Organizations.Tenancy.csproj" />'
 }
@@ -1309,6 +1328,10 @@ if ($hasAuth -and $hasNotifications) {
 
 if ($hasAuth -and $hasOrganizations) {
     $programUsingLines += 'using Gma.Extensions.Auth.Organizations;'
+}
+
+if ($hasOrganizations -and $hasAccessControl) {
+    $programUsingLines += 'using Gma.Extensions.Organizations.AccessControl;'
 }
 
 if ($hasOrganizations -and $hasTenancy) {
@@ -1384,6 +1407,10 @@ if ($hasAuth -and $hasNotifications) {
 
 if ($hasAuth -and $hasOrganizations) {
     $programLines += 'builder.Services.AddAuthOrganizationsExtension();'
+}
+
+if ($hasOrganizations -and $hasAccessControl) {
+    $programLines += 'builder.Services.AddOrganizationsAccessControlExtension();'
 }
 
 if ($hasOrganizations -and $hasTenancy) {
