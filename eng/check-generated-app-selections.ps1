@@ -23,7 +23,19 @@ $cases = @(
     [pscustomobject] @{ Name = 'OrganizationsTenancy'; Modules = @('organizations', 'tenancy'); Extensions = @('Organizations.Tenancy') },
     [pscustomobject] @{ Name = 'AuthNotifications'; Modules = @('auth', 'notifications'); Extensions = @('Auth.Notifications') },
     [pscustomobject] @{ Name = 'AuthOrganizations'; Modules = @('auth', 'organizations'); Extensions = @('Auth.Organizations') },
-    [pscustomobject] @{ Name = 'AuthOrganizationsTenancy'; Modules = @('auth', 'organizations', 'tenancy'); Extensions = @('Auth.Organizations', 'Organizations.Tenancy') }
+    [pscustomobject] @{ Name = 'AuthOrganizationsTenancy'; Modules = @('auth', 'organizations', 'tenancy'); Extensions = @('Auth.Organizations', 'Organizations.Tenancy') },
+    [pscustomobject] @{
+        Name = 'AdministrationAccessControl'
+        Modules = @('administration', 'access-control')
+        Hosts = @('Api', 'AdminApi', 'AdminCli')
+        Extensions = @()
+    },
+    [pscustomobject] @{
+        Name = 'AllAdmin'
+        Modules = @('access-control', 'administration', 'auth', 'files', 'notifications', 'organizations', 'task-runtime', 'tenancy')
+        Hosts = @('Api', 'AdminApi', 'AdminCli')
+        Extensions = @('Auth.Notifications', 'Auth.Organizations', 'Organizations.AccessControl', 'Organizations.Tenancy')
+    }
 )
 
 $sharedExtensionTokens = @(
@@ -41,10 +53,12 @@ $extensionTokens = @{
 
 foreach ($case in $cases) {
     $outputPath = Join-Path $resolvedMatrixRoot $case.Name
+    $caseHosts = if ($case.PSObject.Properties.Name -contains 'Hosts') { @($case.Hosts) } else { @('Api') }
     & (Join-Path $PSScriptRoot 'new-gma-app.ps1') `
         -Name $case.Name `
         -OutputPath $outputPath `
-        -Modules $case.Modules
+        -Modules $case.Modules `
+        -Hosts $caseHosts
 
     $conditionalSurfacePaths = @(
         (Join-Path $outputPath 'Gma.SourceRoots.props.example'),
@@ -52,6 +66,20 @@ foreach ($case in $cases) {
         (Join-Path $outputPath "src\Hosts\$($case.Name).Host.Api\$($case.Name).Host.Api.csproj"),
         (Join-Path $outputPath "src\Hosts\$($case.Name).Host.Api\Program.cs")
     )
+    if ($caseHosts -contains 'AdminApi') {
+        $conditionalSurfacePaths += @(
+            (Join-Path $outputPath "src\Hosts\$($case.Name).Host.AdminApi\$($case.Name).Host.AdminApi.csproj"),
+            (Join-Path $outputPath "src\Hosts\$($case.Name).Host.AdminApi\Program.cs"),
+            (Join-Path $outputPath "src\Hosts\$($case.Name).Host.AdminApi\appsettings.json")
+        )
+    }
+    if ($caseHosts -contains 'AdminCli') {
+        $conditionalSurfacePaths += @(
+            (Join-Path $outputPath "src\Hosts\$($case.Name).Host.AdminCli\$($case.Name).Host.AdminCli.csproj"),
+            (Join-Path $outputPath "src\Hosts\$($case.Name).Host.AdminCli\Program.cs"),
+            (Join-Path $outputPath "src\Hosts\$($case.Name).Host.AdminCli\appsettings.json")
+        )
+    }
     $surfacePaths = @(
         (Join-Path $outputPath 'Directory.Build.props'),
         (Join-Path $outputPath 'eng\gma-bootstrap.ps1')
@@ -109,6 +137,93 @@ foreach ($case in $cases) {
             throw "$($case.Name) generated incorrect Organizations settings for token: $organizationSettingsToken"
         }
     }
+
+    if ($caseHosts -contains 'AdminApi') {
+        $requiredAdminTokens = @(
+            'Gma.Modules.Administration.AdminApi',
+            'Gma.Modules.AccessControl.AdminApi',
+            'AddAdminApiModule<AdministrationAdminApiModule>',
+            'AddAdminApiModule<AccessControlAdminApiModule>',
+            'Gma.Modules.Administration.AdminCli',
+            'Gma.Modules.AccessControl.AdminCli',
+            'AddAdminModule<AdministrationAdminCliModule>',
+            'AddAdminModule<AccessControlAdminCliModule>',
+            'Gma.Modules.Administration.Persistence.SqlServerMigrations',
+            'Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations',
+            'AddGmaEntityFrameworkReadinessCheck<Gma.Modules.Administration.Persistence.AdminDbContext>',
+            'AddGmaEntityFrameworkReadinessCheck<Gma.Modules.AccessControl.Persistence.AccessControlDbContext>',
+            'ContentRootPath = AppContext.BaseDirectory',
+            'catch (OptionsValidationException exception)',
+            'catch (ModuleCompositionValidationException exception)',
+            'CopyToOutputDirectory="PreserveNewest"',
+            '"Administration"',
+            '"Audit"',
+            '"AccessControl"',
+            '"Bootstrap"'
+        )
+        if ($case.Name -eq 'AllAdmin') {
+            $requiredAdminTokens += @(
+                'AddAuthAdminApiModule(AuthProfile.Global())',
+                'AddAuthAdminModule(AuthProfile.Global())',
+                'AddAdminApiModule<NotificationsAdminApiModule>',
+                'AddAdminApiModule<OrganizationsAdminApiModule>',
+                'AddAdminApiModule<TaskRuntimeAdminApiModule>',
+                'AddAdminModule<OrganizationsAdminCliModule>',
+                'AddAdminModule<TaskRuntimeAdminCliModule>',
+                'AddGmaEntityFrameworkReadinessCheck<Gma.Modules.TaskRuntime.Persistence.TaskRuntimeDbContext>'
+            )
+        }
+
+        $missingAdminTokens = @($requiredAdminTokens | Where-Object {
+            $conditionalSurface.IndexOf($_, [System.StringComparison]::Ordinal) -lt 0
+        })
+        if ($missingAdminTokens.Count -gt 0) {
+            throw "$($case.Name) is missing admin composition tokens: $($missingAdminTokens -join ', ')"
+        }
+    }
 }
 
-Write-Host 'Generated app selection matrix passed for AccessControl, Auth, Notifications, Organizations, and their opt-in extensions.'
+$buildCaseName = 'AllAdmin'
+$buildCaseRoot = Join-Path $resolvedMatrixRoot $buildCaseName
+$sourceRootContent = [System.IO.File]::ReadAllText(
+    (Join-Path $buildCaseRoot 'Gma.SourceRoots.props.example'))
+$directorySeparator = [string][System.IO.Path]::DirectorySeparatorChar
+$frameworkSourceRoot = [System.IO.Path]::GetFullPath((Join-GmaPath 'gma\framework\src')).TrimEnd('\', '/') + $directorySeparator
+$extensionsSourceRoot = [System.IO.Path]::GetFullPath((Join-GmaPath 'gma\extensions\src')).TrimEnd('\', '/') + $directorySeparator
+$modulesSourceRoot = [System.IO.Path]::GetFullPath((Join-GmaPath 'gma\modules')).TrimEnd('\', '/') + $directorySeparator
+$sourceRootContent = $sourceRootContent.Replace(
+    '$(MSBuildThisFileDirectory)gma\framework\src\',
+    $frameworkSourceRoot)
+$sourceRootContent = $sourceRootContent.Replace(
+    '$(MSBuildThisFileDirectory)gma\extensions\src\',
+    $extensionsSourceRoot)
+$sourceRootContent = $sourceRootContent.Replace(
+    '$(MSBuildThisFileDirectory)gma\modules\',
+    $modulesSourceRoot)
+$sourceRootContent = $sourceRootContent.Replace('\', $directorySeparator)
+[System.IO.File]::WriteAllText(
+    (Join-Path $buildCaseRoot 'Gma.SourceRoots.props'),
+    $sourceRootContent,
+    [System.Text.UTF8Encoding]::new($false))
+
+& dotnet restore (Join-Path $buildCaseRoot "$buildCaseName.slnx")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& dotnet build (Join-Path $buildCaseRoot "$buildCaseName.slnx") --no-restore -m:1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+$invalidAdminOutput = Join-Path $resolvedMatrixRoot 'InvalidAdminSelection'
+try {
+    & (Join-Path $PSScriptRoot 'new-gma-app.ps1') `
+        -Name InvalidAdminSelection `
+        -OutputPath $invalidAdminOutput `
+        -Modules @('access-control') `
+        -Hosts @('Api', 'AdminApi')
+    throw 'Invalid admin selection unexpectedly succeeded.'
+}
+catch {
+    if ($_.Exception.Message -notlike '*require both administration and access-control*') {
+        throw
+    }
+}
+
+Write-Host 'Generated app selection matrix passed for public, admin, and opt-in extension composition.'

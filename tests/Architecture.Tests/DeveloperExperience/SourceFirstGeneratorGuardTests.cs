@@ -71,6 +71,32 @@ public sealed class SourceFirstGeneratorGuardTests
     }
 
     [Fact]
+    public void App_generator_composes_durable_authorized_admin_hosts()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string generator = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-gma-app.ps1"));
+        string[] requiredTokens =
+        [
+            "AdminApiProject = 'Gma.Modules.Administration.AdminApi'",
+            "AdminCliProject = 'Gma.Modules.AccessControl.AdminCli'",
+            "require both administration and access-control",
+            "$persistedAdminApiModuleSpecs",
+            "$persistedAdminCliModuleSpecs",
+            "AddGmaEntityFrameworkReadinessCheck<$($moduleSpec.DbContextType)>",
+            "builder.AddAdminApiModule<$($moduleSpec.AdminApiModuleType)>();",
+            "builder.AddAdminModule<$($moduleSpec.AdminCliModuleType)>();",
+            "ContentRootPath = AppContext.BaseDirectory",
+            "catch (OptionsValidationException exception)",
+            "catch (ModuleCompositionValidationException exception)",
+            "CopyToOutputDirectory=\"PreserveNewest\"",
+            "$baseSettings.Administration",
+            "$baseSettings.AccessControl",
+        ];
+
+        Assert.DoesNotContain(requiredTokens, token => !generator.Contains(token, StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void App_generator_composes_optional_auth_notification_and_organization_adapters()
     {
         string repositoryRoot = FindRepositoryRoot();
@@ -125,6 +151,8 @@ public sealed class SourceFirstGeneratorGuardTests
             "AuthOrganizations",
             "OrganizationsTenancy",
             "AuthOrganizationsTenancy",
+            "AdministrationAccessControl",
+            "AllAdmin",
             "OrganizationsOnly",
             "Extensions = @()",
             "Gma.Extensions.Auth.Notifications",
@@ -133,6 +161,9 @@ public sealed class SourceFirstGeneratorGuardTests
             "AddAuthOrganizationsExtension",
             "Gma.Extensions.Organizations.Tenancy",
             "AddOrganizationsTenancyExtension",
+            "AddAdminApiModule<AdministrationAdminApiModule>",
+            "AddAdminModule<AccessControlAdminCliModule>",
+            "InvalidAdminSelection",
         ];
 
         Assert.DoesNotContain(requiredTokens, token => !script.Contains(token, StringComparison.Ordinal));

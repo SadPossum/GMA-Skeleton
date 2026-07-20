@@ -1748,8 +1748,10 @@ public sealed partial class DeveloperExperienceGuardTests
             "Public API modules composed by",
             "AddApiSecurityDefaults",
             "ValidateModuleComposition",
-            "AddAuthModule(AuthProfile.Global())",
-            "AddAuthModule(AuthProfile.ScopeAware())",
+            "$authProfileExpression = if ($hasTenancy -and -not $hasOrganizations)",
+            "'AuthProfile.ScopeAware()'",
+            "'AuthProfile.Global()'",
+            "builder.AddAuthModule($authProfileExpression);",
             "Gma.SourceRoots.props.example",
             "GMA-Extensions.git",
             "GmaExtensionsRoot",
@@ -4945,7 +4947,10 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             new(
                 "Gma.Framework.Administration",
-                ["Microsoft.Extensions.Logging.Abstractions"],
+                [
+                    "Microsoft.Extensions.Logging.Abstractions",
+                    "Microsoft.Extensions.Options"
+                ],
                 [],
                 [
                     @"..\..\Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj",

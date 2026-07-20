@@ -14,7 +14,7 @@ The repo is intentionally small and explicit:
 - tenant support starts with shared-database isolation through `TenantId`;
 - reliable cross-boundary publishing goes through outbox tables and a NATS JetStream adapter.
 - optional cache-aside reads use provider-neutral contracts, HybridCache, and an opt-in Redis adapter.
-- optional administration uses a separate CLI host, persisted RBAC/audit, and feature-owned admin front doors.
+- optional administration uses separate CLI and HTTP hosts, AccessControl-owned persisted RBAC, Administration-owned audit, and feature-owned admin front doors.
 - optional admin HTTP APIs use a separate `Host.AdminApi` composition root.
 - optional background processing uses a separate `Host.Worker` composition root when deployments want HTTP hosts to avoid publisher, consumer, and task-worker load.
 

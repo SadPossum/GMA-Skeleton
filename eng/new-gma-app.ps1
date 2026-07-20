@@ -31,6 +31,12 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiModuleType = 'AccessControlApiModule'
         MigrationProjectPrefix = 'Gma.Modules.AccessControl.Persistence'
         DbContextType = 'Gma.Modules.AccessControl.Persistence.AccessControlDbContext'
+        AdminApiProject = 'Gma.Modules.AccessControl.AdminApi'
+        AdminApiNamespace = 'Gma.Modules.AccessControl.AdminApi'
+        AdminApiModuleType = 'AccessControlAdminApiModule'
+        AdminCliProject = 'Gma.Modules.AccessControl.AdminCli'
+        AdminCliNamespace = 'Gma.Modules.AccessControl.AdminCli'
+        AdminCliModuleType = 'AccessControlAdminCliModule'
     },
     [pscustomobject] @{
         Alias = 'administration'
@@ -40,7 +46,13 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiNamespace = $null
         PublicApiModuleType = $null
         MigrationProjectPrefix = 'Gma.Modules.Administration.Persistence'
-        DbContextType = $null
+        DbContextType = 'Gma.Modules.Administration.Persistence.AdminDbContext'
+        AdminApiProject = 'Gma.Modules.Administration.AdminApi'
+        AdminApiNamespace = 'Gma.Modules.Administration.AdminApi'
+        AdminApiModuleType = 'AdministrationAdminApiModule'
+        AdminCliProject = 'Gma.Modules.Administration.AdminCli'
+        AdminCliNamespace = 'Gma.Modules.Administration.AdminCli'
+        AdminCliModuleType = 'AdministrationAdminCliModule'
     },
     [pscustomobject] @{
         Alias = 'auth'
@@ -51,6 +63,12 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiModuleType = 'AuthModule'
         MigrationProjectPrefix = 'Gma.Modules.Auth.Persistence'
         DbContextType = 'Gma.Modules.Auth.Persistence.AuthDbContext'
+        AdminApiProject = 'Gma.Modules.Auth.AdminApi'
+        AdminApiNamespace = 'Gma.Modules.Auth.AdminApi'
+        AdminApiModuleType = 'AuthAdminApiModule'
+        AdminCliProject = 'Gma.Modules.Auth.AdminCli'
+        AdminCliNamespace = 'Gma.Modules.Auth.AdminCli'
+        AdminCliModuleType = 'AuthAdminCliModule'
     },
     [pscustomobject] @{
         Alias = 'files'
@@ -61,6 +79,12 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiModuleType = 'FilesModule'
         MigrationProjectPrefix = $null
         DbContextType = $null
+        AdminApiProject = $null
+        AdminApiNamespace = $null
+        AdminApiModuleType = $null
+        AdminCliProject = $null
+        AdminCliNamespace = $null
+        AdminCliModuleType = $null
     },
     [pscustomobject] @{
         Alias = 'notifications'
@@ -71,6 +95,12 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiModuleType = 'NotificationsModule'
         MigrationProjectPrefix = 'Gma.Modules.Notifications.Persistence'
         DbContextType = 'Gma.Modules.Notifications.Persistence.NotificationsDbContext'
+        AdminApiProject = 'Gma.Modules.Notifications.AdminApi'
+        AdminApiNamespace = 'Gma.Modules.Notifications.AdminApi'
+        AdminApiModuleType = 'NotificationsAdminApiModule'
+        AdminCliProject = $null
+        AdminCliNamespace = $null
+        AdminCliModuleType = $null
     },
     [pscustomobject] @{
         Alias = 'organizations'
@@ -81,6 +111,12 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiModuleType = 'OrganizationsModule'
         MigrationProjectPrefix = 'Gma.Modules.Organizations.Persistence'
         DbContextType = 'Gma.Modules.Organizations.Persistence.OrganizationsDbContext'
+        AdminApiProject = 'Gma.Modules.Organizations.AdminApi'
+        AdminApiNamespace = 'Gma.Modules.Organizations.AdminApi'
+        AdminApiModuleType = 'OrganizationsAdminApiModule'
+        AdminCliProject = 'Gma.Modules.Organizations.AdminCli'
+        AdminCliNamespace = 'Gma.Modules.Organizations.AdminCli'
+        AdminCliModuleType = 'OrganizationsAdminCliModule'
     },
     [pscustomobject] @{
         Alias = 'task-runtime'
@@ -90,7 +126,13 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiNamespace = $null
         PublicApiModuleType = $null
         MigrationProjectPrefix = 'Gma.Modules.TaskRuntime.Persistence'
-        DbContextType = $null
+        DbContextType = 'Gma.Modules.TaskRuntime.Persistence.TaskRuntimeDbContext'
+        AdminApiProject = 'Gma.Modules.TaskRuntime.AdminApi'
+        AdminApiNamespace = 'Gma.Modules.TaskRuntime.AdminApi'
+        AdminApiModuleType = 'TaskRuntimeAdminApiModule'
+        AdminCliProject = 'Gma.Modules.TaskRuntime.AdminCli'
+        AdminCliNamespace = 'Gma.Modules.TaskRuntime.AdminCli'
+        AdminCliModuleType = 'TaskRuntimeAdminCliModule'
     },
     [pscustomobject] @{
         Alias = 'tenancy'
@@ -101,6 +143,12 @@ $script:GmaKnownModuleSpecs = @(
         PublicApiModuleType = 'TenancyModule'
         MigrationProjectPrefix = $null
         DbContextType = $null
+        AdminApiProject = $null
+        AdminApiNamespace = $null
+        AdminApiModuleType = $null
+        AdminCliProject = $null
+        AdminCliNamespace = $null
+        AdminCliModuleType = $null
     }
 )
 
@@ -151,6 +199,21 @@ function Get-GmaSelectedModuleSpecs {
     }
 
     return @($script:GmaKnownModuleSpecs | Where-Object { $normalizedAliases -contains $_.Alias })
+}
+
+function Get-GmaDistinctModuleSpecs {
+    param([object[]] $ModuleSpecs)
+
+    $seenAliases = @{}
+    $result = New-Object 'System.Collections.Generic.List[object]'
+    foreach ($moduleSpec in @($ModuleSpecs)) {
+        if (-not $seenAliases.ContainsKey($moduleSpec.Alias)) {
+            $seenAliases[$moduleSpec.Alias] = $true
+            $result.Add($moduleSpec)
+        }
+    }
+
+    return @($result.ToArray())
 }
 
 function Write-GmaTemplateFile {
@@ -933,6 +996,13 @@ $hasAdminApiHost = $selectedHosts -contains 'AdminApi'
 $hasAdminCliHost = $selectedHosts -contains 'AdminCli'
 $hasWorkerHost = $selectedHosts -contains 'Worker'
 $hasAspireHost = $selectedHosts -contains 'Aspire'
+$selectedModuleAliases = @($selectedModuleSpecArray | ForEach-Object { $_.Alias })
+$hasAdministration = $selectedModuleAliases -contains 'administration'
+$hasAccessControl = $selectedModuleAliases -contains 'access-control'
+if (($hasAdminApiHost -or $hasAdminCliHost) -and (-not $hasAdministration -or -not $hasAccessControl)) {
+    throw 'Generated AdminApi and AdminCli hosts require both administration and access-control modules for durable audit and persisted authorization.'
+}
+
 $selectedHostText = $selectedHosts -join ', '
 $selectedModuleText = if ($selectedModuleSpecArray.Count -eq 0) {
     'none'
@@ -944,13 +1014,35 @@ else {
 $publicApiModuleSpecs = @($selectedModuleSpecArray | Where-Object { -not [string]::IsNullOrWhiteSpace($_.PublicApiProject) })
 $persistedPublicApiModuleSpecs = @($publicApiModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.MigrationProjectPrefix) })
 $readinessModuleSpecs = @($publicApiModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.DbContextType) })
-$selectedModuleAliases = @($selectedModuleSpecArray | ForEach-Object { $_.Alias })
+$orderedAdminModuleSpecs = @(
+    $selectedModuleSpecArray | Where-Object { $_.Alias -eq 'administration' }
+    $selectedModuleSpecArray | Where-Object { $_.Alias -eq 'access-control' }
+    $selectedModuleSpecArray | Where-Object { $_.Alias -notin @('administration', 'access-control') }
+)
+$adminApiModuleSpecs = @()
+if ($hasAdminApiHost) {
+    $adminApiModuleSpecs = @($orderedAdminModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.AdminApiProject) })
+}
+$adminCliModuleSpecs = @()
+if ($hasAdminCliHost) {
+    $adminCliModuleSpecs = @($orderedAdminModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.AdminCliProject) })
+}
+$persistedAdminApiModuleSpecs = @($adminApiModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.MigrationProjectPrefix) })
+$persistedAdminCliModuleSpecs = @($adminCliModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.MigrationProjectPrefix) })
+$adminApiReadinessModuleSpecs = @($adminApiModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.DbContextType) })
+$persistedHostCandidates = @($persistedPublicApiModuleSpecs) + @($persistedAdminApiModuleSpecs) + @($persistedAdminCliModuleSpecs)
+$persistedHostModuleSpecs = @(Get-GmaDistinctModuleSpecs -ModuleSpecs $persistedHostCandidates)
 $hasAuth = $selectedModuleAliases -contains 'auth'
-$hasAccessControl = $selectedModuleAliases -contains 'access-control'
 $hasFiles = $selectedModuleAliases -contains 'files'
 $hasNotifications = $selectedModuleAliases -contains 'notifications'
 $hasOrganizations = $selectedModuleAliases -contains 'organizations'
 $hasTenancy = $selectedModuleAliases -contains 'tenancy'
+$authProfileExpression = if ($hasTenancy -and -not $hasOrganizations) {
+    'AuthProfile.ScopeAware()'
+}
+else {
+    'AuthProfile.Global()'
+}
 $hasExtensions =
     ($hasAuth -and ($hasNotifications -or $hasOrganizations)) -or
     ($hasOrganizations -and $hasAccessControl) -or
@@ -960,6 +1052,18 @@ $publicApiModuleText = if ($publicApiModuleSpecs.Count -eq 0) {
 }
 else {
     ($publicApiModuleSpecs | ForEach-Object { $_.Alias }) -join ', '
+}
+$adminApiModuleText = if ($adminApiModuleSpecs.Count -eq 0) {
+    'none'
+}
+else {
+    ($adminApiModuleSpecs | ForEach-Object { $_.Alias }) -join ', '
+}
+$adminCliModuleText = if ($adminCliModuleSpecs.Count -eq 0) {
+    'none'
+}
+else {
+    ($adminCliModuleSpecs | ForEach-Object { $_.Alias }) -join ', '
 }
 
 $submoduleCommandLines = @(
@@ -1086,9 +1190,11 @@ $gmaSourceDocsLines = @(
     '- Reusable GMA module mounts: `gma/modules/<alias>`.',
     "- Selected reusable GMA modules for this shell: $selectedModuleText.",
     "- Public API modules composed by ``src/Hosts/$Name.Host.Api``: $publicApiModuleText.",
+    "- Admin API modules composed by ``src/Hosts/$Name.Host.AdminApi``: $adminApiModuleText.",
+    "- Admin CLI modules composed by ``src/Hosts/$Name.Host.AdminCli``: $adminCliModuleText.",
     "- Generated host surfaces: $selectedHostText.",
     "- Service defaults generated: $([bool]$ServiceDefaults).",
-    '- Generated admin and worker hosts are composition shells; add only the reusable or product modules each process owns.',
+    '- Generated admin hosts compose every selected module that exposes that admin surface. Worker hosts remain composition shells for product-owned runtime choices.',
     '- Selected Auth and Notifications adapters are composed explicitly by the API host; credentials, enabled providers, shared Data Protection storage for multi-replica OIDC callbacks and TOTP secrets, email transport, messaging, and production connection strings remain app-owned deployment choices.',
     '- `Directory.Packages.props` is seeded from the skeleton catalog so app-owned generated modules can restore immediately; prune or add versions as the product evolves.',
     '',
@@ -1354,12 +1460,7 @@ if ($hasTenancy) {
 }
 
 if ($hasAuth) {
-    if ($hasTenancy -and -not $hasOrganizations) {
-        $moduleRegistrationLines.Add('builder.AddAuthModule(AuthProfile.ScopeAware());')
-    }
-    else {
-        $moduleRegistrationLines.Add('builder.AddAuthModule(AuthProfile.Global());')
-    }
+    $moduleRegistrationLines.Add("builder.AddAuthModule($authProfileExpression);")
 }
 
 foreach ($moduleSpec in $publicApiModuleSpecs | Where-Object { $_.Alias -notin @('auth', 'tenancy') }) {
@@ -1507,6 +1608,9 @@ if ($hasAuth) {
 }
 
 $sensitivePathPrefixes = @()
+if ($hasAdminApiHost) {
+    $sensitivePathPrefixes += '/api/admin'
+}
 if ($hasAuth) {
     $sensitivePathPrefixes += @(
         '/api/auth/register',
@@ -1579,8 +1683,8 @@ $developmentSettings = [ordered]@{
     AllowedHosts = '*'
 }
 
-$hasPersistedPublicModule = $persistedPublicApiModuleSpecs.Count -gt 0
-if ($hasPersistedPublicModule) {
+$hasPersistedHostModule = $persistedHostModuleSpecs.Count -gt 0
+if ($hasPersistedHostModule) {
     $baseSettings.Persistence = [ordered]@{
         Provider = 'SqlServer'
     }
@@ -1594,6 +1698,35 @@ if ($hasPersistedPublicModule) {
     $developmentSettings.ConnectionStrings = [ordered]@{
         SqlServer = "Server=localhost,1433;Database=$Name;User Id=sa;Password=Pass@word1;TrustServerCertificate=True"
         PostgreSql = "Host=localhost;Port=5432;Database=$($Name.ToLowerInvariant());Username=postgres;Password=postgres"
+    }
+}
+
+if ($hasAdministration) {
+    $administrationSettings = [ordered]@{
+        Audit = [ordered]@{
+            DefaultPageSize = 50
+            MaxPageSize = 200
+            DefaultPurgeBatchSize = 500
+            MaxPurgeBatchSize = 2000
+        }
+    }
+    if ($hasAdminApiHost) {
+        $administrationSettings.Api = [ordered]@{
+            ActorIdClaim = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+            TenantIdClaim = 'scope_id'
+            RequireTenantClaimMatch = [bool]$hasTenancy
+            AllowGeneratedPasswordResponses = $false
+        }
+    }
+    $baseSettings.Administration = $administrationSettings
+}
+
+if ($hasAccessControl) {
+    $baseSettings.AccessControl = [ordered]@{
+        Bootstrap = [ordered]@{
+            AllowWhenAssignmentsExist = $false
+            OwnerRoleName = 'owner'
+        }
     }
 }
 
@@ -1803,6 +1936,21 @@ if ($hasAdminApiHost) {
     if ($ServiceDefaults) {
         $adminApiProjectLines += "    <ProjectReference Include=`"..\..\ServiceDefaults\$Name.ServiceDefaults\$Name.ServiceDefaults.csproj`" />"
     }
+    if ($adminApiReadinessModuleSpecs.Count -gt 0) {
+        $adminApiProjectLines += '    <ProjectReference Include="$(GmaFrameworkRoot)Api\Gma.Framework.Api.Production.EntityFrameworkCore\Gma.Framework.Api.Production.EntityFrameworkCore.csproj" />'
+    }
+    if ($adminApiModuleSpecs.Alias -contains 'auth') {
+        $adminApiProjectLines += '    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj" />'
+    }
+    foreach ($moduleSpec in $adminApiModuleSpecs) {
+        $sourceRootPropertyReference = '$(' + $moduleSpec.SourceRootProperty + ')'
+        $adminApiProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.AdminApiProject)\$($moduleSpec.AdminApiProject).csproj`" />"
+    }
+    foreach ($moduleSpec in $persistedAdminApiModuleSpecs) {
+        $sourceRootPropertyReference = '$(' + $moduleSpec.SourceRootProperty + ')'
+        $adminApiProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.MigrationProjectPrefix).SqlServerMigrations\$($moduleSpec.MigrationProjectPrefix).SqlServerMigrations.csproj`" />"
+        $adminApiProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.MigrationProjectPrefix).PostgreSqlMigrations\$($moduleSpec.MigrationProjectPrefix).PostgreSqlMigrations.csproj`" />"
+    }
     $adminApiProjectLines += @('  </ItemGroup>', '</Project>')
 
     Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.AdminApi\$Name.Host.AdminApi.csproj") $adminApiProjectLines
@@ -1814,9 +1962,19 @@ if ($hasAdminApiHost) {
         'using Gma.Framework.Infrastructure;',
         'using Gma.Framework.ModuleComposition;'
     )
+    if ($adminApiReadinessModuleSpecs.Count -gt 0) {
+        $adminApiProgramLines += 'using Gma.Framework.Api.Production.EntityFrameworkCore;'
+    }
     if ($ServiceDefaults) {
         $adminApiProgramLines += "using $Name.ServiceDefaults;"
     }
+    if ($adminApiModuleSpecs.Alias -contains 'auth') {
+        $adminApiProgramLines += 'using Gma.Modules.Auth.Contracts;'
+    }
+    foreach ($moduleSpec in $adminApiModuleSpecs) {
+        $adminApiProgramLines += "using $($moduleSpec.AdminApiNamespace);"
+    }
+    $adminApiProgramLines = @($adminApiProgramLines | Select-Object -Unique)
     $adminApiProgramLines += @(
         '',
         'WebApplicationBuilder builder = WebApplication.CreateBuilder(args);',
@@ -1829,7 +1987,20 @@ if ($hasAdminApiHost) {
     if ($ServiceDefaults) {
         $adminApiProgramLines += 'builder.AddServiceDefaults();'
     }
+    foreach ($moduleSpec in $adminApiModuleSpecs) {
+        if ($moduleSpec.Alias -eq 'auth') {
+            $adminApiProgramLines += "builder.AddAuthAdminApiModule($authProfileExpression);"
+        }
+        else {
+            $adminApiProgramLines += "builder.AddAdminApiModule<$($moduleSpec.AdminApiModuleType)>();"
+        }
+    }
+    foreach ($moduleSpec in $adminApiReadinessModuleSpecs) {
+        $databaseName = ConvertTo-GmaKebabCase $moduleSpec.Alias
+        $adminApiProgramLines += "builder.Services.AddGmaEntityFrameworkReadinessCheck<$($moduleSpec.DbContextType)>(`"$databaseName-database`");"
+    }
     $adminApiProgramLines += @(
+        '',
         'builder.ValidateModuleComposition();',
         '',
         'WebApplication app = builder.Build();',
@@ -1852,7 +2023,7 @@ if ($hasAdminApiHost) {
 }
 
 if ($hasAdminCliHost) {
-    Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.AdminCli\$Name.Host.AdminCli.csproj") @(
+    $adminCliProjectLines = @(
         '<Project Sdk="Microsoft.NET.Sdk">',
         '  <PropertyGroup>',
         '    <OutputType>Exe</OutputType>',
@@ -1865,32 +2036,120 @@ if ($hasAdminCliHost) {
         '    <PackageReference Include="System.CommandLine" />',
         '    <ProjectReference Include="$(GmaFrameworkRoot)Administration\Gma.Framework.Administration.Cli\Gma.Framework.Administration.Cli.csproj" />',
         '    <ProjectReference Include="$(GmaFrameworkRoot)Infrastructure\Gma.Framework.Infrastructure\Gma.Framework.Infrastructure.csproj" />',
-        '    <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />',
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj" />'
+    )
+    if ($adminCliModuleSpecs.Alias -contains 'auth') {
+        $adminCliProjectLines += '    <ProjectReference Include="$(GmaModuleAuthRoot)Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj" />'
+    }
+    foreach ($moduleSpec in $adminCliModuleSpecs) {
+        $sourceRootPropertyReference = '$(' + $moduleSpec.SourceRootProperty + ')'
+        $adminCliProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.AdminCliProject)\$($moduleSpec.AdminCliProject).csproj`" />"
+    }
+    foreach ($moduleSpec in $persistedAdminCliModuleSpecs) {
+        $sourceRootPropertyReference = '$(' + $moduleSpec.SourceRootProperty + ')'
+        $adminCliProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.MigrationProjectPrefix).SqlServerMigrations\$($moduleSpec.MigrationProjectPrefix).SqlServerMigrations.csproj`" />"
+        $adminCliProjectLines += "    <ProjectReference Include=`"$sourceRootPropertyReference$($moduleSpec.MigrationProjectPrefix).PostgreSqlMigrations\$($moduleSpec.MigrationProjectPrefix).PostgreSqlMigrations.csproj`" />"
+    }
+    $adminCliProjectLines += @(
+        '  </ItemGroup>',
+        '  <ItemGroup>',
+        '    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />',
+        '    <None Update="appsettings.Development.json" CopyToOutputDirectory="PreserveNewest" />',
         '  </ItemGroup>',
         '</Project>'
     )
+    Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.AdminCli\$Name.Host.AdminCli.csproj") $adminCliProjectLines
 
-    Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.AdminCli\Program.cs") @(
+    $adminCliProgramLines = @(
         'using Gma.Framework.Administration.Cli;',
         'using Gma.Framework.Infrastructure;',
         'using Gma.Framework.ModuleComposition;',
         'using Microsoft.Extensions.DependencyInjection;',
         'using Microsoft.Extensions.Hosting;',
+        'using Microsoft.Extensions.Options;',
         'using System.CommandLine;',
-        'using System.CommandLine.Parsing;',
-        '',
-        'HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);',
-        'builder.Services.AddGmaAdministrationCli();',
-        'builder.AddGmaInfrastructure();',
-        'builder.ValidateModuleComposition();',
-        '',
-        'using IHost host = builder.Build();',
-        'host.Services.ValidateAdminCliStartup();',
-        'RootCommand rootCommand = host.Services.CreateAdminRootCommand();',
-        'ParseResult parseResult = rootCommand.Parse(args);',
-        'InvocationConfiguration invocation = new() { EnableDefaultExceptionHandler = false };',
-        'return await parseResult.InvokeAsync(invocation, CancellationToken.None).ConfigureAwait(false);'
+        'using System.CommandLine.Parsing;'
     )
+    if ($adminCliModuleSpecs.Alias -contains 'auth') {
+        $adminCliProgramLines += 'using Gma.Modules.Auth.Contracts;'
+    }
+    foreach ($moduleSpec in $adminCliModuleSpecs) {
+        $adminCliProgramLines += "using $($moduleSpec.AdminCliNamespace);"
+    }
+    $adminCliProgramLines = @($adminCliProgramLines | Select-Object -Unique)
+    $adminCliProgramLines += @(
+        '',
+        'try',
+        '{',
+        '    HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(',
+        '        new HostApplicationBuilderSettings',
+        '        {',
+        '            Args = args,',
+        '            ContentRootPath = AppContext.BaseDirectory',
+        '        });',
+        '',
+        '    builder.Services.AddGmaAdministrationCli();',
+        '    builder.AddGmaInfrastructure();'
+    )
+    foreach ($moduleSpec in $adminCliModuleSpecs) {
+        if ($moduleSpec.Alias -eq 'auth') {
+            $adminCliProgramLines += "    builder.AddAuthAdminModule($authProfileExpression);"
+        }
+        else {
+            $adminCliProgramLines += "    builder.AddAdminModule<$($moduleSpec.AdminCliModuleType)>();"
+        }
+    }
+    $adminCliProgramLines += @(
+        '    builder.ValidateModuleComposition();',
+        '',
+        '    using IHost host = builder.Build();',
+        '',
+        '    host.Services.ValidateAdminCliStartup();',
+        '    RootCommand rootCommand = host.Services.CreateAdminRootCommand();',
+        '    ParseResult parseResult = rootCommand.Parse(args);',
+        '    InvocationConfiguration invocation = new()',
+        '    {',
+        '        EnableDefaultExceptionHandler = false',
+        '    };',
+        '',
+        '    return await parseResult.InvokeAsync(invocation, CancellationToken.None).ConfigureAwait(false);',
+        '}',
+        'catch (OperationCanceledException)',
+        '{',
+        '    AdminCliOutput.WriteError("Admin command was canceled.");',
+        '    return AdminExitCodes.Failed;',
+        '}',
+        'catch (OptionsValidationException exception)',
+        '{',
+        '    AdminCliOutput.WriteError("Admin CLI configuration is invalid.");',
+        '',
+        '    foreach (string failure in exception.Failures.Distinct(StringComparer.Ordinal))',
+        '    {',
+        '        AdminCliOutput.WriteError(failure);',
+        '    }',
+        '',
+        '    return AdminExitCodes.Failed;',
+        '}',
+        'catch (ModuleCompositionValidationException exception)',
+        '{',
+        '    AdminCliOutput.WriteError("Admin CLI module composition is invalid.");',
+        '',
+        '    foreach (string error in exception.Errors)',
+        '    {',
+        '        AdminCliOutput.WriteError(error);',
+        '    }',
+        '',
+        '    return AdminExitCodes.Failed;',
+        '}',
+        'catch (Exception)',
+        '{',
+        '    AdminCliOutput.WriteError("Admin command failed unexpectedly.");',
+        '    return AdminExitCodes.Failed;',
+        '}'
+    )
+    Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.AdminCli\Program.cs") $adminCliProgramLines
+    Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.AdminCli\appsettings.json") ($baseSettingsJson -split "`r?`n")
+    Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.AdminCli\appsettings.Development.json") ($developmentSettingsJson -split "`r?`n")
 }
 
 if ($hasWorkerHost) {
