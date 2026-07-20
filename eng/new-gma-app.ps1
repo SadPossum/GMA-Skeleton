@@ -524,6 +524,7 @@ function Write-GmaGeneratedBootstrap {
         '. (Join-Path $PSScriptRoot ''common.ps1'')',
         '',
         '& (Join-GmaPath ''eng/sync-solution.ps1'') -Check',
+        '& (Join-GmaPath ''eng/check-source-packages.ps1'') -SkipRestore -SkipBuild',
         '',
         "`$solutionPath = Join-GmaPath '$Name.slnx'",
         'if (-not $SkipRestore) {',

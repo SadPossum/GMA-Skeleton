@@ -219,7 +219,7 @@ The root script is a skeleton convenience wrapper. The canonical framework-owned
 - Keep warnings as errors.
 - Use central package management in `Directory.Packages.props`.
 - Do not hide package versions in individual project files.
-- Do not introduce cross-module project references except to `.Contracts` projects.
+- Reusable module repositories must not reference sibling reusable modules, including their `.Contracts` projects. Put reusable cross-module bridges in GMA Extensions. Product modules may reference another product module's `.Contracts` project only when an explicit contract dependency is preferable to an integration event or local projection.
 - Keep SQL Server and PostgreSQL migration snapshots synchronized.
 - Do not apply database migrations from `Host.Api` startup.
 - Run `.\eng\check-source-packages.ps1 -SkipRestore` after moving docs, tests, scripts, focused `.slnx` files, or source-package project references.

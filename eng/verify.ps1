@@ -8,6 +8,8 @@ param(
 
 & (Join-Path $PSScriptRoot 'sync-solution.ps1') -Check
 
+& (Join-Path $PSScriptRoot 'check-source-packages.ps1') -SkipRestore -SkipBuild
+
 & (Join-Path $PSScriptRoot 'check-generated-app-selections.ps1')
 
 if (-not $SkipRestore) {

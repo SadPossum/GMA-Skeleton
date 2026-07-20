@@ -132,6 +132,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] allowedArchitectureDocs =
         [
             "composition-tooling-alignment-task.md",
+            "gma-production-completion-audit-task.md",
             "gma-rebrand-and-source-repo-split.md",
             "overview.md"
         ];
@@ -2287,7 +2288,9 @@ public sealed partial class DeveloperExperienceGuardTests
             "framework",
             "eng",
             "check-source-packages.ps1"));
+        string verifyScript = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "verify.ps1"));
         string validationScript = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "gma-validate.ps1"));
+        string appGenerator = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-gma-app.ps1"));
         string[] focusedSolutions =
         [
             "Gma.Framework.slnx",
@@ -2297,6 +2300,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "Gma.Modules.Auth.slnx",
             "Gma.Modules.Files.slnx",
             "Gma.Modules.Notifications.slnx",
+            "Gma.Modules.Organizations.slnx",
             "Gma.Modules.TaskRuntime.slnx",
             "Gma.Modules.Tenancy.slnx"
         ];
@@ -2317,6 +2321,12 @@ public sealed partial class DeveloperExperienceGuardTests
                 .Select(token => $"gma/framework/eng/check-source-packages.ps1 missing {token}"))
             .Concat(!wrapper.Contains("gma/framework/eng/check-source-packages.ps1", StringComparison.OrdinalIgnoreCase)
                 ? ["eng/check-source-packages.ps1 should delegate to the Framework-owned checker."]
+                : [])
+            .Concat(!verifyScript.Contains("check-source-packages.ps1') -SkipRestore -SkipBuild", StringComparison.Ordinal)
+                ? ["eng/verify.ps1 should enforce source-package ownership without duplicating its all-up build."]
+                : [])
+            .Concat(!appGenerator.Contains("eng/check-source-packages.ps1'') -SkipRestore -SkipBuild", StringComparison.Ordinal)
+                ? ["Generated application validation should enforce source-package ownership."]
                 : [])
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();

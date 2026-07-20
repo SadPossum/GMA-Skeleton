@@ -13,6 +13,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 | Auth | [Docs](https://github.com/SadPossum/GMA-Module-Auth/blob/dev/docs/README.md) | `gma/modules/auth/docs/README.md` |
 | Files | [Docs](https://github.com/SadPossum/GMA-Module-Files/blob/dev/docs/README.md) | `gma/modules/files/docs/README.md` |
 | Notifications | [Docs](https://github.com/SadPossum/GMA-Module-Notifications/blob/dev/docs/README.md) | `gma/modules/notifications/docs/README.md` |
+| Organizations | [Docs](https://github.com/SadPossum/GMA-Module-Organizations/blob/dev/docs/README.md) | `gma/modules/organizations/docs/README.md` |
 | TaskRuntime | [Docs](https://github.com/SadPossum/GMA-Module-Task-Runtime/blob/dev/docs/README.md) | `gma/modules/task-runtime/docs/README.md` |
 | Tenancy | [Docs](https://github.com/SadPossum/GMA-Module-Tenancy/blob/dev/docs/README.md) | `gma/modules/tenancy/docs/README.md` |
 
@@ -24,6 +25,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 - [Production Readiness Boundary](production-readiness.md)
 - [Skeleton Overview](architecture/overview.md)
 - [Composition Tooling Alignment Task](architecture/composition-tooling-alignment-task.md)
+- [GMA Production Completion Audit](architecture/gma-production-completion-audit-task.md)
 - [GMA Rebrand And Source Repo Split Plan](architecture/gma-rebrand-and-source-repo-split.md)
 
 ## Examples

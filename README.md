@@ -111,6 +111,9 @@ Useful entry points:
 - [Auth Module](https://github.com/SadPossum/GMA-Module-Auth/blob/dev/docs/README.md)
 - [Administration Module](https://github.com/SadPossum/GMA-Module-Administration/blob/dev/docs/README.md)
 - [Files Module](https://github.com/SadPossum/GMA-Module-Files/blob/dev/docs/README.md)
+- [Notifications Module](https://github.com/SadPossum/GMA-Module-Notifications/blob/dev/docs/README.md)
+- [Organizations Module](https://github.com/SadPossum/GMA-Module-Organizations/blob/dev/docs/README.md)
+- [TaskRuntime Module](https://github.com/SadPossum/GMA-Module-Task-Runtime/blob/dev/docs/README.md)
 - [Tenancy Module](https://github.com/SadPossum/GMA-Module-Tenancy/blob/dev/docs/README.md)
 - [Naming Conventions](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/guidelines/naming-conventions.md)
 - [Development Guidelines](https://github.com/SadPossum/GMA-Framework/blob/dev/docs/guidelines/development-guidelines.md)
@@ -122,5 +125,5 @@ HTTP examples live in [requests/auth.http](requests/auth.http) and [requests/adm
 
 ## Project Status
 
-This is a work-in-progress skeleton. The current reusable modules are AccessControl, Administration, Auth, Files, Notifications, TaskRuntime, and Tenancy. Optional reusable cross-module composition lives in GMA Extensions.
+This is a work-in-progress skeleton. The current reusable modules are AccessControl, Administration, Auth, Files, Notifications, Organizations, TaskRuntime, and Tenancy. Optional reusable cross-module composition lives in GMA Extensions.
 Catalog, Ordering, and TaskSamples are compiled optional example modules used to prove stored data, admin surfaces, caching, cross-module integration, notifications, and task execution without being registered in default hosts.
