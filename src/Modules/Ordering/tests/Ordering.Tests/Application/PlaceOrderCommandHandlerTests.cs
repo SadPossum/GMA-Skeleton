@@ -17,6 +17,7 @@ using Gma.Framework.Scoping;
 using Gma.Framework.Numerics;
 using Gma.Framework.Results;
 using Gma.Framework.Cqrs.Infrastructure;
+using Gma.Framework.Cqrs.UnitOfWork;
 using Gma.Framework.Runtime.Infrastructure;
 using Xunit;
 
@@ -237,8 +238,16 @@ public sealed class PlaceOrderCommandHandlerTests
         builder.Services.AddSingleton<IScopeContextAccessor>(scopeContext);
         builder.Services.AddScoped<IOrderRepository>(_ => orderRepository);
         builder.Services.AddScoped<ICatalogItemProjectionRepository>(_ => catalogRepository);
+        builder.Services.AddScoped<IUnitOfWork, TestUnitOfWork>();
 
         return builder.Build();
+    }
+
+    private sealed class TestUnitOfWork : IUnitOfWork
+    {
+        public string ModuleName => OrderingModuleMetadata.Name;
+
+        public Task SaveChangesAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
     private sealed class TestScopeContext(string scopeId) : IScopeContextAccessor
