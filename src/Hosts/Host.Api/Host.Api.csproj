@@ -14,6 +14,7 @@
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Api\Gma.Modules.Notifications.Api.csproj" />
     <ProjectReference Include="$(GmaExtensionsRoot)Gma.Extensions.Auth.Notifications\Gma.Extensions.Auth.Notifications.csproj" />
     <ProjectReference Include="$(GmaExtensionsRoot)Gma.Extensions.Auth.Organizations\Gma.Extensions.Auth.Organizations.csproj" />
+    <ProjectReference Include="$(GmaExtensionsRoot)Gma.Extensions.Organizations.AccessControl\Gma.Extensions.Organizations.AccessControl.csproj" />
     <ProjectReference Include="$(GmaExtensionsRoot)Gma.Extensions.Organizations.Tenancy\Gma.Extensions.Organizations.Tenancy.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Persistence.PostgreSqlMigrations\Gma.Modules.Notifications.Persistence.PostgreSqlMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleNotificationsRoot)Gma.Modules.Notifications.Persistence.SqlServerMigrations\Gma.Modules.Notifications.Persistence.SqlServerMigrations.csproj" />

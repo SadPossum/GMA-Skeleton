@@ -23,12 +23,17 @@ public sealed class AccessControlHostCompositionTests
             "Host.Api.csproj"));
 
         Assert.Contains("builder.AddModule<AccessControlApiModule>();", program, StringComparison.Ordinal);
+        Assert.Contains("builder.Services.AddOrganizationsAccessControlExtension();", program, StringComparison.Ordinal);
         Assert.Contains(
             "AddGmaEntityFrameworkReadinessCheck<AccessControlDbContext>",
             program,
             StringComparison.Ordinal);
         Assert.DoesNotContain("AddAccessProfilePermissionAllowlist", program, StringComparison.Ordinal);
         Assert.Contains("Gma.Modules.AccessControl.Api.csproj", project, StringComparison.Ordinal);
+        Assert.Contains(
+            "Gma.Extensions.Organizations.AccessControl.csproj",
+            project,
+            StringComparison.Ordinal);
         Assert.Contains(
             "Gma.Modules.AccessControl.Persistence.PostgreSqlMigrations.csproj",
             project,

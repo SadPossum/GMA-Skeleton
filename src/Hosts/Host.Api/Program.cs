@@ -1,5 +1,6 @@
 using Gma.Extensions.Auth.Notifications;
 using Gma.Extensions.Auth.Organizations;
+using Gma.Extensions.Organizations.AccessControl;
 using Gma.Extensions.Organizations.Tenancy;
 using Gma.Framework.Api.Modules;
 using Gma.Framework.Api.OpenApi;
@@ -64,6 +65,7 @@ builder.AddModule<AccessControlApiModule>();
 builder.AddModule<OrganizationsModule>();
 builder.AddModule<NotificationsModule>();
 builder.Services.AddAuthOrganizationsExtension();
+builder.Services.AddOrganizationsAccessControlExtension();
 builder.Services.AddOrganizationsTenancyExtension();
 builder.Services.AddAuthNotificationsExtension();
 builder.Services.AddNotificationEmailAdapter(builder.Configuration);

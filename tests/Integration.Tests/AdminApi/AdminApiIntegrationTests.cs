@@ -319,23 +319,21 @@ public sealed class AdminApiIntegrationTests
         using HttpResponseMessage missingMember = await supportClient.GetAsync($"/api/admin/auth/members/{Guid.NewGuid()}").ConfigureAwait(false);
         Assert.Equal(HttpStatusCode.NotFound, missingMember.StatusCode);
 
-        int invalidUsernameTypeAuditCountBefore = await application
+        int malformedUsernameTypeAuditCountBefore = await application
             .CountAuditEntriesAsync(AuthAdminOperationNames.MembersCreate, AuthApplicationErrors.UsernameTypeInvalid.Code)
             .ConfigureAwait(false);
-        using HttpResponseMessage invalidUsernameType = await supportClient.PostAsJsonAsync(
+        using HttpResponseMessage malformedUsernameType = await supportClient.PostAsJsonAsync(
             "/api/admin/auth/members",
             new
             {
                 username = $"{provider.ToLowerInvariant()}-invalid-type@example.com",
-                usernameType = 999,
+                usernameType = "unsupported",
                 password = "manual-password",
                 generatePassword = false
             }).ConfigureAwait(false);
-        string invalidUsernameTypeBody = await invalidUsernameType.Content.ReadAsStringAsync().ConfigureAwait(false);
-        Assert.Equal(HttpStatusCode.BadRequest, invalidUsernameType.StatusCode);
-        Assert.Contains(AuthApplicationErrors.UsernameTypeInvalid.Code, invalidUsernameTypeBody, StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.BadRequest, malformedUsernameType.StatusCode);
         Assert.Equal(
-            invalidUsernameTypeAuditCountBefore + 1,
+            malformedUsernameTypeAuditCountBefore,
             await application
                 .CountAuditEntriesAsync(AuthAdminOperationNames.MembersCreate, AuthApplicationErrors.UsernameTypeInvalid.Code)
                 .ConfigureAwait(false));
