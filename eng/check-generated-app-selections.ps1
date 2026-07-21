@@ -138,6 +138,26 @@ foreach ($case in $cases) {
         }
     }
 
+    if ($case.Modules -contains 'files') {
+        $apiDevelopmentSettings = [System.IO.File]::ReadAllText(
+            (Join-Path $outputPath "src\Hosts\$($case.Name).Host.Api\appsettings.Development.json"))
+        $baseFileSettings = $apiSettings | ConvertFrom-Json
+        $developmentFileSettings = $apiDevelopmentSettings | ConvertFrom-Json
+        if ($null -ne $baseFileSettings.FileManagement.PSObject.Properties['RequireContentInspection']) {
+            throw "$($case.Name) generated the obsolete FileManagement:RequireContentInspection setting."
+        }
+
+        if (-not $baseFileSettings.Files.Uploads.RequireTrustedContentType -or
+            -not $baseFileSettings.Files.Uploads.RequireContentInspection) {
+            throw "$($case.Name) did not generate fail-closed production Files upload policy."
+        }
+
+        if ($developmentFileSettings.Files.Uploads.RequireTrustedContentType -or
+            $developmentFileSettings.Files.Uploads.RequireContentInspection) {
+            throw "$($case.Name) did not generate explicit local Files upload opt-outs."
+        }
+    }
+
     if ($caseHosts -contains 'AdminApi') {
         $requiredAdminTokens = @(
             'Gma.Modules.Administration.AdminApi',

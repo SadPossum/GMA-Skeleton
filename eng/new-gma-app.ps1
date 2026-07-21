@@ -1851,20 +1851,30 @@ if ($hasFiles) {
         Enabled = $false
         Provider = 'Unknown'
         MaximumObjectBytes = 10485760
-        RequireContentInspection = $true
         AllowedContentTypes = @('image/jpeg', 'image/png', 'application/pdf')
         LocalStorage = [ordered]@{
             RootPath = 'data/files'
+        }
+    }
+    $baseSettings.Files = [ordered]@{
+        Uploads = [ordered]@{
+            RequireTrustedContentType = $true
+            RequireContentInspection = $true
         }
     }
     $developmentSettings.FileManagement = [ordered]@{
         Enabled = $true
         Provider = 'LocalStorage'
         MaximumObjectBytes = 10485760
-        RequireContentInspection = $false
         AllowedContentTypes = @('image/jpeg', 'image/png', 'application/pdf')
         LocalStorage = [ordered]@{
             RootPath = 'data/files'
+        }
+    }
+    $developmentSettings.Files = [ordered]@{
+        Uploads = [ordered]@{
+            RequireTrustedContentType = $false
+            RequireContentInspection = $false
         }
     }
 }
