@@ -2,6 +2,8 @@
 
 [![Validate](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/validate.yml/badge.svg?branch=dev)](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/validate.yml)
 [![Docker Tests](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/docker-tests.yml/badge.svg?branch=dev)](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/docker-tests.yml)
+[![Security Baseline](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/security.yml/badge.svg?branch=dev)](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/security.yml)
+[![CodeQL](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/codeql.yml/badge.svg?branch=dev)](https://github.com/SadPossum/GMA-Skeleton/actions/workflows/codeql.yml)
 
 GMA-Skeleton is a .NET 10 modular monolith skeleton for building projects from optional, replaceable modules.
 
@@ -91,6 +93,8 @@ To generate a new production app shell that consumes selected GMA source reposit
 The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull requests, and manual dispatch. It checks submodule pointers against each reusable repository's `dev` head, bootstraps source roots, restores, builds, checks provider migration drift, and runs fast tests through `eng/verify.ps1`.
 
 The `Docker Tests` workflow runs for relevant pull-request/main changes, on a weekly schedule, and by manual dispatch. It runs Docker-backed integration tests with `GMA_REQUIRE_DOCKER_TESTS=true`.
+
+The `Security Baseline` workflow scans the complete composed source set for vulnerable dependencies, committed secrets, unsafe configuration, and high-risk licences. It publishes SARIF plus a CycloneDX SBOM and fails on high or critical findings. The separate `CodeQL` workflow performs compiled C# analysis. Repository policy and private reporting are documented in [SECURITY.md](SECURITY.md).
 
 ## Documentation
 

@@ -595,6 +595,10 @@ function Write-GmaGeneratedWorkflow {
         '        shell: pwsh',
         '        run: ./eng/gma-bootstrap.ps1 -Force',
         '',
+        '      - name: Check repository security baseline',
+        '        shell: pwsh',
+        '        run: ./eng/check-repository-security.ps1',
+        '',
         '      - name: Check source dependency heads',
         '        shell: pwsh',
         '        run: ./eng/check-submodule-heads.ps1',
@@ -700,6 +704,108 @@ function Write-GmaGeneratedWorkflow {
             '      - run: dotnet test ' + $Name + '.slnx --no-build --filter Category=Docker --logger ''console;verbosity=minimal'' -m:1 -nr:false'
         )
     }
+}
+
+function Write-GmaGeneratedSecurityBaseline {
+    param(
+        [Parameter(Mandatory = $true)][string] $Root,
+        [Parameter(Mandatory = $true)][string] $ApplicationName
+    )
+
+    $sharedFiles = @(
+        [pscustomobject] @{
+            Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\action.yml'
+            Destination = Join-Path $Root '.github\actions\security-baseline\action.yml'
+        },
+        [pscustomobject] @{
+            Source = Join-Path $script:RepositoryRoot '.github\workflows\security.yml'
+            Destination = Join-Path $Root '.github\workflows\security.yml'
+        },
+        [pscustomobject] @{
+            Source = Join-Path $PSScriptRoot 'check-repository-security.ps1'
+            Destination = Join-Path $Root 'eng\check-repository-security.ps1'
+        }
+    )
+    foreach ($sharedFile in $sharedFiles) {
+        $content = [System.IO.File]::ReadAllLines($sharedFile.Source)
+        Write-GmaTemplateFile $sharedFile.Destination $content
+    }
+
+    Write-GmaTemplateFile (Join-Path $Root '.github\workflows\codeql.yml') @(
+        'name: CodeQL',
+        '',
+        'on:',
+        '  pull_request:',
+        '  push:',
+        '    branches:',
+        '      - main',
+        '      - dev',
+        '  schedule:',
+        '    - cron: ''13 4 * * 2''',
+        '  workflow_dispatch:',
+        '',
+        'permissions:',
+        '  contents: read',
+        '  security-events: write',
+        '',
+        'concurrency:',
+        '  group: codeql-${{ github.ref }}',
+        '  cancel-in-progress: true',
+        '',
+        'jobs:',
+        '  analyze:',
+        '    name: Analyze composed C# source',
+        '    runs-on: ubuntu-latest',
+        '    timeout-minutes: 45',
+        '    steps:',
+        '      - name: Checkout complete source set',
+        '        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0',
+        '        with:',
+        '          fetch-depth: 0',
+        '          submodules: recursive',
+        '          token: ${{ secrets.GMA_CI_TOKEN || github.token }}',
+        '          persist-credentials: false',
+        '',
+        '      - name: Setup .NET',
+        '        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0',
+        '        with:',
+        '          dotnet-version: 10.0.x',
+        '',
+        '      - name: Initialize CodeQL',
+        '        uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1',
+        '        with:',
+        '          languages: csharp',
+        '          build-mode: manual',
+        '',
+        '      - name: Bootstrap source roots',
+        '        shell: pwsh',
+        '        run: ./eng/gma-bootstrap.ps1 -Force',
+        '',
+        '      - name: Restore',
+        "        run: dotnet restore $ApplicationName.slnx",
+        '',
+        '      - name: Build composed source',
+        "        run: dotnet build $ApplicationName.slnx --no-restore -m:1",
+        '',
+        '      - name: Analyze',
+        '        uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1',
+        '        with:',
+        '          category: /language:csharp'
+    )
+
+    Write-GmaTemplateFile (Join-Path $Root 'SECURITY.md') @(
+        '# Security Policy',
+        '',
+        '## Supported Versions',
+        '',
+        'This generated application has no supported production release until its owner publishes a version and support policy. Security fixes belong on the maintained default branch and in the next supported release.',
+        '',
+        '## Report a Vulnerability',
+        '',
+        'Enable GitHub private vulnerability reporting before publishing this repository. Use the repository Security tab to report an undisclosed vulnerability; do not open a public issue or include credentials, personal data, or third-party confidential data.',
+        '',
+        'Replace this generated policy with repository-owned response targets, disclosure coordination, supported versions, and support boundaries before the first production release.'
+    )
 }
 
 function Write-GmaGeneratedDeveloperTools {
@@ -1258,6 +1364,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'docs\gma-source.md') $gmaS
 
 Write-GmaGeneratedBootstrap -Root $resolvedOutputPath -ModuleSpecs $selectedModuleSpecArray
 Write-GmaGeneratedWorkflow -Root $resolvedOutputPath -IncludeDocker:$DockerValidation
+Write-GmaGeneratedSecurityBaseline -Root $resolvedOutputPath -ApplicationName $Name
 Write-GmaGeneratedDeveloperTools -Root $resolvedOutputPath -ApplicationName $Name -ModuleSpecs $selectedModuleSpecArray
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'src\Hosts\README.md') @(

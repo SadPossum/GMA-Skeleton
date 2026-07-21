@@ -60,6 +60,8 @@ foreach ($case in $cases) {
         -Modules $case.Modules `
         -Hosts $caseHosts
 
+    & (Join-Path $outputPath 'eng\check-repository-security.ps1')
+
     $conditionalSurfacePaths = @(
         (Join-Path $outputPath 'Gma.SourceRoots.props.example'),
         (Join-Path $outputPath 'docs\gma-source.md'),

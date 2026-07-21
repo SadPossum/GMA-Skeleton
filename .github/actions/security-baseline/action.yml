@@ -1,0 +1,80 @@
+name: GMA repository security baseline
+description: Scan an owned source tree and emit SARIF plus a CycloneDX SBOM.
+
+inputs:
+  scan-path:
+    description: Repository-relative path to scan.
+    required: false
+    default: .
+  output-directory:
+    description: Repository-relative directory for generated evidence.
+    required: false
+    default: artifacts/security
+  severity:
+    description: Finding severities that fail the gate.
+    required: false
+    default: HIGH,CRITICAL
+  skip-directories:
+    description: Comma-separated generated or cache directories excluded from traversal.
+    required: false
+    default: .git,.tmp,.vs,artifacts,**/bin,**/obj,**/node_modules
+  timeout:
+    description: Maximum duration for each bounded Trivy pass.
+    required: false
+    default: 20m
+
+runs:
+  using: composite
+  steps:
+    - name: Install Trivy
+      uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514 # v0.2.6
+      with:
+        version: v0.70.0
+        cache: 'true'
+
+    - name: Scan and generate evidence
+      shell: bash
+      env:
+        OUTPUT_DIRECTORY: ${{ inputs.output-directory }}
+        SCAN_PATH: ${{ inputs.scan-path }}
+        SCAN_SEVERITY: ${{ inputs.severity }}
+        SKIP_DIRECTORIES: ${{ inputs.skip-directories }}
+        SCAN_TIMEOUT: ${{ inputs.timeout }}
+      run: |
+        set -euo pipefail
+        mkdir -p "$OUTPUT_DIRECTORY"
+
+        IFS=',' read -ra configured_skip_directories <<< "$SKIP_DIRECTORIES"
+        skip_arguments=()
+        for directory in "${configured_skip_directories[@]}"; do
+          if [[ -n "$directory" ]]; then
+            skip_arguments+=(--skip-dirs "$directory")
+          fi
+        done
+
+        set +e
+        trivy fs \
+          --scanners vuln,secret,misconfig,license \
+          --severity "$SCAN_SEVERITY" \
+          --ignore-unfixed=false \
+          --exit-code 1 \
+          --format sarif \
+          --output "$OUTPUT_DIRECTORY/trivy-results.sarif" \
+          --timeout "$SCAN_TIMEOUT" \
+          --skip-version-check \
+          "${skip_arguments[@]}" \
+          "$SCAN_PATH"
+        scan_exit_code=$?
+        set -e
+
+        trivy fs \
+          --scanners vuln \
+          --list-all-pkgs \
+          --format cyclonedx \
+          --output "$OUTPUT_DIRECTORY/sbom.cdx.json" \
+          --timeout "$SCAN_TIMEOUT" \
+          --skip-version-check \
+          "${skip_arguments[@]}" \
+          "$SCAN_PATH"
+
+        exit "$scan_exit_code"

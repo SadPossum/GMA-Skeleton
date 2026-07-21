@@ -2,9 +2,14 @@
   <Folder Name="/.github/">
     <File Path=".github/dependabot.yml" />
   </Folder>
+  <Folder Name="/.github/actions/security-baseline/">
+    <File Path=".github/actions/security-baseline/action.yml" />
+  </Folder>
   <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/codeql.yml" />
     <File Path=".github/workflows/docker-tests.yml" />
     <File Path=".github/workflows/release-source-set.yml" />
+    <File Path=".github/workflows/security.yml" />
     <File Path=".github/workflows/validate.yml" />
   </Folder>
   <Folder Name="/Solution Items/">
@@ -34,6 +39,7 @@
     <File Path="docs/architecture/gma-production-completion-summary.md" />
     <File Path="docs/architecture/gma-rebrand-and-source-repo-split.md" />
     <File Path="docs/architecture/overview.md" />
+    <File Path="docs/architecture/supply-chain-baseline-task.md" />
   </Folder>
   <Folder Name="/docs/examples/">
     <File Path="docs/examples/cross-module-integration.md" />
@@ -48,6 +54,7 @@
     <File Path="eng/build.ps1" />
     <File Path="eng/check-generated-app-selections.ps1" />
     <File Path="eng/check-migrations.ps1" />
+    <File Path="eng/check-repository-security.ps1" />
     <File Path="eng/check-source-packages.ps1" />
     <File Path="eng/check-submodule-dev-heads.ps1" />
     <File Path="eng/common.ps1" />

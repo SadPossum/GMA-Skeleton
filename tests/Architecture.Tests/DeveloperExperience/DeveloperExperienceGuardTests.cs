@@ -135,7 +135,8 @@ public sealed partial class DeveloperExperienceGuardTests
             "gma-production-completion-audit-task.md",
             "gma-production-completion-summary.md",
             "gma-rebrand-and-source-repo-split.md",
-            "overview.md"
+            "overview.md",
+            "supply-chain-baseline-task.md"
         ];
         string[] directoryOffenders = forbiddenRootDirectories
             .Select(directory => Path.Combine(docsRoot, directory))

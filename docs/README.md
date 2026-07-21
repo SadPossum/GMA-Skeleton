@@ -27,6 +27,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 - [Composition Tooling Alignment Task](architecture/composition-tooling-alignment-task.md)
 - [GMA Production Completion Summary](architecture/gma-production-completion-summary.md)
 - [GMA Production Completion Audit](architecture/gma-production-completion-audit-task.md)
+- [Repository Supply-Chain Baseline Task](architecture/supply-chain-baseline-task.md)
 - [GMA Rebrand And Source Repo Split Plan](architecture/gma-rebrand-and-source-repo-split.md)
 
 ## Examples
