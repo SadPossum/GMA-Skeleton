@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Gma.Framework.Messaging;
 using Gma.Framework.ModuleComposition;
 using Gma.Framework.Tasks;
+using Gma.Modules.Auth.Domain.Services;
 using Xunit;
 
 [Trait("Category", "Architecture")]
@@ -42,6 +43,7 @@ public sealed class WorkerHostCompositionTests
         builder.Configuration["NatsJetStream:Enabled"] = "true";
         builder.Configuration["ConnectionStrings:nats"] = "nats://localhost:4222";
         builder.Configuration["Worker:Modules:Auth"] = "true";
+        builder.Configuration["Auth:RefreshTokens:Pepper"] = "test-refresh-token-pepper-000000000000000000000000";
         builder.Configuration["ConnectionStrings:SqlServer"] = "Server=localhost;Database=gma;Trusted_Connection=True;TrustServerCertificate=True";
 
         builder.AddWorkerHost();
@@ -53,6 +55,7 @@ public sealed class WorkerHostCompositionTests
         Assert.Contains(builder.Services, descriptor =>
             descriptor.ServiceType == typeof(IEventBus) &&
             descriptor.ImplementationFactory is not null);
+        Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(IRefreshTokenHashingService));
         Assert.Equal(AuthModuleNames, GetWorkerOptions(builder).GetComposedModuleNames());
     }
 
@@ -135,6 +138,10 @@ public sealed class WorkerHostCompositionTests
         Assert.DoesNotContain("Microsoft.NET.Sdk.Web", project, StringComparison.Ordinal);
         Assert.DoesNotContain(".Api.csproj", project, StringComparison.Ordinal);
         Assert.DoesNotContain(".AdminApi.csproj", project, StringComparison.Ordinal);
+        Assert.Contains("Gma.Modules.Auth.Infrastructure.TokenHashing.csproj", project, StringComparison.Ordinal);
+        Assert.DoesNotContain("Gma.Modules.Auth.Infrastructure\\Gma.Modules.Auth.Infrastructure.csproj", project, StringComparison.Ordinal);
+        Assert.Contains("AddAuthTokenHashingInfrastructure(builder.Configuration)", composition, StringComparison.Ordinal);
+        Assert.DoesNotContain("AddAuthInfrastructure(builder.Configuration)", composition, StringComparison.Ordinal);
         Assert.DoesNotContain("MapModules", combinedSource, StringComparison.Ordinal);
         Assert.DoesNotContain("MapAdminApiModules", combinedSource, StringComparison.Ordinal);
         Assert.DoesNotContain("MapGet", combinedSource, StringComparison.Ordinal);

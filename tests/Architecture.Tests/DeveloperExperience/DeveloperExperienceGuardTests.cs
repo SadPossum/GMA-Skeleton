@@ -802,6 +802,11 @@ public sealed partial class DeveloperExperienceGuardTests
             "Auth",
             "Gma.Modules.Auth.Infrastructure.JwtBearer",
             "Gma.Modules.Auth.Infrastructure.JwtBearer.csproj"));
+        string authTokenHashingProject = File.ReadAllText(GmaSourceLayout.ModulePath(
+            repositoryRoot,
+            "Auth",
+            "Gma.Modules.Auth.Infrastructure.TokenHashing",
+            "Gma.Modules.Auth.Infrastructure.TokenHashing.csproj"));
         string authAdminCliProject = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
             "Auth",
@@ -831,6 +836,9 @@ public sealed partial class DeveloperExperienceGuardTests
         Assert.Contains("IServiceCollection AddAuthInfrastructure", authInfrastructureSource, StringComparison.Ordinal);
         Assert.Contains("System.IdentityModel.Tokens.Jwt", authInfrastructureProject, StringComparison.Ordinal);
         Assert.Contains("Microsoft.Extensions.Identity.Core", authInfrastructureProject, StringComparison.Ordinal);
+        Assert.Contains("Gma.Modules.Auth.Infrastructure.TokenHashing.csproj", authInfrastructureProject, StringComparison.Ordinal);
+        Assert.DoesNotContain("System.IdentityModel.Tokens.Jwt", authTokenHashingProject, StringComparison.Ordinal);
+        Assert.DoesNotContain("Microsoft.AspNetCore", authTokenHashingProject, StringComparison.Ordinal);
         Assert.Contains("Microsoft.AspNetCore.Authentication.JwtBearer", authJwtBearerProject, StringComparison.Ordinal);
         Assert.Contains("Gma.Modules.Auth.Infrastructure.csproj", authJwtBearerProject, StringComparison.Ordinal);
         Assert.Contains("Gma.Modules.Auth.Infrastructure.JwtBearer.csproj", authApiProject, StringComparison.Ordinal);
@@ -3234,7 +3242,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string source = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
             "Auth",
-            "Gma.Modules.Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure.TokenHashing",
             "Services",
             "RefreshTokenHashingService.cs"));
 
@@ -3255,6 +3263,11 @@ public sealed partial class DeveloperExperienceGuardTests
             "Auth",
             "Gma.Modules.Auth.Infrastructure",
             "DependencyInjection.cs"));
+        string tokenHashingSource = File.ReadAllText(GmaSourceLayout.ModulePath(
+            repositoryRoot,
+            "Auth",
+            "Gma.Modules.Auth.Infrastructure.TokenHashing",
+            "DependencyInjection.cs"));
         string applicationSource = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
             "Auth",
@@ -3265,6 +3278,11 @@ public sealed partial class DeveloperExperienceGuardTests
         [
             "AuthInfrastructureOptionsValidation.Validate(configuration);",
             "IValidateOptions<JwtSettings>, JwtSettingsValidator",
+            ".ValidateOnStart()"
+        ];
+        string[] tokenHashingRequiredTokens =
+        [
+            "ValidateOptions(configuration);",
             "IValidateOptions<RefreshTokenHashingOptions>, RefreshTokenHashingOptionsValidator",
             ".ValidateOnStart()"
         ];
@@ -3277,6 +3295,9 @@ public sealed partial class DeveloperExperienceGuardTests
         string[] offenders = infrastructureRequiredTokens
             .Where(token => !infrastructureSource.Contains(token, StringComparison.Ordinal))
             .Select(token => $"Gma.Modules.Auth.Infrastructure dependency injection missing {token}")
+            .Concat(tokenHashingRequiredTokens
+                .Where(token => !tokenHashingSource.Contains(token, StringComparison.Ordinal))
+                .Select(token => $"Gma.Modules.Auth.Infrastructure.TokenHashing dependency injection missing {token}"))
             .Concat(applicationRequiredTokens
                 .Where(token => !applicationSource.Contains(token, StringComparison.Ordinal))
                 .Select(token => $"Gma.Modules.Auth.Application dependency injection missing {token}"))
@@ -3298,7 +3319,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string refreshTokenHashingOptions = File.ReadAllText(GmaSourceLayout.ModulePath(
             repositoryRoot,
             "Auth",
-            "Gma.Modules.Auth.Infrastructure",
+            "Gma.Modules.Auth.Infrastructure.TokenHashing",
             "RefreshTokenHashingOptions.cs"));
 
         Assert.Contains("public string SigningKey { get; set; } = string.Empty;", jwtSettings, StringComparison.Ordinal);
@@ -3311,11 +3332,12 @@ public sealed partial class DeveloperExperienceGuardTests
     public void Runtime_host_secret_configuration_is_development_only()
     {
         string repositoryRoot = FindRepositoryRoot();
-        string[] hostDirectories =
+        (string Directory, bool RequiresJwtSigningKey)[] hosts =
         [
-            Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api"),
-            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi"),
-            Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminCli")
+            (Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api"), true),
+            (Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminApi"), true),
+            (Path.Combine(repositoryRoot, "src", "Hosts", "Host.AdminCli"), true),
+            (Path.Combine(repositoryRoot, "src", "Hosts", "Host.Worker"), false)
         ];
         (string Name, string[] JsonPath)[] runtimeSecretKeys =
         [
@@ -3325,13 +3347,16 @@ public sealed partial class DeveloperExperienceGuardTests
             ("Auth:Jwt:SigningKey", ["Auth", "Jwt", "SigningKey"]),
             ("Auth:RefreshTokens:Pepper", ["Auth", "RefreshTokens", "Pepper"])
         ];
-        string[] baseConfigOffenders = hostDirectories
-            .SelectMany(hostDirectory =>
+        string[] baseConfigOffenders = hosts
+            .SelectMany(host =>
             {
+                string hostDirectory = host.Directory;
                 string hostName = Path.GetFileName(hostDirectory);
                 string appsettings = Path.Combine(hostDirectory, "appsettings.json");
 
                 return runtimeSecretKeys
+                    .Where(key => host.RequiresJwtSigningKey ||
+                        !string.Equals(key.Name, "Auth:Jwt:SigningKey", StringComparison.Ordinal))
                     .Select(key =>
                     {
                         string? value = GetJsonStringValue(appsettings, key.JsonPath);
@@ -3349,13 +3374,16 @@ public sealed partial class DeveloperExperienceGuardTests
             })
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
-        string[] developmentConfigOffenders = hostDirectories
-            .SelectMany(hostDirectory =>
+        string[] developmentConfigOffenders = hosts
+            .SelectMany(host =>
             {
+                string hostDirectory = host.Directory;
                 string hostName = Path.GetFileName(hostDirectory);
                 string appsettings = Path.Combine(hostDirectory, "appsettings.Development.json");
 
                 return runtimeSecretKeys
+                    .Where(key => host.RequiresJwtSigningKey ||
+                        !string.Equals(key.Name, "Auth:Jwt:SigningKey", StringComparison.Ordinal))
                     .Select(key =>
                     {
                         string? value = GetJsonStringValue(appsettings, key.JsonPath);
@@ -6013,6 +6041,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 [],
                 [
                     @"..\Modules\Auth\Gma.Modules.Auth.Contracts\Gma.Modules.Auth.Contracts.csproj",
+                    @"..\Modules\Auth\Gma.Modules.Auth.Infrastructure.TokenHashing\Gma.Modules.Auth.Infrastructure.TokenHashing.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence\Gma.Modules.Auth.Persistence.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.PostgreSqlMigrations\Gma.Modules.Auth.Persistence.PostgreSqlMigrations.csproj",
                     @"..\Modules\Auth\Gma.Modules.Auth.Persistence.SqlServerMigrations\Gma.Modules.Auth.Persistence.SqlServerMigrations.csproj",

@@ -89,6 +89,7 @@ internal static class ArchitectureCatalog
         new("Auth", "Gma.Modules.Auth.Domain", ModuleProjectKind.Domain, typeof(Member).Assembly),
         new("Auth", "Gma.Modules.Auth.Infrastructure", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Infrastructure.DependencyInjection).Assembly),
         new("Auth", "Gma.Modules.Auth.Infrastructure.JwtBearer", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Infrastructure.JwtBearer.DependencyInjection).Assembly),
+        new("Auth", "Gma.Modules.Auth.Infrastructure.TokenHashing", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Infrastructure.TokenHashing.DependencyInjection).Assembly),
         new("Auth", "Gma.Modules.Auth.Providers.OpenIdConnect", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Auth.Providers.OpenIdConnect.DependencyInjection).Assembly),
         new("Auth", "Gma.Modules.Auth.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.Auth.Persistence.DependencyInjection).Assembly),
 

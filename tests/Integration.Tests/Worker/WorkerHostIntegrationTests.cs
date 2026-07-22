@@ -2,6 +2,7 @@ namespace Integration.Tests;
 
 using System.Text.Json;
 using Gma.Modules.Auth.Persistence;
+using Gma.Modules.Auth.Domain.Services;
 using Catalog.Persistence;
 using DotNet.Testcontainers.Containers;
 using Host.Worker;
@@ -117,6 +118,7 @@ public sealed class WorkerHostIntegrationTests
         builder.Configuration["Tasks:Worker:TimeoutScannerEnabled"] = "false";
         builder.Configuration["Tasks:Worker:MetricsSamplerEnabled"] = "false";
         builder.Configuration["Worker:Modules:Auth"] = "true";
+        builder.Configuration["Auth:RefreshTokens:Pepper"] = "integration-test-refresh-token-pepper-change-me-000000000000000000";
         builder.Configuration["Worker:Modules:Catalog"] = "true";
         builder.Configuration["Worker:Modules:Ordering"] = "true";
         builder.Configuration["Worker:Modules:TaskRuntime"] = "true";
@@ -200,6 +202,7 @@ public sealed class WorkerHostIntegrationTests
         Assert.Contains("NatsJetStreamConsumerService", hostedServiceNames);
         Assert.Contains("TaskWorkerService", hostedServiceNames);
         Assert.IsType<NatsJetStreamEventBus>(worker.Services.GetRequiredService<IEventBus>());
+        Assert.NotNull(worker.Services.GetRequiredService<IRefreshTokenHashingService>());
         Assert.NotEmpty(worker.Services.GetRequiredService<IIntegrationEventSubscriptionRegistry>().Subscriptions);
         Assert.Contains("auth", outboxStores);
         Assert.Contains("catalog", outboxStores);

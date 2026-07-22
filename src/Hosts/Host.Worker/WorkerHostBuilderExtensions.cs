@@ -1,6 +1,7 @@
 namespace Host.Worker;
 
 using Gma.Modules.Auth.Contracts;
+using Gma.Modules.Auth.Infrastructure.TokenHashing;
 using Gma.Modules.Auth.Persistence;
 using Catalog.Application;
 using Catalog.Contracts;
@@ -98,6 +99,7 @@ public static class WorkerHostBuilderExtensions
         if (workerOptions.Modules.Auth)
         {
             builder.SelectModuleProfile(AuthProfile.Global().Descriptor, "Host.Worker/Auth");
+            builder.Services.AddAuthTokenHashingInfrastructure(builder.Configuration);
             builder.AddAuthPersistence();
         }
 
