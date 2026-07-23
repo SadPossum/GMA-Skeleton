@@ -939,8 +939,9 @@ public sealed partial class DeveloperExperienceGuardTests
         Assert.Contains("Serilog.AspNetCore", serilogAdapterProject, StringComparison.Ordinal);
         Assert.DoesNotContain("Gma.Framework.Tenancy", serilogAdapterProject, StringComparison.Ordinal);
         Assert.Contains("Gma.Framework.Tenancy", tenantSerilogBridgeProject, StringComparison.Ordinal);
-        Assert.Contains("UseSerilogRequestLogging", sharedExtension, StringComparison.Ordinal);
-        Assert.Contains("EnrichDiagnosticContext", sharedExtension, StringComparison.Ordinal);
+        Assert.Contains("SafeRequestLoggingMiddleware.InvokeAsync", sharedExtension, StringComparison.Ordinal);
+        Assert.DoesNotContain("UseSerilogRequestLogging", sharedExtension, StringComparison.Ordinal);
+        Assert.DoesNotContain("EnrichDiagnosticContext", sharedExtension, StringComparison.Ordinal);
 
         foreach (string hostProgram in hostPrograms)
         {
