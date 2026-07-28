@@ -2090,7 +2090,14 @@ if ($hasOrganizations) {
         InvitationMaxLifetimeHours = 720
         EnrollmentDefaultLifetimeHours = 24
         EnrollmentMaxLifetimeHours = 720
+        EnrollmentClaimLifetimeHours = 168
         EnrollmentMaxClaims = 1000
+        Lifecycle = [ordered]@{
+            Enabled = $false
+            BatchSize = 100
+            MaxBatchesPerCategoryPerCycle = 4
+            IntervalMinutes = 5
+        }
         Retention = [ordered]@{
             Enabled = $false
             InvitationHistoryDays = 90

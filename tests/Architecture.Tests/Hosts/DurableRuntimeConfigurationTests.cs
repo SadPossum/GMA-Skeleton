@@ -61,6 +61,62 @@ public sealed class DurableRuntimeConfigurationTests
     }
 
     [Fact]
+    public void Organizations_natural_expiry_is_inert_by_default_and_has_one_development_owner()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+
+        foreach (string host in MessagingHosts)
+        {
+            using JsonDocument document = ReadAppSettings(repositoryRoot, host);
+            if (!document.RootElement.TryGetProperty("Organizations", out JsonElement organizations))
+            {
+                continue;
+            }
+
+            JsonElement lifecycle = organizations.GetProperty("Lifecycle");
+            Assert.False(lifecycle.GetProperty("Enabled").GetBoolean());
+            Assert.True(lifecycle.GetProperty("BatchSize").GetInt32() > 0);
+            Assert.True(lifecycle.GetProperty("MaxBatchesPerCategoryPerCycle").GetInt32() > 0);
+            Assert.True(lifecycle.GetProperty("IntervalMinutes").GetInt32() > 0);
+        }
+
+        using JsonDocument apiDocument = ReadAppSettings(repositoryRoot, "Host.Api");
+        Assert.Equal(
+            168,
+            apiDocument.RootElement
+                .GetProperty("Organizations")
+                .GetProperty("EnrollmentClaimLifetimeHours")
+                .GetInt32());
+
+        using JsonDocument workerDocument = ReadAppSettings(repositoryRoot, "Host.Worker");
+        Assert.False(
+            workerDocument.RootElement
+                .GetProperty("Worker")
+                .GetProperty("Modules")
+                .GetProperty("Organizations")
+                .GetBoolean());
+
+        using JsonDocument developmentWorkerDocument = ReadAppSettings(
+            repositoryRoot,
+            "Host.Worker",
+            "appsettings.Development.json");
+        JsonElement developmentRoot = developmentWorkerDocument.RootElement;
+        Assert.True(
+            developmentRoot
+                .GetProperty("Worker")
+                .GetProperty("Modules")
+                .GetProperty("Organizations")
+                .GetBoolean());
+        JsonElement developmentLifecycle = developmentRoot
+            .GetProperty("Organizations")
+            .GetProperty("Lifecycle");
+        Assert.True(developmentLifecycle.GetProperty("Enabled").GetBoolean());
+        Assert.True(developmentLifecycle.GetProperty("BatchSize").GetInt32() > 0);
+        Assert.True(developmentLifecycle.GetProperty("MaxBatchesPerCategoryPerCycle").GetInt32() > 0);
+        Assert.True(developmentLifecycle.GetProperty("IntervalMinutes").GetInt32() > 0);
+    }
+
+    [Fact]
     public void Api_host_exposes_bounded_authentication_runtime_defaults()
     {
         string repositoryRoot = FindRepositoryRoot();
@@ -75,13 +131,16 @@ public sealed class DurableRuntimeConfigurationTests
         Assert.True(retention.GetProperty("AuthenticationFailureHistoryHours").GetInt32() > 0);
     }
 
-    private static JsonDocument ReadAppSettings(string repositoryRoot, string host) =>
+    private static JsonDocument ReadAppSettings(
+        string repositoryRoot,
+        string host,
+        string fileName = "appsettings.json") =>
         JsonDocument.Parse(File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
             "Hosts",
             host,
-            "appsettings.json")));
+            fileName)));
 
     private static TimeSpan ParseDuration(JsonElement section, string propertyName) =>
         TimeSpan.Parse(

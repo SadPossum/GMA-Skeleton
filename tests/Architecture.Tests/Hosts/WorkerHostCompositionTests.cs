@@ -15,6 +15,7 @@ public sealed class WorkerHostCompositionTests
 {
     private static readonly string[] AuthModuleNames = ["auth"];
     private static readonly string[] CatalogOrderingModuleNames = ["catalog", "ordering"];
+    private static readonly string[] OrganizationsModuleNames = ["organizations"];
     private static readonly string[] TaskRuntimeModuleNames = ["task-runtime"];
 
     [Fact]
@@ -122,6 +123,24 @@ public sealed class WorkerHostCompositionTests
         AssertHostedService(builder, "TaskWorkerService");
         Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(ITaskRunStore));
         Assert.Equal(TaskRuntimeModuleNames, GetWorkerOptions(builder).GetComposedModuleNames());
+    }
+
+    [Fact]
+    public void Worker_runs_organizations_lifecycle_only_when_explicitly_composed()
+    {
+        HostApplicationBuilder builder = CreateBuilder();
+        builder.Configuration["Worker:Modules:Organizations"] = "true";
+        builder.Configuration["Organizations:Lifecycle:Enabled"] = "true";
+        builder.Configuration["ConnectionStrings:SqlServer"] =
+            "Server=localhost;Database=gma;Trusted_Connection=True;TrustServerCertificate=True";
+
+        builder.AddWorkerHost();
+        ModuleCompositionValidationResult result = builder.ValidateModuleComposition();
+
+        Assert.True(result.IsValid, result.Report);
+        AssertHostedService(builder, "OrganizationsLifecycleService");
+        AssertNoHostedService(builder, "OrganizationsRetentionService");
+        Assert.Equal(OrganizationsModuleNames, GetWorkerOptions(builder).GetComposedModuleNames());
     }
 
     [Fact]

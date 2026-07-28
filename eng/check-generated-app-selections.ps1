@@ -20,6 +20,12 @@ $cases = @(
     [pscustomobject] @{ Name = 'AuthOnly'; Modules = @('auth'); Extensions = @() },
     [pscustomobject] @{ Name = 'NotificationsOnly'; Modules = @('notifications'); Extensions = @() },
     [pscustomobject] @{ Name = 'OrganizationsOnly'; Modules = @('organizations'); Extensions = @() },
+    [pscustomobject] @{
+        Name = 'OrganizationsWorker'
+        Modules = @('organizations')
+        Hosts = @('Api', 'Worker')
+        Extensions = @()
+    },
     [pscustomobject] @{ Name = 'OrganizationsAccessControl'; Modules = @('organizations', 'access-control'); Extensions = @('Organizations.AccessControl') },
     [pscustomobject] @{ Name = 'OrganizationsTenancy'; Modules = @('organizations', 'tenancy'); Extensions = @('Organizations.Tenancy') },
     [pscustomobject] @{ Name = 'AuthNotifications'; Modules = @('auth', 'notifications'); Extensions = @('Auth.Notifications') },
@@ -137,6 +143,8 @@ foreach ($case in $cases) {
         (Join-Path $outputPath "src\Hosts\$($case.Name).Host.Api\appsettings.json"))
     $organizationSettingsTokens = @(
         '"Organizations"',
+        '"EnrollmentClaimLifetimeHours"',
+        '"Lifecycle"',
         '"InvitationHistoryDays"',
         '"/api/organization-invitations"',
         '"/api/organization-enrollment"'
@@ -148,6 +156,19 @@ foreach ($case in $cases) {
             [System.StringComparison]::Ordinal) -ge 0
         if ($containsToken -ne $expectsOrganizations) {
             throw "$($case.Name) generated incorrect Organizations settings for token: $organizationSettingsToken"
+        }
+    }
+
+    if ($caseHosts -contains 'Worker') {
+        $workerSettings = [System.IO.File]::ReadAllText(
+            (Join-Path $outputPath "src\Hosts\$($case.Name).Host.Worker\appsettings.json"))
+        foreach ($organizationSettingsToken in $organizationSettingsTokens) {
+            $containsToken = $workerSettings.IndexOf(
+                $organizationSettingsToken,
+                [System.StringComparison]::Ordinal) -ge 0
+            if ($containsToken -ne $expectsOrganizations) {
+                throw "$($case.Name) generated incorrect worker Organizations settings for token: $organizationSettingsToken"
+            }
         }
     }
 
