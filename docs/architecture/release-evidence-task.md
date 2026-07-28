@@ -132,22 +132,26 @@ synchronized solution discoverability.
 
 | Repository | Published `dev` commit |
 | --- | --- |
-| Framework | `adfa31c1c9ed803ef2e90aaf19c8bf3be8472d56` |
+| Framework | `96775555d27683dbbb591d90cc332f871d0320fe` |
 | Extensions | `a1ece7af5c49660c1539e0f740a1069e61964496` |
-| Access Control | `60dddc5c5bcba48a3a1c4531d920ba61dfd2f5d0` |
-| Administration | `d192913dc0b00702375f0821ca8a8914c09cc409` |
-| Auth | `594332e4bd5a2657978eac4ff657eafdbfd61a4b` |
-| Files | `1a8070d8e55990c3b32f655e299b8b1cbbed0bdb` |
-| Notifications | `b58b530db1f23899bb9dfa5cd0a02021751708ac` |
-| Organizations | `05f52e1bdb6f40ff6f8ed51fea3964073ab496a8` |
-| Task Runtime | `c451b8089de55979b0f04eb1c114cf993fa84fe3` |
-| Tenancy | `ae0f1a3318f2cfbeff8cd8c6f813e968719e5a88` |
+| Access Control | `ad49a932b265b1e9107ff5e472f33d8e6415e1ea` |
+| Administration | `84f646747a28718b16e9b8482d81d1a5c827ba6d` |
+| Auth | `838db27257872d1ab10d6f51a746cae50faa17c8` |
+| Files | `f18979068d55cdbe3f2cb98084f80b282842eb5f` |
+| Notifications | `e7c13a89bb172b072c47d882200d6a52ad6d6ef0` |
+| Organizations | `d09d411e5e9bd59eafbddf397c2cc172eeb021b9` |
+| Task Runtime | `2c7d9c56fe504d818d86f7aec8ede6d4c8bf2899` |
+| Tenancy | `0e2a6ce5b06cda0764307c9ef7b6e66a3e82182b` |
 
 Focused local evidence covered all ten release-policy guards, all ten
 solution-synchronization checks, the Skeleton source-package guard, and the 10
 Framework composition-tooling tests. The broader contribution, conduct,
 maintainer/review, and branding policy decision remains separate from this
 release-evidence rollout.
+
+The final validation repair taught the shared solution synchronizer to preserve
+role folders in standalone `Gma.Modules.*` solutions and regenerated every
+module solution from that rule.
 
 ## Delivery Slices
 
