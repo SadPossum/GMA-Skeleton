@@ -1,0 +1,83 @@
+name: GMA source release evidence
+description: Create deterministic source artifacts, release metadata and checksums from one exact commit.
+
+inputs:
+  repository-root:
+    description: Repository root containing the release manifest.
+    required: false
+    default: .
+  manifest-path:
+    description: Repository-relative release-evidence manifest path.
+    required: false
+    default: .gma/release-evidence.json
+  release-version:
+    description: SemVer tag or candidate identity for this evidence set.
+    required: true
+  source-ref:
+    description: Full Git ref used to create this evidence set.
+    required: true
+  security-evidence-directory:
+    description: Directory containing sbom.cdx.json and security-summary.json.
+    required: false
+    default: artifacts/release-security
+  output-directory:
+    description: Directory for public release evidence.
+    required: false
+    default: artifacts/release
+  require-tag:
+    description: Require release-version to be an exact tag pointing at HEAD.
+    required: false
+    default: 'false'
+
+outputs:
+  archive-path:
+    description: Absolute source archive path.
+    value: ${{ steps.create.outputs.archive-path }}
+  manifest-path:
+    description: Absolute deterministic release manifest path.
+    value: ${{ steps.create.outputs.manifest-path }}
+  checksums-path:
+    description: Absolute SHA256SUMS path.
+    value: ${{ steps.create.outputs.checksums-path }}
+  sbom-path:
+    description: Absolute CycloneDX SBOM path.
+    value: ${{ steps.create.outputs.sbom-path }}
+  evidence-directory:
+    description: Absolute release evidence directory.
+    value: ${{ steps.create.outputs.evidence-directory }}
+
+runs:
+  using: composite
+  steps:
+    - name: Create source release evidence
+      id: create
+      shell: pwsh
+      env:
+        RELEASE_EVIDENCE_SCRIPT: ${{ github.action_path }}/create-source-release-evidence.ps1
+        RELEASE_REPOSITORY_ROOT: ${{ inputs.repository-root }}
+        RELEASE_MANIFEST_PATH: ${{ inputs.manifest-path }}
+        RELEASE_VERSION: ${{ inputs.release-version }}
+        RELEASE_SOURCE_REF: ${{ inputs.source-ref }}
+        RELEASE_SECURITY_EVIDENCE_DIRECTORY: ${{ inputs.security-evidence-directory }}
+        RELEASE_OUTPUT_DIRECTORY: ${{ inputs.output-directory }}
+        RELEASE_REQUIRE_TAG: ${{ inputs.require-tag }}
+      run: |
+        $arguments = @{
+          RepositoryRoot = $env:RELEASE_REPOSITORY_ROOT
+          ManifestPath = $env:RELEASE_MANIFEST_PATH
+          ReleaseVersion = $env:RELEASE_VERSION
+          SourceRef = $env:RELEASE_SOURCE_REF
+          SecurityEvidenceDirectory = $env:RELEASE_SECURITY_EVIDENCE_DIRECTORY
+          OutputDirectory = $env:RELEASE_OUTPUT_DIRECTORY
+        }
+        if ($env:RELEASE_REQUIRE_TAG -eq 'true') {
+          $arguments.RequireTag = $true
+        }
+
+        $result = & $env:RELEASE_EVIDENCE_SCRIPT @arguments |
+          ConvertFrom-Json
+        "archive-path=$($result.archivePath)" >> $env:GITHUB_OUTPUT
+        "manifest-path=$($result.manifestPath)" >> $env:GITHUB_OUTPUT
+        "checksums-path=$($result.checksumsPath)" >> $env:GITHUB_OUTPUT
+        "sbom-path=$($result.sbomPath)" >> $env:GITHUB_OUTPUT
+        "evidence-directory=$($result.evidenceDirectory)" >> $env:GITHUB_OUTPUT

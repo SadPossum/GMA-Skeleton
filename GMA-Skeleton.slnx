@@ -7,10 +7,14 @@
     <File Path=".github/actions/security-baseline/convert-security-exceptions.ps1" />
     <File Path=".github/actions/security-baseline/write-security-evidence-summary.ps1" />
   </Folder>
+  <Folder Name="/.github/actions/source-release-evidence/">
+    <File Path=".github/actions/source-release-evidence/action.yml" />
+    <File Path=".github/actions/source-release-evidence/create-source-release-evidence.ps1" />
+  </Folder>
   <Folder Name="/.github/workflows/">
     <File Path=".github/workflows/codeql.yml" />
     <File Path=".github/workflows/docker-tests.yml" />
-    <File Path=".github/workflows/release-source-set.yml" />
+    <File Path=".github/workflows/release-evidence.yml" />
     <File Path=".github/workflows/security.yml" />
     <File Path=".github/workflows/validate.yml" />
   </Folder>
@@ -21,6 +25,7 @@
     <File Path=".github/dependabot.yml" />
     <File Path=".gitignore" />
     <File Path=".gitmodules" />
+    <File Path=".gma/release-evidence.json" />
     <File Path=".gma/security-exceptions.json" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
@@ -28,6 +33,7 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path="SECURITY.md" />
+    <File Path="SUPPORT.md" />
     <File Path="global.json" />
     <File Path="gma/README.md" />
     <File Path="gma/modules/README.md" />
@@ -43,6 +49,7 @@
     <File Path="docs/architecture/gma-production-completion-summary.md" />
     <File Path="docs/architecture/gma-rebrand-and-source-repo-split.md" />
     <File Path="docs/architecture/overview.md" />
+    <File Path="docs/architecture/release-evidence-task.md" />
     <File Path="docs/architecture/supply-chain-baseline-task.md" />
   </Folder>
   <Folder Name="/docs/examples/">
@@ -55,10 +62,12 @@
   </Folder>
   <Folder Name="/eng/">
     <File Path="eng/add-migration.ps1" />
+    <File Path="eng/apply-repository-release-baseline.ps1" />
     <File Path="eng/apply-repository-security-baseline.ps1" />
     <File Path="eng/build.ps1" />
     <File Path="eng/check-generated-app-selections.ps1" />
     <File Path="eng/check-migrations.ps1" />
+    <File Path="eng/check-repository-release.ps1" />
     <File Path="eng/check-repository-security.ps1" />
     <File Path="eng/check-source-packages.ps1" />
     <File Path="eng/check-submodule-dev-heads.ps1" />
@@ -80,6 +89,9 @@
     <File Path="eng/test-docker.ps1" />
     <File Path="eng/test-fast.ps1" />
     <File Path="eng/verify.ps1" />
+  </Folder>
+  <Folder Name="/eng/repository-release/">
+    <File Path="eng/repository-release/check-repository-release.ps1" />
   </Folder>
   <Folder Name="/eng/repository-security/">
     <File Path="eng/repository-security/check-repository-security.ps1" />

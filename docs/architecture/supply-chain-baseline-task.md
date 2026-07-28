@@ -1,6 +1,6 @@
 # Repository Supply-Chain Baseline Task
 
-**Status:** Slices 1 and 2 published; Slice 3 planned
+**Status:** Slices 1 and 2 published; Slice 3 source evidence in progress
 
 ## Goal
 
@@ -115,6 +115,9 @@ The final backend commit changes only the Framework source-package governance
 checker and is covered by the final cross-platform validation above.
 
 ### Slice 3 - Release Evidence
+
+The detailed responsibility boundary, evidence contract, and delivery sequence
+are defined in the [Repository Release Evidence Task](release-evidence-task.md).
 
 1. Define the supported release channels and end-of-life policy in each release-owning repository.
 2. Produce release checksums, SBOM, and GitHub artifact attestations from exact clean commits.

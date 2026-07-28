@@ -12,6 +12,9 @@ param(
     -ExpectedPrivateReportingUrl 'https://github.com/SadPossum/GMA-Skeleton/security/advisories/new' `
     -RequireRolloutTooling
 
+& (Join-Path $PSScriptRoot 'check-repository-release.ps1') `
+    -RequireRolloutTooling
+
 & (Join-Path $PSScriptRoot 'check-source-packages.ps1') -SkipRestore -SkipBuild
 
 & (Join-Path $PSScriptRoot 'check-generated-app-selections.ps1')

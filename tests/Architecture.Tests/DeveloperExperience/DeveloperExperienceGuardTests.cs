@@ -136,6 +136,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "gma-production-completion-summary.md",
             "gma-rebrand-and-source-repo-split.md",
             "overview.md",
+            "release-evidence-task.md",
             "supply-chain-baseline-task.md"
         ];
         string[] directoryOffenders = forbiddenRootDirectories

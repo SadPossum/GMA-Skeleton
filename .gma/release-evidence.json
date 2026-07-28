@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "repository": "SadPossum/GMA-Skeleton",
+  "artifactName": "gma-skeleton",
+  "releaseKind": "composition",
+  "releaseEvidence": {
+    "repository": "SadPossum/GMA-Skeleton",
+    "commit": "9d2bd026cace696cf0c3cd0f307dc374728d6c32"
+  },
+  "sourceSetPath": "artifacts/gma-source-set.json"
+}

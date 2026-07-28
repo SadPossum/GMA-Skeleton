@@ -28,6 +28,7 @@ Reusable framework and module documentation lives with the source that owns it. 
 - [GMA Production Completion Summary](architecture/gma-production-completion-summary.md)
 - [GMA Production Completion Audit](architecture/gma-production-completion-audit-task.md)
 - [Repository Supply-Chain Baseline Task](architecture/supply-chain-baseline-task.md)
+- [Repository Release Evidence Task](architecture/release-evidence-task.md)
 - [GMA Rebrand And Source Repo Split Plan](architecture/gma-rebrand-and-source-repo-split.md)
 
 ## Examples

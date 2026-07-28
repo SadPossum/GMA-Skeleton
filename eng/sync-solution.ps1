@@ -18,6 +18,7 @@ $arguments = @{
         '.gitignore',
         '.gitmodules',
         '.github/dependabot.yml',
+        '.gma/release-evidence.json',
         '.gma/security-exceptions.json',
         'Directory.Build.props',
         'Directory.Packages.props',
@@ -28,7 +29,8 @@ $arguments = @{
         'LICENSE',
         'nuget.config',
         'README.md',
-        'SECURITY.md'
+        'SECURITY.md',
+        'SUPPORT.md'
     )
 }
 if ($Check) {
