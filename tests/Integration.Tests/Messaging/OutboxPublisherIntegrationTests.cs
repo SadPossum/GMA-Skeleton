@@ -105,6 +105,8 @@ public sealed class OutboxPublisherIntegrationTests
         builder.Configuration["Outbox:PollIntervalMilliseconds"] = "100";
         builder.Configuration["Outbox:LockDurationMilliseconds"] = "1000";
         builder.Configuration["Worker:Modules:Auth"] = "true";
+        builder.Configuration["Auth:RefreshTokens:Pepper"] =
+            "integration-test-refresh-token-pepper-change-me-000000000000000000";
         builder.Logging.ClearProviders();
 
         builder.AddWorkerHost();

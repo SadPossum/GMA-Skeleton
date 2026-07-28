@@ -69,7 +69,7 @@ public sealed class InboxStoreIntegrationTests
 
             Assert.Equal(0, await dbContext.CatalogItemProjections.CountAsync());
             Assert.Equal(1, failure.Attempts);
-            Assert.Equal("handler failed", failure.LastError);
+            Assert.Equal("inbox-handler-failed:InvalidOperationException", failure.LastError);
         }
 
         Guid committedCatalogItemId = Guid.NewGuid();

@@ -24,6 +24,7 @@ public sealed class ModuleBoundaryTests
         "Gma.Framework.Notifications.Api",
         "Gma.Framework.Notifications.Cqrs",
         "Gma.Framework.Notifications.SignalR",
+        "Gma.Framework.RateLimiting.Redis",
         "Gma.Framework.Realtime.Notifications",
         "Gma.Framework.Persistence.EntityFrameworkCore",
         "Gma.Framework.Tenancy.Api.Serilog",
@@ -221,6 +222,8 @@ public sealed class ModuleBoundaryTests
             "Microsoft.Extensions.Caching.StackExchangeRedis",
             "Gma.Framework.Caching.Cqrs",
             "Gma.Framework.Caching.Redis",
+            "Gma.Framework.RateLimiting.Infrastructure",
+            "Gma.Framework.RateLimiting.Redis",
             "StackExchange.Redis"
         ];
 

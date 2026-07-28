@@ -5387,6 +5387,40 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.Security\Gma.Framework.Security.csproj",
                 ]),
             new(
+                "Gma.Framework.RateLimiting",
+                [],
+                [],
+                [
+                    @"..\..\Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj"
+                ]),
+            new(
+                "Gma.Framework.RateLimiting.Infrastructure",
+                [
+                    "Microsoft.Extensions.Hosting"
+                ],
+                [],
+                [
+                    @"..\Gma.Framework.RateLimiting\Gma.Framework.RateLimiting.csproj",
+                    @"..\..\Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\..\Runtime\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\..\Runtime\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj"
+                ]),
+            new(
+                "Gma.Framework.RateLimiting.Redis",
+                [
+                    "Microsoft.Extensions.Configuration.Binder",
+                    "Microsoft.Extensions.Hosting",
+                    "Microsoft.Extensions.Options.ConfigurationExtensions",
+                    "StackExchange.Redis"
+                ],
+                [],
+                [
+                    @"..\Gma.Framework.RateLimiting\Gma.Framework.RateLimiting.csproj",
+                    @"..\..\Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\..\Runtime\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\..\Runtime\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj"
+                ]),
+            new(
                 "Gma.Framework.Realtime",
                 [],
                 [],

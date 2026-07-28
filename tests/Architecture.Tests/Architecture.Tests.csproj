@@ -97,6 +97,9 @@
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.Infrastructure\Gma.Framework.Notifications.Infrastructure.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications.SignalR\Gma.Framework.Notifications.SignalR.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Notifications\Gma.Framework.Notifications\Gma.Framework.Notifications.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)RateLimiting\Gma.Framework.RateLimiting\Gma.Framework.RateLimiting.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)RateLimiting\Gma.Framework.RateLimiting.Infrastructure\Gma.Framework.RateLimiting.Infrastructure.csproj" />
+    <ProjectReference Include="$(GmaFrameworkRoot)RateLimiting\Gma.Framework.RateLimiting.Redis\Gma.Framework.RateLimiting.Redis.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Realtime\Gma.Framework.Realtime\Gma.Framework.Realtime.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Realtime\Gma.Framework.Realtime.Infrastructure\Gma.Framework.Realtime.Infrastructure.csproj" />
     <ProjectReference Include="$(GmaFrameworkRoot)Realtime\Gma.Framework.Realtime.Notifications\Gma.Framework.Realtime.Notifications.csproj" />
