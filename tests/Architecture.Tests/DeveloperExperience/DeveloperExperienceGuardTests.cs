@@ -2136,7 +2136,8 @@ public sealed partial class DeveloperExperienceGuardTests
             "LICENSE",
             "nuget.config",
             "README.md",
-            "SECURITY.md"
+            "SECURITY.md",
+            "SUPPORT.md"
         ];
 
         string[] offenders = packages
@@ -2283,7 +2284,8 @@ public sealed partial class DeveloperExperienceGuardTests
                 "LICENSE" or
                 "nuget.config" or
                 "README.md" or
-                "SECURITY.md";
+                "SECURITY.md" or
+                "SUPPORT.md";
     }
 
     [Fact]
