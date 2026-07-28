@@ -31,6 +31,7 @@ using Microsoft.Extensions.Hosting;
 
 internal sealed class AdminCliTestApplication : IAsyncDisposable
 {
+    private static readonly SemaphoreSlim ConsoleCaptureGate = new(1, 1);
     private readonly IHost host;
     private readonly RootCommand rootCommand;
 
@@ -79,27 +80,36 @@ internal sealed class AdminCliTestApplication : IAsyncDisposable
 
     public async Task<AdminCliResult> ExecuteAsync(params string[] args)
     {
-        TextWriter originalOut = Console.Out;
-        TextWriter originalError = Console.Error;
-        using StringWriter output = new();
-        using StringWriter error = new();
-
-        Console.SetOut(output);
-        Console.SetError(error);
-
+        await ConsoleCaptureGate.WaitAsync().ConfigureAwait(false);
         try
         {
-            ParseResult parseResult = this.rootCommand.Parse(args);
-            int exitCode = await parseResult
-                .InvokeAsync(new InvocationConfiguration { EnableDefaultExceptionHandler = false }, CancellationToken.None)
-                .ConfigureAwait(false);
+            TextWriter originalOut = Console.Out;
+            TextWriter originalError = Console.Error;
+            using ConcurrentTextWriter output = new();
+            using ConcurrentTextWriter error = new();
 
-            return new AdminCliResult(exitCode, output.ToString(), error.ToString());
+            Console.SetOut(output);
+            Console.SetError(error);
+
+            int exitCode;
+            try
+            {
+                ParseResult parseResult = this.rootCommand.Parse(args);
+                exitCode = await parseResult
+                    .InvokeAsync(new InvocationConfiguration { EnableDefaultExceptionHandler = false }, CancellationToken.None)
+                    .ConfigureAwait(false);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+                Console.SetError(originalError);
+            }
+
+            return new AdminCliResult(exitCode, output.Snapshot(), error.Snapshot());
         }
         finally
         {
-            Console.SetOut(originalOut);
-            Console.SetError(originalError);
+            ConsoleCaptureGate.Release();
         }
     }
 
