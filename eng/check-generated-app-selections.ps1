@@ -15,6 +15,7 @@ if (Test-Path -LiteralPath $resolvedMatrixRoot) {
 }
 
 $cases = @(
+    [pscustomobject] @{ Name = 'FrameworkOnly'; Modules = @(); Extensions = @() },
     [pscustomobject] @{ Name = 'AccessControlOnly'; Modules = @('access-control'); Extensions = @() },
     [pscustomobject] @{ Name = 'AuthOnly'; Modules = @('auth'); Extensions = @() },
     [pscustomobject] @{ Name = 'NotificationsOnly'; Modules = @('notifications'); Extensions = @() },
@@ -61,6 +62,16 @@ foreach ($case in $cases) {
         -Hosts $caseHosts
 
     & (Join-Path $outputPath 'eng\check-repository-security.ps1')
+    foreach ($unexpectedReleasePath in @(
+        '.github\workflows\release-source-set.yml',
+        '.github\workflows\release-evidence.yml',
+        '.gma\release-evidence.json'
+    )) {
+        if (Test-Path -LiteralPath (
+                Join-Path $outputPath $unexpectedReleasePath)) {
+            throw "$($case.Name) generated release evidence without a repository identity."
+        }
+    }
 
     $conditionalSurfacePaths = @(
         (Join-Path $outputPath 'Gma.SourceRoots.props.example'),
@@ -205,6 +216,70 @@ foreach ($case in $cases) {
     }
 }
 
+$releaseCaseName = 'ReleaseReady'
+$releaseCaseRoot = Join-Path $resolvedMatrixRoot $releaseCaseName
+$releaseRepository = 'SadPossum/Generated-Release-Ready'
+& (Join-Path $PSScriptRoot 'new-gma-app.ps1') `
+    -Name $releaseCaseName `
+    -OutputPath $releaseCaseRoot `
+    -RepositorySlug $releaseRepository
+
+& git -C $releaseCaseRoot init -b dev | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw 'Unable to initialize the release-ready generated app.'
+}
+& git -C $releaseCaseRoot remote add origin `
+    "https://github.com/$releaseRepository.git"
+if ($LASTEXITCODE -ne 0) {
+    throw 'Unable to configure the release-ready generated app origin.'
+}
+& (Join-Path $releaseCaseRoot 'eng\check-repository-security.ps1')
+& (Join-Path $releaseCaseRoot 'eng\check-repository-release.ps1')
+
+$releaseSolution = [System.IO.File]::ReadAllText(
+    (Join-Path $releaseCaseRoot "$releaseCaseName.slnx"))
+$releaseSurface = @(
+    '.github\workflows\release-evidence.yml',
+    '.gma\release-evidence.json',
+    '.gma\repository-security.json',
+    'eng\check-repository-release.ps1',
+    'SUPPORT.md'
+)
+foreach ($relativePath in $releaseSurface) {
+    if (-not [System.IO.File]::Exists(
+            (Join-Path $releaseCaseRoot $relativePath))) {
+        throw "Release-ready generated app is missing '$relativePath'."
+    }
+    if ($releaseSolution.IndexOf(
+            $relativePath.Replace('\', '/'),
+            [System.StringComparison]::Ordinal) -lt 0) {
+        throw "Release-ready solution is missing '$relativePath'."
+    }
+}
+if (Test-Path -LiteralPath (
+        Join-Path $releaseCaseRoot '.github\actions\security-baseline')) {
+    throw 'Release-ready generated app retained a copied security action.'
+}
+$identityDowngradeRejected = $false
+try {
+    & (Join-Path $PSScriptRoot 'new-gma-app.ps1') `
+        -Name $releaseCaseName `
+        -OutputPath $releaseCaseRoot `
+        -Force
+}
+catch {
+    if ($_.Exception.Message -like
+        '*Refusing identity-free generation over release-enabled output*') {
+        $identityDowngradeRejected = $true
+    }
+    else {
+        throw
+    }
+}
+if (-not $identityDowngradeRejected) {
+    throw 'Generated app allowed a release identity to be removed in place.'
+}
+
 $buildCaseName = 'AllAdmin'
 $buildCaseRoot = Join-Path $resolvedMatrixRoot $buildCaseName
 $sourceRootContent = [System.IO.File]::ReadAllText(
@@ -248,4 +323,4 @@ catch {
     }
 }
 
-Write-Host 'Generated app selection matrix passed for public, admin, and opt-in extension composition.'
+Write-Host 'Generated app selection matrix passed for public, admin, extension, and release-ready composition.'

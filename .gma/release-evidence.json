@@ -5,7 +5,7 @@
   "releaseKind": "composition",
   "releaseEvidence": {
     "repository": "SadPossum/GMA-Skeleton",
-    "commit": "9d2bd026cace696cf0c3cd0f307dc374728d6c32"
+    "commit": "4a1a6a857eff7524bc25821a89fe8b0260cb95a0"
   },
   "sourceSetPath": "artifacts/gma-source-set.json"
 }

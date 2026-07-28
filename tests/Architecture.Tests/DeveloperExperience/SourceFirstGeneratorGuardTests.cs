@@ -174,7 +174,7 @@ public sealed class SourceFirstGeneratorGuardTests
     }
 
     [Fact]
-    public void Generated_ci_uses_immutable_actions_and_release_source_set_evidence()
+    public void Generated_ci_uses_immutable_actions_and_opt_in_release_evidence()
     {
         string repositoryRoot = FindRepositoryRoot();
         string generator = File.ReadAllText(Path.Combine(repositoryRoot, "eng", "new-gma-app.ps1"));
@@ -182,10 +182,14 @@ public sealed class SourceFirstGeneratorGuardTests
         [
             "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
             "actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1",
-            "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
             "persist-credentials: false",
             ".github\\dependabot.yml",
-            ".github\\workflows\\release-source-set.yml",
+            "RepositorySlug",
+            "32ec053c78a87f5b5941068eb449e7ae10f51f59",
+            "4a1a6a857eff7524bc25821a89fe8b0260cb95a0",
+            "apply-repository-security-baseline.ps1",
+            "apply-repository-release-baseline.ps1",
+            ".github/workflows/release-evidence.yml",
         ];
 
         Assert.DoesNotContain(requiredTokens, token => !generator.Contains(token, StringComparison.Ordinal));

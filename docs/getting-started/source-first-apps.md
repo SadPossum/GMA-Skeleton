@@ -36,6 +36,25 @@ Generate a source-first shell:
 .\eng\new-gma-app.ps1 -Name MyProduct -OutputPath ..\MyProduct -Modules auth,notifications
 ```
 
+When the GitHub repository identity is already known, generate the pinned
+repository security and release-evidence baselines at the same time:
+
+```powershell
+.\eng\new-gma-app.ps1 `
+  -Name MyProduct `
+  -OutputPath ..\MyProduct `
+  -Modules auth,notifications `
+  -RepositorySlug SadPossum/MyProduct
+```
+
+The repository slug is deliberately not inferred from the application name.
+Without it, the shell keeps local security validation but does not generate a
+release workflow or pretend that a retained source-set artifact is a release.
+After a repository and its `origin` exist, the Skeleton-owned
+`apply-repository-security-baseline.ps1` and
+`apply-repository-release-baseline.ps1` scaffolders can add the same pinned
+contracts.
+
 Omit `-Modules` for a framework-only app shell. Use `-Modules all` only when you deliberately want every reusable module mounted for a full local proof. For selected modules that expose a public `IModule` front door, including AccessControl's scoped-profile API, the generated API host adds the project reference and explicit module registration. Administration, TaskRuntime, and other admin/worker-only selections are mounted without silently adding those surfaces to the public API; add their hosts deliberately when the product needs them.
 
 The generated shell is runnable and startup-tested. It includes production HTTP policy, the framework Data Protection composition, liveness/readiness endpoints, local development settings, explicit SQL-provider migration tooling, an app-module scaffold wrapper, and architecture/startup tests. Selected AccessControl, Auth, Notifications, and Organizations databases contribute readiness checks. Auth composes the generic OpenID Connect adapter; Notifications composes the transport-neutral email adapter; Auth plus Notifications selects `Gma.Extensions.Auth.Notifications`; Auth plus Organizations selects `Gma.Extensions.Auth.Organizations` with global identity and organization-scoped resources; Organizations plus AccessControl selects `Gma.Extensions.Organizations.AccessControl` for membership-lifecycle profile cleanup; and Organizations plus Tenancy selects `Gma.Extensions.Organizations.Tenancy` so tenant-scoped user requests require an active organization membership. Organizations selection also classifies invitation and enrollment token routes as sensitive rate-limit paths and emits disabled-by-default bounded domain-retention settings. Unselected bridges and module settings are excluded from the generated graph, so individual modules remain independently buildable. Every adapter is disabled or inert until the app supplies explicit provider credentials and transport configuration. Files gets local storage for development and requires a content-inspection adapter in production. Cloud credentials, trusted proxy IPs or CIDR networks, a distributed HTTP limiter for multi-replica operation, real secrets, shared Data Protection storage for multi-replica OIDC callbacks, messaging topology, enabled external identity providers, email transport, admin hosts, workers, and retention policy remain deliberate app/deployment choices.
@@ -114,7 +133,12 @@ CI for private submodules needs credentials that can read the selected GMA repos
 
 Checkout actions are commit-pinned and use `persist-credentials: false`. Keep those properties when updating the generated workflow.
 
-Before releasing this skeleton source set, run `eng/export-source-set.ps1 -RequireClean` (or use its release-tag workflow) to capture the exact skeleton/framework/module commits, SDK, and central package hash. Generated applications can adopt the same manifest pattern in their own release workflow when they need an independently archived source bill of materials.
+Before releasing a composition, run `eng/export-source-set.ps1 -RequireClean`.
+Release-enabled repositories do this inside `release-evidence.yml`, then bind
+the source archive, source set, checksum manifest, CycloneDX SBOM, and
+payload-free scan summary to immutable GitHub attestations. Workflow-dispatch
+runs retain candidate evidence without publishing a release; exact `v*` tags
+publish only after every evidence gate passes.
 
 Generated app shells include `.github/workflows/validate.yml`. Set a repository secret named `GMA_CI_TOKEN` when the app consumes private GMA repositories from another repository boundary; the default `GITHUB_TOKEN` normally only has access to the current repository.
 

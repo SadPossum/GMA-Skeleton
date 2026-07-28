@@ -16,7 +16,19 @@ param(
 
     [switch] $ServiceDefaults,
 
-    [switch] $DockerValidation
+    [switch] $DockerValidation,
+
+    [ValidatePattern(
+        '^$|^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$')]
+    [string] $RepositorySlug = '',
+
+    [ValidatePattern('^[0-9a-f]{40}$')]
+    [string] $SecurityBaselineCommit =
+        '32ec053c78a87f5b5941068eb449e7ae10f51f59',
+
+    [ValidatePattern('^[0-9a-f]{40}$')]
+    [string] $ReleaseEvidenceCommit =
+        '4a1a6a857eff7524bc25821a89fe8b0260cb95a0'
 )
 
 . (Join-Path $PSScriptRoot 'common.ps1')
@@ -246,22 +258,28 @@ function Write-GmaGeneratedBootstrap {
         [Parameter(Mandatory = $true)]
         [string] $Root,
 
-        [object[]] $ModuleSpecs = @()
+        [object[]] $ModuleSpecs = @(),
+
+        [switch] $IncludeRepositoryRelease
     )
 
     $selectedModuleSpecArray = @($ModuleSpecs)
+    $selectedModuleAliases = @(
+        $selectedModuleSpecArray |
+            ForEach-Object { $_.Alias }
+    )
     $includeAuthNotificationsExtension =
-        ($selectedModuleSpecArray.Alias -contains 'auth') -and
-        ($selectedModuleSpecArray.Alias -contains 'notifications')
+        ($selectedModuleAliases -contains 'auth') -and
+        ($selectedModuleAliases -contains 'notifications')
     $includeAuthOrganizationsExtension =
-        ($selectedModuleSpecArray.Alias -contains 'auth') -and
-        ($selectedModuleSpecArray.Alias -contains 'organizations')
+        ($selectedModuleAliases -contains 'auth') -and
+        ($selectedModuleAliases -contains 'organizations')
     $includeOrganizationsAccessControlExtension =
-        ($selectedModuleSpecArray.Alias -contains 'organizations') -and
-        ($selectedModuleSpecArray.Alias -contains 'access-control')
+        ($selectedModuleAliases -contains 'organizations') -and
+        ($selectedModuleAliases -contains 'access-control')
     $includeOrganizationsTenancyExtension =
-        ($selectedModuleSpecArray.Alias -contains 'organizations') -and
-        ($selectedModuleSpecArray.Alias -contains 'tenancy')
+        ($selectedModuleAliases -contains 'organizations') -and
+        ($selectedModuleAliases -contains 'tenancy')
     $includeExtensions =
         $includeAuthNotificationsExtension -or
         $includeAuthOrganizationsExtension -or
@@ -515,7 +533,15 @@ function Write-GmaGeneratedBootstrap {
         '}'
     )
 
-    Write-GmaTemplateFile (Join-Path $Root 'eng\gma-validate.ps1') @(
+    $repositoryGuardLines = @(
+        '& (Join-GmaPath ''eng/check-repository-security.ps1'')'
+    )
+    if ($IncludeRepositoryRelease) {
+        $repositoryGuardLines +=
+            '& (Join-GmaPath ''eng/check-repository-release.ps1'')'
+    }
+
+    $gmaValidateLines = @(
         'param(',
         '    [switch] $SkipRestore,',
         '    [switch] $SkipBuild',
@@ -523,7 +549,8 @@ function Write-GmaGeneratedBootstrap {
         '',
         '. (Join-Path $PSScriptRoot ''common.ps1'')',
         '',
-        '& (Join-GmaPath ''eng/sync-solution.ps1'') -Check',
+        '& (Join-GmaPath ''eng/sync-solution.ps1'') -Check'
+    ) + $repositoryGuardLines + @(
         '& (Join-GmaPath ''eng/check-source-packages.ps1'') -SkipRestore -SkipBuild',
         '',
         "`$solutionPath = Join-GmaPath '$Name.slnx'",
@@ -538,15 +565,29 @@ function Write-GmaGeneratedBootstrap {
         '',
         'Invoke-GmaDotNet -Arguments @(''test'', $solutionPath, ''--no-build'', ''--logger'', ''console;verbosity=minimal'', ''-m:1'', ''-nr:false'')'
     )
+    Write-GmaTemplateFile `
+        (Join-Path $Root 'eng\gma-validate.ps1') `
+        $gmaValidateLines
 }
 
 function Write-GmaGeneratedWorkflow {
     param(
         [Parameter(Mandatory = $true)][string] $Root,
-        [switch] $IncludeDocker
+        [switch] $IncludeDocker,
+        [switch] $IncludeRepositoryRelease
     )
 
-    Write-GmaTemplateFile (Join-Path $Root '.github\workflows\validate.yml') @(
+    $repositoryReleaseCheckLines = @()
+    if ($IncludeRepositoryRelease) {
+        $repositoryReleaseCheckLines = @(
+            '',
+            '      - name: Check repository release baseline',
+            '        shell: pwsh',
+            '        run: ./eng/check-repository-release.ps1'
+        )
+    }
+
+    $validateWorkflowLines = @(
         'name: validate',
         '',
         'on:',
@@ -597,7 +638,8 @@ function Write-GmaGeneratedWorkflow {
         '',
         '      - name: Check repository security baseline',
         '        shell: pwsh',
-        '        run: ./eng/check-repository-security.ps1',
+        '        run: ./eng/check-repository-security.ps1'
+    ) + $repositoryReleaseCheckLines + @(
         '',
         '      - name: Check source dependency heads',
         '        shell: pwsh',
@@ -616,6 +658,9 @@ function Write-GmaGeneratedWorkflow {
         '      - name: Test',
         "        run: dotnet test $Name.slnx --no-build --logger 'console;verbosity=minimal' -m:1 -nr:false"
     )
+    Write-GmaTemplateFile `
+        (Join-Path $Root '.github\workflows\validate.yml') `
+        $validateWorkflowLines
 
     Write-GmaTemplateFile (Join-Path $Root '.github\dependabot.yml') @(
         'version: 2',
@@ -637,44 +682,6 @@ function Write-GmaGeneratedWorkflow {
         '    schedule:',
         '      interval: weekly',
         '    open-pull-requests-limit: 10'
-    )
-
-    Write-GmaTemplateFile (Join-Path $Root '.github\workflows\release-source-set.yml') @(
-        'name: Release Source Set',
-        '',
-        'on:',
-        '  push:',
-        '    tags:',
-        '      - ''v*''',
-        '  workflow_dispatch:',
-        '',
-        'permissions:',
-        '  contents: read',
-        '',
-        'jobs:',
-        '  manifest:',
-        '    runs-on: ubuntu-latest',
-        '    timeout-minutes: 10',
-        '    steps:',
-        '      - name: Checkout compatible source set',
-        '        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0',
-        '        with:',
-        '          fetch-depth: 0',
-        '          submodules: recursive',
-        '          token: ${{ secrets.GMA_CI_TOKEN || github.token }}',
-        '          persist-credentials: false',
-        '',
-        '      - name: Export source bill of materials',
-        '        shell: pwsh',
-        '        run: ./eng/export-source-set.ps1 -RequireClean',
-        '',
-        '      - name: Publish source bill of materials',
-        '        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1',
-        '        with:',
-        '          name: gma-source-set-${{ github.ref_name }}',
-        '          path: artifacts/gma-source-set.json',
-        '          if-no-files-found: error',
-        '          retention-days: 90'
     )
 
     if ($IncludeDocker) {
@@ -715,42 +722,62 @@ function Write-GmaGeneratedWorkflow {
 function Write-GmaGeneratedSecurityBaseline {
     param(
         [Parameter(Mandatory = $true)][string] $Root,
-        [Parameter(Mandatory = $true)][string] $ApplicationName
+        [Parameter(Mandatory = $true)][string] $ApplicationName,
+        [string] $RepositorySlug = '',
+        [string] $SecurityBaselineCommit = ''
     )
 
-    $sharedFiles = @(
-        [pscustomobject] @{
-            Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\action.yml'
-            Destination = Join-Path $Root '.github\actions\security-baseline\action.yml'
-        },
-        [pscustomobject] @{
-            Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\convert-security-exceptions.ps1'
-            Destination = Join-Path $Root '.github\actions\security-baseline\convert-security-exceptions.ps1'
-        },
-        [pscustomobject] @{
-            Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\write-security-evidence-summary.ps1'
-            Destination = Join-Path $Root '.github\actions\security-baseline\write-security-evidence-summary.ps1'
-        },
-        [pscustomobject] @{
-            Source = Join-Path $script:RepositoryRoot '.github\workflows\security.yml'
-            Destination = Join-Path $Root '.github\workflows\security.yml'
-        },
-        [pscustomobject] @{
-            Source = Join-Path $PSScriptRoot 'check-repository-security.ps1'
-            Destination = Join-Path $Root 'eng\check-repository-security.ps1'
-        }
-    )
-    foreach ($sharedFile in $sharedFiles) {
-        $content = [System.IO.File]::ReadAllLines($sharedFile.Source)
-        Write-GmaTemplateFile $sharedFile.Destination $content
+    $usePinnedBaseline =
+        -not [string]::IsNullOrWhiteSpace($RepositorySlug)
+    if ($usePinnedBaseline) {
+        & (Join-Path $PSScriptRoot `
+            'apply-repository-security-baseline.ps1') `
+            -OutputPath $Root `
+            -RepositorySlug $RepositorySlug `
+            -RepositoryDisplayName $ApplicationName `
+            -PackageEcosystem nuget `
+            -SecurityBaselineCommit $SecurityBaselineCommit `
+            -IncludeGitSubmodules `
+            -Force
     }
+    else {
+        $sharedFiles = @(
+            [pscustomobject] @{
+                Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\action.yml'
+                Destination = Join-Path $Root '.github\actions\security-baseline\action.yml'
+            },
+            [pscustomobject] @{
+                Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\convert-security-exceptions.ps1'
+                Destination = Join-Path $Root '.github\actions\security-baseline\convert-security-exceptions.ps1'
+            },
+            [pscustomobject] @{
+                Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\write-security-evidence-summary.ps1'
+                Destination = Join-Path $Root '.github\actions\security-baseline\write-security-evidence-summary.ps1'
+            },
+            [pscustomobject] @{
+                Source = Join-Path $script:RepositoryRoot '.github\workflows\security.yml'
+                Destination = Join-Path $Root '.github\workflows\security.yml'
+            },
+            [pscustomobject] @{
+                Source = Join-Path $PSScriptRoot 'check-repository-security.ps1'
+                Destination = Join-Path $Root 'eng\check-repository-security.ps1'
+            }
+        )
+        foreach ($sharedFile in $sharedFiles) {
+            $content = [System.IO.File]::ReadAllLines(
+                $sharedFile.Source)
+            Write-GmaTemplateFile $sharedFile.Destination $content
+        }
 
-    Write-GmaTemplateFile (Join-Path $Root '.gma\security-exceptions.json') @(
-        '{',
-        '  "schemaVersion": 1,',
-        '  "exceptions": []',
-        '}'
-    )
+        Write-GmaTemplateFile `
+            (Join-Path $Root '.gma\security-exceptions.json') `
+            @(
+                '{',
+                '  "schemaVersion": 1,',
+                '  "exceptions": []',
+                '}'
+            )
+    }
 
     Write-GmaTemplateFile (Join-Path $Root '.github\workflows\codeql.yml') @(
         'name: CodeQL',
@@ -814,19 +841,21 @@ function Write-GmaGeneratedSecurityBaseline {
         '          category: /language:csharp'
     )
 
-    Write-GmaTemplateFile (Join-Path $Root 'SECURITY.md') @(
-        '# Security Policy',
-        '',
-        '## Supported Versions',
-        '',
-        'This generated application has no supported production release until its owner publishes a version and support policy. Security fixes belong on the maintained default branch and in the next supported release.',
-        '',
-        '## Report a Vulnerability',
-        '',
-        'Enable GitHub private vulnerability reporting before publishing this repository. Use the repository Security tab to report an undisclosed vulnerability; do not open a public issue or include credentials, personal data, or third-party confidential data.',
-        '',
-        'Replace this generated policy with repository-owned response targets, disclosure coordination, supported versions, and support boundaries before the first production release.'
-    )
+    if (-not $usePinnedBaseline) {
+        Write-GmaTemplateFile (Join-Path $Root 'SECURITY.md') @(
+            '# Security Policy',
+            '',
+            '## Supported Versions',
+            '',
+            'This generated application has no supported production release until its owner publishes a version and support policy. Security fixes belong on the maintained default branch and in the next supported release.',
+            '',
+            '## Report a Vulnerability',
+            '',
+            'Enable GitHub private vulnerability reporting before publishing this repository. Use the repository Security tab to report an undisclosed vulnerability; do not open a public issue or include credentials, personal data, or third-party confidential data.',
+            '',
+            'Replace this generated policy with repository-owned response targets, disclosure coordination, supported versions, and support boundaries before the first production release.'
+        )
+    }
 }
 
 function Write-GmaGeneratedDeveloperTools {
@@ -837,7 +866,9 @@ function Write-GmaGeneratedDeveloperTools {
         [Parameter(Mandatory = $true)]
         [string] $ApplicationName,
 
-        [object[]] $ModuleSpecs = @()
+        [object[]] $ModuleSpecs = @(),
+
+        [switch] $IncludeRepositoryRelease
     )
 
     $moduleSpecArray = @($ModuleSpecs)
@@ -954,7 +985,16 @@ function Write-GmaGeneratedDeveloperTools {
         '& $implementation @PSBoundParameters -RepositoryRoot (Get-GmaRepositoryRoot)'
     )
 
-    Write-GmaTemplateFile (Join-Path $Root 'eng\sync-solution.ps1') @(
+    $repositorySolutionItemLines = @()
+    if ($IncludeRepositoryRelease) {
+        $repositorySolutionItemLines = @(
+            '        ''.gma/release-evidence.json'',',
+            '        ''.gma/repository-security.json'','
+            '        ''SUPPORT.md'','
+        )
+    }
+
+    $syncSolutionLines = @(
         'param([switch] $Check)',
         '',
         '. (Join-Path $PSScriptRoot ''common.ps1'')',
@@ -967,7 +1007,8 @@ function Write-GmaGeneratedDeveloperTools {
         '    SolutionItems = @(',
         '        ''.config/dotnet-tools.json'',',
         '        ''.github/dependabot.yml'',',
-        '        ''.gma/security-exceptions.json'',',
+        '        ''.gma/security-exceptions.json'','
+    ) + $repositorySolutionItemLines + @(
         '        ''.gitignore'',',
         '        ''Directory.Build.props'',',
         '        ''Directory.Packages.props'',',
@@ -975,12 +1016,15 @@ function Write-GmaGeneratedDeveloperTools {
         '        ''Gma.SourceRoots.props.example'',',
         '        ''nuget.config'',',
         '        ''README.md'',',
-        '        ''SECURITY.md''',
+        '        ''SECURITY.md'''
         '    )',
         '}',
         'if ($Check) { $arguments.Check = $true }',
         '& $implementation @arguments'
     )
+    Write-GmaTemplateFile `
+        (Join-Path $Root 'eng\sync-solution.ps1') `
+        $syncSolutionLines
 
     $migrationSpecs = @($ModuleSpecs | Where-Object { -not [string]::IsNullOrWhiteSpace($_.MigrationProjectPrefix) })
     $migrationMapLines = @()
@@ -1045,10 +1089,31 @@ function Write-GmaGeneratedDeveloperTools {
 }
 
 $resolvedOutputPath = Resolve-GmaTemplatePath $OutputPath
+$includeRepositoryRelease =
+    -not [string]::IsNullOrWhiteSpace($RepositorySlug)
 if ((Test-Path -LiteralPath $resolvedOutputPath) -and
     @(Get-ChildItem -LiteralPath $resolvedOutputPath -Force).Count -gt 0 -and
     -not $Force) {
     throw "Output path '$resolvedOutputPath' already exists and is not empty. Choose a new path or rerun with -Force."
+}
+if (-not $includeRepositoryRelease -and
+    (Test-Path -LiteralPath $resolvedOutputPath)) {
+    $releaseBaselinePaths = @(
+        '.github\workflows\release-evidence.yml',
+        '.gma\release-evidence.json',
+        'eng\check-repository-release.ps1',
+        'SUPPORT.md'
+    )
+    $existingReleaseBaselinePaths = @(
+        $releaseBaselinePaths |
+            Where-Object {
+                Test-Path -LiteralPath (
+                    Join-Path $resolvedOutputPath $_)
+            }
+    )
+    if ($existingReleaseBaselinePaths.Count -gt 0) {
+        throw "Refusing identity-free generation over release-enabled output '$resolvedOutputPath'. Keep the repository identity or use a new empty output path."
+    }
 }
 
 New-Item -ItemType Directory -Force -Path $resolvedOutputPath | Out-Null
@@ -1246,17 +1311,49 @@ $sourceRootExampleLines += @(
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'Gma.SourceRoots.props.example') $sourceRootExampleLines
 
-Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
-    '<Solution>',
-    '  <Folder Name="/.github/actions/security-baseline/">',
-    '    <File Path=".github/actions/security-baseline/action.yml" />',
-    '    <File Path=".github/actions/security-baseline/convert-security-exceptions.ps1" />',
-    '    <File Path=".github/actions/security-baseline/write-security-evidence-summary.ps1" />',
-    '  </Folder>',
+$securityActionSolutionLines = if ($includeRepositoryRelease) {
+    @()
+}
+else {
+    @(
+        '  <Folder Name="/.github/actions/security-baseline/">',
+        '    <File Path=".github/actions/security-baseline/action.yml" />',
+        '    <File Path=".github/actions/security-baseline/convert-security-exceptions.ps1" />',
+        '    <File Path=".github/actions/security-baseline/write-security-evidence-summary.ps1" />',
+        '  </Folder>'
+    )
+}
+$releaseEngSolutionLines = if ($includeRepositoryRelease) {
+    @('    <File Path="eng/check-repository-release.ps1" />')
+}
+else {
+    @()
+}
+$releaseWorkflowSolutionLines = if ($includeRepositoryRelease) {
+    @('    <File Path=".github/workflows/release-evidence.yml" />')
+}
+else {
+    @()
+}
+$releaseItemSolutionLines = if ($includeRepositoryRelease) {
+    @(
+        '    <File Path=".gma/release-evidence.json" />',
+        '    <File Path=".gma/repository-security.json" />',
+        '    <File Path="SUPPORT.md" />'
+    )
+}
+else {
+    @()
+}
+
+$initialSolutionLines = @(
+    '<Solution>'
+) + $securityActionSolutionLines + @(
     '  <Folder Name="/eng/">',
     '    <File Path="eng/add-migration.ps1" />',
     '    <File Path="eng/check-migrations.ps1" />',
-    '    <File Path="eng/check-repository-security.ps1" />',
+    '    <File Path="eng/check-repository-security.ps1" />'
+) + $releaseEngSolutionLines + @(
     '    <File Path="eng/check-source-packages.ps1" />',
     '    <File Path="eng/check-submodule-heads.ps1" />',
     '    <File Path="eng/common.ps1" />',
@@ -1270,8 +1367,8 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '    <File Path="eng/sync-solution.ps1" />',
     '  </Folder>',
     '  <Folder Name="/.github/workflows/">',
-    '    <File Path=".github/workflows/codeql.yml" />',
-    '    <File Path=".github/workflows/release-source-set.yml" />',
+    '    <File Path=".github/workflows/codeql.yml" />'
+) + $releaseWorkflowSolutionLines + @(
     '    <File Path=".github/workflows/security.yml" />',
     '    <File Path=".github/workflows/validate.yml" />',
     '  </Folder>',
@@ -1281,7 +1378,8 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '  <Folder Name="/Solution Items/">',
     '    <File Path=".gitignore" />',
     '    <File Path=".github/dependabot.yml" />',
-    '    <File Path=".gma/security-exceptions.json" />',
+    '    <File Path=".gma/security-exceptions.json" />'
+) + $releaseItemSolutionLines + @(
     '    <File Path=".config/dotnet-tools.json" />',
     '    <File Path="Directory.Build.props" />',
     '    <File Path="Directory.Packages.props" />',
@@ -1307,6 +1405,9 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '  </Folder>',
     '</Solution>'
 )
+Write-GmaTemplateFile `
+    (Join-Path $resolvedOutputPath "$Name.slnx") `
+    $initialSolutionLines
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'README.md') @(
     "# $Name",
@@ -1408,12 +1509,58 @@ $gmaSourceDocsLines += @(
     'Set `GMA_CI_TOKEN` in GitHub Actions only when private GMA submodules need cross-repository read access. Public GMA repositories can use the default GitHub token.'
 )
 
+if ($includeRepositoryRelease) {
+    $gmaSourceDocsLines += @(
+        '',
+        '## Release Evidence',
+        '',
+        "This shell is bound to ``$RepositorySlug``. The security baseline is pinned to ``$SecurityBaselineCommit`` and source-release mechanics are pinned to ``$ReleaseEvidenceCommit``.",
+        '',
+        'A workflow-dispatch run creates retained candidate evidence without publishing a release. A `v*` tag publishes immutable source, source-set, checksum, SBOM, scan-summary, and attestation evidence only after every release gate passes.',
+        '',
+        'Review `SECURITY.md`, `SUPPORT.md`, and `.gma/release-evidence.json` before the first release. Repository settings, private vulnerability reporting, release notes, and product support claims remain repository-owned.'
+    )
+}
+else {
+    $gmaSourceDocsLines += @(
+        '',
+        '## Release Setup',
+        '',
+        'No release workflow is generated without a real GitHub repository identity. After the repository and its `origin` exist, apply the Skeleton-owned repository security and release baseline scaffolders with the exact repository slug and immutable baseline commits.'
+    )
+}
+
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'docs\gma-source.md') $gmaSourceDocsLines
 
-Write-GmaGeneratedBootstrap -Root $resolvedOutputPath -ModuleSpecs $selectedModuleSpecArray
-Write-GmaGeneratedWorkflow -Root $resolvedOutputPath -IncludeDocker:$DockerValidation
-Write-GmaGeneratedSecurityBaseline -Root $resolvedOutputPath -ApplicationName $Name
-Write-GmaGeneratedDeveloperTools -Root $resolvedOutputPath -ApplicationName $Name -ModuleSpecs $selectedModuleSpecArray
+Write-GmaGeneratedBootstrap `
+    -Root $resolvedOutputPath `
+    -ModuleSpecs $selectedModuleSpecArray `
+    -IncludeRepositoryRelease:$includeRepositoryRelease
+Write-GmaGeneratedWorkflow `
+    -Root $resolvedOutputPath `
+    -IncludeDocker:$DockerValidation `
+    -IncludeRepositoryRelease:$includeRepositoryRelease
+Write-GmaGeneratedSecurityBaseline `
+    -Root $resolvedOutputPath `
+    -ApplicationName $Name `
+    -RepositorySlug $RepositorySlug `
+    -SecurityBaselineCommit $SecurityBaselineCommit
+Write-GmaGeneratedDeveloperTools `
+    -Root $resolvedOutputPath `
+    -ApplicationName $Name `
+    -ModuleSpecs $selectedModuleSpecArray `
+    -IncludeRepositoryRelease:$includeRepositoryRelease
+if ($includeRepositoryRelease) {
+    & (Join-Path $PSScriptRoot `
+        'apply-repository-release-baseline.ps1') `
+        -OutputPath $resolvedOutputPath `
+        -RepositorySlug $RepositorySlug `
+        -RepositoryDisplayName $Name `
+        -ArtifactName (ConvertTo-GmaKebabCase $Name) `
+        -ReleaseKind composition `
+        -ReleaseEvidenceCommit $ReleaseEvidenceCommit `
+        -IncludeGitSubmodules
+}
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'src\Hosts\README.md') @(
     '# Hosts',
@@ -2538,7 +2685,31 @@ if (-not (Test-Path -LiteralPath $solutionTool -PathType Leaf)) {
     throw 'The mounted GMA framework does not provide eng/sync-solution.ps1.'
 }
 
-& $solutionTool -RepositoryRoot $resolvedOutputPath -Solution "$Name.slnx"
+$generatedSolutionItems = @(
+    '.config/dotnet-tools.json',
+    '.github/dependabot.yml',
+    '.gma/security-exceptions.json',
+    '.gitignore',
+    'Directory.Build.props',
+    'Directory.Packages.props',
+    'global.json',
+    'Gma.SourceRoots.props.example',
+    'nuget.config',
+    'README.md',
+    'SECURITY.md'
+)
+if ($includeRepositoryRelease) {
+    $generatedSolutionItems += @(
+        '.gma/release-evidence.json',
+        '.gma/repository-security.json',
+        'SUPPORT.md'
+    )
+}
+
+& $solutionTool `
+    -RepositoryRoot $resolvedOutputPath `
+    -Solution "$Name.slnx" `
+    -SolutionItems $generatedSolutionItems
 
 Write-Host "Created GMA app shell: $resolvedOutputPath"
 Write-Host 'Next: add or mount GMA source packages, initialize them, bootstrap source roots, sync the solution, and run eng/gma-validate.ps1.'

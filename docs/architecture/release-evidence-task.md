@@ -102,6 +102,22 @@ deterministic release manifest.
   `attestations: write`; the final tag-publication job alone receives
   `contents: write`.
 
+## Reusable Baseline
+
+The reusable implementation is anchored at
+`4a1a6a857eff7524bc25821a89fe8b0260cb95a0`.
+
+- `.github/actions/source-release-evidence` creates and validates source
+  archives, bounded manifests, public evidence, and checksums.
+- `eng/check-repository-release.ps1` tests determinism, exact-tag identity,
+  clean-tree enforcement, source-set integrity, scan/commit binding, and
+  payload rejection.
+- `eng/apply-repository-release-baseline.ps1` creates repository-owned
+  manifests, support policy, immutable workflow pins, and a reusable guard.
+- `eng/new-gma-app.ps1 -RepositorySlug <owner/repository>` composes the pinned
+  security and release baselines for an identified generated repository.
+  Identity-free shells intentionally receive no release workflow.
+
 ## Delivery Slices
 
 ### Slice 1 - Reusable Source Evidence
