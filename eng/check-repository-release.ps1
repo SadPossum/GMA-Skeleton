@@ -398,7 +398,7 @@ if ($RequireRolloutTooling) {
                 'jobs:',
                 '  scan:',
                 '    steps:',
-                '      - name: Run repository security baseline',
+                '      - name: Run pinned reusable security controls',
                 "        uses: SadPossum/GMA-Skeleton/.github/actions/security-baseline@$securityBaselineCommit"
             ) -join "`n",
             [System.Text.UTF8Encoding]::new($false))

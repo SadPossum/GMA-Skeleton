@@ -368,17 +368,25 @@ $releaseValidationToken =
 if ($securityWorkflow.IndexOf(
         $releaseValidationToken,
         [System.StringComparison]::Ordinal) -lt 0) {
-    $securityBaselineAnchor =
-        '      - name: Run repository security baseline'
-    $anchorIndex = $securityWorkflow.IndexOf(
-        $securityBaselineAnchor,
+    $securityBaselineUsePattern =
+        '(?m)^        uses: (?:' +
+        'SadPossum/GMA-Skeleton/\.github/actions/security-baseline@[0-9a-f]{40}' +
+        '|\./\.github/actions/security-baseline)\s*$'
+    $securityBaselineUses = [regex]::Matches(
+        $securityWorkflow,
+        $securityBaselineUsePattern,
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)
+    if ($securityBaselineUses.Count -ne 1) {
+        throw 'Security workflow must invoke one reusable security baseline action.'
+    }
+
+    $stepAnchor = '      - name: '
+    $anchorIndex = $securityWorkflow.LastIndexOf(
+        $stepAnchor,
+        $securityBaselineUses[0].Index,
         [System.StringComparison]::Ordinal)
-    if ($anchorIndex -lt 0 -or
-        $securityWorkflow.IndexOf(
-            $securityBaselineAnchor,
-            $anchorIndex + $securityBaselineAnchor.Length,
-            [System.StringComparison]::Ordinal) -ge 0) {
-        throw 'Security workflow does not contain one release-validation insertion point.'
+    if ($anchorIndex -lt 0) {
+        throw 'Security baseline action is not inside a named workflow step.'
     }
 
     $lineEnding = if ($securityWorkflow.Contains("`r`n")) {
@@ -391,12 +399,11 @@ if ($securityWorkflow.IndexOf(
         '      - name: Validate repository release policy',
         '        shell: pwsh',
         '        run: ./eng/check-repository-release.ps1',
-        '',
-        $securityBaselineAnchor
+        ''
     )
-    $securityWorkflow = $securityWorkflow.Replace(
-        $securityBaselineAnchor,
-        ($releaseValidationLines -join $lineEnding))
+    $securityWorkflow = $securityWorkflow.Insert(
+        $anchorIndex,
+        ($releaseValidationLines -join $lineEnding) + $lineEnding)
     [System.IO.File]::WriteAllText(
         $securityWorkflowPath,
         $securityWorkflow,
