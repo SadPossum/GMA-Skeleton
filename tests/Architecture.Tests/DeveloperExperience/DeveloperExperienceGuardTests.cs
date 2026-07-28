@@ -5056,7 +5056,8 @@ public sealed partial class DeveloperExperienceGuardTests
                 [
                     @"..\Gma.Framework.AccessControl\Gma.Framework.AccessControl.csproj",
                     @"..\Gma.Framework.Permissions\Gma.Framework.Permissions.csproj",
-                    @"..\Gma.Framework.Security\Gma.Framework.Security.csproj"
+                    @"..\Gma.Framework.Security\Gma.Framework.Security.csproj",
+                    @"..\..\Observability\Gma.Framework.Observability\Gma.Framework.Observability.csproj"
                 ]),
             new(
                 "Gma.Framework.Api",
@@ -5464,7 +5465,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 ]),
             new(
                 "Gma.Framework.Observability",
-                [],
+                ["Microsoft.Extensions.DependencyInjection.Abstractions"],
                 [],
                 [@"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj"]),
             new("Gma.Framework.Pagination", [], [], []),
@@ -5497,7 +5498,8 @@ public sealed partial class DeveloperExperienceGuardTests
                 [
                     @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
                     @"..\Gma.Framework.Observability\Gma.Framework.Observability.csproj",
-                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
+                    @"..\Gma.Framework.Runtime.Infrastructure\Gma.Framework.Runtime.Infrastructure.csproj"
                 ]),
             new(
                 "Gma.Framework.Persistence.EntityFrameworkCore",
@@ -6150,6 +6152,7 @@ public sealed partial class DeveloperExperienceGuardTests
                 ["Microsoft.AspNetCore.App"],
                 [
                     @"..\Framework\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Framework\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj",
                     @"..\Framework\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
                 ])
         ];

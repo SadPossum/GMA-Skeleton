@@ -17,6 +17,7 @@ using OpenTelemetry.Trace;
 using Prometheus;
 using ServiceDefaults.Observability;
 using Gma.Framework.Naming;
+using Gma.Framework.Observability.Infrastructure;
 using Gma.Framework.Runtime;
 
 public static class Extensions
@@ -31,6 +32,7 @@ public static class Extensions
         }
 
         builder.Services.AddSingleton<ServiceDefaultsRegistrationMarker>();
+        builder.AddSecuritySignalObservability();
         IConfigurationSection observabilitySection = builder.Configuration.GetSection(ObservabilityOptions.SectionName);
         ObservabilityOptions observability = observabilitySection.Get<ObservabilityOptions>() ?? new();
         ApplicationIdentityOptions applicationIdentity = builder.Configuration

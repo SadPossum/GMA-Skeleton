@@ -65,6 +65,8 @@ public sealed class SourceFirstGeneratorGuardTests
             "[switch] $ServiceDefaults",
             "[switch] $DockerValidation",
             "Aspire.AppHost.Sdk/13.4.2",
+            "Gma.Framework.Observability.Infrastructure.csproj",
+            "builder.AddSecuritySignalObservability();",
         ];
 
         Assert.DoesNotContain(requiredTokens, token => !generator.Contains(token, StringComparison.Ordinal));

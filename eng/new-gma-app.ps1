@@ -1409,6 +1409,7 @@ if ($ServiceDefaults) {
         '<Project Sdk="Microsoft.NET.Sdk">',
         '  <ItemGroup>',
         '    <FrameworkReference Include="Microsoft.AspNetCore.App" />',
+        '    <ProjectReference Include="$(GmaFrameworkRoot)Observability\Gma.Framework.Observability.Infrastructure\Gma.Framework.Observability.Infrastructure.csproj" />',
         '  </ItemGroup>',
         '</Project>'
     )
@@ -1421,12 +1422,14 @@ if ($ServiceDefaults) {
         'using Microsoft.AspNetCore.Routing;',
         'using Microsoft.Extensions.DependencyInjection;',
         'using Microsoft.Extensions.Hosting;',
+        'using Gma.Framework.Observability.Infrastructure;',
         '',
         'public static class Extensions',
         '{',
         '    public static IHostApplicationBuilder AddServiceDefaults(this IHostApplicationBuilder builder)',
         '    {',
         '        ArgumentNullException.ThrowIfNull(builder);',
+        '        builder.AddSecuritySignalObservability();',
         '        builder.Services.AddHealthChecks();',
         '        return builder;',
         '    }',
