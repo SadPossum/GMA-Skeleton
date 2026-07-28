@@ -32,6 +32,10 @@ jobs:
           token: ${{ secrets.GMA_CI_TOKEN || github.token }}
           persist-credentials: false
 
+      - name: Validate repository release policy
+        shell: pwsh
+        run: ./eng/check-repository-release.ps1
+
       - name: Run repository security baseline
         uses: ./.github/actions/security-baseline
         with:

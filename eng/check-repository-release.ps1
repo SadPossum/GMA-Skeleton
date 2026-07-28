@@ -389,6 +389,19 @@ if ($RequireRolloutTooling) {
             (Join-Path $rolloutRoot 'eng\check-repository-security.ps1'),
             "param([string] `$RepositoryRoot)`n",
             [System.Text.UTF8Encoding]::new($false))
+        [System.IO.Directory]::CreateDirectory(
+            (Join-Path $rolloutRoot '.github\workflows')) | Out-Null
+        [System.IO.File]::WriteAllText(
+            (Join-Path $rolloutRoot '.github\workflows\security.yml'),
+            @(
+                'name: Security Baseline',
+                'jobs:',
+                '  scan:',
+                '    steps:',
+                '      - name: Run repository security baseline',
+                "        uses: SadPossum/GMA-Skeleton/.github/actions/security-baseline@$securityBaselineCommit"
+            ) -join "`n",
+            [System.Text.UTF8Encoding]::new($false))
 
         & (Join-Path $root 'eng\apply-repository-release-baseline.ps1') `
             -OutputPath $rolloutRoot `

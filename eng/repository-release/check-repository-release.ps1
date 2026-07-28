@@ -97,6 +97,7 @@ function Assert-RepositoryRelativePath {
 }
 
 $requiredFiles = @(
+    '.github\workflows\security.yml',
     '.github\workflows\release-evidence.yml',
     '.gma\release-evidence.json',
     '.gma\security-exceptions.json',
@@ -214,6 +215,13 @@ if (-not $remoteMatch.Success -or
 
 $workflow = [System.IO.File]::ReadAllText(
     (Join-Path $root '.github\workflows\release-evidence.yml'))
+$securityWorkflow = [System.IO.File]::ReadAllText(
+    (Join-Path $root '.github\workflows\security.yml'))
+if ($securityWorkflow.IndexOf(
+        'run: ./eng/check-repository-release.ps1',
+        [System.StringComparison]::Ordinal) -lt 0) {
+    throw 'Security workflow does not validate repository release policy.'
+}
 $releaseActionReference = if ($LocalImplementation) {
     'uses: ./.github/actions/source-release-evidence'
 }

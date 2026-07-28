@@ -1,6 +1,7 @@
 # Repository Supply-Chain Baseline Task
 
-**Status:** Slices 1 and 2 published; Slice 3 source evidence in progress
+**Status:** Slices 1 and 2 published; Slice 3 GMA source evidence published and
+BunkFy product evidence in progress
 
 ## Goal
 
@@ -118,6 +119,10 @@ checker and is covered by the final cross-platform validation above.
 
 The detailed responsibility boundary, evidence contract, and delivery sequence
 are defined in the [Repository Release Evidence Task](release-evidence-task.md).
+
+The reusable release mechanics and repository-owned source evidence are
+published across Framework, Extensions, and all eight reusable modules. BunkFy
+component and composed-product rollout remains in progress.
 
 1. Define the supported release channels and end-of-life policy in each release-owning repository.
 2. Produce release checksums, SBOM, and GitHub artifact attestations from exact clean commits.

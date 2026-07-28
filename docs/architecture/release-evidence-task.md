@@ -1,7 +1,7 @@
 # Repository Release Evidence Task
 
-**Status:** Reusable source-evidence slice implemented; repository rollout in
-progress
+**Status:** Reusable source evidence and the GMA source-repository rollout are
+implemented; product rollout is in progress
 
 ## Goal
 
@@ -117,6 +117,32 @@ The reusable implementation is anchored at
 - `eng/new-gma-app.ps1 -RepositorySlug <owner/repository>` composes the pinned
   security and release baselines for an identified generated repository.
   Identity-free shells intentionally receive no release workflow.
+
+## GMA Source-Repository Rollout
+
+The reusable baseline is now applied to each independently versioned GMA source
+repository. Every repository has its own release manifest, support policy,
+release workflow, repository guard, security-workflow policy check, and
+synchronized solution discoverability.
+
+| Repository | Published `dev` commit |
+| --- | --- |
+| Framework | `ead06676f3a827936c4bfb69b97a5a0ce4465587` |
+| Extensions | `a1ece7af5c49660c1539e0f740a1069e61964496` |
+| Access Control | `60dddc5c5bcba48a3a1c4531d920ba61dfd2f5d0` |
+| Administration | `d192913dc0b00702375f0821ca8a8914c09cc409` |
+| Auth | `594332e4bd5a2657978eac4ff657eafdbfd61a4b` |
+| Files | `1a8070d8e55990c3b32f655e299b8b1cbbed0bdb` |
+| Notifications | `b58b530db1f23899bb9dfa5cd0a02021751708ac` |
+| Organizations | `05f52e1bdb6f40ff6f8ed51fea3964073ab496a8` |
+| Task Runtime | `c451b8089de55979b0f04eb1c114cf993fa84fe3` |
+| Tenancy | `ae0f1a3318f2cfbeff8cd8c6f813e968719e5a88` |
+
+Focused local evidence covered all ten release-policy guards, all ten
+solution-synchronization checks, the Skeleton source-package guard, and the 10
+Framework composition-tooling tests. The broader contribution, conduct,
+maintainer/review, and branding policy decision remains separate from this
+release-evidence rollout.
 
 ## Delivery Slices
 

@@ -52,6 +52,7 @@ $securityManifestPath = Join-Path `
     $resolvedOutputPath `
     '.gma\repository-security.json'
 foreach ($relativePath in @(
+    '.github\workflows\security.yml',
     '.gma\repository-security.json',
     '.gma\security-exceptions.json',
     'eng\check-repository-security.ps1'
@@ -357,5 +358,49 @@ Write-BaselineFile `
 Write-BaselineFile `
     -RelativePath 'eng\check-repository-release.ps1' `
     -Lines ([System.IO.File]::ReadAllLines($templateCheckPath))
+
+$securityWorkflowPath = Join-Path `
+    $resolvedOutputPath `
+    '.github\workflows\security.yml'
+$securityWorkflow = [System.IO.File]::ReadAllText($securityWorkflowPath)
+$releaseValidationToken =
+    'run: ./eng/check-repository-release.ps1'
+if ($securityWorkflow.IndexOf(
+        $releaseValidationToken,
+        [System.StringComparison]::Ordinal) -lt 0) {
+    $securityBaselineAnchor =
+        '      - name: Run repository security baseline'
+    $anchorIndex = $securityWorkflow.IndexOf(
+        $securityBaselineAnchor,
+        [System.StringComparison]::Ordinal)
+    if ($anchorIndex -lt 0 -or
+        $securityWorkflow.IndexOf(
+            $securityBaselineAnchor,
+            $anchorIndex + $securityBaselineAnchor.Length,
+            [System.StringComparison]::Ordinal) -ge 0) {
+        throw 'Security workflow does not contain one release-validation insertion point.'
+    }
+
+    $lineEnding = if ($securityWorkflow.Contains("`r`n")) {
+        "`r`n"
+    }
+    else {
+        "`n"
+    }
+    $releaseValidationLines = @(
+        '      - name: Validate repository release policy',
+        '        shell: pwsh',
+        '        run: ./eng/check-repository-release.ps1',
+        '',
+        $securityBaselineAnchor
+    )
+    $securityWorkflow = $securityWorkflow.Replace(
+        $securityBaselineAnchor,
+        ($releaseValidationLines -join $lineEnding))
+    [System.IO.File]::WriteAllText(
+        $securityWorkflowPath,
+        $securityWorkflow,
+        [System.Text.UTF8Encoding]::new($false))
+}
 
 Write-Host "Applied the repository release baseline to $RepositorySlug."
