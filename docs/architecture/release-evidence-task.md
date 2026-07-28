@@ -117,6 +117,9 @@ The reusable implementation is anchored at
 - `eng/new-gma-app.ps1 -RepositorySlug <owner/repository>` composes the pinned
   security and release baselines for an identified generated repository.
   Identity-free shells intentionally receive no release workflow.
+- Framework source-set export supports explicit recursive traversal for product
+  compositions whose components mount independently versioned source
+  repositories.
 
 ## GMA Source-Repository Rollout
 
@@ -127,7 +130,7 @@ synchronized solution discoverability.
 
 | Repository | Published `dev` commit |
 | --- | --- |
-| Framework | `ead06676f3a827936c4bfb69b97a5a0ce4465587` |
+| Framework | `f49213593f6f5df27e2223f4120c31cbbb5c3d01` |
 | Extensions | `a1ece7af5c49660c1539e0f740a1069e61964496` |
 | Access Control | `60dddc5c5bcba48a3a1c4531d920ba61dfd2f5d0` |
 | Administration | `d192913dc0b00702375f0821ca8a8914c09cc409` |
