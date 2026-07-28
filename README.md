@@ -94,7 +94,7 @@ The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull r
 
 The `Docker Tests` workflow runs for relevant pull-request/main changes, on a weekly schedule, and by manual dispatch. It runs Docker-backed integration tests with `GMA_REQUIRE_DOCKER_TESTS=true`.
 
-The `Security Baseline` workflow scans the complete composed source set for vulnerable dependencies, committed secrets, unsafe configuration, and high-risk licences. It publishes SARIF plus a CycloneDX SBOM and fails on high or critical findings. The separate `CodeQL` workflow performs compiled C# analysis. Repository policy and private reporting are documented in [SECURITY.md](SECURITY.md).
+The `Security Baseline` workflow scans the complete composed source set for vulnerable dependencies, committed secrets, unsafe configuration, and high-risk licences. It publishes SARIF, a CycloneDX SBOM, and a payload-free aggregate summary containing only bounded scanner counts and CI provenance; it fails on high or critical findings. The separate `CodeQL` workflow performs compiled C# analysis. Repository policy and private reporting are documented in [SECURITY.md](SECURITY.md).
 
 ## Documentation
 

@@ -718,6 +718,10 @@ function Write-GmaGeneratedSecurityBaseline {
             Destination = Join-Path $Root '.github\actions\security-baseline\action.yml'
         },
         [pscustomobject] @{
+            Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\write-security-evidence-summary.ps1'
+            Destination = Join-Path $Root '.github\actions\security-baseline\write-security-evidence-summary.ps1'
+        },
+        [pscustomobject] @{
             Source = Join-Path $script:RepositoryRoot '.github\workflows\security.yml'
             Destination = Join-Path $Root '.github\workflows\security.yml'
         },

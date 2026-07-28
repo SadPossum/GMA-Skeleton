@@ -1,5 +1,5 @@
 name: GMA repository security baseline
-description: Scan an owned source tree and emit SARIF plus a CycloneDX SBOM.
+description: Scan an owned source tree and emit SARIF, a CycloneDX SBOM and a payload-free summary.
 
 inputs:
   scan-path:
@@ -40,9 +40,12 @@ runs:
         SCAN_SEVERITY: ${{ inputs.severity }}
         SKIP_DIRECTORIES: ${{ inputs.skip-directories }}
         SCAN_TIMEOUT: ${{ inputs.timeout }}
+        SUMMARY_SCRIPT: ${{ github.action_path }}/write-security-evidence-summary.ps1
       run: |
         set -euo pipefail
         mkdir -p "$OUTPUT_DIRECTORY"
+        raw_report="$(mktemp "${RUNNER_TEMP:-/tmp}/gma-security.XXXXXX.json")"
+        trap 'rm -f "$raw_report"' EXIT
 
         IFS=',' read -ra configured_skip_directories <<< "$SKIP_DIRECTORIES"
         skip_arguments=()
@@ -58,8 +61,8 @@ runs:
           --severity "$SCAN_SEVERITY" \
           --ignore-unfixed=false \
           --exit-code 1 \
-          --format sarif \
-          --output "$OUTPUT_DIRECTORY/trivy-results.sarif" \
+          --format json \
+          --output "$raw_report" \
           --timeout "$SCAN_TIMEOUT" \
           --skip-version-check \
           "${skip_arguments[@]}" \
@@ -67,14 +70,37 @@ runs:
         scan_exit_code=$?
         set -e
 
-        trivy fs \
-          --scanners vuln \
-          --list-all-pkgs \
-          --format cyclonedx \
-          --output "$OUTPUT_DIRECTORY/sbom.cdx.json" \
-          --timeout "$SCAN_TIMEOUT" \
-          --skip-version-check \
-          "${skip_arguments[@]}" \
-          "$SCAN_PATH"
+        evidence_exit_code=$scan_exit_code
+        if [[ -s "$raw_report" ]]; then
+          set +e
+          trivy convert \
+            --format sarif \
+            --output "$OUTPUT_DIRECTORY/trivy-results.sarif" \
+            "$raw_report"
+          sarif_exit_code=$?
 
-        exit "$scan_exit_code"
+          trivy fs \
+            --scanners vuln \
+            --list-all-pkgs \
+            --format cyclonedx \
+            --output "$OUTPUT_DIRECTORY/sbom.cdx.json" \
+            --timeout "$SCAN_TIMEOUT" \
+            --skip-version-check \
+            "${skip_arguments[@]}" \
+            "$SCAN_PATH"
+          sbom_exit_code=$?
+          set -e
+
+          if [[ "$sarif_exit_code" -ne 0 || "$sbom_exit_code" -ne 0 ]]; then
+            evidence_exit_code=2
+          fi
+        else
+          evidence_exit_code=2
+        fi
+
+        pwsh -NoLogo -NoProfile -File "$SUMMARY_SCRIPT" \
+          -InputPath "$raw_report" \
+          -OutputPath "$OUTPUT_DIRECTORY/security-summary.json" \
+          -ScanExitCode "$evidence_exit_code"
+
+        exit "$evidence_exit_code"

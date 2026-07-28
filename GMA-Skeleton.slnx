@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/.github/actions/security-baseline/">
     <File Path=".github/actions/security-baseline/action.yml" />
+    <File Path=".github/actions/security-baseline/write-security-evidence-summary.ps1" />
   </Folder>
   <Folder Name="/.github/workflows/">
     <File Path=".github/workflows/codeql.yml" />

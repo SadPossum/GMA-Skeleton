@@ -15,7 +15,8 @@ GMA-Skeleton owns:
 - reusable GitHub Actions mechanics with immutable action pins;
 - generated-application security workflow and dependency-update defaults;
 - source, dependency, secret, licence, and infrastructure scanning defaults;
-- CycloneDX evidence generation and generated-output guards;
+- CycloneDX evidence generation, payload-free aggregate scan summaries, and
+  generated-output guards;
 - documentation of the deployment and repository decisions a product must make.
 
 Each public repository owns:
@@ -48,7 +49,10 @@ BunkFy owns its product support and disclosure language, aggregate product scan,
    - scans vulnerabilities, committed secrets, configuration, and licences;
    - fails on high or critical findings;
    - emits SARIF for code-scanning ingestion;
-   - emits a CycloneDX JSON SBOM as retained workflow evidence.
+   - emits a CycloneDX JSON SBOM as retained workflow evidence;
+   - retains a closed aggregate summary with fixed scanner/severity counts,
+     source commit, CI run correlation, and status, but no finding path, rule,
+     title, match, or snippet.
 3. Add aggregate CodeQL analysis for Skeleton and BunkFy.
 4. Add BunkFy dependency-update configuration without changing dependency ownership inside its subrepositories.
 5. Verify action pins and required generated security files mechanically.
@@ -74,6 +78,8 @@ BunkFy owns its product support and disclosure language, aggregate product scan,
 - High and critical findings fail the workflow by default. An exception must be explicit, narrow, reviewed, and time bounded.
 - Unfixed findings are not silently ignored.
 - Evidence upload runs even when the blocking scan fails.
+- Aggregate summaries expose only fixed scanner/severity counts and bounded CI
+  provenance; detailed findings remain in access-controlled scanner evidence.
 - Scanner output and SBOMs are workflow artifacts; generated evidence is not committed to source.
 - Scans exclude generated build/cache folders, not owned source or deployment configuration.
 - Secrets required to checkout private dependencies are not passed to scanner actions.
@@ -84,7 +90,9 @@ BunkFy owns its product support and disclosure language, aggregate product scan,
 Slice 1 is complete when:
 
 - Skeleton and BunkFy private vulnerability reporting is enabled and linked from repository-local `SECURITY.md` files;
-- local guards prove required workflow files, immutable action pins, scanner set, severity gate, SARIF, and CycloneDX output;
+- local guards prove required workflow files, immutable action pins, scanner
+  set, severity gate, SARIF, CycloneDX output, the closed summary shape, and
+  non-disclosure of synthetic finding content;
 - generated applications include the security baseline and pass the generated-selection matrix;
 - Skeleton and BunkFy security workflows pass on their published commits;
 - existing validation and Docker workflows remain green;
