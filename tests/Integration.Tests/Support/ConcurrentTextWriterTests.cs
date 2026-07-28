@@ -2,6 +2,7 @@ namespace Integration.Tests.Support;
 
 using Xunit;
 
+[Trait("Category", "Integration")]
 public sealed class ConcurrentTextWriterTests
 {
     [Fact]
