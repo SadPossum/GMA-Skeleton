@@ -92,6 +92,7 @@ internal sealed class GmaSourceLayout
             ["Catalog"] = "GmaModuleCatalogRoot",
             ["Files"] = "GmaModuleFilesRoot",
             ["Notifications"] = "GmaModuleNotificationsRoot",
+            ["Organizations"] = "GmaModuleOrganizationsRoot",
             ["Ordering"] = "GmaModuleOrderingRoot",
             ["TaskRuntime"] = "GmaModuleTaskRuntimeRoot",
             ["TaskSamples"] = "GmaModuleTaskSamplesRoot",

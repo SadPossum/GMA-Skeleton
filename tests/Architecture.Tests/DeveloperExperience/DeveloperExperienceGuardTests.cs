@@ -2110,17 +2110,19 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string repositoryRoot = FindRepositoryRoot();
         GmaSourceLayout sourceLayout = GmaSourceLayout.FromRepositoryRoot(repositoryRoot);
+        string[] packageLocalFolders = ["/.github/", "/.gma/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"];
         Dictionary<string, (string SolutionPath, string[] AllowedFolders)> packages = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Gma.Framework.slnx"] = (Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Extensions.slnx"] = (Path.Combine(sourceLayout.ExtensionsRepositoryRoot, "Gma.Extensions.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Modules.AccessControl.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Modules.Administration.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Modules.Auth.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Modules.Files.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Modules.Notifications.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Modules.TaskRuntime.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"]),
-            ["Gma.Modules.Tenancy.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx"), ["/.github/", "/Solution Items/", "/docs/", "/eng/", "/src/", "/tests/"])
+            ["Gma.Framework.slnx"] = (Path.Combine(sourceLayout.FrameworkRepositoryRoot, "Gma.Framework.slnx"), packageLocalFolders),
+            ["Gma.Extensions.slnx"] = (Path.Combine(sourceLayout.ExtensionsRepositoryRoot, "Gma.Extensions.slnx"), packageLocalFolders),
+            ["Gma.Modules.AccessControl.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("AccessControl"), "Gma.Modules.AccessControl.slnx"), packageLocalFolders),
+            ["Gma.Modules.Administration.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Administration"), "Gma.Modules.Administration.slnx"), packageLocalFolders),
+            ["Gma.Modules.Auth.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"), packageLocalFolders),
+            ["Gma.Modules.Files.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"), packageLocalFolders),
+            ["Gma.Modules.Notifications.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"), packageLocalFolders),
+            ["Gma.Modules.Organizations.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Organizations"), "Gma.Modules.Organizations.slnx"), packageLocalFolders),
+            ["Gma.Modules.TaskRuntime.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"), packageLocalFolders),
+            ["Gma.Modules.Tenancy.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx"), packageLocalFolders)
         };
         string[] allowedPackageRootFiles =
         [
@@ -2133,7 +2135,8 @@ public sealed partial class DeveloperExperienceGuardTests
             "Gma.SourceRoots.props.example",
             "LICENSE",
             "nuget.config",
-            "README.md"
+            "README.md",
+            "SECURITY.md"
         ];
 
         string[] offenders = packages
@@ -2177,6 +2180,7 @@ public sealed partial class DeveloperExperienceGuardTests
             ["Gma.Modules.Auth.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"),
             ["Gma.Modules.Files.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"),
             ["Gma.Modules.Notifications.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"),
+            ["Gma.Modules.Organizations.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Organizations"), "Gma.Modules.Organizations.slnx"),
             ["Gma.Modules.TaskRuntime.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"),
             ["Gma.Modules.Tenancy.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx")
         };
@@ -2247,6 +2251,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     .Where(path => !path.StartsWith("docs/", StringComparison.OrdinalIgnoreCase) &&
                                    !path.StartsWith("eng/", StringComparison.OrdinalIgnoreCase) &&
                                    !path.StartsWith(".github/", StringComparison.OrdinalIgnoreCase) &&
+                                   !path.StartsWith(".gma/", StringComparison.OrdinalIgnoreCase) &&
                                    !path.StartsWith("src/", StringComparison.OrdinalIgnoreCase) &&
                                    !path.StartsWith("tests/", StringComparison.OrdinalIgnoreCase) &&
                                    !IsPackageRootSolutionItem(path))
@@ -2278,7 +2283,8 @@ public sealed partial class DeveloperExperienceGuardTests
                 "Gma.SourceRoots.props.example" or
                 "LICENSE" or
                 "nuget.config" or
-                "README.md";
+                "README.md" or
+                "SECURITY.md";
     }
 
     [Fact]

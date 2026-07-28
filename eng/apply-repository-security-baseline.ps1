@@ -26,6 +26,8 @@ param(
     [switch] $Force
 )
 
+. (Join-Path $PSScriptRoot 'common.ps1')
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
