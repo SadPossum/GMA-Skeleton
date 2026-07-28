@@ -4372,7 +4372,9 @@ public sealed partial class DeveloperExperienceGuardTests
             [
                 "AccessSubject.IdMaxLength",
                 "AccessScope.MaxLength",
-                "HasIndex(assignment => new { assignment.SubjectKind, assignment.SubjectId, assignment.ScopeValue })"
+                "AccessScopeIndex.HashLength",
+                "assignment.ScopeHash",
+                "IX_role_assignments_subject_role_scope_hash"
             ]
         };
         string accessControlPersistenceRoot = GmaSourceLayout.ModulePath(
@@ -5027,6 +5029,7 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\..\Naming\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
                     @"..\..\Results\Gma.Framework.Results\Gma.Framework.Results.csproj",
                     @"..\..\Security\Gma.Framework.Security\Gma.Framework.Security.csproj",
+                    @"..\..\Security\Gma.Framework.Security.AspNetCore\Gma.Framework.Security.AspNetCore.csproj",
                     @"..\..\Tenancy\Gma.Framework.Tenancy\Gma.Framework.Tenancy.csproj"
                 ]),
             new(
