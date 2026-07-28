@@ -35,7 +35,6 @@ using Gma.Modules.Notifications.Persistence;
 using Gma.Modules.Organizations.Api;
 using Gma.Modules.Organizations.Persistence;
 using Gma.Modules.Tenancy.Api;
-using Host.Api;
 using ServiceDefaults;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -55,7 +54,7 @@ builder.AddConfiguredNatsJetStreamMessaging();
 builder.AddUserNotificationServerSentEvents();
 builder.AddUserNotificationSignalR();
 builder.Services.AddApiSecurityDefaults();
-builder.AddConfiguredDataProtection();
+builder.AddGmaProductionDataProtection();
 
 builder.AddModule<TenancyModule>();
 builder.AddAuthModule(AuthProfile.Global());

@@ -847,7 +847,7 @@ public sealed partial class DeveloperExperienceGuardTests
     }
 
     [Fact]
-    public void Auth_totp_adapter_is_host_selected_and_uses_configured_data_protection()
+    public void Auth_totp_adapter_is_host_selected_and_uses_framework_data_protection()
     {
         string repositoryRoot = FindRepositoryRoot();
         string apiProgram = File.ReadAllText(Path.Combine(
@@ -862,12 +862,20 @@ public sealed partial class DeveloperExperienceGuardTests
             "Hosts",
             "Host.Api",
             "Host.Api.csproj"));
-        string dataProtectionComposition = File.ReadAllText(Path.Combine(
+        string localDataProtectionComposition = Path.Combine(
             repositoryRoot,
             "src",
             "Hosts",
             "Host.Api",
-            "DataProtectionComposition.cs"));
+            "DataProtectionComposition.cs");
+        string frameworkDataProtectionComposition = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "gma",
+            "framework",
+            "src",
+            "Api",
+            "Gma.Framework.Api.Production",
+            "ProductionDataProtectionDependencyInjection.cs"));
         string adminApiProgram = File.ReadAllText(Path.Combine(
             repositoryRoot,
             "src",
@@ -876,13 +884,13 @@ public sealed partial class DeveloperExperienceGuardTests
             "Program.cs"));
 
         Assert.Contains("Gma.Modules.Auth.Authenticators.Totp.csproj", apiProject, StringComparison.Ordinal);
-        Assert.Contains("AddConfiguredDataProtection()", apiProgram, StringComparison.Ordinal);
+        Assert.Contains("AddGmaProductionDataProtection()", apiProgram, StringComparison.Ordinal);
         Assert.Contains("AddAuthTotpAuthenticator()", apiProgram, StringComparison.Ordinal);
         Assert.DoesNotContain("AddAuthTotpAuthenticator()", adminApiProgram, StringComparison.Ordinal);
-        Assert.Contains("SetApplicationName(applicationName)", dataProtectionComposition, StringComparison.Ordinal);
-        Assert.Contains("PersistKeysToFileSystem", dataProtectionComposition, StringComparison.Ordinal);
-        Assert.Contains("builder.Environment.IsProduction()", dataProtectionComposition, StringComparison.Ordinal);
-        Assert.Contains("DataProtection:KeyRingPath is required in Production", dataProtectionComposition, StringComparison.Ordinal);
+        Assert.False(File.Exists(localDataProtectionComposition));
+        Assert.Contains("SetApplicationName(applicationName)", frameworkDataProtectionComposition, StringComparison.Ordinal);
+        Assert.Contains("PersistKeysToFileSystem", frameworkDataProtectionComposition, StringComparison.Ordinal);
+        Assert.Contains("builder.Environment.IsProduction()", frameworkDataProtectionComposition, StringComparison.Ordinal);
 
         string baseSettings = Path.Combine(repositoryRoot, "src", "Hosts", "Host.Api", "appsettings.json");
         string developmentSettings = Path.Combine(
@@ -5069,7 +5077,12 @@ public sealed partial class DeveloperExperienceGuardTests
                 "Gma.Framework.Api.Production",
                 [],
                 ["Microsoft.AspNetCore.App"],
-                [@"..\..\Cqrs\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj"]),
+                [
+                    @"..\..\Cqrs\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
+                    @"..\..\Modules\Gma.Framework.ModuleComposition\Gma.Framework.ModuleComposition.csproj",
+                    @"..\..\RateLimiting\Gma.Framework.RateLimiting\Gma.Framework.RateLimiting.csproj",
+                    @"..\..\Runtime\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj"
+                ]),
             new(
                 "Gma.Framework.Api.Production.EntityFrameworkCore",
                 ["Microsoft.EntityFrameworkCore"],

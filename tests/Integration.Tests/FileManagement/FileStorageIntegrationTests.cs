@@ -205,7 +205,10 @@ public sealed class FileStorageIntegrationTests
         string secretKey,
         string bucketName)
     {
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
+        {
+            EnvironmentName = Environments.Development
+        });
         builder.Configuration["FileManagement:Enabled"] = "true";
         builder.Configuration["FileManagement:Provider"] = "Minio";
         builder.Configuration["FileManagement:MaximumObjectBytes"] = "1048576";

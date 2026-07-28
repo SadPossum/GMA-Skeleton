@@ -4,7 +4,9 @@ The skeleton provides a hardened, explicit foundation; it cannot choose deployme
 
 ## Built In
 
-- production host filtering, trusted forwarded-header configuration, ProblemDetails, HTTPS/HSTS, security headers, CORS, request timeouts, rate limits, and optional private-network enforcement;
+- production host filtering, trusted proxy IP/CIDR forwarded-header configuration, ProblemDetails, HTTPS/HSTS, security headers, CORS, request timeouts, in-process or provider-backed distributed rate limits, and optional private-network enforcement;
+- configured Data Protection composition with a stable application name and a mandatory persistent key ring in Production;
+- production-safe MinIO defaults that require encrypted transport and a pre-provisioned bucket unless the application explicitly accepts a private-network exception;
 - dependency-free `/alive` and explicitly composed `/health` readiness checks;
 - provider-explicit migrations, generated startup/architecture tests, Windows/Linux CI, automatic Docker validation, dependency updates, immutable action pins, aggregate source/dependency/secret/licence/configuration scanning, CodeQL, CycloneDX evidence, and release source-set manifests;
 - Auth password/blocklist/throttling/rehash behavior, key-ring rotation, refresh reuse revocation, optimistic concurrency, multi-provider external identities, safe explicit linking, hashed one-time OIDC handoffs, email-verification state, optional TOTP/recovery-code MFA, and security events;
@@ -12,9 +14,10 @@ The skeleton provides a hardened, explicit foundation; it cannot choose deployme
 
 ## Deployment Must Supply
 
-- concrete `AllowedHosts`, trusted proxy IPs, production connection strings, secret-store values, TLS/ingress, a persistent shared and at-rest-protected ASP.NET Core Data Protection key ring for OIDC callbacks and TOTP secrets, observability exporters, alert thresholds, backups/restores, and capacity/connection-pool tuning;
+- concrete `AllowedHosts`, trusted proxy IPs or CIDR networks, production connection strings, secret-store values, TLS/ingress, a persistent shared and at-rest-protected ASP.NET Core Data Protection key ring for OIDC callbacks and TOTP secrets, observability exporters, alert thresholds, backups/restores, and capacity/connection-pool tuning;
+- a distributed `IMultiPartitionRateLimiter` provider with `Http:RateLimiting:Mode=Distributed` for every multi-replica public HTTP deployment;
 - a distributed `IAuthenticationAttemptLimiter` for multi-replica Auth, a real `IPasswordBlocklist`, OIDC client credentials for enabled providers, an `IEmailSender` for enabled Auth/Notifications mail, and an `IFileContentInspector` when Files is enabled;
-- optional Redis/NATS/MinIO credentials and topology, notification provider credentials/rate limits, JetStream management ownership and replica count, organization retention enablement on the one host responsible for its maintenance, retention windows aligned with broker replay, external scheduler/backplane adapters, and deployment-specific readiness for those selected adapters.
+- optional Redis/NATS/MinIO credentials and topology, any reviewed MinIO plaintext or bucket-creation exception, notification provider credentials/rate limits, JetStream management ownership and replica count, organization retention enablement on the one host responsible for its maintenance, retention windows aligned with broker replay, external scheduler/backplane adapters, and deployment-specific readiness for those selected adapters.
 
 ## Product Must Decide
 

@@ -1525,7 +1525,6 @@ if ($readinessModuleSpecs.Count -gt 0) {
 }
 
 if ($hasAuth) {
-    $programUsingLines += "using $Name.Host.Api;"
     $programUsingLines += 'using Gma.Framework.Messaging.Infrastructure;'
     $programUsingLines += 'using Gma.Modules.Auth.Authenticators.Totp;'
     $programUsingLines += 'using Gma.Modules.Auth.Contracts;'
@@ -1592,7 +1591,7 @@ if ($ServiceDefaults) {
 $programLines += @('', '// module-scaffold:public-api-modules')
 
 if ($hasAuth) {
-    $programLines += 'builder.AddConfiguredDataProtection();'
+    $programLines += 'builder.AddGmaProductionDataProtection();'
     $programLines += 'builder.AddMessagingInfrastructure();'
 }
 
@@ -1664,57 +1663,6 @@ $programLines += @('', 'app.Run();')
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\Program.cs") $programLines
 
-if ($hasAuth) {
-    Write-GmaTemplateFile (Join-Path $resolvedOutputPath "src\Hosts\$Name.Host.Api\DataProtectionComposition.cs") @(
-        "namespace $Name.Host.Api;",
-        '',
-        'using Microsoft.AspNetCore.DataProtection;',
-        'using Microsoft.Extensions.Configuration;',
-        'using Microsoft.Extensions.DependencyInjection;',
-        'using Microsoft.Extensions.Hosting;',
-        '',
-        'internal static class DataProtectionComposition',
-        '{',
-        '    public static IHostApplicationBuilder AddConfiguredDataProtection(this IHostApplicationBuilder builder)',
-        '    {',
-        '        ArgumentNullException.ThrowIfNull(builder);',
-        '',
-        '        string? configuredApplicationName = builder.Configuration["DataProtection:ApplicationName"];',
-        '        string? applicationNamespace = builder.Configuration["ApplicationIdentity:Namespace"];',
-        '        string applicationName = !string.IsNullOrWhiteSpace(configuredApplicationName)',
-        '            ? configuredApplicationName.Trim()',
-        '            : applicationNamespace?.Trim() ?? string.Empty;',
-        '        if (string.IsNullOrWhiteSpace(applicationName))',
-        '        {',
-        '            throw new InvalidOperationException(',
-        '                "DataProtection:ApplicationName or ApplicationIdentity:Namespace must provide a stable application name.");',
-        '        }',
-        '',
-        '        IDataProtectionBuilder dataProtection = builder.Services',
-        '            .AddDataProtection()',
-        '            .SetApplicationName(applicationName);',
-        '        string? configuredKeyRingPath = builder.Configuration["DataProtection:KeyRingPath"];',
-        '        if (string.IsNullOrWhiteSpace(configuredKeyRingPath))',
-        '        {',
-        '            if (builder.Environment.IsProduction())',
-        '            {',
-        '                throw new InvalidOperationException(',
-        '                    "DataProtection:KeyRingPath is required in Production so OIDC state and protected Auth secrets survive restarts and work across replicas.");',
-        '            }',
-        '',
-        '            return builder;',
-        '        }',
-        '',
-        '        string keyRingPath = Path.GetFullPath(',
-        '            configuredKeyRingPath.Trim(),',
-        '            builder.Environment.ContentRootPath);',
-        '        dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyRingPath));',
-        '        return builder;',
-        '    }',
-        '}'
-    )
-}
-
 $sensitivePathPrefixes = @()
 if ($hasAdminApiHost) {
     $sensitivePathPrefixes += '/api/admin'
@@ -1753,6 +1701,7 @@ $baseSettings = [ordered]@{
             AllowUnknownProxies = $false
             ForwardLimit = 1
             KnownProxies = @()
+            KnownNetworks = @()
         }
         Cors = [ordered]@{
             Enabled = $false
@@ -1765,6 +1714,7 @@ $baseSettings = [ordered]@{
         }
         RateLimiting = [ordered]@{
             Enabled = $true
+            Mode = 'InProcess'
             GlobalPermitLimit = 300
             SensitivePermitLimit = 10
             WindowSeconds = 60
@@ -1840,6 +1790,7 @@ if ($hasAccessControl) {
 
 if ($hasAuth) {
     $baseSettings.DataProtection = [ordered]@{
+        RequirePersistentKeys = $false
         ApplicationName = $Name
         KeyRingPath = ''
     }

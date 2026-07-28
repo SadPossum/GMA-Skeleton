@@ -16,7 +16,13 @@ The resolved SDK must be .NET 10. If your .NET 10 SDK is not on `PATH`, set `GMA
 
 Base `appsettings.json` files contain configuration shape and non-secret defaults only. Local disposable connection strings, JWT signing material, refresh-token peppers, and a local Data Protection key-ring path live in `appsettings.Development.json`. Production and shared environments must provide `ConnectionStrings:*` plus Auth signing/pepper keys through environment variables, user secrets, a vault, or another secret provider. Prefer the key-ring settings below so rotation does not invalidate every active access or refresh token; the single-key settings remain compatibility options.
 
-The default API host explicitly composes the optional TOTP adapter. Production startup fails when `DataProtection:KeyRingPath` is empty: mount a persistent path shared by every API replica, keep `DataProtection:ApplicationName` stable across deployments, and protect the key ring at rest using deployment-appropriate platform, certificate, KMS, or HSM controls. Losing or isolating this key ring makes existing protected TOTP secrets and in-flight OIDC state unusable.
+The default API host explicitly composes the optional TOTP adapter and the
+framework Production Data Protection helper. Production startup fails when
+`DataProtection:KeyRingPath` is empty: mount a persistent path shared by every
+API replica, keep `DataProtection:ApplicationName` stable across deployments,
+and protect the key ring at rest using deployment-appropriate platform,
+certificate, KMS, or HSM controls. Losing or isolating this key ring makes
+existing protected TOTP secrets and in-flight OIDC state unusable.
 
 ## First Run
 
