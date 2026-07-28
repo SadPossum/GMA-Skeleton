@@ -234,6 +234,14 @@ if ($RequireRolloutTooling) {
             'eng\check-repository-security.ps1'
         & $generatedGuard -RepositoryRoot $rolloutTestDirectory
 
+        $generatedDependabot = [System.IO.File]::ReadAllText(
+            (Join-Path $rolloutTestDirectory '.github\dependabot.yml'))
+        if ($generatedDependabot.EndsWith(
+                "`n`n",
+                [System.StringComparison]::Ordinal)) {
+            throw 'Generated Dependabot policy has a trailing blank line.'
+        }
+
         $generatedWorkflowPath = Join-Path `
             $rolloutTestDirectory `
             '.github\workflows\security.yml'

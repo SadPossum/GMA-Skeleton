@@ -119,6 +119,7 @@ foreach ($ecosystem in $dependencyEcosystems) {
     }
     $dependabotLines.Add('')
 }
+$dependabotLines.RemoveAt($dependabotLines.Count - 1)
 Write-BaselineFile `
     -RelativePath '.github\dependabot.yml' `
     -Lines $dependabotLines

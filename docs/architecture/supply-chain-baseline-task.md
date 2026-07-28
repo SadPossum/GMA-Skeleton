@@ -1,6 +1,6 @@
 # Repository Supply-Chain Baseline Task
 
-**Status:** Slice 1 published; Slice 2 implementation in progress
+**Status:** Slices 1 and 2 published; Slice 3 planned
 
 ## Goal
 
@@ -79,14 +79,40 @@ dependency SBOM.
 
 ### Slice 2 - Repository Rollout
 
-1. [ ] Apply repository-local disclosure and dependency-update policy to
+1. [x] Apply repository-local disclosure and dependency-update policy to
    Framework, Extensions, each reusable module, BunkFy Backend, and BunkFy Web.
-2. [ ] Consume the pinned Skeleton security action from each repository and
+2. [x] Consume the pinned Skeleton security action from each repository and
    retain repository-specific evidence.
 3. [x] Add a bounded exception format that requires reason, owner, expiry, and
    a narrow path or package scope.
-4. [ ] Prove every public repository has a private reporting path and a
+4. [x] Prove every public repository has a private reporting path and a
    blocking default-branch security workflow.
+
+### Slice 2 Published Evidence
+
+Private vulnerability reporting was enabled and read back through the GitHub
+API on 2026-07-28 for Framework, Extensions, all eight reusable modules,
+BunkFy Backend, and BunkFy Web.
+
+| Repository | Commit | Validate | Security |
+| --- | --- | --- | --- |
+| Framework | `cd1672b` | [30355366440](https://github.com/SadPossum/GMA-Framework/actions/runs/30355366440) | [30355366389](https://github.com/SadPossum/GMA-Framework/actions/runs/30355366389) |
+| Extensions | `6729ff8` | [30354094974](https://github.com/SadPossum/GMA-Extensions/actions/runs/30354094974) | [30354096123](https://github.com/SadPossum/GMA-Extensions/actions/runs/30354096123) |
+| Access Control | `33a7b0c` | [30354097300](https://github.com/SadPossum/GMA-Module-Access-Control/actions/runs/30354097300) | [30354097426](https://github.com/SadPossum/GMA-Module-Access-Control/actions/runs/30354097426) |
+| Administration | `75e1867` | [30354096906](https://github.com/SadPossum/GMA-Module-Administration/actions/runs/30354096906) | [30354096894](https://github.com/SadPossum/GMA-Module-Administration/actions/runs/30354096894) |
+| Auth | `f1df694` | [30354099978](https://github.com/SadPossum/GMA-Module-Auth/actions/runs/30354099978) | [30354099970](https://github.com/SadPossum/GMA-Module-Auth/actions/runs/30354099970) |
+| Files | `5056071` | [30354103100](https://github.com/SadPossum/GMA-Module-Files/actions/runs/30354103100) | [30354103042](https://github.com/SadPossum/GMA-Module-Files/actions/runs/30354103042) |
+| Notifications | `27d372d` | [30354106010](https://github.com/SadPossum/GMA-Module-Notifications/actions/runs/30354106010) | [30354105957](https://github.com/SadPossum/GMA-Module-Notifications/actions/runs/30354105957) |
+| Organizations | `3fbc344` | [30354112616](https://github.com/SadPossum/GMA-Module-Organizations/actions/runs/30354112616) | [30354111258](https://github.com/SadPossum/GMA-Module-Organizations/actions/runs/30354111258) |
+| Task Runtime | `a0ea885` | [30354115539](https://github.com/SadPossum/GMA-Module-Task-Runtime/actions/runs/30354115539) | [30354114309](https://github.com/SadPossum/GMA-Module-Task-Runtime/actions/runs/30354114309) |
+| Tenancy | `3869709` | [30354116486](https://github.com/SadPossum/GMA-Module-Tenancy/actions/runs/30354116486) | [30354116580](https://github.com/SadPossum/GMA-Module-Tenancy/actions/runs/30354116580) |
+| BunkFy Backend | `4ea8910` | [30355444971](https://github.com/SadPossum/BunkFy.Backend/actions/runs/30355444971) | [30355444845](https://github.com/SadPossum/BunkFy.Backend/actions/runs/30355444845) |
+| BunkFy Web | `f6230b5` | [30354688477](https://github.com/SadPossum/BunkFy.Web/actions/runs/30354688477) | [30354688716](https://github.com/SadPossum/BunkFy.Web/actions/runs/30354688716) |
+
+The backend Docker suite passed once on parent composition commit `51f5e23`
+([30354655109](https://github.com/SadPossum/BunkFy.Backend/actions/runs/30354655109)).
+The final backend commit changes only the Framework source-package governance
+checker and is covered by the final cross-platform validation above.
 
 ### Slice 3 - Release Evidence
 
