@@ -34,6 +34,8 @@ jobs:
 
       - name: Run repository security baseline
         uses: ./.github/actions/security-baseline
+        with:
+          exception-file: .gma/security-exceptions.json
 
       - name: Publish code-scanning evidence
         if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}

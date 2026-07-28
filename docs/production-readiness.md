@@ -9,6 +9,9 @@ The skeleton provides a hardened, explicit foundation; it cannot choose deployme
 - production-safe MinIO defaults that require encrypted transport and a pre-provisioned bucket unless the application explicitly accepts a private-network exception;
 - dependency-free `/alive` and explicitly composed `/health` readiness checks;
 - provider-explicit migrations, generated startup/architecture tests, Windows/Linux CI, automatic Docker validation, dependency updates, immutable action pins, aggregate source/dependency/secret/licence/configuration scanning, CodeQL, CycloneDX evidence, payload-free scanner summaries, and release source-set manifests;
+- a repository-security scaffolder plus a closed exception ledger that requires
+  every temporary scanner exception to name a bounded owner and reason, expire
+  within 90 days, and target an exact repository path or package URL;
 - payload-free, registry-bounded security signal records with opaque incident correlation, structured logs, and metrics; generated ServiceDefaults compose the real recorder while modules own their finite definitions;
 - Auth password/blocklist/throttling/rehash behavior, key-ring rotation, refresh reuse revocation, optimistic concurrency, multi-provider external identities, safe explicit linking, hashed one-time OIDC handoffs, email-verification state, optional TOTP/recovery-code MFA, and security events;
 - atomic first-owner bootstrap, no-store organization token responses, sensitive-route throttling, disabled-by-default bounded organization-domain retention, outbox backlog metrics, disabled-by-default bounded message-journal and task-history retention, lease heartbeats, managed/external JetStream ownership with finite limits, in-progress consumer acknowledgements, tagged notification preferences/routing, leased at-least-once notification delivery with bounded retries/receipts/retention, and a fail-closed file inspection seam.
@@ -34,3 +37,9 @@ Keep these as app-owned adapters/modules. A generic default that silently accept
 2. Apply migrations using the generated provider/module-explicit migration script; API startup never migrates every database implicitly.
 3. Exercise `/alive` and `/health`, backup restore, signing/pepper/Data Protection key rotation, cross-replica OIDC callbacks and TOTP verification, refresh reuse, scanner outage, broker outage, worker lease loss, duplicate delivery, retention cleanup, and rollback in staging.
 4. Export a clean source-set manifest with `eng/export-source-set.ps1 -RequireClean` and release from the pinned commits.
+
+Scanner exceptions belong in `.gma/security-exceptions.json`. Do not commit raw
+scanner output, secret matches, personal data, or private incident context as an
+exception reason. `eng/check-repository-security.ps1` validates the contract
+locally; the security action converts approved entries to a temporary Trivy
+ignore file and deletes it after the run.

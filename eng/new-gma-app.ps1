@@ -626,6 +626,12 @@ function Write-GmaGeneratedWorkflow {
         '      interval: weekly',
         '    open-pull-requests-limit: 5',
         '',
+        '  - package-ecosystem: gitsubmodule',
+        '    directory: /',
+        '    schedule:',
+        '      interval: weekly',
+        '    open-pull-requests-limit: 10',
+        '',
         '  - package-ecosystem: nuget',
         '    directory: /',
         '    schedule:',
@@ -718,6 +724,10 @@ function Write-GmaGeneratedSecurityBaseline {
             Destination = Join-Path $Root '.github\actions\security-baseline\action.yml'
         },
         [pscustomobject] @{
+            Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\convert-security-exceptions.ps1'
+            Destination = Join-Path $Root '.github\actions\security-baseline\convert-security-exceptions.ps1'
+        },
+        [pscustomobject] @{
             Source = Join-Path $script:RepositoryRoot '.github\actions\security-baseline\write-security-evidence-summary.ps1'
             Destination = Join-Path $Root '.github\actions\security-baseline\write-security-evidence-summary.ps1'
         },
@@ -734,6 +744,13 @@ function Write-GmaGeneratedSecurityBaseline {
         $content = [System.IO.File]::ReadAllLines($sharedFile.Source)
         Write-GmaTemplateFile $sharedFile.Destination $content
     }
+
+    Write-GmaTemplateFile (Join-Path $Root '.gma\security-exceptions.json') @(
+        '{',
+        '  "schemaVersion": 1,',
+        '  "exceptions": []',
+        '}'
+    )
 
     Write-GmaTemplateFile (Join-Path $Root '.github\workflows\codeql.yml') @(
         'name: CodeQL',
@@ -943,7 +960,24 @@ function Write-GmaGeneratedDeveloperTools {
         '. (Join-Path $PSScriptRoot ''common.ps1'')',
         '$implementation = Join-GmaPath ''gma/framework/eng/sync-solution.ps1''',
         'if (-not (Test-Path -LiteralPath $implementation -PathType Leaf)) { throw ''GMA framework tooling is not mounted.'' }',
-        "`$arguments = @{ RepositoryRoot = Get-GmaRepositoryRoot; Solution = '$ApplicationName.slnx'; ProjectRoots = $solutionProjectRootsLiteral }",
+        '$arguments = @{',
+        '    RepositoryRoot = Get-GmaRepositoryRoot',
+        "    Solution = '$ApplicationName.slnx'",
+        "    ProjectRoots = $solutionProjectRootsLiteral",
+        '    SolutionItems = @(',
+        '        ''.config/dotnet-tools.json'',',
+        '        ''.github/dependabot.yml'',',
+        '        ''.gma/security-exceptions.json'',',
+        '        ''.gitignore'',',
+        '        ''Directory.Build.props'',',
+        '        ''Directory.Packages.props'',',
+        '        ''global.json'',',
+        '        ''Gma.SourceRoots.props.example'',',
+        '        ''nuget.config'',',
+        '        ''README.md'',',
+        '        ''SECURITY.md''',
+        '    )',
+        '}',
         'if ($Check) { $arguments.Check = $true }',
         '& $implementation @arguments'
     )
@@ -1214,9 +1248,15 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'Gma.SourceRoots.props.exam
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '<Solution>',
+    '  <Folder Name="/.github/actions/security-baseline/">',
+    '    <File Path=".github/actions/security-baseline/action.yml" />',
+    '    <File Path=".github/actions/security-baseline/convert-security-exceptions.ps1" />',
+    '    <File Path=".github/actions/security-baseline/write-security-evidence-summary.ps1" />',
+    '  </Folder>',
     '  <Folder Name="/eng/">',
     '    <File Path="eng/add-migration.ps1" />',
     '    <File Path="eng/check-migrations.ps1" />',
+    '    <File Path="eng/check-repository-security.ps1" />',
     '    <File Path="eng/check-source-packages.ps1" />',
     '    <File Path="eng/check-submodule-heads.ps1" />',
     '    <File Path="eng/common.ps1" />',
@@ -1230,7 +1270,9 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '    <File Path="eng/sync-solution.ps1" />',
     '  </Folder>',
     '  <Folder Name="/.github/workflows/">',
+    '    <File Path=".github/workflows/codeql.yml" />',
     '    <File Path=".github/workflows/release-source-set.yml" />',
+    '    <File Path=".github/workflows/security.yml" />',
     '    <File Path=".github/workflows/validate.yml" />',
     '  </Folder>',
     '  <Folder Name="/docs/">',
@@ -1239,6 +1281,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '  <Folder Name="/Solution Items/">',
     '    <File Path=".gitignore" />',
     '    <File Path=".github/dependabot.yml" />',
+    '    <File Path=".gma/security-exceptions.json" />',
     '    <File Path=".config/dotnet-tools.json" />',
     '    <File Path="Directory.Build.props" />',
     '    <File Path="Directory.Packages.props" />',
@@ -1246,6 +1289,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath "$Name.slnx") @(
     '    <File Path="Gma.SourceRoots.props.example" />',
     '    <File Path="nuget.config" />',
     '    <File Path="README.md" />',
+    '    <File Path="SECURITY.md" />',
     '  </Folder>',
     '  <Folder Name="/src/Hosts/">',
     '    <File Path="src/Hosts/README.md" />',

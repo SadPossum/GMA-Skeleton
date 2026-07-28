@@ -1,6 +1,6 @@
 # Repository Supply-Chain Baseline Task
 
-**Status:** in progress
+**Status:** Slice 1 published; Slice 2 implementation in progress
 
 ## Goal
 
@@ -30,15 +30,35 @@ Framework and reusable modules do not own repository governance. They may consum
 
 BunkFy owns its product support and disclosure language, aggregate product scan, release evidence, and any hosted-service response process. BunkFy policy must not be copied into GMA.
 
-## Current Gaps
+## Current Baseline And Gaps
 
-- The Skeleton root has Dependabot for GitHub Actions and NuGet, but no vulnerability disclosure policy.
-- Most module workflows run `dotnet list package --vulnerable`; Framework and aggregate Skeleton/BunkFy validation do not consistently run equivalent checks.
-- The release source-set manifest records compatible repository commits but is not a dependency SBOM.
-- No aggregate source, secret, licence, or infrastructure scan is published from Skeleton or BunkFy.
-- No CodeQL workflow covers the composed source set.
-- Generated applications receive validation, dependency-update, Docker-test, and source-set workflows, but no security evidence workflow or repository security policy template.
-- Release signing, checksums, attestations, and component-to-release traceability are not yet complete.
+Slice 1 is published in GMA-Skeleton. The Skeleton now owns the pinned composite
+scan action, aggregate security and CodeQL workflows, CycloneDX and payload-free
+summary evidence, generated-application defaults, immutable-pin guards, and its
+repository-local disclosure policy. BunkFy owns the corresponding aggregate
+product policy and workflow candidate.
+
+The Slice 2 audit on 2026-07-28 found that private vulnerability reporting was
+enabled only for GMA-Skeleton and the BunkFy root. Framework, Extensions, all
+eight reusable modules, BunkFy Backend, and BunkFy Web had neither an enabled
+private reporting path nor a repository-local security workflow. Most also had
+no `SECURITY.md` or Dependabot policy.
+
+Slice 2 therefore adds:
+
+- a strict repository manifest that pins the reusable Skeleton action and
+  declares repository-owned dependency ecosystems;
+- a bounded JSON exception ledger converted to Trivy's scoped YAML format,
+  requiring owner, reason, expiry within 90 days, and a path or package scope;
+- a reusable guard and scaffolder for repository-local policies without adding
+  any runtime dependency;
+- one owned-source security workflow per public repository, plus private
+  reporting enablement and exact published evidence.
+
+Release signing, checksums, attestations, component-to-release traceability,
+support/EOL policy, downstream notification, and the private triage drill remain
+Slice 3 work. The release source-set manifest is composition evidence, not a
+dependency SBOM.
 
 ## Delivery Slices
 
@@ -59,10 +79,14 @@ BunkFy owns its product support and disclosure language, aggregate product scan,
 
 ### Slice 2 - Repository Rollout
 
-1. Apply repository-local disclosure and dependency-update policy to Framework, Extensions, and each reusable module.
-2. Consume the pinned Skeleton security action from each repository and retain repository-specific evidence.
-3. Add a bounded exception format that requires reason, owner, and expiry.
-4. Prove every public repository has a private reporting path and a blocking default-branch security workflow.
+1. [ ] Apply repository-local disclosure and dependency-update policy to
+   Framework, Extensions, each reusable module, BunkFy Backend, and BunkFy Web.
+2. [ ] Consume the pinned Skeleton security action from each repository and
+   retain repository-specific evidence.
+3. [x] Add a bounded exception format that requires reason, owner, expiry, and
+   a narrow path or package scope.
+4. [ ] Prove every public repository has a private reporting path and a
+   blocking default-branch security workflow.
 
 ### Slice 3 - Release Evidence
 

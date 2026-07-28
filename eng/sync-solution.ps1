@@ -18,6 +18,7 @@ $arguments = @{
         '.gitignore',
         '.gitmodules',
         '.github/dependabot.yml',
+        '.gma/security-exceptions.json',
         'Directory.Build.props',
         'Directory.Packages.props',
         'global.json',
@@ -26,7 +27,8 @@ $arguments = @{
         'Gma.SourceRoots.props.example',
         'LICENSE',
         'nuget.config',
-        'README.md'
+        'README.md',
+        'SECURITY.md'
     )
 }
 if ($Check) {

@@ -1,6 +1,8 @@
 [CmdletBinding()]
 param(
-    [string] $ExpectedPrivateReportingUrl
+    [string] $ExpectedPrivateReportingUrl,
+
+    [switch] $RequireRolloutTooling
 )
 
 . (Join-Path $PSScriptRoot 'common.ps1')
@@ -8,12 +10,20 @@ param(
 $root = Get-GmaRepositoryRoot
 $requiredFiles = @(
     '.github\actions\security-baseline\action.yml',
+    '.github\actions\security-baseline\convert-security-exceptions.ps1',
     '.github\actions\security-baseline\write-security-evidence-summary.ps1',
     '.github\dependabot.yml',
     '.github\workflows\codeql.yml',
     '.github\workflows\security.yml',
+    '.gma\security-exceptions.json',
     'SECURITY.md'
 )
+if ($RequireRolloutTooling) {
+    $requiredFiles += @(
+        'eng\apply-repository-security-baseline.ps1',
+        'eng\repository-security\check-repository-security.ps1'
+    )
+}
 
 foreach ($relativePath in $requiredFiles) {
     $path = Join-Path $root $relativePath
@@ -36,12 +46,217 @@ $requiredActionTokens = @(
     '--exit-code 1',
     '--ignore-unfixed=false',
     'security-summary.json',
+    'convert-security-exceptions.ps1',
+    'default: .gma/security-exceptions.json',
+    '--ignorefile "$exception_ignore_file"',
     'write-security-evidence-summary.ps1',
     'default: 20m'
 )
 foreach ($token in $requiredActionTokens) {
     if ($securityAction.IndexOf($token, [System.StringComparison]::Ordinal) -lt 0) {
         throw "Repository security action is missing required token '$token'."
+    }
+}
+
+$exceptionScript = Join-Path $root `
+    '.github\actions\security-baseline\convert-security-exceptions.ps1'
+$exceptionTestDirectory = Join-Path `
+    ([System.IO.Path]::GetTempPath()) `
+    ('gma-security-exceptions-' + [System.Guid]::NewGuid().ToString('N'))
+[System.IO.Directory]::CreateDirectory($exceptionTestDirectory) | Out-Null
+
+try {
+    $exceptionInputPath = Join-Path $exceptionTestDirectory 'exceptions.json'
+    $exceptionOutputPath = Join-Path $exceptionTestDirectory 'exceptions.yaml'
+    $observedAtUtc = [datetimeoffset] '2026-07-28T00:00:00Z'
+    $validExceptionDocument = [ordered] @{
+        schemaVersion = 1
+        exceptions = @(
+            [ordered] @{
+                scanner = 'vulnerability'
+                findingId = 'CVE-2099-0001'
+                owner = 'security-maintainers'
+                reason = 'The affected feature is not included in this source set.'
+                expiresOn = '2026-08-31'
+                purls = @('pkg:nuget/Example.Package@1.0.0')
+            },
+            [ordered] @{
+                scanner = 'secret'
+                findingId = 'synthetic-secret-rule'
+                owner = 'security-maintainers'
+                reason = 'The fixture contains a documented non-secret sentinel.'
+                expiresOn = '2026-08-31'
+                paths = @('tests/Fixtures/sentinel.txt')
+            }
+        )
+    }
+    [System.IO.File]::WriteAllText(
+        $exceptionInputPath,
+        ($validExceptionDocument | ConvertTo-Json -Depth 8),
+        [System.Text.UTF8Encoding]::new($false))
+
+    $exceptionCount = & $exceptionScript `
+        -InputPath $exceptionInputPath `
+        -OutputPath $exceptionOutputPath `
+        -ObservedAtUtc $observedAtUtc
+    if ($exceptionCount -ne 2) {
+        throw 'Security exception converter returned an invalid entry count.'
+    }
+
+    $exceptionYaml = [System.IO.File]::ReadAllText($exceptionOutputPath)
+    foreach ($token in @(
+        'vulnerabilities:',
+        'secrets:',
+        'CVE-2099-0001',
+        'pkg:nuget/Example.Package@1.0.0',
+        'tests/Fixtures/sentinel.txt',
+        'expired_at: 2026-08-31',
+        'owner=security-maintainers; reason=')) {
+        if ($exceptionYaml.IndexOf(
+            $token,
+            [System.StringComparison]::Ordinal) -lt 0) {
+            throw "Security exception YAML is missing required token '$token'."
+        }
+    }
+
+    $emptyExceptionCount = & $exceptionScript `
+        -InputPath (Join-Path $root '.gma\security-exceptions.json') `
+        -OutputPath $exceptionOutputPath `
+        -ObservedAtUtc $observedAtUtc
+    if ($emptyExceptionCount -ne 0 -or
+        [System.IO.File]::ReadAllText($exceptionOutputPath).Trim() -ne '{}') {
+        throw 'Empty security exception handling is invalid.'
+    }
+
+    $invalidExceptionDocuments = @(
+        [pscustomobject] @{
+            Name = 'expired'
+            Document = [ordered] @{
+                schemaVersion = 1
+                exceptions = @(
+                    [ordered] @{
+                        scanner = 'secret'
+                        findingId = 'expired-rule'
+                        owner = 'security-maintainers'
+                        reason = 'This exception has already expired.'
+                        expiresOn = '2026-07-27'
+                        paths = @('tests/fixture.txt')
+                    }
+                )
+            }
+        },
+        [pscustomobject] @{
+            Name = 'unscoped'
+            Document = [ordered] @{
+                schemaVersion = 1
+                exceptions = @(
+                    [ordered] @{
+                        scanner = 'license'
+                        findingId = 'GPL-3.0'
+                        owner = 'security-maintainers'
+                        reason = 'This exception is intentionally missing a scope.'
+                        expiresOn = '2026-08-31'
+                    }
+                )
+            }
+        },
+        [pscustomobject] @{
+            Name = 'too-long'
+            Document = [ordered] @{
+                schemaVersion = 1
+                exceptions = @(
+                    [ordered] @{
+                        scanner = 'misconfiguration'
+                        findingId = 'AVD-TEST-0001'
+                        owner = 'security-maintainers'
+                        reason = 'This exception exceeds the maximum review interval.'
+                        expiresOn = '2027-07-28'
+                        paths = @('deploy/test.yaml')
+                    }
+                )
+            }
+        },
+        [pscustomobject] @{
+            Name = 'unknown-property'
+            Document = [ordered] @{
+                schemaVersion = 1
+                exceptions = @()
+                allowEverything = $true
+            }
+        }
+    )
+
+    foreach ($invalidCase in $invalidExceptionDocuments) {
+        [System.IO.File]::WriteAllText(
+            $exceptionInputPath,
+            ($invalidCase.Document | ConvertTo-Json -Depth 8),
+            [System.Text.UTF8Encoding]::new($false))
+        $rejected = $false
+        try {
+            & $exceptionScript `
+                -InputPath $exceptionInputPath `
+                -OutputPath $exceptionOutputPath `
+                -ObservedAtUtc $observedAtUtc |
+                Out-Null
+        }
+        catch {
+            $rejected = $true
+        }
+
+        if (-not $rejected) {
+            throw "Security exception case '$($invalidCase.Name)' was not rejected."
+        }
+    }
+}
+finally {
+    Remove-Item -LiteralPath $exceptionTestDirectory -Recurse -Force
+}
+
+if ($RequireRolloutTooling) {
+    $rolloutTestDirectory = Join-Path `
+        ([System.IO.Path]::GetTempPath()) `
+        ('gma-repository-security-' + [System.Guid]::NewGuid().ToString('N'))
+    [System.IO.Directory]::CreateDirectory($rolloutTestDirectory) | Out-Null
+
+    try {
+        $baselineCommit = 'b' * 40
+        & (Join-Path $root 'eng\apply-repository-security-baseline.ps1') `
+            -OutputPath $rolloutTestDirectory `
+            -RepositorySlug 'SadPossum/Generated-Security-Test' `
+            -RepositoryDisplayName 'Generated Security Test' `
+            -PackageEcosystem nuget `
+            -SecurityBaselineCommit $baselineCommit `
+            -SupportedVersion 'v0.2.0' `
+            -IncludeGitSubmodules
+
+        $generatedGuard = Join-Path `
+            $rolloutTestDirectory `
+            'eng\check-repository-security.ps1'
+        & $generatedGuard -RepositoryRoot $rolloutTestDirectory
+
+        $generatedWorkflowPath = Join-Path `
+            $rolloutTestDirectory `
+            '.github\workflows\security.yml'
+        $generatedWorkflow = [System.IO.File]::ReadAllText(
+            $generatedWorkflowPath)
+        [System.IO.File]::WriteAllText(
+            $generatedWorkflowPath,
+            $generatedWorkflow.Replace($baselineCommit, ('c' * 40)),
+            [System.Text.UTF8Encoding]::new($false))
+
+        $driftRejected = $false
+        try {
+            & $generatedGuard -RepositoryRoot $rolloutTestDirectory
+        }
+        catch {
+            $driftRejected = $true
+        }
+        if (-not $driftRejected) {
+            throw 'Generated repository security baseline did not reject action drift.'
+        }
+    }
+    finally {
+        Remove-Item -LiteralPath $rolloutTestDirectory -Recurse -Force
     }
 }
 
@@ -199,6 +414,7 @@ $securityWorkflow = [System.IO.File]::ReadAllText(
     (Join-Path $root '.github\workflows\security.yml'))
 $requiredWorkflowTokens = @(
     'uses: ./.github/actions/security-baseline',
+    'exception-file: .gma/security-exceptions.json',
     'github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a',
     'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a',
     'security-events: write',
@@ -207,6 +423,17 @@ $requiredWorkflowTokens = @(
 foreach ($token in $requiredWorkflowTokens) {
     if ($securityWorkflow.IndexOf($token, [System.StringComparison]::Ordinal) -lt 0) {
         throw "Repository security workflow is missing required token '$token'."
+    }
+}
+
+$dependabotPolicy = [System.IO.File]::ReadAllText(
+    (Join-Path $root '.github\dependabot.yml'))
+foreach ($ecosystem in @('github-actions', 'gitsubmodule', 'nuget')) {
+    $token = "package-ecosystem: $ecosystem"
+    if ($dependabotPolicy.IndexOf(
+        $token,
+        [System.StringComparison]::Ordinal) -lt 0) {
+        throw "Dependency update policy is missing ecosystem '$ecosystem'."
     }
 }
 
@@ -248,7 +475,8 @@ foreach ($file in $workflowFiles) {
         }
 
         if ($reference -notmatch '^[^@\s]+@[0-9a-fA-F]{40}$') {
-            $relativePath = [System.IO.Path]::GetRelativePath($root, $file.FullName)
+            $relativePath = $file.FullName.Substring(
+                $root.TrimEnd('\', '/').Length).TrimStart('\', '/')
             throw "GitHub Action reference '$reference' in '$relativePath' is not pinned to an immutable commit."
         }
     }
