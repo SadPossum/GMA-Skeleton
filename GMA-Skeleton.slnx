@@ -70,6 +70,7 @@
     <File Path="eng/check-repository-release.ps1" />
     <File Path="eng/check-repository-security.ps1" />
     <File Path="eng/check-source-packages.ps1" />
+    <File Path="eng/check-source-solutions.ps1" />
     <File Path="eng/check-submodule-dev-heads.ps1" />
     <File Path="eng/common.ps1" />
     <File Path="eng/export-source-set.ps1" />

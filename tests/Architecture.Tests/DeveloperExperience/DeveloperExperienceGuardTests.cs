@@ -1013,6 +1013,7 @@ public sealed partial class DeveloperExperienceGuardTests
             NormalizePath(Path.Combine("src", "Modules", "Auth", "Gma.Modules.Auth.Persistence", "AuthDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Catalog", "Catalog.Persistence", "CatalogDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Notifications", "Gma.Modules.Notifications.Persistence", "NotificationsDbContext.cs")),
+            NormalizePath(Path.Combine("src", "Modules", "Organizations", "Gma.Modules.Organizations.Persistence", "OrganizationsDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "Ordering", "Ordering.Persistence", "OrderingDbContext.cs")),
             NormalizePath(Path.Combine("src", "Modules", "TaskRuntime", "Gma.Modules.TaskRuntime.Persistence", "TaskRuntimeDbContext.cs"))
         };
@@ -2050,6 +2051,18 @@ public sealed partial class DeveloperExperienceGuardTests
                     "eng/bootstrap-source-roots.ps1",
                     "README.md"
                 ]),
+            ["Gma.Modules.Organizations.slnx"] = (
+                Path.Combine(sourceLayout.GetModulePackageRoot("Organizations"), "Gma.Modules.Organizations.slnx"),
+                [
+                    "src/Gma.Modules.Organizations.Application/Gma.Modules.Organizations.Application.csproj",
+                    "tests/Gma.Modules.Organizations.Tests/Gma.Modules.Organizations.Tests.csproj"
+                ],
+                [
+                    ".github/workflows/validate.yml",
+                    "docs/README.md",
+                    "eng/bootstrap-source-roots.ps1",
+                    "README.md"
+                ]),
             ["Gma.Modules.TaskRuntime.slnx"] = (
                 Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"),
                 ["src/Gma.Modules.TaskRuntime.Application/Gma.Modules.TaskRuntime.Application.csproj"],
@@ -2121,6 +2134,7 @@ public sealed partial class DeveloperExperienceGuardTests
             ["Gma.Modules.Auth.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"), packageLocalFolders),
             ["Gma.Modules.Files.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"), packageLocalFolders),
             ["Gma.Modules.Notifications.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"), packageLocalFolders),
+            ["Gma.Modules.Organizations.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Organizations"), "Gma.Modules.Organizations.slnx"), packageLocalFolders),
             ["Gma.Modules.TaskRuntime.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"), packageLocalFolders),
             ["Gma.Modules.Tenancy.slnx"] = (Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx"), packageLocalFolders)
         };
@@ -2181,6 +2195,7 @@ public sealed partial class DeveloperExperienceGuardTests
             ["Gma.Modules.Auth.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"),
             ["Gma.Modules.Files.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"),
             ["Gma.Modules.Notifications.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"),
+            ["Gma.Modules.Organizations.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Organizations"), "Gma.Modules.Organizations.slnx"),
             ["Gma.Modules.TaskRuntime.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"),
             ["Gma.Modules.Tenancy.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx")
         };
@@ -2227,6 +2242,7 @@ public sealed partial class DeveloperExperienceGuardTests
             ["Gma.Modules.Auth.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Auth"), "Gma.Modules.Auth.slnx"),
             ["Gma.Modules.Files.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Files"), "Gma.Modules.Files.slnx"),
             ["Gma.Modules.Notifications.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Notifications"), "Gma.Modules.Notifications.slnx"),
+            ["Gma.Modules.Organizations.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Organizations"), "Gma.Modules.Organizations.slnx"),
             ["Gma.Modules.TaskRuntime.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("TaskRuntime"), "Gma.Modules.TaskRuntime.slnx"),
             ["Gma.Modules.Tenancy.slnx"] = Path.Combine(sourceLayout.GetModulePackageRoot("Tenancy"), "Gma.Modules.Tenancy.slnx")
         };

@@ -7,6 +7,7 @@ param(
 . (Join-Path $PSScriptRoot 'common.ps1')
 
 & (Join-Path $PSScriptRoot 'sync-solution.ps1') -Check
+& (Join-Path $PSScriptRoot 'check-source-solutions.ps1')
 
 & (Join-Path $PSScriptRoot 'check-repository-security.ps1') `
     -ExpectedPrivateReportingUrl 'https://github.com/SadPossum/GMA-Skeleton/security/advisories/new' `

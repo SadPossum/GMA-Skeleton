@@ -7,6 +7,9 @@ param(
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
+& (Join-Path $PSScriptRoot 'sync-solution.ps1') -Check
+& (Join-Path $PSScriptRoot 'check-source-solutions.ps1')
+
 $solutions = @('GMA-Skeleton.slnx')
 
 if ($FocusedSolutions) {

@@ -1014,13 +1014,16 @@ public sealed partial class ModuleMetadataTests
             .GetConstructors()
             .Single()
             .GetParameters()
-            .Select(parameter => CreateSampleValue(parameter.ParameterType, parameter.Name ?? string.Empty))
+            .Select(parameter => CreateSampleValue(
+                parameter.ParameterType,
+                parameter.Name ?? string.Empty,
+                eventType))
             .ToArray();
 
         return (IIntegrationEvent)Activator.CreateInstance(eventType, arguments)!;
     }
 
-    private static object? CreateSampleValue(Type type, string parameterName)
+    private static object? CreateSampleValue(Type type, string parameterName, Type eventType)
     {
         Type effectiveType = Nullable.GetUnderlyingType(type) ?? type;
 
@@ -1047,14 +1050,24 @@ public sealed partial class ModuleMetadataTests
         if (effectiveType == typeof(DateTimeOffset))
         {
             DateTimeOffset occurredAtUtc = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            return parameterName.Contains("expires", StringComparison.OrdinalIgnoreCase)
-                ? occurredAtUtc.AddDays(1)
-                : occurredAtUtc;
+            if (!parameterName.Contains("expires", StringComparison.OrdinalIgnoreCase))
+            {
+                return occurredAtUtc;
+            }
+
+            return eventType.Name.EndsWith("ExpiredIntegrationEvent", StringComparison.Ordinal)
+                ? occurredAtUtc.AddMinutes(-1)
+                : occurredAtUtc.AddDays(1);
         }
 
         if (effectiveType == typeof(int))
         {
             return 1;
+        }
+
+        if (effectiveType == typeof(long))
+        {
+            return 1L;
         }
 
         if (effectiveType == typeof(decimal))

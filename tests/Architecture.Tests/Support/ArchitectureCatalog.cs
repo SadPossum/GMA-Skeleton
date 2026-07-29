@@ -43,6 +43,13 @@ using Gma.Modules.Notifications.Api;
 using Gma.Modules.Notifications.Contracts;
 using Gma.Modules.Notifications.Domain.Aggregates;
 using Gma.Modules.Notifications.Persistence;
+using Gma.Modules.Organizations.Admin.Contracts;
+using Gma.Modules.Organizations.AdminApi;
+using Gma.Modules.Organizations.AdminCli;
+using Gma.Modules.Organizations.Api;
+using Gma.Modules.Organizations.Contracts;
+using Gma.Modules.Organizations.Domain.Aggregates;
+using Gma.Modules.Organizations.Persistence;
 using Gma.Modules.TaskRuntime.Admin.Contracts;
 using Gma.Modules.TaskRuntime.AdminApi;
 using Gma.Modules.TaskRuntime.AdminCli;
@@ -115,6 +122,15 @@ internal static class ArchitectureCatalog
         new("Notifications", "Gma.Modules.Notifications.Domain", ModuleProjectKind.Domain, typeof(UserNotification).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.Notifications.Persistence.DependencyInjection).Assembly),
 
+        new("Organizations", "Gma.Modules.Organizations.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(OrganizationsAdminPermissions).Assembly),
+        new("Organizations", "Gma.Modules.Organizations.AdminCli", ModuleProjectKind.AdminCli, typeof(OrganizationsAdminCliModule).Assembly),
+        new("Organizations", "Gma.Modules.Organizations.AdminApi", ModuleProjectKind.AdminApi, typeof(OrganizationsAdminApiModule).Assembly),
+        new("Organizations", "Gma.Modules.Organizations.Api", ModuleProjectKind.Api, typeof(OrganizationsModule).Assembly),
+        new("Organizations", "Gma.Modules.Organizations.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Organizations.Application.DependencyInjection).Assembly),
+        new("Organizations", "Gma.Modules.Organizations.Contracts", ModuleProjectKind.Contracts, typeof(OrganizationsModuleMetadata).Assembly),
+        new("Organizations", "Gma.Modules.Organizations.Domain", ModuleProjectKind.Domain, typeof(Organization).Assembly),
+        new("Organizations", "Gma.Modules.Organizations.Persistence", ModuleProjectKind.Persistence, typeof(Gma.Modules.Organizations.Persistence.DependencyInjection).Assembly),
+
         new("Ordering", "Ordering.Api", ModuleProjectKind.Api, typeof(OrderingModule).Assembly),
         new("Ordering", "Ordering.Application", ModuleProjectKind.Application, typeof(Ordering.Application.DependencyInjection).Assembly),
         new("Ordering", "Ordering.Contracts", ModuleProjectKind.Contracts, typeof(OrderingModuleMetadata).Assembly),
@@ -143,6 +159,7 @@ internal static class ArchitectureCatalog
         CatalogModuleMetadata.Descriptor,
         FilesModuleMetadata.Descriptor,
         NotificationsModuleMetadata.Descriptor,
+        OrganizationsModuleMetadata.Descriptor,
         OrderingModuleMetadata.Descriptor,
         TaskRuntimeModuleMetadata.Descriptor,
         TaskSamplesModuleMetadata.Descriptor,
@@ -177,6 +194,7 @@ internal static class ArchitectureCatalog
         typeof(AdministrationAdminCliModule).Assembly,
         typeof(AuthAdminCliModule).Assembly,
         typeof(CatalogAdminCliModule).Assembly,
+        typeof(OrganizationsAdminCliModule).Assembly,
         typeof(TaskRuntimeAdminCliModule).Assembly,
         typeof(Gma.Framework.Administration.Cli.AdminCliExecutor).Assembly,
         AdminCliAssemblyReference.Assembly,
