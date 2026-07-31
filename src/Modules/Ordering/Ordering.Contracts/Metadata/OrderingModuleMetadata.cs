@@ -26,6 +26,7 @@ public static class OrderingModuleMetadata
         .WithSubscription<CatalogItemDiscontinuedIntegrationEvent>(CatalogModuleMetadata.Name, CatalogItemDiscontinuedProjectionHandlerName)
         .WithPublishedEvent<UserNotificationRequestedIntegrationEvent>()
         .WithPublishedEvent<UserNotificationRequestedIntegrationEventV2>()
+        .WithPublishedEvent<UserNotificationRequestedIntegrationEventV3>()
         .WithTask<RebuildCatalogItemProjectionPayload>()
         .WithProfile(OrderingProfiles.Default)
         .Build();

@@ -42,7 +42,7 @@ internal sealed class CatalogItemChangeNotificationPublisher(
                 JsonOptions);
 
             await outbox.EnqueueAsync(
-                new UserNotificationRequestedIntegrationEventV2(
+                new UserNotificationRequestedIntegrationEventV3(
                     idGenerator.NewId(),
                     scopeId,
                     clock.UtcNow,
@@ -61,6 +61,11 @@ internal sealed class CatalogItemChangeNotificationPublisher(
                             NotificationTagKind.Domain,
                             "Order updates",
                             "Changes to catalog items referenced by the recipient's orders.")
+                    ],
+                    [
+                        NotificationHistoryReference.FromCanonicalCoordinate(
+                            "catalog-item",
+                            $"catalog-item/v1|{scopeId}|{catalogItemId:D}")
                     ]),
                 cancellationToken).ConfigureAwait(false);
         }

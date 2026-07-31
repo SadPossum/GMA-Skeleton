@@ -1091,6 +1091,16 @@ public sealed partial class ModuleMetadataTests
             };
         }
 
+        if (effectiveType == typeof(IReadOnlyCollection<Gma.Modules.Notifications.Contracts.NotificationHistoryReference>) ||
+            effectiveType == typeof(IReadOnlyList<Gma.Modules.Notifications.Contracts.NotificationHistoryReference>))
+        {
+            return new Gma.Modules.Notifications.Contracts.NotificationHistoryReference[]
+            {
+                Gma.Modules.Notifications.Contracts.NotificationHistoryReference
+                    .FromCanonicalCoordinate("sample", "sample")
+            };
+        }
+
         if (effectiveType.IsEnum)
         {
             Array values = Enum.GetValues(effectiveType);

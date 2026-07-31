@@ -60,12 +60,12 @@ public sealed class OrderingNotificationIntegrationTests
         Assert.Equal(CatalogItemId, projection.CatalogItemId);
         Assert.Equal(["US"], projection.AvailableRegions);
         Assert.Equal(["user-1", "user-2"], outbox.Events
-            .OfType<UserNotificationRequestedIntegrationEventV2>()
+            .OfType<UserNotificationRequestedIntegrationEventV3>()
             .Select(integrationEvent => integrationEvent.UserId)
             .Order(StringComparer.Ordinal)
             .ToArray());
         Assert.All(
-            outbox.Events.OfType<UserNotificationRequestedIntegrationEventV2>(),
+            outbox.Events.OfType<UserNotificationRequestedIntegrationEventV3>(),
             integrationEvent =>
             {
                 Assert.Equal("tenant-a", integrationEvent.ScopeId);
@@ -74,6 +74,13 @@ public sealed class OrderingNotificationIntegrationTests
                 Assert.Equal(OrderingNotificationNames.CatalogItemChangedVersion, integrationEvent.NotificationVersion);
                 Assert.Contains(integrationEvent.Tags, tag => tag.Key == "delivery:web");
                 Assert.Contains(integrationEvent.Tags, tag => tag.Key == "domain:order-updates");
+                Assert.Equal(
+                    [
+                        NotificationHistoryReference.FromCanonicalCoordinate(
+                            "catalog-item",
+                            $"catalog-item/v1|tenant-a|{CatalogItemId:D}")
+                    ],
+                    integrationEvent.References);
             });
     }
 
