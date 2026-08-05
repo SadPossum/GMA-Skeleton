@@ -39,6 +39,7 @@ using Gma.Modules.Files.Contracts;
 using Gma.Modules.Notifications.Adapters.Email;
 using Gma.Modules.Notifications.Admin.Contracts;
 using Gma.Modules.Notifications.AdminApi;
+using Gma.Modules.Notifications.AdminCli;
 using Gma.Modules.Notifications.Api;
 using Gma.Modules.Notifications.Contracts;
 using Gma.Modules.Notifications.Domain.Aggregates;
@@ -116,6 +117,7 @@ internal static class ArchitectureCatalog
         new("Notifications", "Gma.Modules.Notifications.Api", ModuleProjectKind.Api, typeof(NotificationsModule).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Admin.Contracts", ModuleProjectKind.AdminContracts, typeof(NotificationsAdminPermissions).Assembly),
         new("Notifications", "Gma.Modules.Notifications.AdminApi", ModuleProjectKind.AdminApi, typeof(NotificationsAdminApiModule).Assembly),
+        new("Notifications", "Gma.Modules.Notifications.AdminCli", ModuleProjectKind.AdminCli, typeof(NotificationsAdminCliModule).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Adapters.Email", ModuleProjectKind.Infrastructure, typeof(Gma.Modules.Notifications.Adapters.Email.DependencyInjection).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Application", ModuleProjectKind.Application, typeof(Gma.Modules.Notifications.Application.DependencyInjection).Assembly),
         new("Notifications", "Gma.Modules.Notifications.Contracts", ModuleProjectKind.Contracts, typeof(NotificationsModuleMetadata).Assembly),

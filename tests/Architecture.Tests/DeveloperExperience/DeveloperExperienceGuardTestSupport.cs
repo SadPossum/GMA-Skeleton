@@ -1326,6 +1326,7 @@ public sealed partial class DeveloperExperienceGuardTests
     {
         string source = File.ReadAllText(markdownFile);
         string markdownDirectory = Path.GetDirectoryName(markdownFile)!;
+        string documentationOwnerRoot = FindDocumentationOwnerRoot(repositoryRoot, markdownFile);
 
         foreach (Match match in MarkdownLinkPattern().Matches(source))
         {
@@ -1350,10 +1351,10 @@ public sealed partial class DeveloperExperienceGuardTests
             string normalizedTarget = Uri.UnescapeDataString(localTarget)
                 .Replace('/', Path.DirectorySeparatorChar);
             string resolvedPath = Path.GetFullPath(Path.Combine(markdownDirectory, normalizedTarget));
-            if (!IsUnder(resolvedPath, repositoryRoot) &&
-                !string.Equals(resolvedPath, repositoryRoot, StringComparison.OrdinalIgnoreCase))
+            if (!IsUnder(resolvedPath, documentationOwnerRoot) &&
+                !string.Equals(resolvedPath, documentationOwnerRoot, StringComparison.OrdinalIgnoreCase))
             {
-                yield return $"{Path.GetRelativePath(repositoryRoot, markdownFile)} links outside the repository: {target}";
+                yield return $"{Path.GetRelativePath(repositoryRoot, markdownFile)} links outside its source package: {target}";
                 continue;
             }
 
@@ -1365,6 +1366,18 @@ public sealed partial class DeveloperExperienceGuardTests
             }
         }
     }
+
+    private static string FindDocumentationOwnerRoot(
+        string repositoryRoot,
+        string markdownFile) =>
+        GmaSourceLayout.FromRepositoryRoot(repositoryRoot)
+            .DocumentationRoots()
+            .Select(Path.GetDirectoryName)
+            .Where(path => path is not null &&
+                           (IsUnder(markdownFile, path) ||
+                            string.Equals(markdownFile, path, StringComparison.OrdinalIgnoreCase)))
+            .OrderByDescending(path => path!.Length)
+            .FirstOrDefault() ?? repositoryRoot;
 
     private static bool TryResolveSourceLayoutDocumentationTarget(
         string repositoryRoot,

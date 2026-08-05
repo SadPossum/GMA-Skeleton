@@ -110,9 +110,9 @@ $script:GmaKnownModuleSpecs = @(
         AdminApiProject = 'Gma.Modules.Notifications.AdminApi'
         AdminApiNamespace = 'Gma.Modules.Notifications.AdminApi'
         AdminApiModuleType = 'NotificationsAdminApiModule'
-        AdminCliProject = $null
-        AdminCliNamespace = $null
-        AdminCliModuleType = $null
+        AdminCliProject = 'Gma.Modules.Notifications.AdminCli'
+        AdminCliNamespace = 'Gma.Modules.Notifications.AdminCli'
+        AdminCliModuleType = 'NotificationsAdminCliModule'
     },
     [pscustomobject] @{
         Alias = 'organizations'

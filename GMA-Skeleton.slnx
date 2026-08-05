@@ -50,6 +50,7 @@
     <File Path="docs/architecture/gma-rebrand-and-source-repo-split.md" />
     <File Path="docs/architecture/overview.md" />
     <File Path="docs/architecture/release-evidence-task.md" />
+    <File Path="docs/architecture/source-compatibility-revalidation-task.md" />
     <File Path="docs/architecture/supply-chain-baseline-task.md" />
   </Folder>
   <Folder Name="/docs/examples/">
@@ -338,6 +339,7 @@
   <Folder Name="/gma/modules/notifications/src/Admin/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Admin.Contracts/Gma.Modules.Notifications.Admin.Contracts.csproj" />
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.AdminApi/Gma.Modules.Notifications.AdminApi.csproj" />
+    <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.AdminCli/Gma.Modules.Notifications.AdminCli.csproj" />
   </Folder>
   <Folder Name="/gma/modules/notifications/src/Api/">
     <Project Path="gma/modules/notifications/src/Gma.Modules.Notifications.Api/Gma.Modules.Notifications.Api.csproj" />

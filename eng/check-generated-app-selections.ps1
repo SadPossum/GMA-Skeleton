@@ -1,7 +1,33 @@
 [CmdletBinding()]
-param()
+param(
+    [string] $FrameworkSourceRoot,
+    [string] $ExtensionsSourceRoot,
+    [string] $ModulesSourceRoot
+)
 
 . (Join-Path $PSScriptRoot 'common.ps1')
+
+function Resolve-SelectionSourceRoot {
+    param(
+        [string] $ConfiguredPath,
+        [Parameter(Mandatory = $true)]
+        [string] $DefaultPath
+    )
+
+    $candidate = if ([string]::IsNullOrWhiteSpace($ConfiguredPath)) {
+        Join-GmaPath $DefaultPath
+    }
+    else {
+        $ConfiguredPath
+    }
+    $resolved = [System.IO.Path]::GetFullPath($candidate)
+    if (-not (Test-Path -LiteralPath $resolved -PathType Container)) {
+        throw "Generated selection source root does not exist: $resolved"
+    }
+
+    return $resolved.TrimEnd('\', '/') +
+        [string][System.IO.Path]::DirectorySeparatorChar
+}
 
 $matrixRoot = Join-GmaPath '.tmp\generated-selection-matrix'
 $temporaryRoot = [System.IO.Path]::GetFullPath((Join-GmaPath '.tmp')).TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
@@ -220,6 +246,7 @@ foreach ($case in $cases) {
                 'AddAuthAdminApiModule(AuthProfile.Global())',
                 'AddAuthAdminModule(AuthProfile.Global())',
                 'AddAdminApiModule<NotificationsAdminApiModule>',
+                'AddAdminModule<NotificationsAdminCliModule>',
                 'AddAdminApiModule<OrganizationsAdminApiModule>',
                 'AddAdminApiModule<TaskRuntimeAdminApiModule>',
                 'AddAdminModule<OrganizationsAdminCliModule>',
@@ -306,18 +333,24 @@ $buildCaseRoot = Join-Path $resolvedMatrixRoot $buildCaseName
 $sourceRootContent = [System.IO.File]::ReadAllText(
     (Join-Path $buildCaseRoot 'Gma.SourceRoots.props.example'))
 $directorySeparator = [string][System.IO.Path]::DirectorySeparatorChar
-$frameworkSourceRoot = [System.IO.Path]::GetFullPath((Join-GmaPath 'gma\framework\src')).TrimEnd('\', '/') + $directorySeparator
-$extensionsSourceRoot = [System.IO.Path]::GetFullPath((Join-GmaPath 'gma\extensions\src')).TrimEnd('\', '/') + $directorySeparator
-$modulesSourceRoot = [System.IO.Path]::GetFullPath((Join-GmaPath 'gma\modules')).TrimEnd('\', '/') + $directorySeparator
+$resolvedFrameworkSourceRoot = Resolve-SelectionSourceRoot `
+    -ConfiguredPath $FrameworkSourceRoot `
+    -DefaultPath 'gma\framework\src'
+$resolvedExtensionsSourceRoot = Resolve-SelectionSourceRoot `
+    -ConfiguredPath $ExtensionsSourceRoot `
+    -DefaultPath 'gma\extensions\src'
+$resolvedModulesSourceRoot = Resolve-SelectionSourceRoot `
+    -ConfiguredPath $ModulesSourceRoot `
+    -DefaultPath 'gma\modules'
 $sourceRootContent = $sourceRootContent.Replace(
     '$(MSBuildThisFileDirectory)gma\framework\src\',
-    $frameworkSourceRoot)
+    $resolvedFrameworkSourceRoot)
 $sourceRootContent = $sourceRootContent.Replace(
     '$(MSBuildThisFileDirectory)gma\extensions\src\',
-    $extensionsSourceRoot)
+    $resolvedExtensionsSourceRoot)
 $sourceRootContent = $sourceRootContent.Replace(
     '$(MSBuildThisFileDirectory)gma\modules\',
-    $modulesSourceRoot)
+    $resolvedModulesSourceRoot)
 $sourceRootContent = $sourceRootContent.Replace('\', $directorySeparator)
 [System.IO.File]::WriteAllText(
     (Join-Path $buildCaseRoot 'Gma.SourceRoots.props'),
