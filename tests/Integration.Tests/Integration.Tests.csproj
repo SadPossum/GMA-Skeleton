@@ -66,6 +66,7 @@
     <ProjectReference Include="$(GmaModuleTaskRuntimeRoot)Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations\Gma.Modules.TaskRuntime.Persistence.PostgreSqlMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleTaskRuntimeRoot)Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations\Gma.Modules.TaskRuntime.Persistence.SqlServerMigrations.csproj" />
     <ProjectReference Include="$(GmaModuleTaskRuntimeRoot)Gma.Modules.TaskRuntime.Application\Gma.Modules.TaskRuntime.Application.csproj" />
+    <ProjectReference Include="$(GmaModuleTaskRuntimeRoot)Gma.Modules.TaskRuntime.Contracts\Gma.Modules.TaskRuntime.Contracts.csproj" />
     <ProjectReference Include="$(GmaModuleTaskSamplesRoot)TaskSamples.Application\TaskSamples.Application.csproj" />
     <ProjectReference Include="$(GmaModuleTaskSamplesRoot)TaskSamples.Contracts\TaskSamples.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Hosts\Host.Api\Host.Api.csproj" />

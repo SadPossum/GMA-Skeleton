@@ -75,7 +75,7 @@ public sealed class TaskRuntimeIntegrationTests
                 taskName: TaskSamples.Contracts.SlowReportTaskPayload.TaskName)
             .ConfigureAwait(false);
         await application.StartAsync().ConfigureAwait(false);
-        Result<TaskControlMessage> control = await application.SendControlThroughApplicationAsync(
+        Result<TaskControlMessage> control = await application.SendControlThroughContractAsync(
                 runId,
                 TaskControlCommandNames.Cancel,
                 "{}",

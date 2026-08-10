@@ -1,7 +1,6 @@
 namespace Integration.Tests.Support;
 
 using System.Text.Json;
-using Gma.Framework.Cqrs;
 using Gma.Framework.Persistence.EntityFrameworkCore;
 using Gma.Framework.Results;
 using Gma.Framework.Tasks;
@@ -10,7 +9,7 @@ using Gma.Framework.Tasks.Infrastructure;
 using Gma.Framework.Tenancy.Infrastructure;
 using Gma.Framework.Tenancy.Tasks;
 using Gma.Modules.TaskRuntime.Application;
-using Gma.Modules.TaskRuntime.Application.Commands;
+using Gma.Modules.TaskRuntime.Contracts;
 using Gma.Modules.TaskRuntime.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -135,16 +134,16 @@ internal sealed class TaskRuntimeTestApplication : IAsyncDisposable
             .ConfigureAwait(false);
     }
 
-    public async Task<Result<TaskControlMessage>> SendControlThroughApplicationAsync(
+    public async Task<Result<TaskControlMessage>> SendControlThroughContractAsync(
         Guid runId,
         string commandName,
         string payloadJson,
         DateTimeOffset? expiresAtUtc)
     {
         using IServiceScope scope = this.Services.CreateScope();
-        IRequestDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
-        return await dispatcher.SendAsync(
-                new SendTaskControlMessageCommand(
+        ITaskRunController controller = scope.ServiceProvider.GetRequiredService<ITaskRunController>();
+        return await controller.SendControlMessageAsync(
+                new TaskRunControlRequest(
                     runId,
                     commandName,
                     payloadJson,
