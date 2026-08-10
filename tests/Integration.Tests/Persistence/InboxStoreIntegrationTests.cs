@@ -1,15 +1,17 @@
 namespace Integration.Tests;
 
+using System.Data;
 using Catalog.Contracts;
 using DotNet.Testcontainers.Containers;
+using Gma.Framework.Messaging;
+using Gma.Framework.Messaging.Infrastructure;
+using Gma.Framework.Runtime.Infrastructure;
+using Gma.Framework.Scoping.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ordering.Persistence;
-using Gma.Framework.Messaging;
-using Gma.Framework.Messaging.Infrastructure;
-using Gma.Framework.Scoping.Infrastructure;
-using Gma.Framework.Runtime.Infrastructure;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -36,6 +38,7 @@ public sealed class InboxStoreIntegrationTests
             1,
             "tenant-a",
             new DateTimeOffset(2026, 6, 30, 12, 0, 0, TimeSpan.Zero));
+        List<IsolationLevel> observedIsolationLevels = [];
 
         using (IServiceScope scope = provider.CreateScope())
         {
@@ -46,6 +49,8 @@ public sealed class InboxStoreIntegrationTests
                 record,
                 _ =>
                 {
+                    observedIsolationLevels.Add(
+                        dbContext.Database.CurrentTransaction!.GetDbTransaction().IsolationLevel);
                     dbContext.CatalogItemProjections.Add(CatalogItemProjection.Create(
                         Guid.NewGuid(),
                         "tenant-a",
@@ -82,6 +87,8 @@ public sealed class InboxStoreIntegrationTests
                 record,
                 _ =>
                 {
+                    observedIsolationLevels.Add(
+                        dbContext.Database.CurrentTransaction!.GetDbTransaction().IsolationLevel);
                     dbContext.CatalogItemProjections.Add(CatalogItemProjection.Create(
                         Guid.NewGuid(),
                         "tenant-a",
@@ -107,6 +114,10 @@ public sealed class InboxStoreIntegrationTests
             Assert.Equal(2, processed.Attempts);
             Assert.Equal(InboxMessageStatus.Processed, processed.Status);
         }
+
+        Assert.Equal(
+            [IsolationLevel.ReadCommitted, IsolationLevel.ReadCommitted],
+            observedIsolationLevels);
     }
 
     [DockerFact]
