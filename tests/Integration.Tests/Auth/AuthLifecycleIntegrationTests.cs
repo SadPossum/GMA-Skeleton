@@ -129,6 +129,14 @@ public sealed class AuthLifecycleIntegrationTests
             Assert.Equal(HttpStatusCode.NoContent, signOut.StatusCode);
             Assert.False(string.IsNullOrWhiteSpace(registered.AccessToken));
 
+            using HttpClient replicaClient = replica.CreateClient();
+            using HttpResponseMessage revokedBearer = await AuthApiClient.GetAsync(
+                replicaClient,
+                "tenant-auth",
+                "/api/integration/authentication-assurance/password",
+                refreshed.AccessToken).ConfigureAwait(false);
+            Assert.Equal(HttpStatusCode.Unauthorized, revokedBearer.StatusCode);
+
             await RunMultiFactorLifecycleAsync(application, replica, client, provider).ConfigureAwait(false);
             await RunBrowserMultiFactorLifecycleAsync(application, provider).ConfigureAwait(false);
         }

@@ -46,6 +46,7 @@ internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled =
         builder.UseSetting("Auth:Jwt:Audience", JwtAudience);
         builder.UseSetting("Auth:Jwt:SigningKey", JwtSigningKey);
         builder.UseSetting("Auth:Jwt:AccessTokenLifetimeMinutes", "15");
+        builder.UseSetting("Auth:BearerAdmission:Mode", "TokenLifetime");
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
             configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -67,6 +68,7 @@ internal sealed class NotificationStreamingTestApplication(bool tenancyEnabled =
                 ["Auth:Jwt:Audience"] = JwtAudience,
                 ["Auth:Jwt:SigningKey"] = JwtSigningKey,
                 ["Auth:Jwt:AccessTokenLifetimeMinutes"] = "15",
+                ["Auth:BearerAdmission:Mode"] = "TokenLifetime",
             });
         });
 

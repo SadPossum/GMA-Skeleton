@@ -49,6 +49,7 @@ internal sealed class AuthTestApplication(
         builder.UseSetting("Auth:Jwt:Audience", JwtAudience);
         builder.UseSetting("Auth:Jwt:SigningKey", JwtSigningKey);
         builder.UseSetting("Auth:Jwt:AccessTokenLifetimeMinutes", "15");
+        builder.UseSetting("Auth:BearerAdmission:Mode", "ActiveSession");
         builder.UseSetting("Auth:RefreshTokens:Pepper", RefreshTokenPepper);
         builder.UseSetting("DataProtection:ApplicationName", "GMA-Skeleton.IntegrationTests");
         builder.UseSetting("DataProtection:KeyRingPath", dataProtectionKeyRingPath ?? string.Empty);
@@ -66,6 +67,7 @@ internal sealed class AuthTestApplication(
                 ["Auth:Jwt:Audience"] = JwtAudience,
                 ["Auth:Jwt:SigningKey"] = JwtSigningKey,
                 ["Auth:Jwt:AccessTokenLifetimeMinutes"] = "15",
+                ["Auth:BearerAdmission:Mode"] = "ActiveSession",
                 ["DataProtection:ApplicationName"] = "GMA-Skeleton.IntegrationTests",
                 ["DataProtection:KeyRingPath"] = dataProtectionKeyRingPath,
                 ["NatsJetStream:Enabled"] = disableOutboxPublisher ? "false" : "true",

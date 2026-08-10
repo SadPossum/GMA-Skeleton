@@ -131,6 +131,24 @@ public sealed class DurableRuntimeConfigurationTests
         Assert.True(retention.GetProperty("AuthenticationFailureHistoryHours").GetInt32() > 0);
     }
 
+    [Fact]
+    public void Bearer_api_hosts_require_active_auth_session_admission()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+
+        foreach (string host in new[] { "Host.Api", "Host.AdminApi" })
+        {
+            using JsonDocument document = ReadAppSettings(repositoryRoot, host);
+            Assert.Equal(
+                "ActiveSession",
+                document.RootElement
+                    .GetProperty("Auth")
+                    .GetProperty("BearerAdmission")
+                    .GetProperty("Mode")
+                    .GetString());
+        }
+    }
+
     private static JsonDocument ReadAppSettings(
         string repositoryRoot,
         string host,
