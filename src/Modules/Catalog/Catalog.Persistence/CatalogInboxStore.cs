@@ -1,8 +1,18 @@
 namespace Catalog.Persistence;
 
+using Gma.Framework.Application.Events;
+using Gma.Framework.Persistence.EntityFrameworkCore;
 using Gma.Framework.Runtime.Identity;
 using Gma.Framework.Runtime.Time;
-using Gma.Framework.Messaging.Infrastructure;
 
-internal sealed class CatalogInboxStore(CatalogDbContext dbContext, ISystemClock clock, IIdGenerator idGenerator)
-    : EfInboxStore<CatalogDbContext>(dbContext, clock, idGenerator, CatalogMigrations.Schema);
+internal sealed class CatalogInboxStore(
+    CatalogDbContext dbContext,
+    ISystemClock clock,
+    IIdGenerator idGenerator,
+    IDomainEventDispatcher domainEventDispatcher)
+    : EfDomainEventInboxStore<CatalogDbContext>(
+        dbContext,
+        clock,
+        idGenerator,
+        domainEventDispatcher,
+        CatalogMigrations.Schema);

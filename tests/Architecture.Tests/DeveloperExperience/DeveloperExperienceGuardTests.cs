@@ -5541,7 +5541,9 @@ public sealed partial class DeveloperExperienceGuardTests
                     @"..\Gma.Framework.Application.Events\Gma.Framework.Application.Events.csproj",
                     @"..\Gma.Framework.Cqrs\Gma.Framework.Cqrs.csproj",
                     @"..\Gma.Framework.Domain\Gma.Framework.Domain.csproj",
+                    @"..\Gma.Framework.Messaging.Infrastructure\Gma.Framework.Messaging.Infrastructure.csproj",
                     @"..\Gma.Framework.Naming\Gma.Framework.Naming.csproj",
+                    @"..\Gma.Framework.Runtime\Gma.Framework.Runtime.csproj",
                     @"..\Gma.Framework.Scoping\Gma.Framework.Scoping.csproj"
                 ]),
             new(
@@ -7160,10 +7162,12 @@ public sealed partial class DeveloperExperienceGuardTests
         string scaffolder = File.ReadAllText(ModuleScaffolderPath(repositoryRoot));
         string[] requiredTokens =
         [
+            "using Gma.Framework.Application.Events;",
             "using Gma.Framework.Naming;",
             "using Gma.Framework.Runtime.Identity;",
             "IIdGenerator idGenerator",
-            ": EfInboxStore<${Name}DbContext>(dbContext, clock, idGenerator,"
+            "IDomainEventDispatcher domainEventDispatcher",
+            ": EfDomainEventInboxStore<${Name}DbContext>("
         ];
         string[] offenders = requiredTokens
             .Where(token => !scaffolder.Contains(token, StringComparison.Ordinal))
@@ -7318,7 +7322,7 @@ public sealed partial class DeveloperExperienceGuardTests
             ": EfDomainEventUnitOfWork<${Name}DbContext>(${Name}Migrations.Schema, dbContext, domainEventDispatcher)",
             ": EfOutboxWriter<${Name}DbContext>(dbContext, clock, applicationIdentity, ${Name}Migrations.Schema);",
             ": EfOutboxStore<${Name}DbContext>(dbContext, options, ${Name}Migrations.Schema);",
-            ": EfInboxStore<${Name}DbContext>(dbContext, clock, idGenerator, ${Name}Migrations.Schema)"
+            ": EfDomainEventInboxStore<${Name}DbContext>("
         ];
         string[] forbiddenTokens =
         [
@@ -7838,7 +7842,7 @@ public sealed partial class DeveloperExperienceGuardTests
         string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
         string[] offenders = EnumerateSourceFiles(modulesRoot)
             .Where(path => Path.GetFileName(path).EndsWith("InboxStore.cs", StringComparison.Ordinal))
-            .Where(path => File.ReadAllText(path).Contains(": EfInboxStore<", StringComparison.Ordinal))
+            .Where(path => File.ReadAllText(path).Contains("InboxStore<", StringComparison.Ordinal))
             .Where(path => RawStringArgumentPattern().IsMatch(File.ReadAllText(path)))
             .Select(path => Path.GetRelativePath(repositoryRoot, path))
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -7857,10 +7861,15 @@ public sealed partial class DeveloperExperienceGuardTests
             .Where(path =>
             {
                 string source = File.ReadAllText(path);
-                return !source.Contains(": EfInboxStore<", StringComparison.Ordinal) ||
+                bool usesSharedBase = source.Contains(
+                    ": EfDomainEventInboxStore<",
+                    StringComparison.Ordinal) || source.Contains(
+                    ": EfInboxStore<",
+                    StringComparison.Ordinal);
+                return !usesSharedBase ||
                        source.Contains("ProcessAsync(", StringComparison.Ordinal);
             })
-            .Select(path => $"{Path.GetRelativePath(repositoryRoot, path)} should inherit EfInboxStore without hand-written process logic")
+            .Select(path => $"{Path.GetRelativePath(repositoryRoot, path)} should inherit a shared EF inbox store without hand-written process logic")
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 

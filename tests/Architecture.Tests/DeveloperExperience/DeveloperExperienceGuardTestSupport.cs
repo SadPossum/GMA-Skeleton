@@ -24,6 +24,23 @@ using Xunit;
 [Trait("Category", "Architecture")]
 public sealed partial class DeveloperExperienceGuardTests
 {
+    [Fact]
+    public void Product_domain_module_inbox_stores_dispatch_domain_events_transactionally()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string modulesRoot = Path.Combine(repositoryRoot, "src", "Modules");
+        string[] offenders = Directory
+            .EnumerateFiles(modulesRoot, "*InboxStore.cs", SearchOption.AllDirectories)
+            .Where(path => !File.ReadAllText(path).Contains(
+                ": EfDomainEventInboxStore<",
+                StringComparison.Ordinal))
+            .Select(path => Path.GetRelativePath(repositoryRoot, path))
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
     private static bool ImplementsOpenGeneric(Type type, Type openGenericInterface) =>
         type.GetInterfaces()
             .Any(@interface =>
