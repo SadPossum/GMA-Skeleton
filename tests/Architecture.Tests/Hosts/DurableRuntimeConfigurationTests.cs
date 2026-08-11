@@ -38,7 +38,9 @@ public sealed class DurableRuntimeConfigurationTests
             Assert.True(ParseDuration(jetStream, "MaxAge") > TimeSpan.Zero);
             Assert.True(jetStream.GetProperty("MaxBytes").GetInt64() > 0);
             Assert.True(jetStream.GetProperty("MaxMessages").GetInt64() > 0);
+            Assert.True(jetStream.GetProperty("MaxMessageSize").GetInt32() > 0);
             Assert.True(jetStream.GetProperty("Replicas").GetInt32() > 0);
+            Assert.Equal("Old", jetStream.GetProperty("DiscardPolicy").GetString());
 
             Assert.True(ParseDuration(consumers, "AckProgressInterval") <
                         ParseDuration(consumers, "AckWait"));

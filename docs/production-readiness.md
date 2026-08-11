@@ -14,7 +14,9 @@ The skeleton provides a hardened, explicit foundation; it cannot choose deployme
   within 90 days, and target an exact repository path or package URL;
 - payload-free, registry-bounded security signal records with opaque incident correlation, structured logs, and metrics; generated ServiceDefaults compose the real recorder while modules own their finite definitions;
 - Auth password/blocklist/throttling/rehash behavior, key-ring rotation, refresh reuse revocation, optimistic concurrency, multi-provider external identities, safe explicit linking, hashed one-time OIDC handoffs, email-verification state, optional TOTP/recovery-code MFA, and security events;
-- atomic first-owner bootstrap, no-store organization token responses, sensitive-route throttling, disabled-by-default bounded organization-domain retention, outbox backlog metrics, disabled-by-default bounded message-journal and task-history retention, lease heartbeats, managed/external JetStream ownership with finite limits, in-progress consumer acknowledgements, tagged notification preferences/routing, leased at-least-once notification delivery with bounded retries/receipts/retention, and a fail-closed file inspection seam.
+- atomic first-owner bootstrap, no-store organization token responses, sensitive-route throttling, disabled-by-default bounded organization-domain retention, outbox backlog metrics, disabled-by-default bounded message-journal and task-history retention, lease heartbeats, managed/external JetStream ownership with finite age/byte/count/message-size and discard policies, in-progress consumer acknowledgements, tagged notification preferences/routing, leased at-least-once notification delivery with bounded retries/receipts/retention, and a fail-closed file inspection seam.
+
+Provider-backed conformance tests verify bounded journal cleanup on PostgreSQL and SQL Server, managed-stream idempotence, external-stream drift rejection, acknowledgement progress for slow handlers, and redelivery after progress stops. The SQL Server sample migration also exercises its collation change from an empty database while preserving dependent keys and indexes.
 
 ## Deployment Must Supply
 

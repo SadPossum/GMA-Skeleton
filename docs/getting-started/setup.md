@@ -136,6 +136,7 @@ Core runtime keys:
 - `Outbox:MaxAttempts`
 - `NatsJetStream:Enabled`
 - `NatsJetStream:StreamName` optional physical override; defaults from `ApplicationIdentity:Namespace`
+- `NatsJetStream:MaxMessageSize` and `NatsJetStream:DiscardPolicy` as explicit finite stream safety bounds
 - `ConnectionStrings:nats` when JetStream publishing is enabled
 - `NatsConsumers:Enabled`
 - `NatsConsumers:DurablePrefix` optional physical override; defaults to `ApplicationIdentity:Namespace`

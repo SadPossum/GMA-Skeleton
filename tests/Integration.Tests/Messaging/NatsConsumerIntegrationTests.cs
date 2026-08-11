@@ -197,6 +197,189 @@ public sealed class NatsConsumerIntegrationTests
         Assert.Equal(message.Payload, storedMessages[0].Data);
     }
 
+    [DockerFact]
+    [Trait("Category", "Docker")]
+    [Trait("Category", "Integration")]
+    public async Task Stream_manager_enforces_safety_and_progress_ownership_until_reporting_stops()
+    {
+        await using IContainer nats = AuthTestContainers.CreateNatsContainer();
+        await nats.StartAsync();
+
+        string streamName = $"GMA_LIMITS_{Guid.NewGuid():N}".ToUpperInvariant();
+        ApplicationIdentityOptions applicationIdentity = new();
+        NatsJetStreamOptions managedOptions = new()
+        {
+            Enabled = true,
+            StreamName = streamName,
+            ManagementMode = NatsStreamManagementMode.Managed,
+            Storage = NatsStreamStorage.Memory,
+            MaxAge = TimeSpan.FromHours(6),
+            MaxBytes = 8_388_608,
+            MaxMessages = 2_000,
+            MaxMessageSize = 4_096,
+            Replicas = 1,
+            DiscardPolicy = NatsStreamDiscardPolicy.New,
+            DuplicateWindow = TimeSpan.FromMinutes(1),
+        };
+        await using NatsConnection connection = new(new NatsOpts
+        {
+            Url = AuthTestContainers.GetNatsConnectionString(nats),
+        });
+        using NatsJetStreamStreamManager managed = new(
+            connection,
+            Options.Create(managedOptions),
+            Options.Create(applicationIdentity),
+            NullLogger<NatsJetStreamStreamManager>.Instance);
+
+        await managed.EnsureReadyAsync(CancellationToken.None).ConfigureAwait(false);
+
+        NatsJSContext jetStream = new(connection);
+        INatsJSStream stream = await jetStream.GetStreamAsync(
+                streamName,
+                cancellationToken: CancellationToken.None)
+            .ConfigureAwait(false);
+        StreamConfig actual = stream.Info.Config;
+        Assert.Equal(managedOptions.MaxAge, actual.MaxAge);
+        Assert.Equal(managedOptions.MaxBytes, actual.MaxBytes);
+        Assert.Equal(managedOptions.MaxMessages, actual.MaxMsgs);
+        Assert.Equal(managedOptions.MaxMessageSize, actual.MaxMsgSize);
+        Assert.Equal(StreamConfigDiscard.New, actual.Discard);
+
+        using NatsJetStreamStreamManager idempotentManaged = new(
+            connection,
+            Options.Create(managedOptions),
+            Options.Create(applicationIdentity),
+            NullLogger<NatsJetStreamStreamManager>.Instance);
+        await idempotentManaged.EnsureReadyAsync(CancellationToken.None).ConfigureAwait(false);
+
+        string progressSubject = $"{applicationIdentity.EffectiveNamespace}.progress.proof.v1";
+        INatsJSConsumer progressConsumer = await jetStream.CreateOrUpdateConsumerAsync(
+                streamName,
+                new ConsumerConfig($"progress-{Guid.NewGuid():N}")
+                {
+                    FilterSubject = progressSubject,
+                    AckWait = TimeSpan.FromMilliseconds(500),
+                    MaxDeliver = 3,
+                    MaxAckPending = 1,
+                },
+                CancellationToken.None)
+            .ConfigureAwait(false);
+        PubAckResponse publishAck = await jetStream.PublishAsync(
+                progressSubject,
+                "progress-proof",
+                cancellationToken: CancellationToken.None)
+            .ConfigureAwait(false);
+        publishAck.EnsureSuccess();
+
+        INatsJSMsg<string>? firstDeliveryCandidate = await FetchOneAsync(
+                progressConsumer,
+                TimeSpan.FromSeconds(2))
+            .ConfigureAwait(false);
+        Assert.NotNull(firstDeliveryCandidate);
+        INatsJSMsg<string> firstDelivery = firstDeliveryCandidate;
+        Assert.NotNull(firstDelivery.Metadata);
+        Assert.Equal((ulong)1, firstDelivery.Metadata.Value.NumDelivered);
+
+        using CancellationTokenSource progressStop = new();
+        Task progress = SendProgressAsync(
+            firstDelivery,
+            TimeSpan.FromMilliseconds(150),
+            progressStop.Token);
+        await Task.Delay(TimeSpan.FromMilliseconds(900)).ConfigureAwait(false);
+        Assert.Null(await FetchOneAsync(progressConsumer, TimeSpan.FromMilliseconds(1100)).ConfigureAwait(false));
+
+        await progressStop.CancelAsync().ConfigureAwait(false);
+        await progress.ConfigureAwait(false);
+        INatsJSMsg<string>? redeliveryCandidate = await FetchOneAsync(
+                progressConsumer,
+                TimeSpan.FromSeconds(3))
+            .ConfigureAwait(false);
+        Assert.NotNull(redeliveryCandidate);
+        INatsJSMsg<string> redelivery = redeliveryCandidate;
+        Assert.NotNull(redelivery.Metadata);
+        Assert.Equal((ulong)2, redelivery.Metadata.Value.NumDelivered);
+        await redelivery.AckAsync(cancellationToken: CancellationToken.None).ConfigureAwait(false);
+
+        await jetStream.CreateOrUpdateStreamAsync(
+                new StreamConfig(
+                    streamName,
+                    [NatsJetStreamOptions.CreateSubjectWildcard(applicationIdentity.EffectiveNamespace)])
+                {
+                    MaxAge = managedOptions.MaxAge,
+                    MaxBytes = managedOptions.MaxBytes,
+                    MaxMsgs = managedOptions.MaxMessages,
+                    MaxMsgSize = managedOptions.MaxMessageSize * 2,
+                    NumReplicas = managedOptions.Replicas,
+                    Storage = StreamConfigStorage.Memory,
+                    Discard = StreamConfigDiscard.New,
+                    DuplicateWindow = managedOptions.DuplicateWindow,
+                },
+                CancellationToken.None)
+            .ConfigureAwait(false);
+
+        NatsJetStreamOptions externalOptions = new()
+        {
+            Enabled = true,
+            StreamName = streamName,
+            ManagementMode = NatsStreamManagementMode.External,
+            Storage = managedOptions.Storage,
+            MaxAge = managedOptions.MaxAge,
+            MaxBytes = managedOptions.MaxBytes,
+            MaxMessages = managedOptions.MaxMessages,
+            MaxMessageSize = managedOptions.MaxMessageSize,
+            Replicas = managedOptions.Replicas,
+            DiscardPolicy = managedOptions.DiscardPolicy,
+            DuplicateWindow = managedOptions.DuplicateWindow,
+        };
+        using NatsJetStreamStreamManager external = new(
+            connection,
+            Options.Create(externalOptions),
+            Options.Create(applicationIdentity),
+            NullLogger<NatsJetStreamStreamManager>.Instance);
+
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => external.EnsureReadyAsync(CancellationToken.None));
+        Assert.Contains(nameof(StreamConfig.MaxMsgSize), exception.Message, StringComparison.Ordinal);
+    }
+
+    private static async Task<INatsJSMsg<string>?> FetchOneAsync(
+        INatsJSConsumer consumer,
+        TimeSpan expires)
+    {
+        await foreach (INatsJSMsg<string> message in consumer.FetchAsync(
+                           new NatsJSFetchOpts
+                           {
+                               MaxMsgs = 1,
+                               Expires = expires,
+                           },
+                           NatsDefaultSerializer<string>.Default,
+                           CancellationToken.None)
+                       .ConfigureAwait(false))
+        {
+            return message;
+        }
+
+        return null;
+    }
+
+    private static async Task SendProgressAsync(
+        INatsJSMsg<string> message,
+        TimeSpan interval,
+        CancellationToken cancellationToken)
+    {
+        using PeriodicTimer timer = new(interval);
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false))
+            {
+                await message.AckProgressAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+    }
+
     private static IHost BuildHost(
         string postgreSqlConnectionString,
         string natsConnectionString,
