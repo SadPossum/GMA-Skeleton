@@ -1865,23 +1865,34 @@ $sensitivePathPrefixes = @()
 if ($hasAdminApiHost) {
     $sensitivePathPrefixes += '/api/admin'
 }
+$rateLimitPolicies = @()
 if ($hasAuth) {
-    $sensitivePathPrefixes += @(
-        '/api/auth/register',
-        '/api/auth/login',
-        '/api/auth/refresh',
-        '/api/auth/browser',
-        '/api/auth/password',
-        '/api/auth/external',
-        '/api/auth/email-verification',
-        '/api/auth/mfa'
-    )
+    $rateLimitPolicies += [ordered]@{
+        Name = 'authentication-write'
+        PermitLimit = 10
+        PathPrefixes = @(
+            '/api/auth/register',
+            '/api/auth/login',
+            '/api/auth/refresh',
+            '/api/auth/browser',
+            '/api/auth/password',
+            '/api/auth/external',
+            '/api/auth/email-verification',
+            '/api/auth/mfa'
+        )
+        Methods = @('POST', 'PUT', 'PATCH', 'DELETE')
+    }
 }
 if ($hasOrganizations) {
-    $sensitivePathPrefixes += @(
-        '/api/organization-invitations',
-        '/api/organization-enrollment'
-    )
+    $rateLimitPolicies += [ordered]@{
+        Name = 'organization-join-write'
+        PermitLimit = 10
+        PathPrefixes = @(
+            '/api/organization-invitations',
+            '/api/organization-enrollment'
+        )
+        Methods = @('POST', 'PUT', 'PATCH', 'DELETE')
+    }
 }
 
 $baseSettings = [ordered]@{
@@ -1917,6 +1928,7 @@ $baseSettings = [ordered]@{
             SensitivePermitLimit = 10
             WindowSeconds = 60
             SensitivePathPrefixes = @($sensitivePathPrefixes)
+            Policies = @($rateLimitPolicies)
         }
         PrivateNetwork = [ordered]@{
             Enabled = $false

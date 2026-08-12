@@ -134,6 +134,47 @@ public sealed class DurableRuntimeConfigurationTests
     }
 
     [Fact]
+    public void Api_host_separates_read_traffic_from_sensitive_mutation_budgets()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        using JsonDocument document = ReadAppSettings(repositoryRoot, "Host.Api");
+        JsonElement rateLimiting = document.RootElement
+            .GetProperty("Http")
+            .GetProperty("RateLimiting");
+
+        Assert.Empty(rateLimiting
+            .GetProperty("SensitivePathPrefixes")
+            .EnumerateArray());
+        Dictionary<string, JsonElement> policies = rateLimiting
+            .GetProperty("Policies")
+            .EnumerateArray()
+            .ToDictionary(
+                policy => policy.GetProperty("Name").GetString()!,
+                StringComparer.Ordinal);
+        Assert.Equal(
+            ["authentication-write", "organization-join-write"],
+            policies.Keys.Order(StringComparer.Ordinal));
+
+        foreach (JsonElement policy in policies.Values)
+        {
+            Assert.Equal(10, policy.GetProperty("PermitLimit").GetInt32());
+            Assert.Equal(
+                ["POST", "PUT", "PATCH", "DELETE"],
+                policy.GetProperty("Methods")
+                    .EnumerateArray()
+                    .Select(method => method.GetString()!)
+                    .ToArray());
+        }
+
+        Assert.Contains(
+            policies["authentication-write"].GetProperty("PathPrefixes").EnumerateArray(),
+            path => path.GetString() == "/api/auth/browser");
+        Assert.Contains(
+            policies["organization-join-write"].GetProperty("PathPrefixes").EnumerateArray(),
+            path => path.GetString() == "/api/organization-enrollment");
+    }
+
+    [Fact]
     public void Bearer_api_hosts_require_active_auth_session_admission()
     {
         string repositoryRoot = FindRepositoryRoot();

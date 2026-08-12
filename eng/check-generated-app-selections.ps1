@@ -185,6 +185,27 @@ foreach ($case in $cases) {
         }
     }
 
+    $parsedApiSettings = $apiSettings | ConvertFrom-Json
+    $rateLimitPolicies = @($parsedApiSettings.Http.RateLimiting.Policies)
+    $actualPolicyNames = @($rateLimitPolicies | ForEach-Object { $_.Name } | Sort-Object)
+    $expectedPolicyNames = @()
+    if ($case.Modules -contains 'auth') {
+        $expectedPolicyNames += 'authentication-write'
+    }
+    if ($case.Modules -contains 'organizations') {
+        $expectedPolicyNames += 'organization-join-write'
+    }
+    $expectedPolicyNames = @($expectedPolicyNames | Sort-Object)
+    if (($actualPolicyNames -join ',') -cne ($expectedPolicyNames -join ',')) {
+        throw "$($case.Name) generated incorrect method-aware rate-limit policies."
+    }
+    foreach ($policy in $rateLimitPolicies) {
+        $methods = @($policy.Methods)
+        if (($methods -join ',') -cne 'POST,PUT,PATCH,DELETE') {
+            throw "$($case.Name) generated an unsafe rate-limit method set for '$($policy.Name)'."
+        }
+    }
+
     if ($caseHosts -contains 'Worker') {
         $workerSettings = [System.IO.File]::ReadAllText(
             (Join-Path $outputPath "src\Hosts\$($case.Name).Host.Worker\appsettings.json"))
