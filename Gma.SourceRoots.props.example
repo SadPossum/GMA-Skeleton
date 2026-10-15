@@ -14,5 +14,7 @@
     <GmaModuleCatalogRoot>$(GmaRepositoryRoot)src\Modules\Catalog\</GmaModuleCatalogRoot>
     <GmaModuleOrderingRoot>$(GmaRepositoryRoot)src\Modules\Ordering\</GmaModuleOrderingRoot>
     <GmaModuleTaskSamplesRoot>$(GmaRepositoryRoot)src\Modules\TaskSamples\</GmaModuleTaskSamplesRoot>
+    <GmaSocialNetworkingEngineRoot>$(GmaRepositoryRoot)..\GMA-Social-Networking\src\</GmaSocialNetworkingEngineRoot>
+    <GmaSocialNetworkingModuleRoot>$(GmaRepositoryRoot)..\GMA-Module-Social-Networking\src\</GmaSocialNetworkingModuleRoot>
   </PropertyGroup>
 </Project>
