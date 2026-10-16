@@ -20,8 +20,6 @@
     <GmaModuleTaskRuntimeRoot Condition="'$(GmaModuleTaskRuntimeRoot)' == ''">$(GmaModulesRoot)TaskRuntime\</GmaModuleTaskRuntimeRoot>
     <GmaModuleTaskSamplesRoot Condition="'$(GmaModuleTaskSamplesRoot)' == ''">$(GmaModulesRoot)TaskSamples\</GmaModuleTaskSamplesRoot>
     <GmaModuleTenancyRoot Condition="'$(GmaModuleTenancyRoot)' == ''">$(GmaModulesRoot)Tenancy\</GmaModuleTenancyRoot>
-    <GmaSocialNetworkingEngineRoot Condition="'$(GmaSocialNetworkingEngineRoot)' == ''">$(GmaRepositoryRoot)..\GMA-Social-Networking\src\</GmaSocialNetworkingEngineRoot>
-    <GmaSocialNetworkingModuleRoot Condition="'$(GmaSocialNetworkingModuleRoot)' == ''">$(GmaRepositoryRoot)..\GMA-Module-Social-Networking\src\</GmaSocialNetworkingModuleRoot>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
