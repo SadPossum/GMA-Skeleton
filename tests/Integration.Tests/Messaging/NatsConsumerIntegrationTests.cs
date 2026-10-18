@@ -4,6 +4,7 @@ using Catalog.Contracts;
 using System.Collections.Concurrent;
 using DotNet.Testcontainers.Containers;
 using Integration.Tests.Support;
+using Gma.Framework.Application.Events.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -410,6 +411,7 @@ public sealed class NatsConsumerIntegrationTests
         builder.AddTenancyInfrastructure();
         builder.AddTenantScoping();
         builder.AddTenantAwareMessaging();
+        builder.AddApplicationEventsInfrastructure();
         builder.Services.AddOrderingApplication();
         builder.AddOrderingPersistence();
         builder.AddNatsJetStreamMessaging();

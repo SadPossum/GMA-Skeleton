@@ -3,6 +3,7 @@ namespace Integration.Tests;
 using System.Data;
 using Catalog.Contracts;
 using DotNet.Testcontainers.Containers;
+using Gma.Framework.Application.Events.Infrastructure;
 using Gma.Framework.Messaging;
 using Gma.Framework.Messaging.Infrastructure;
 using Gma.Framework.Runtime.Infrastructure;
@@ -176,6 +177,7 @@ public sealed class InboxStoreIntegrationTests
         builder.Configuration["Tenancy:Enabled"] = "false";
         builder.AddRuntimeInfrastructure();
         builder.AddScopingInfrastructure();
+        builder.AddApplicationEventsInfrastructure();
         builder.AddOrderingPersistence();
 
         return builder.Services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });

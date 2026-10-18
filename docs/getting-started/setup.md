@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - PowerShell 7 on Windows, Linux, or macOS.
-- .NET 10 SDK. The repo pins SDK `10.0.300` in `global.json`.
+- .NET 10 SDK. The repo pins SDK `10.0.303` in `global.json`.
 - Docker Desktop for SQL Server, PostgreSQL, NATS, Aspire resources, and Docker-backed integration tests.
 - An editor that understands `.slnx` files or plain C# projects.
 
