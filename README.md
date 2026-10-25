@@ -90,7 +90,7 @@ To generate a new production app shell that consumes selected GMA source reposit
 
 ## GitHub Actions
 
-The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull requests, and manual dispatch. It checks submodule pointers against each reusable repository's `dev` head, bootstraps source roots, restores, builds, checks provider migration drift, and runs fast tests through `eng/verify.ps1`.
+The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull requests, and manual dispatch. It checks submodule pointers against each reusable repository's `dev` head using the URLs committed in `.gitmodules`, bootstraps source roots, restores, builds, checks provider migration drift, and runs fast tests through `eng/verify.ps1`. Local submodule remote overrides do not change the declared source used for validation. Keep optional private extension checkouts local; the public skeleton must retain a public extension gitlink.
 
 The `Docker Tests` workflow runs for relevant pull-request/main changes, on a weekly schedule, and by manual dispatch. It runs Docker-backed integration tests with `GMA_REQUIRE_DOCKER_TESTS=true`.
 

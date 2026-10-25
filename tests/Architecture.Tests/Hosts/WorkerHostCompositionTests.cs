@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Gma.Framework.Messaging;
+using Gma.Framework.Cqrs.UnitOfWork;
 using Gma.Framework.ModuleComposition;
 using Gma.Framework.Tasks;
 using Gma.Modules.Auth.Domain.Services;
@@ -58,6 +59,27 @@ public sealed class WorkerHostCompositionTests
             descriptor.ImplementationFactory is not null);
         Assert.Contains(builder.Services, descriptor => descriptor.ServiceType == typeof(IRefreshTokenHashingService));
         Assert.Equal(AuthModuleNames, GetWorkerOptions(builder).GetComposedModuleNames());
+    }
+
+    [Fact]
+    public void Auth_worker_validates_without_interactive_browser_or_jwt_services()
+    {
+        HostApplicationBuilder builder = CreateBuilder();
+        builder.Configuration["Worker:Modules:Auth"] = "true";
+        builder.Configuration["Auth:RefreshTokens:Pepper"] = "test-refresh-token-pepper-000000000000000000000000";
+        builder.Configuration["ConnectionStrings:SqlServer"] = "Server=localhost;Database=gma;Trusted_Connection=True;TrustServerCertificate=True";
+        builder.AddWorkerHost();
+
+        using ServiceProvider provider = builder.Services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true
+        });
+        using IServiceScope scope = provider.CreateScope();
+
+        Assert.NotNull(scope.ServiceProvider.GetRequiredService<IUnitOfWork>());
+        Assert.Null(scope.ServiceProvider.GetService<IPasswordHashingService>());
+        Assert.Null(scope.ServiceProvider.GetService<ITokenService>());
     }
 
     [Fact]
