@@ -71,6 +71,12 @@ Docker-backed tests are skippable by default. To require them:
 .\eng\test-docker.ps1 -NoBuild
 ```
 
+The MinIO integration fixture builds upstream `RELEASE.2025-10-15T17-29-55Z`
+from its immutable source commit using a digest-pinned Go build image. The first
+Docker test run needs network access for that image and Go module downloads.
+Testcontainers removes the temporary fixture image and container after the test.
+This follows MinIO's [source-only distribution instructions](https://github.com/minio/minio/blob/9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a/README.md#source-only-distribution).
+
 Standalone source-repo entrypoints are available for focused framework/module work:
 
 ```powershell
@@ -90,7 +96,7 @@ To generate a new production app shell that consumes selected GMA source reposit
 
 ## GitHub Actions
 
-The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull requests, and manual dispatch. It checks submodule pointers against each reusable repository's `dev` head, bootstraps source roots, restores, builds, checks provider migration drift, and runs fast tests through `eng/verify.ps1`.
+The `Validate` workflow runs the normal non-Docker lane on `dev`, `main`, pull requests, and manual dispatch. It checks submodule pointers against each reusable repository's `dev` head using the URLs committed in `.gitmodules`, bootstraps source roots, restores, builds, checks provider migration drift, and runs fast tests through `eng/verify.ps1`. Local submodule remote overrides do not change the declared source used for validation. Keep optional private extension checkouts local; the public skeleton must retain a public extension gitlink.
 
 The `Docker Tests` workflow runs for relevant pull-request/main changes, on a weekly schedule, and by manual dispatch. It runs Docker-backed integration tests with `GMA_REQUIRE_DOCKER_TESTS=true`.
 
