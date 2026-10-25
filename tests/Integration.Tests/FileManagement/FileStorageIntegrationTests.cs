@@ -3,6 +3,7 @@ namespace Integration.Tests;
 using System.Text;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
+using DotNet.Testcontainers.Images;
 using Gma.Modules.Files.Api;
 using Gma.Modules.Files.Application.Commands;
 using Gma.Modules.Files.Application.Queries;
@@ -135,12 +136,21 @@ public sealed class FileStorageIntegrationTests
         const string secretKey = "minioadmin";
         string bucketName = $"gma-file-tests-{Guid.NewGuid():N}";
 
-        await using IContainer minio = new ContainerBuilder("quay.io/minio/minio:latest")
+        await using IFutureDockerImage image = new ImageFromDockerfileBuilder()
+            .WithDockerfileDirectory(Path.Combine(AppContext.BaseDirectory, "FileManagement", "Minio"))
+            .WithName($"gma-minio-integration:{Guid.NewGuid():N}")
+            .WithCleanUp(true)
+            .Build();
+        using CancellationTokenSource buildTimeout = new(TimeSpan.FromMinutes(12));
+        await image.CreateAsync(buildTimeout.Token).ConfigureAwait(false);
+
+        await using IContainer minio = new ContainerBuilder(image.FullName)
             .WithEnvironment("MINIO_ROOT_USER", accessKey)
             .WithEnvironment("MINIO_ROOT_PASSWORD", secretKey)
             .WithPortBinding(9000, assignRandomHostPort: true)
             .WithCommand("server", "/data", "--console-address", ":9001")
-            .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(9000))
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(request =>
+                request.ForPort(9000).ForPath("/minio/health/live")))
             .Build();
 
         await minio.StartAsync().ConfigureAwait(false);

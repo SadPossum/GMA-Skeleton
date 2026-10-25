@@ -71,6 +71,12 @@ Docker-backed tests are skippable by default. To require them:
 .\eng\test-docker.ps1 -NoBuild
 ```
 
+The MinIO integration fixture builds upstream `RELEASE.2025-10-15T17-29-55Z`
+from its immutable source commit using a digest-pinned Go build image. The first
+Docker test run needs network access for that image and Go module downloads.
+Testcontainers removes the temporary fixture image and container after the test.
+This follows MinIO's [source-only distribution instructions](https://github.com/minio/minio/blob/9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a/README.md#source-only-distribution).
+
 Standalone source-repo entrypoints are available for focused framework/module work:
 
 ```powershell
