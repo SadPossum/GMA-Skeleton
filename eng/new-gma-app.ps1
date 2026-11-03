@@ -820,7 +820,7 @@ function Write-GmaGeneratedSecurityBaseline {
         '          dotnet-version: 10.0.x',
         '',
         '      - name: Initialize CodeQL',
-        '        uses: github/codeql-action/init@1fc58d04a4d4374f921bdac573c3811c240f9c26 # v4.37.1',
+        '        uses: github/codeql-action/init@1fc58d04a4d4374f921bdac573c3811c240f9c26 # v4.39.2',
         '        with:',
         '          languages: csharp',
         '          build-mode: manual',
@@ -836,7 +836,7 @@ function Write-GmaGeneratedSecurityBaseline {
         "        run: dotnet build $ApplicationName.slnx --no-restore -m:1",
         '',
         '      - name: Analyze',
-        '        uses: github/codeql-action/analyze@1fc58d04a4d4374f921bdac573c3811c240f9c26 # v4.37.1',
+        '        uses: github/codeql-action/analyze@1fc58d04a4d4374f921bdac573c3811c240f9c26 # v4.39.2',
         '        with:',
         '          category: /language:csharp'
     )

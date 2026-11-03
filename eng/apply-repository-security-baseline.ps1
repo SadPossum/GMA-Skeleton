@@ -188,7 +188,7 @@ $workflowLines = @(
     '',
     '      - name: Publish code-scanning evidence',
     '        if: ${{ always() && (github.event_name != ''pull_request'' || github.event.pull_request.head.repo.full_name == github.repository) }}',
-    '        uses: github/codeql-action/upload-sarif@1fc58d04a4d4374f921bdac573c3811c240f9c26 # v4.37.1',
+    '        uses: github/codeql-action/upload-sarif@1fc58d04a4d4374f921bdac573c3811c240f9c26 # v4.39.2',
     '        with:',
     '          sarif_file: artifacts/security/trivy-results.sarif',
     '          category: trivy-owned-source',
