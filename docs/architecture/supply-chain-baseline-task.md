@@ -133,6 +133,10 @@ component and composed-product rollout remains in progress.
 ## Security Defaults
 
 - Third-party actions are pinned to immutable commits and annotated with a human-readable version.
+- Action maintenance updates the workflow, generator and matching policy expectations together. CodeQL initialization, analysis and SARIF upload use one reviewed revision.
+- Dependabot groups compatible Actions minor and patch version updates for one combined review and validation run. Major updates and security-update policy retain their existing review paths.
+- An immutable action pin does not establish that its bundled dependency inventory is free of advisories. Review the shipped code, relevant inputs and current advisory matches when updating the pin.
+- Release tag and source metadata enter PowerShell through environment values. Generated workflows preserve that boundary; release policy rejects executable metadata interpolation and the actual identity fragment is checked with a Git-valid command-substitution probe.
 - High and critical findings fail the workflow by default. An exception must be explicit, narrow, reviewed, and time bounded.
 - Unfixed findings are not silently ignored.
 - Evidence upload runs even when the blocking scan fails.

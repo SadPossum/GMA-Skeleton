@@ -11,6 +11,7 @@ $requiredFiles = @(
     '.github\actions\source-release-evidence\create-source-release-evidence.ps1',
     '.github\workflows\release-evidence.yml',
     '.gma\release-evidence.json',
+    'eng\test-release-workflow-identity.ps1',
     'eng\repository-release\check-repository-release.ps1',
     'SUPPORT.md'
 )
@@ -26,6 +27,9 @@ foreach ($relativePath in $requiredFiles) {
 & (Join-Path $root 'eng\repository-release\check-repository-release.ps1') `
     -RepositoryRoot $root `
     -LocalImplementation
+
+& (Join-Path $root 'eng\test-release-workflow-identity.ps1') `
+    -WorkflowPath (Join-Path $root '.github\workflows\release-evidence.yml')
 
 $action = [System.IO.File]::ReadAllText(
     (Join-Path $root '.github\actions\source-release-evidence\action.yml'))
@@ -417,11 +421,32 @@ if ($RequireRolloutTooling) {
             'eng\check-repository-release.ps1'
         & $generatedGuard -RepositoryRoot $rolloutRoot
 
+        & (Join-Path $root 'eng\test-release-workflow-identity.ps1') `
+            -WorkflowPath (Join-Path $rolloutRoot '.github\workflows\release-evidence.yml')
+
         $generatedWorkflowPath = Join-Path `
             $rolloutRoot `
             '.github\workflows\release-evidence.yml'
         $generatedWorkflow = [System.IO.File]::ReadAllText(
             $generatedWorkflowPath)
+        $unsafeWorkflow = $generatedWorkflow.Replace(
+            '"version=$env:RELEASE_REF_NAME"',
+            '"version=${{ github.ref_name }}"')
+        if ($unsafeWorkflow -ceq $generatedWorkflow) {
+            throw 'Release metadata regression fixture did not change the identity script.'
+        }
+        [System.IO.File]::WriteAllText(
+            $generatedWorkflowPath, $unsafeWorkflow, [System.Text.UTF8Encoding]::new($false))
+        $unsafeMetadataRejected = $false
+        try {
+            & $generatedGuard -RepositoryRoot $rolloutRoot
+        }
+        catch {
+            $unsafeMetadataRejected = $true
+        }
+        if (-not $unsafeMetadataRejected) {
+            throw 'Generated release guard did not reject executable tag interpolation.'
+        }
         [System.IO.File]::WriteAllText(
             $generatedWorkflowPath,
             $generatedWorkflow.Replace(
