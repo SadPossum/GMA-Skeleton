@@ -35,7 +35,7 @@ foreach ($relativePath in $requiredFiles) {
 $securityAction = [System.IO.File]::ReadAllText(
     (Join-Path $root '.github\actions\security-baseline\action.yml'))
 $requiredActionTokens = @(
-    'aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514',
+    'aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567',
     'version: v0.70.0',
     '--scanners vuln,secret,misconfig,license',
     '--severity "$SCAN_SEVERITY"',
@@ -423,8 +423,8 @@ $securityWorkflow = [System.IO.File]::ReadAllText(
 $requiredWorkflowTokens = @(
     'uses: ./.github/actions/security-baseline',
     'exception-file: .gma/security-exceptions.json',
-    'github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a',
-    'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a',
+    'github/codeql-action/upload-sarif@1fc58d04a4d4374f921bdac573c3811c240f9c26',
+    'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9',
     'security-events: write',
     'retention-days: 30'
 )
@@ -448,8 +448,8 @@ foreach ($ecosystem in @('github-actions', 'gitsubmodule', 'nuget')) {
 $codeQlWorkflow = [System.IO.File]::ReadAllText(
     (Join-Path $root '.github\workflows\codeql.yml'))
 foreach ($token in @(
-    'github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a',
-    'github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a',
+    'github/codeql-action/init@1fc58d04a4d4374f921bdac573c3811c240f9c26',
+    'github/codeql-action/analyze@1fc58d04a4d4374f921bdac573c3811c240f9c26',
     'build-mode: manual',
     'languages: csharp')) {
     if ($codeQlWorkflow.IndexOf($token, [System.StringComparison]::Ordinal) -lt 0) {

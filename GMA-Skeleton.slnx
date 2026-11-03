@@ -90,6 +90,7 @@
     <File Path="eng/sync-solution.ps1" />
     <File Path="eng/test-docker.ps1" />
     <File Path="eng/test-fast.ps1" />
+    <File Path="eng/test-release-workflow-identity.ps1" />
     <File Path="eng/verify.ps1" />
   </Folder>
   <Folder Name="/eng/repository-release/">

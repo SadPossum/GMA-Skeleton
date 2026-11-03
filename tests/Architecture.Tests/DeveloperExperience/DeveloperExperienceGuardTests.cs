@@ -1787,14 +1787,14 @@ public sealed partial class DeveloperExperienceGuardTests
             "eng\\gma-update.ps1",
             "eng\\gma-validate.ps1",
             "Write-GmaGeneratedWorkflow",
-            "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+            "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
             "actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1",
             "rev-parse --show-toplevel",
             "Git status: app repository not initialized"
         ];
         string[] requiredRootWorkflowTokens =
         [
-            "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+            "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
             "submodules: recursive",
             "secrets.GMA_CI_TOKEN",
             "actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1",
@@ -7258,7 +7258,8 @@ public sealed partial class DeveloperExperienceGuardTests
             "using Gma.Framework.Runtime;",
             "using Gma.Framework.Runtime.Time;",
             "IOptions<ApplicationIdentityOptions> applicationIdentity",
-            ": EfOutboxWriter<${Name}DbContext>(dbContext, clock, applicationIdentity, ${Name}Migrations.Schema);"
+            "IEnumerable<IIntegrationEventScopeResolver> scopeResolvers",
+            ": EfOutboxWriter<${Name}DbContext>(dbContext, clock, applicationIdentity, ${Name}Migrations.Schema, scopeResolvers);"
         ];
         string[] forbiddenTokens =
         [
@@ -7320,7 +7321,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "using $projectName.Contracts;",
             "public const string Schema = ${Name}ModuleMetadata.Schema;",
             ": EfDomainEventUnitOfWork<${Name}DbContext>(${Name}Migrations.Schema, dbContext, domainEventDispatcher)",
-            ": EfOutboxWriter<${Name}DbContext>(dbContext, clock, applicationIdentity, ${Name}Migrations.Schema);",
+            ": EfOutboxWriter<${Name}DbContext>(dbContext, clock, applicationIdentity, ${Name}Migrations.Schema, scopeResolvers);",
             ": EfOutboxStore<${Name}DbContext>(dbContext, options, ${Name}Migrations.Schema);",
             ": EfDomainEventInboxStore<${Name}DbContext>("
         ];
