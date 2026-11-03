@@ -3,8 +3,7 @@ param(
     [Parameter(Mandatory = $true)][string] $WorkflowPath
 )
 
-Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'common.ps1')
 
 $content = [IO.File]::ReadAllText($WorkflowPath)
 $steps = [regex]::Matches($content,
