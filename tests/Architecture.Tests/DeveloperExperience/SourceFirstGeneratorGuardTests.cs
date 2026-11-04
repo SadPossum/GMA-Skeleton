@@ -184,11 +184,11 @@ public sealed class SourceFirstGeneratorGuardTests
         string[] requiredTokens =
         [
             "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-            "actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1",
+            "actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73",
             "persist-credentials: false",
             ".github\\dependabot.yml",
             "RepositorySlug",
-            "32ec053c78a87f5b5941068eb449e7ae10f51f59",
+            "02210e3379976fd342251ffd6d967bbb541b7384",
             "4a1a6a857eff7524bc25821a89fe8b0260cb95a0",
             "apply-repository-security-baseline.ps1",
             "apply-repository-release-baseline.ps1",
