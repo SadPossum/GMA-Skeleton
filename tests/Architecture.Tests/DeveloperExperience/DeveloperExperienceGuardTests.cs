@@ -1788,7 +1788,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "eng\\gma-validate.ps1",
             "Write-GmaGeneratedWorkflow",
             "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-            "actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1",
+            "actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73",
             "rev-parse --show-toplevel",
             "Git status: app repository not initialized"
         ];
@@ -1797,7 +1797,7 @@ public sealed partial class DeveloperExperienceGuardTests
             "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
             "submodules: recursive",
             "secrets.GMA_CI_TOKEN",
-            "actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1",
+            "actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73",
             "dotnet-version: 10.0.x",
             "./eng/check-submodule-dev-heads.ps1",
             "./eng/gma-bootstrap.ps1 -SourceLayout GmaSubmodules -Force",

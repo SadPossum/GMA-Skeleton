@@ -24,7 +24,7 @@ param(
 
     [ValidatePattern('^[0-9a-f]{40}$')]
     [string] $SecurityBaselineCommit =
-        '32ec053c78a87f5b5941068eb449e7ae10f51f59',
+        '02210e3379976fd342251ffd6d967bbb541b7384',
 
     [ValidatePattern('^[0-9a-f]{40}$')]
     [string] $ReleaseEvidenceCommit =
@@ -628,7 +628,7 @@ function Write-GmaGeneratedWorkflow {
         '          persist-credentials: false',
         '',
         '      - name: Setup .NET',
-        '        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0',
+        '        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0',
         '        with:',
         '          dotnet-version: 10.0.x',
         '',
@@ -707,14 +707,14 @@ function Write-GmaGeneratedWorkflow {
             '          submodules: recursive',
             '          token: ${{ secrets.GMA_CI_TOKEN || github.token }}',
             '          persist-credentials: false',
-            '      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0',
+            '      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0',
             '        with:',
             '          dotnet-version: 10.0.x',
             '      - shell: pwsh',
             '        run: ./eng/gma-bootstrap.ps1 -Force',
-            '      - run: dotnet restore ' + $Name + '.slnx',
-            '      - run: dotnet build ' + $Name + '.slnx --no-restore -m:1',
-            '      - run: dotnet test ' + $Name + '.slnx --no-build --filter Category=Docker --logger ''console;verbosity=minimal'' -m:1 -nr:false'
+            "      - run: dotnet restore $Name.slnx",
+            "      - run: dotnet build $Name.slnx --no-restore -m:1",
+            "      - run: dotnet test $Name.slnx --no-build --filter Category=Docker --logger 'console;verbosity=minimal' -m:1 -nr:false"
         )
     }
 }
@@ -815,7 +815,7 @@ function Write-GmaGeneratedSecurityBaseline {
         '          persist-credentials: false',
         '',
         '      - name: Setup .NET',
-        '        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0',
+        '        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0',
         '        with:',
         '          dotnet-version: 10.0.x',
         '',
@@ -1559,7 +1559,8 @@ if ($includeRepositoryRelease) {
         -ArtifactName (ConvertTo-GmaKebabCase $Name) `
         -ReleaseKind composition `
         -ReleaseEvidenceCommit $ReleaseEvidenceCommit `
-        -IncludeGitSubmodules
+        -IncludeGitSubmodules `
+        -Force:$Force
 }
 
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'src\Hosts\README.md') @(

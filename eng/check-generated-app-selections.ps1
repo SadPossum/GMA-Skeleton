@@ -42,6 +42,7 @@ if (Test-Path -LiteralPath $resolvedMatrixRoot) {
 
 $cases = @(
     [pscustomobject] @{ Name = 'FrameworkOnly'; Modules = @(); Extensions = @() },
+    [pscustomobject] @{ Name = 'FrameworkDocker'; Modules = @(); Extensions = @(); DockerValidation = $true },
     [pscustomobject] @{ Name = 'AccessControlOnly'; Modules = @('access-control'); Extensions = @() },
     [pscustomobject] @{ Name = 'AuthOnly'; Modules = @('auth'); Extensions = @() },
     [pscustomobject] @{ Name = 'NotificationsOnly'; Modules = @('notifications'); Extensions = @() },
@@ -87,11 +88,27 @@ $extensionTokens = @{
 foreach ($case in $cases) {
     $outputPath = Join-Path $resolvedMatrixRoot $case.Name
     $caseHosts = if ($case.PSObject.Properties.Name -contains 'Hosts') { @($case.Hosts) } else { @('Api') }
+    $caseDockerValidation = $case.PSObject.Properties.Name -contains 'DockerValidation' -and $case.DockerValidation
     & (Join-Path $PSScriptRoot 'new-gma-app.ps1') `
         -Name $case.Name `
         -OutputPath $outputPath `
         -Modules $case.Modules `
-        -Hosts $caseHosts
+        -Hosts $caseHosts `
+        -DockerValidation:$caseDockerValidation
+
+    if ($caseDockerValidation) {
+        $dockerWorkflowLines = [System.IO.File]::ReadAllLines(
+            (Join-Path $outputPath '.github\workflows\docker-tests.yml'))
+        foreach ($expectedCommand in @(
+            "      - run: dotnet restore $($case.Name).slnx",
+            "      - run: dotnet build $($case.Name).slnx --no-restore -m:1",
+            "      - run: dotnet test $($case.Name).slnx --no-build --filter Category=Docker --logger 'console;verbosity=minimal' -m:1 -nr:false"
+        )) {
+            if (@($dockerWorkflowLines | Where-Object { $_ -ceq $expectedCommand }).Count -ne 1) {
+                throw "$($case.Name) must render each Docker command on one workflow line: $expectedCommand"
+            }
+        }
+    }
 
     & (Join-Path $outputPath 'eng\check-repository-security.ps1')
     foreach ($unexpectedReleasePath in @(
@@ -292,6 +309,13 @@ $releaseRepository = 'SadPossum/Generated-Release-Ready'
     -Name $releaseCaseName `
     -OutputPath $releaseCaseRoot `
     -RepositorySlug $releaseRepository
+
+# A release-enabled shell must support an explicitly requested refresh.
+& (Join-Path $PSScriptRoot 'new-gma-app.ps1') `
+    -Name $releaseCaseName `
+    -OutputPath $releaseCaseRoot `
+    -RepositorySlug $releaseRepository `
+    -Force
 
 & git -C $releaseCaseRoot init -b dev | Out-Null
 if ($LASTEXITCODE -ne 0) {
