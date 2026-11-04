@@ -43,6 +43,13 @@ if (Test-Path -LiteralPath $resolvedMatrixRoot) {
 $cases = @(
     [pscustomobject] @{ Name = 'FrameworkOnly'; Modules = @(); Extensions = @() },
     [pscustomobject] @{ Name = 'FrameworkDocker'; Modules = @(); Extensions = @(); DockerValidation = $true },
+    [pscustomobject] @{
+        Name = 'FrameworkAspire'
+        Modules = @()
+        Hosts = @('Api', 'Aspire')
+        ServiceDefaults = $true
+        Extensions = @()
+    },
     [pscustomobject] @{ Name = 'AccessControlOnly'; Modules = @('access-control'); Extensions = @() },
     [pscustomobject] @{ Name = 'AuthOnly'; Modules = @('auth'); Extensions = @() },
     [pscustomobject] @{ Name = 'NotificationsOnly'; Modules = @('notifications'); Extensions = @() },
@@ -85,16 +92,37 @@ $extensionTokens = @{
     'Organizations.Tenancy' = @('Gma.Extensions.Organizations.Tenancy', 'AddOrganizationsTenancyExtension')
 }
 
+$expectedSdk = [System.IO.File]::ReadAllText((Join-GmaPath 'global.json')) | ConvertFrom-Json
+$expectedTools = [System.IO.File]::ReadAllText((Join-GmaPath '.config\dotnet-tools.json')) | ConvertFrom-Json
+[xml] $expectedAppHost = [System.IO.File]::ReadAllText((Join-GmaPath 'src\Hosts\AppHost\AppHost.csproj'))
+
 foreach ($case in $cases) {
     $outputPath = Join-Path $resolvedMatrixRoot $case.Name
     $caseHosts = if ($case.PSObject.Properties.Name -contains 'Hosts') { @($case.Hosts) } else { @('Api') }
     $caseDockerValidation = $case.PSObject.Properties.Name -contains 'DockerValidation' -and $case.DockerValidation
+    $caseServiceDefaults = $case.PSObject.Properties.Name -contains 'ServiceDefaults' -and $case.ServiceDefaults
     & (Join-Path $PSScriptRoot 'new-gma-app.ps1') `
         -Name $case.Name `
         -OutputPath $outputPath `
         -Modules $case.Modules `
         -Hosts $caseHosts `
-        -DockerValidation:$caseDockerValidation
+        -DockerValidation:$caseDockerValidation `
+        -ServiceDefaults:$caseServiceDefaults
+
+    $actualSdk = [System.IO.File]::ReadAllText((Join-Path $outputPath 'global.json')) | ConvertFrom-Json
+    $actualTools = [System.IO.File]::ReadAllText((Join-Path $outputPath '.config\dotnet-tools.json')) | ConvertFrom-Json
+    if ($actualSdk.sdk.version -cne $expectedSdk.sdk.version -or
+        $actualSdk.sdk.rollForward -cne $expectedSdk.sdk.rollForward -or
+        $actualTools.tools.'dotnet-ef'.version -cne $expectedTools.tools.'dotnet-ef'.version) {
+        throw "$($case.Name) generated stale SDK or EF tool declarations."
+    }
+    if ($caseHosts -contains 'Aspire') {
+        [xml] $actualAppHost = [System.IO.File]::ReadAllText(
+            (Join-Path $outputPath "src\Hosts\$($case.Name).AppHost\$($case.Name).AppHost.csproj"))
+        if ($actualAppHost.Project.Sdk -cne $expectedAppHost.Project.Sdk) {
+            throw "$($case.Name) generated an Aspire SDK that differs from the template host."
+        }
+    }
 
     if ($caseDockerValidation) {
         $dockerWorkflowLines = [System.IO.File]::ReadAllLines(
@@ -373,39 +401,40 @@ if (-not $identityDowngradeRejected) {
     throw 'Generated app allowed a release identity to be removed in place.'
 }
 
-$buildCaseName = 'AllAdmin'
-$buildCaseRoot = Join-Path $resolvedMatrixRoot $buildCaseName
-$sourceRootContent = [System.IO.File]::ReadAllText(
-    (Join-Path $buildCaseRoot 'Gma.SourceRoots.props.example'))
-$directorySeparator = [string][System.IO.Path]::DirectorySeparatorChar
-$resolvedFrameworkSourceRoot = Resolve-SelectionSourceRoot `
-    -ConfiguredPath $FrameworkSourceRoot `
-    -DefaultPath 'gma\framework\src'
-$resolvedExtensionsSourceRoot = Resolve-SelectionSourceRoot `
-    -ConfiguredPath $ExtensionsSourceRoot `
-    -DefaultPath 'gma\extensions\src'
-$resolvedModulesSourceRoot = Resolve-SelectionSourceRoot `
-    -ConfiguredPath $ModulesSourceRoot `
-    -DefaultPath 'gma\modules'
-$sourceRootContent = $sourceRootContent.Replace(
-    '$(MSBuildThisFileDirectory)gma\framework\src\',
-    $resolvedFrameworkSourceRoot)
-$sourceRootContent = $sourceRootContent.Replace(
-    '$(MSBuildThisFileDirectory)gma\extensions\src\',
-    $resolvedExtensionsSourceRoot)
-$sourceRootContent = $sourceRootContent.Replace(
-    '$(MSBuildThisFileDirectory)gma\modules\',
-    $resolvedModulesSourceRoot)
-$sourceRootContent = $sourceRootContent.Replace('\', $directorySeparator)
-[System.IO.File]::WriteAllText(
-    (Join-Path $buildCaseRoot 'Gma.SourceRoots.props'),
-    $sourceRootContent,
-    [System.Text.UTF8Encoding]::new($false))
+foreach ($buildCaseName in @('AllAdmin', 'FrameworkAspire')) {
+    $buildCaseRoot = Join-Path $resolvedMatrixRoot $buildCaseName
+    $sourceRootContent = [System.IO.File]::ReadAllText(
+        (Join-Path $buildCaseRoot 'Gma.SourceRoots.props.example'))
+    $directorySeparator = [string][System.IO.Path]::DirectorySeparatorChar
+    $resolvedFrameworkSourceRoot = Resolve-SelectionSourceRoot `
+        -ConfiguredPath $FrameworkSourceRoot `
+        -DefaultPath 'gma\framework\src'
+    $resolvedExtensionsSourceRoot = Resolve-SelectionSourceRoot `
+        -ConfiguredPath $ExtensionsSourceRoot `
+        -DefaultPath 'gma\extensions\src'
+    $resolvedModulesSourceRoot = Resolve-SelectionSourceRoot `
+        -ConfiguredPath $ModulesSourceRoot `
+        -DefaultPath 'gma\modules'
+    $sourceRootContent = $sourceRootContent.Replace(
+        '$(MSBuildThisFileDirectory)gma\framework\src\',
+        $resolvedFrameworkSourceRoot)
+    $sourceRootContent = $sourceRootContent.Replace(
+        '$(MSBuildThisFileDirectory)gma\extensions\src\',
+        $resolvedExtensionsSourceRoot)
+    $sourceRootContent = $sourceRootContent.Replace(
+        '$(MSBuildThisFileDirectory)gma\modules\',
+        $resolvedModulesSourceRoot)
+    $sourceRootContent = $sourceRootContent.Replace('\', $directorySeparator)
+    [System.IO.File]::WriteAllText(
+        (Join-Path $buildCaseRoot 'Gma.SourceRoots.props'),
+        $sourceRootContent,
+        [System.Text.UTF8Encoding]::new($false))
 
-& dotnet restore (Join-Path $buildCaseRoot "$buildCaseName.slnx")
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-& dotnet build (Join-Path $buildCaseRoot "$buildCaseName.slnx") --no-restore -m:1
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    & dotnet restore (Join-Path $buildCaseRoot "$buildCaseName.slnx")
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    & dotnet build (Join-Path $buildCaseRoot "$buildCaseName.slnx") --no-restore -m:1
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
 
 $invalidAdminOutput = Join-Path $resolvedMatrixRoot 'InvalidAdminSelection'
 try {
@@ -422,4 +451,4 @@ catch {
     }
 }
 
-Write-Host 'Generated app selection matrix passed for public, admin, extension, and release-ready composition.'
+Write-Host 'Generated app selection matrix passed for public, admin, Aspire, extension, and release-ready composition.'
