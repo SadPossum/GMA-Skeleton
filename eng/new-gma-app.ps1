@@ -1134,7 +1134,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath '.gitignore') @(
 Write-GmaTemplateFile (Join-Path $resolvedOutputPath 'global.json') @(
     '{',
     '  "sdk": {',
-    '    "version": "10.0.300",',
+    '    "version": "10.0.403",',
     '    "rollForward": "latestFeature"',
     '  }',
     '}'
@@ -1146,7 +1146,7 @@ Write-GmaTemplateFile (Join-Path $resolvedOutputPath '.config\dotnet-tools.json'
     '  "isRoot": true,',
     '  "tools": {',
     '    "dotnet-ef": {',
-    '      "version": "10.0.8",',
+    '      "version": "10.0.14",',
     '      "commands": [ "dotnet-ef" ]',
     '    }',
     '  }',
@@ -2485,7 +2485,7 @@ if ($hasWorkerHost) {
 
 if ($hasAspireHost) {
     $aspireProjectLines = @(
-        '<Project Sdk="Aspire.AppHost.Sdk/13.4.2">',
+        '<Project Sdk="Aspire.AppHost.Sdk/13.6.4">',
         '  <PropertyGroup>',
         '    <OutputType>Exe</OutputType>',
         '    <IsAspireHost>true</IsAspireHost>',

@@ -64,7 +64,7 @@ public sealed class SourceFirstGeneratorGuardTests
             "'Aspire'",
             "[switch] $ServiceDefaults",
             "[switch] $DockerValidation",
-            "Aspire.AppHost.Sdk/13.4.2",
+            "Aspire.AppHost.Sdk/13.6.4",
             "Gma.Framework.Observability.Infrastructure.csproj",
             "builder.AddSecuritySignalObservability();",
         ];

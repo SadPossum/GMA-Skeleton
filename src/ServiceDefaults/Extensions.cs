@@ -50,6 +50,11 @@ public static class Extensions
             ServiceDescriptor.Singleton<IValidateOptions<ObservabilityOptions>, ObservabilityOptionsValidator>());
         builder.Services.AddHealthChecks();
 
+        if (observability.Otlp.Enabled)
+        {
+            ConfigureOtlpHttpClients(builder.Services);
+        }
+
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName))
             .WithMetrics(metrics =>
@@ -117,6 +122,26 @@ public static class Extensions
         }
 
         return endpoints;
+    }
+
+    private static void ConfigureOtlpHttpClients(IServiceCollection services)
+    {
+        // Exporters use these named factory clients when available, bypassing
+        // the SDK-created client's nonredirecting default transport.
+        foreach (string name in new[] { "OtlpTraceExporter", "OtlpMetricExporter", "OtlpLogExporter" })
+        {
+            services.AddHttpClient(name).ConfigurePrimaryHttpMessageHandler(static (handler, _) =>
+            {
+                if (handler is HttpClientHandler clientHandler)
+                {
+                    clientHandler.AllowAutoRedirect = false;
+                }
+                else if (handler is SocketsHttpHandler socketsHandler)
+                {
+                    socketsHandler.AllowAutoRedirect = false;
+                }
+            });
+        }
     }
 
     private static void ConfigureOtlpExporter(OtlpExporterOptions exporter, OtlpOptions options)
