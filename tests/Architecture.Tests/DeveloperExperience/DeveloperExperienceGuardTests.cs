@@ -5199,7 +5199,8 @@ public sealed partial class DeveloperExperienceGuardTests
                     "Microsoft.Extensions.Caching.StackExchangeRedis",
                     "Microsoft.Extensions.Configuration.Binder",
                     "Microsoft.Extensions.Hosting",
-                    "Microsoft.Extensions.Options.ConfigurationExtensions"
+                    "Microsoft.Extensions.Options.ConfigurationExtensions",
+                    "StackExchange.Redis"
                 ],
                 [],
                 [
